@@ -8,82 +8,53 @@ use App\Models\People;
 use App\Models\Vehicle;
 use App\Models\Employee;
 use App\Models\OverBurden;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\OverBurdenNote;
+use App\Models\EmployeeContract;
 use Yajra\Datatables\Datatables;
 use App\Models\OverBurdenOperator;
 use Illuminate\Support\Facades\DB;
 
 class OverBurdenController extends Controller
 {
+    public static function getOverBurden(){
+        $checkerId = session('dataUser')->employee_contract_uuid;
+        $over_burdens = DB::table('over_burdens')
+        ->where('checker_employee_uuid', $checkerId)
+        ->latest()
+        ->get();
+
+        return $over_burdens;
+    }
+
     public function create(){
-        $dateToday = Carbon::today('Asia/Jakarta')->isoFormat('Y-M-D');
+        $dateToday = Carbon::today('Asia/Jakarta')->isoFormat('D-M-Y');
         $timeNow = Carbon::now('Asia/Jakarta')->isoFormat('h');
 
-        $checkerId = session('dataUser')->employee_id;
-        $data = array();
+        $checkerId = session('dataUser')->employee_contract_uuid;
 
-        $isSetup = DB::table('over_burdens')
+        $shift = DB::table('shifts')
+        ->where('shifts.checker_uuid', $checkerId)
         ->latest()
-        ->where('checker_employee_id', $checkerId)
-        ->get()
+        ->get(['shifts.foreman_uuid'])
         ->first();
+        
 
-
-        if($isSetup){
-            $supervisorId = $isSetup->supervisor_employee_id;
-            $foremanId = $isSetup->foreman_employee_id;
-            $distance = $isSetup->distance;
-            $material = $isSetup->material;
-            $id = $isSetup->id;
-            $note = $isSetup->note;
-            $shifts = $isSetup->shift;
-            $date_start = explode("-", $isSetup->date);
-            $dateToday = $date_start[2].'-'.$date_start[1].'-'.$date_start[0];
-            $distance = 0;
-            $material = '';
-            $id= null;
-            $note = null;
-        }else{
-              //disini ada bug checker terakhir dimasukan atau di setu[ tidak peduli tanggal]
-            $supervisorId = 4;
-            $shift = DB::table('shifts')
-            ->where('shifts.checker_id', $checkerId)
-            ->latest()
-            ->get(['shifts.foreman_id'])
-            ->first();
-            $distance = 0;
-            $material = '';
-            $id= null;
-            $note = null;
-            $date_start = explode("-", $dateToday);
-            
-            
-            $dateToday = $date_start[2].'-'.$date_start[1].'-'.$date_start[0];
-            $shifts =($timeNow > 16)?'Malam': 'Siang';
-            $foremanId = $shift->foreman_id;
-        }
-
-          
+        $id= null;
+        $note = null;
+        $foremanId =  $shift->foreman_uuid;
+        $supervisorId = "Employee-8ed88a5d-157d-4f73-b3f0-46e0fbd7cc71";
+        $distance = null;
+        $material = null;
+        $id_note = null;
+        $shifts =($timeNow > 16)?'Malam': 'Siang';
         
         // all need this
-        $employees = Employee::join('people', 'people.id', '=', 'employees.people_id')
-        ->join('positions', 'positions.id', '=', 'employees.position_id')
-        ->join('employee_contracts', 'employee_contracts.employee_id', '=', 'employees.id')
-        ->get([
-            'people.name',
-            'employees.id as  employee_id',
-            'employees.NIK_employee',
-            'positions.position',
-            'employee_contracts.*'
-        ]);
+        $employees = EmployeeContract::getEmployee();
+        $vehicles =  Vehicle::getAll();
 
-        $vehicles =  Vehicle::join('vehicle_groups', 'vehicle_groups.id', '=', 'vehicles.vehicle_group_id')
-        ->join('unit_groups', 'vehicle_groups.unit_group_id', '=', 'unit_groups.id')
-        ->get(['vehicle_groups.vehicle_group','vehicle_groups.vehicle_code', 'vehicles.*', 'unit_groups.unit_group']);
-    
-
-        $pits = DB::table('pits')
-        ->get();
+        $pits = DB::table('pits')->get();
 
 
         $layout = [
@@ -101,6 +72,7 @@ class OverBurdenController extends Controller
             'title'         => 'Over Burden',
             'id'            => $id,
             'note'  => $note,
+            'id_note'  => $id_note,
             'checker'   => $checkerId,
             'foreman'   => $foremanId,
             'supervisor'    => $supervisorId,
@@ -118,37 +90,33 @@ class OverBurdenController extends Controller
     }
 
     public function show($idOB){
- 
-        $isSetup = DB::table('over_burdens')
-        ->where('id', $idOB)
+        $overBurden = DB::table('over_burdens')
+        ->join('over_burden_notes', 'over_burden_notes.over_burden_uuid', '=', 'over_burdens.uuid')
+        ->where('over_burdens.id', $idOB)
+        ->get([
+            'over_burdens.*',
+            'over_burden_notes.id as id_note',
+            'over_burden_notes.note'
+        ])
         ->first();
-        // dd($isSetup);
-        $date_start = explode("-", $isSetup->date);
+        
+        $date_start = explode("-", $overBurden->date);
         $dateToday = $date_start[2].'-'.$date_start[1].'-'.$date_start[0];
 
-        $supervisorId = $isSetup->supervisor_employee_id;
-        $foremanId = $isSetup->foreman_employee_id;
-        $distance = $isSetup->distance;
-        $material = $isSetup->material;
-        $id = $isSetup->id;
-        $note = $isSetup->note;
-        $shifts = $isSetup->shift;
-        $supervisorId  = $isSetup->supervisor_employee_id;
-        $checkerId = $isSetup->checker_employee_id;
-        $foremanId = $isSetup->foreman_employee_id;
+        $supervisorId = $overBurden->supervisor_employee_uuid;
+        $foremanId = $overBurden->foreman_employee_uuid;
+        $distance = $overBurden->distance;
+        $material = $overBurden->material;
+        $id = $overBurden->id;
+        $note = $overBurden->note;
+        $shifts = $overBurden->shift;
+        $supervisorId  = $overBurden->supervisor_employee_uuid;
+        $checkerId = $overBurden->checker_employee_uuid;
+        $foremanId = $overBurden->foreman_employee_uuid;
+        $id_note = $overBurden->id_note;
        
         // all need this
-        $employees = Employee::join('people', 'people.id', '=', 'employees.people_id')
-        ->join('positions', 'positions.id', '=', 'employees.position_id')
-        ->join('employee_contracts', 'employee_contracts.employee_id', '=', 'employees.id')
-        ->get([
-            'people.name',
-            'employees.id as  employee_id',
-            'employees.NIK_employee',
-            'positions.position',
-            'employee_contracts.*'
-        ]);
-
+        $employees = EmployeeContract::getEmployee();
   
         $pits = DB::table('pits')
         ->get();
@@ -168,6 +136,7 @@ class OverBurdenController extends Controller
         $data =  [
             'title'         => 'Over Burden',
             'id'            => $id,
+            'ob_id'            => $id,
             'note'  => $note,
             'checker'   => $checkerId,
             'foreman'   => $foremanId,
@@ -177,6 +146,7 @@ class OverBurdenController extends Controller
             'distance'      =>$distance,
             'material'      => $material,
             'employees'     => $employees,
+            'id_note'     => $id_note,
             'shifts'    => $shifts,
             'layout'        => $layout
         ];
@@ -184,20 +154,11 @@ class OverBurdenController extends Controller
         return view('ob.create', $data);
     }
     
-
     public function index()
     {
-        $checkerId = session('dataUser')->employee_id;
-        
-        $over_burdens = DB::table('over_burdens')
-        ->where('checker_employee_id', $checkerId)
-        ->latest()
-        ->get();
-
         $supervisorId = 4;
    
         $dateToday = Carbon::today('Asia/Jakarta')->isoFormat('D-M-Y');
-        $date_now = Carbon::today('Asia/Jakarta')->isoFormat('D-M-Y');
         
         $layout = [
             'head_core'            => true,
@@ -211,11 +172,110 @@ class OverBurdenController extends Controller
         $data =  [
             'title'         => 'Over Burden',
             'layout'       => $layout,
-            'over_burden'     => $over_burdens,
             'today'     => $dateToday
         ];
         return view('ob.index', $data);
     }
+
+    public function store(Request $request){
+        // dd($request);
+        $validatedDataOB = $request->validate([
+            'foreman_employee_uuid'      => 'required',
+            'checker_employee_uuid'      => 'required',
+            'supervisor_employee_uuid'      => 'required',
+            'pit_uuid'      => 'required',
+            'distance'      => 'required',
+            'date'          =>'required',
+            'material'      => 'required',
+            'shift' => 'required',
+        ]);
+
+
+        $validatedDataNote = $request->validate([
+            'id_note'   => '',
+            'note'          => ''
+        ]);
+
+
+        $date_start = explode("-", $validatedDataOB['date']);
+        $date = $date_start[2].'-'.$date_start[1].'-'.$date_start[0];
+
+        $validatedDataOB['date'] = $date;
+        $validatedDataOB['uuid'] = 'over-burden-'.Str::uuid();
+
+        $storeOB = OverBurden::updateOrCreate(['id'=> $request->id],$validatedDataOB);
+        $validatedDataNote['uuid'] = 'over-burden-note-'.Str::uuid();
+        $validatedDataNote['over_burden_uuid'] = $storeOB->uuid;
+        $storeNote = OverBurdenNote::updateOrCreate(['id'=> $request->id_note],$validatedDataNote);
+        return $storeNote;
+        $layout = [
+            'head_core'            => true,
+            'javascript_core'       => true,
+            'head_datatable'        => false,
+            'javascript_datatable'  => false,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'        => 'listEmployee'
+        ];
+
+        $with = [
+            'success' => 'Setup done'
+        ];
+        return redirect('/admin-ob/'.$created->id.'/show')->with($with);
+        // return $validatedData;
+
+    }
+
+    public function dataOverBurden()
+    {
+       
+        $over_burdens = OverBurdenController::getOverBurden();
+       
+
+        return Datatables::of($over_burdens)
+        
+        
+        ->addColumn('action', function ($model) {
+            $isToday = '';
+
+            $date_now = Carbon::today('Asia/Jakarta')->format('Y-m-d');
+            if($date_now == $model->date){
+                 $isToday = 'today';
+            }
+            return ' <a class="text-decoration-none" href="/admin-ob/' . $model->id . '/show">
+                <button class="btn btn-secondary py-1 px-2 mr-1">
+                    <i class="icon-copy bi bi-eye-fill"></i>
+                   </button>
+            </a>'.$isToday;
+        })
+        ->make(true);
+            
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function setup()
     {
         $id_employee = session('dataUser')->employee_id;
@@ -331,26 +391,6 @@ class OverBurdenController extends Controller
             
     }
 
-    public function dataOverBurden()
-    {
-        $checkerId = session('dataUser')->employee_id;
-        
-        $over_burdens = DB::table('over_burdens')
-        ->where('checker_employee_id', $checkerId)
-        ->latest()
-        ->get();
-
-        return Datatables::of($over_burdens)
-        ->addColumn('action', function ($model) {
-            return ' <a class="text-decoration-none" href="/admin-ob/' . $model->id . '/show">
-                <button class="btn btn-secondary py-1 px-2 mr-1">
-                    <i class="icon-copy bi bi-eye-fill"></i>
-                   </button>
-            </a>';
-        })
-        ->make(true);
-            
-    }
 
     public function dataOverBurdenForeman($checkerId)
     {
@@ -406,42 +446,7 @@ class OverBurdenController extends Controller
         return redirect('/ob/setup')->with($with);
     }
 
-    public function store(Request $request){
-        
-        $validatedData = $request->validate([
-            'foreman_employee_id'      => 'required',
-            'checker_employee_id'      => 'required',
-            'supervisor_employee_id'      => 'required',
-            'pit_id'      => 'required',
-            'distance'      => 'required',
-            'date'          =>'required',
-            'material'      => 'required',
-            'shift' => 'required',
-            'note'          => ''
-        ]);
-        $date_start = explode("-", $validatedData['date']);
-        
-        $date = $date_start[2].'-'.$date_start[1].'-'.$date_start[0];
-        // dd($date);
-        $validatedData['date'] = $date;
-        $created = OverBurden::updateOrCreate(['id'=> $request->id],$validatedData);
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => false,
-            'javascript_datatable'  => false,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'        => 'listEmployee'
-        ];
-
-        $with = [
-            'success' => 'Setup done'
-        ];
-        return redirect('/admin-ob/'.$created->id.'/show')->with($with);
-        // return $validatedData;
-
-    }
+ 
 
     public function forForemanOB(Request $request){
         $shift = Shift::where('id', $request->id)->get()->first();

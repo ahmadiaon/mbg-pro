@@ -20,7 +20,7 @@ class isSuperAdmin
             return redirect()->intended('/login');
         }
         
-        if( session('dataUser.group') != 'superadmin'){
+        if( session('dataUser.role') != 'superadmin'){
             return redirect()->intended('/login');
         }
         return $next($request);

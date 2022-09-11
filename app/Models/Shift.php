@@ -9,4 +9,8 @@ class Shift extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+    public static function getShift(){
+        return Shift::all();
+    }
 }

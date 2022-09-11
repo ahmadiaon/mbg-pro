@@ -9,6 +9,8 @@
                 <form action="/foreman/manage-member" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="shift_id" id="" value="{{ $checker->id }}">
+
+                    <input type="hidden" name="shift_uuid" id="" value="{{ $checker->uuid }}">
                     <input type="hidden" name="NIK_employee_checker" id="" value="{{ $checker->NIK_employee }}">
                     <label for="">Checker : </label>
                     <h5>
@@ -17,13 +19,14 @@
                         <label>Choose Operator/Driver</label>
                         <div class="row">
                             <div class="col-11">
-                                <select name="employee_id" class="form-control selecOperator" id="employee_id">
+                                <select name="contract_employee_uuid" class="form-control selecOperator"
+                                    id="contract_employee_uuid">
                                     @foreach($employees as $employee)
-                                    @if(old('employee_id' ) == $employee->id)
-                                    <option value="{{ $employee->id }}" selected>{{ $employee->name }}
+                                    @if(old('contract_employee_uuid' ) == $employee->uuid)
+                                    <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                     </option>
                                     @else
-                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                    <option value="{{ $employee->uuid }}">{{ $employee->name }}</option>
                                     @endif
                                     @endforeach
                                 </select>
@@ -80,8 +83,8 @@
                                     <td>{{ $checker->position }}</td>
                                     <td>
                                         <div class="table-actions">
-                                            {{-- <a href="/foreman/manage-unit/{{ $checker->id }}" data-color="#265ed7"
-                                                style="color: rgb(187, 210, 36);">
+                                            {{-- <a href="/foreman/manage-unit/{{ $checker->uuid }}"
+                                                data-color="#265ed7" style="color: rgb(187, 210, 36);">
                                                 <i class="icon-copy fi-list"></i>
                                             </a> --}}
                                             <a href="/foreman/manage-member-list/delete/{{ $checker->NIK_employee }}"

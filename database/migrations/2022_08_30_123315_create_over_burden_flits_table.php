@@ -15,11 +15,11 @@ class CreateOverBurdenFlitsTable extends Migration
     {
         Schema::create('over_burden_flits', function (Blueprint $table) {
             $table->id();
-
+            $table->string('uuid')->nullable();
             //foreign key
-            $table->integer('over_burden_id')->nullable();
-            $table->integer('excavator_employee_id')->nullable();
-            $table->integer('excavator_vehicle_id')->nullable();
+            $table->string('over_burden_uuid')->nullable();
+            $table->string('contract_employee_uuid')->nullable();
+            $table->string('excavator_vehicle_uuid')->nullable();
             $table->integer('capacity')->nullable();
             $table->timestamps();
         });

@@ -45,8 +45,12 @@
                                                         @csrf
                                                         <input type="hidden" name="id"
                                                             value="{{ ($absen->id )?$absen->id:'' }}">
-                                                        <input type="hidden" name="employee_id"
-                                                            value="{{ $absen->employee_id }}">
+                                                        <input type="hidden" name="month"
+                                                            value="{{ ($month)?$month:'' }}">
+                                                        <input type="hidden" name="NIK_employee"
+                                                            value="{{ ($NIK_employee)?$NIK_employee:'' }}">
+                                                        <input type="hidden" name="machine_id"
+                                                            value="{{ $absen->machine_id }}">
                                                         <input type="hidden" name="date_year"
                                                             value="{{ $absen->date_year }}">
                                                         <input type="hidden" name="date_month"

@@ -101,15 +101,15 @@
         <div class="sidebar-menu">
             <ul id="accordion-menu">
                 <li class="dropdown">
-                    <a href="javascript:;" class="dropdown-toggle">
+                    <a href="javascript:;"
+                        class="dropdown-toggle {{ ($layout['active'] == 'foreman-index')? 'active' : '' }}">
                         <span class="micon bi bi-house"></span><span class="mtext">Foreman Menu</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        <li><a href="/foreman/manage-checker">Manage Checker</a></li>
-                        <li><a href="/foreman/manage-employee">Manage Employee</a></li>
-                        <li><a href="/foreman">Tentang TPAKD</a></li>
-                        <li><a href="/foreman">Berita</a></li>
-                        <li><a href="/foreman">Berita</a></li>
+                        <li><a class=" {{ ($layout['active'] == 'manage-shift')? 'active' : '' }}"
+                                href="/foreman/manage-checker">Manage Shift</a></li>
+                        <li><a class=" {{ ($layout['active'] == 'over-burden')? 'active' : '' }}"
+                                href="/foreman/manage-employee">Over Burden</a></li>
                     </ul>
                 </li>
 

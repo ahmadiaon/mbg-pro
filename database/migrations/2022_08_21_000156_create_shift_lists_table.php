@@ -15,8 +15,10 @@ class CreateShiftListsTable extends Migration
     {
         Schema::create('shift_lists', function (Blueprint $table) {
             $table->id();
-            $table->integer('shift_id')->nullable();
-            $table->integer('employee_id')->nullable();
+            $table->string('uuid')->nullable();
+
+            $table->string('shift_uuid')->nullable();
+            $table->string('contract_employee_uuid')->nullable();
             $table->timestamps();
         });
     }

@@ -100,28 +100,27 @@
     <div class="menu-block customscroll">
         <div class="sidebar-menu">
             <ul id="accordion-menu">
-                <li>
-                    <a href="/admin-hr/employees"
-                        class="dropdown-toggle no-arrow {{ ($layout['active'] == 'listEmployee')? 'active' : '' }}">
-                        <span class="micon bi bi-calendar4-week"></span><span class="mtext">List Employees</span>
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <span class="micon bi bi-house"></span><span class="mtext">Employee</span>
                     </a>
-                </li>
-                <li>
-                    <a href="/admin-hr/user" class="dropdown-toggle no-arrow">
-                        <span class="micon bi bi-calendar4-week"></span><span class="mtext">Admin Bank</span>
-                    </a>
+                    <ul class="submenu " style="display:block">
+                        {{-- <li><a class="{{ ($layout['active'] == 'admin-hr-employees')? 'active' : '' }}"
+                                href="/admin-hr/employees">Employees</a></li> --}}
+                        <li><a class="{{ ($layout['active'] == 'admin-hr-employees-monitoring')? 'active' : '' }}"
+                                href="/admin-hr/monitoring">Monitoring</a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="dropdown">
                     <a href="javascript:;" class="dropdown-toggle">
-                        <span class="micon bi bi-house"></span><span class="mtext">Home</span>
+                        <span class="micon bi bi-house"></span><span class="mtext">HR</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        <li><a href="/admin-hr/absensi/{{ \Carbon\Carbon::now()->isoFormat('M') }}">Absensi</a></li>
+                        <li><a class="{{ ($layout['active'] == 'admin-hr-absensi')? 'active' : '' }}"
+                                href="/admin-hr/absensi/{{ \Carbon\Carbon::now()->isoFormat('M') }}">Absensi</a></li>
                         <li><a href="/admin-hr/hour-meter/{{ \Carbon\Carbon::now()->isoFormat('M') }}">Hour Meter</a>
                         </li>
-                        <li><a href="/admin-hr/tentang">Tentang TPAKD</a></li>
-                        <li><a href="/admin-hr/berita">Berita</a></li>
-                        <li><a href="/admin-hr/berita">Berita</a></li>
                     </ul>
                 </li>
 

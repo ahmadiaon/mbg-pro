@@ -19,8 +19,6 @@ class isLogin
     {
         if(!session('dataUser')){
             return redirect()->intended('/login');
-        }else{
-            session('dataUser')['name'];
         }
         if( session('dataUser') == '0'){
             return redirect()->intended('/login');

@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('pits', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
 
-            $table->integer('employee_id')->nullable();
-            $table->integer('mine_id')->nullable();
+            $table->string('employee_contract_uuid')->nullable();
+            $table->string('mine_uuid')->nullable();
             $table->string('pit_name')->nullable();
             $table->timestamps();
         });

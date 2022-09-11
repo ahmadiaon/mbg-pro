@@ -15,16 +15,19 @@
 
     @include('layout_adm.header')
 
-    @if(session('dataUser')->group == 'admin-ob')
+    @if(session('dataUser')->role == 'admin-ob')
     @include('layout_adm.admin_ob_sidebar')
 
-    @elseif(session('dataUser')->group == 'admin-hr')
+    @elseif(session('dataUser')->role == 'admin-hr')
     @include('layout_adm.admin_hr_sidebar')
 
-    @elseif(session('dataUser')->group == 'foreman')
+    @elseif(session('dataUser')->role == 'foreman')
     @include('layout_adm.admin_foreman_sidebar')
 
-    @elseif(session('dataUser')->group == 'superadmin')
+    @elseif(session('dataUser')->role == 'safety')
+    @include('layout_adm.admin_safety_sidebar')
+
+    @elseif(session('dataUser')->role == 'superadmin')
     @include('layout_adm.admin_superadmin_sidebar')
 
     @else

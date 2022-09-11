@@ -30,5 +30,20 @@ class ResponseFormatter
 
     return response()->json(self::$response, self::$response['meta']['code']);
   }
+  
+  public static function toDate($data = null){
+    $date_end = explode(" ", $data);
+    $months = ["","Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    $result = $date_end[2]."-".array_search($date_end[1], $months)."-".$date_end[0];
+      
+    return $result;
+  }
+
+  public static function getMonthName($data = null){
+    $months = ["","Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    $result = $months[$data];
+      
+    return $result;
+  }
 
 }

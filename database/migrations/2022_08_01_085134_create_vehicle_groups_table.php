@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('vehicle_groups', function (Blueprint $table) {
             $table->id();
-            $table->integer('unit_group_id')->nullable();
+            $table->string('uuid')->nullable();
+
+            $table->integer('unit_group_uuid')->nullable();
             $table->string('vehicle_group')->nullable();
             $table->string('vehicle_code')->nullable();
             $table->timestamps();

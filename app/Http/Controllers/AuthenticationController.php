@@ -17,19 +17,37 @@ class AuthenticationController extends Controller
     }
     public function login(Request $request)
     {
+        // return $request;
         $validateData = $request->validate([
             'username'         => 'required',
             'password'          => 'required'
         ]);
 
         
-        $dataUser = User::where('NIK_employee', $request->username)->first();
+         $dataUser = User::where('NIK_employee', $request->username)->get()->first();
+        //  dd($aa = Hash::check($request->password, $dataUser->password));
         if($dataUser){
             if(Hash::check($request->password, $dataUser->password)){
+                $dataUserOld = $dataUser;
+                $dataUser = User::join('employees', 'employees.uuid', '=', 'users.employee_uuid')
+                ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
+                ->where('users.NIK_employee', $request->username)
+                ->get([
+                    'employee_contracts.uuid as employee_contract_uuid',
+                    'users.*',
+                ])->first();
+                if(!$dataUser){
+                    $dataUser =$dataUserOld;
+                }
+               
                 $request->session()->put('dataUser', $dataUser);
-                switch($dataUser->group) {
+                switch($dataUser->role) {
                     case('admin-hr'):
                         return redirect()->intended('/admin-hr');
+                        break;
+                    case('safety'):
+                        // dd('as');
+                        return redirect()->intended('/safety');
                         break;
                     case('supervisor'):
                         return redirect()->intended('/supervisor');
@@ -37,15 +55,11 @@ class AuthenticationController extends Controller
                         case('foreman'):
                             return redirect()->intended('/foreman');
                             break;
-                    case('admin-ob'):
-                        // dd('a');
-                        return redirect()->intended('/admin-ob/create');
+                case('admin-ob'):
+                        return redirect()->intended('/admin-ob');
                         break;
                     case('superadmin'):
-                        // dd('a');
                         return redirect()->intended('/superadmin');
-                        return session('dataUser.id');
-                        return "superadmin ";
                         break;
                     case('employee'):
                         return redirect()->intended('/');

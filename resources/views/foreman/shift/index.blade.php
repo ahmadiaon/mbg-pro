@@ -1,63 +1,68 @@
 @extends('layout_adm.main')
 @section('content')
 <div class="main-container">
+    <div class="pd-ltr-20 xs-pd-20-10">
+        <div class="min-height-200px">
+            <!-- Simple Datatable start -->
+            <div class="card-box mb-30">
+                <div class="pd-20">
 
-    <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-30">
-            <div class="card-box pd-30 pt-10 height-100-p">
-                <h2 class="mb-30 h4">Choose Checker</h2>
-                <form action="/ob-add" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="form-group">
-                        <label>Choose Checker</label>
-                        <div class="row">
-                            <div class="col-11">
-                                <select name="operator_employee_id" class="form-control selecOperator"
-                                    id="operator_employee_id">
-                                    @foreach($employees as $employee)
-                                    @if(old('employee_id' ) == $employee->id)
-                                    <option value="{{ $employee->id }}" selected>{{ $employee->name }}
-                                    </option>
-                                    @else
-                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                                    @endif
-                                    @endforeach
-                                </select>
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="text-blue h4">List Shift</h4>
+                        </div>
+                        <div class="col">
+                            <div class="mb-0 float-right">
+                                <a href="/foreman/shifts/create" class="btn btn-primary">add</a>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Shift Start</label>
-                        <div class="row">
-                            <div class="col-11">
-                                <select name="operator_employee_id" class="form-control selecOperator"
-                                    id="operator_employee_id">
-                                    @foreach($employees as $employee)
-                                    @if(old('employee_id' ) == $employee->id)
-                                    <option value="{{ $employee->id }}" selected>{{ $employee->name }}
-                                    </option>
-                                    @else
-                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                                    @endif
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="/ob/setup">
-                        <button type="button" class="btn btn-secondary">Batal</button>
-                    </a>
-                    <button type="submit" class="btn btn-primary">Tambah</button>
-                </form>
+                    <p class="mb-0">
+                        you can find more options
+                        <a class="text-primary" href="https://datatables.net/" target="_blank">Click Here</a>
+                    </p>
+                </div>
+                <div class="pb-20">
+                    <table class="data-table table stripe hover nowrap">
+                        <thead>
+                            <tr>
+                                <th class="table-plus datatable-nosort">Name</th>
+                                <th>Age</th>
+                                <th>Office</th>
+                                <th>Address</th>
+                                <th>Start Date</th>
+                                <th class="datatable-nosort">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="table-plus">Gloria F. Mead</td>
+                                <td>25</td>
+                                <td>Sagittarius</td>
+                                <td>2829 Trainer Avenue Peoria, IL 61602</td>
+                                <td>29-03-2018</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                            href="#" role="button" data-toggle="dropdown">
+                                            <i class="dw dw-more"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                            <a class="dropdown-item" href="#"><i class="dw dw-eye"></i> View</a>
+                                            <a class="dropdown-item" href="#"><i class="dw dw-edit2"></i> Edit</a>
+                                            <a class="dropdown-item" href="#"><i class="dw dw-delete-3"></i> Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="col-lg-8 col-md-6 col-sm-12 mb-30">
-            <div class="card-box pd-30 pt-10 height-100-p">
-                <h2 class="mb-30 h4">List Shift</h2>
-
-            </div>
+            <!-- Simple Datatable End -->
         </div>
     </div>
+
     <div class="xs-pd-20-10 pd-ltr-20">
         <div class="footer-wrap pd-20 mb-20 card-box">
             DeskApp - Bootstrap 4 Admin Template By

@@ -15,8 +15,10 @@ class CreateShiftsTable extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
-            $table->integer('foreman_id')->nullable();
-            $table->integer('checker_id')->nullable();
+            $table->string('uuid')->nullable();
+
+            $table->string('foreman_uuid')->nullable();//ini tetap contract
+            $table->string('checker_uuid')->nullable();
             $table->date('shift_date_start')->nullable();
             $table->date('shift_date_end')->nullable();
             $table->string('shift_time')->nullable();//siang, malam

@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('religions', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
+
             $table->string('religion')->nullable(); 
             $table->timestamps();
         });

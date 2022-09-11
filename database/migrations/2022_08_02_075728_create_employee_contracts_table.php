@@ -11,13 +11,24 @@ return new class extends Migration
     {
         Schema::create('employee_contracts', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
 
             // foreign key
-            $table->integer('employee_id')->nullable();
-            $table->string('contract_number')->nullable();
+            $table->string('employee_uuid')->nullable();
+
+            $table->string('position_uuid')->nullable();
+            $table->string('department_uuid')->nullable();
+
+            $table->integer('contract_number')->nullable();
             $table->string('contract_status')->nullable();//pkwt-pkwtt
-            $table->string('date_start_contract')->nullable();
-            $table->string('date_end_contract')->nullable();
+            $table->date('date_start_contract')->nullable();
+            // $table->integer('date_month_start_contract')->nullable();
+            // $table->integer('date_year_start_contract')->nullable();
+            $table->date('date_end_contract')->nullable();
+            // $table->integer('date_month_end_contract')->nullable();
+            // $table->integer('date_year_end_contract')->nullable();
+            $table->date('date_document_contract')->nullable();
+            
             $table->integer('long_contract')->nullable();
             $table->string('employee_status')->nullable();      //worker - staff - mekanik   
 

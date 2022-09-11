@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('unit_groups', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
             
-            $table->integer('unit_id')->nullable();  
+            $table->integer('unit_uuid')->nullable();  
             
             $table->string('unit_group')->nullable();
             $table->float('capacity')->nullable();

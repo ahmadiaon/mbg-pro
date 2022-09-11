@@ -7,3 +7,4 @@
 <!-- Slick Slider css -->
 <link rel="stylesheet" type="text/css" href="{{ env('APP_URL') }}src/plugins/slick/slick.css" />
 <!-- bootstrap-touchspin css -->
+<link rel="stylesheet" type="text/css" href="{{ env('APP_URL') }}src/plugins/cropperjs/dist/cropper.css" />

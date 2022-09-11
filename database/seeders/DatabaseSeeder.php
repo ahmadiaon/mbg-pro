@@ -20,24 +20,21 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         User::create([
-            'name' => 'admin',
-            'password' =>  Hash::make('adminpas'),
-            'group' => 'superadmin'
-        ]);
-        User::create([
-            'name' => 'admin-ob-arwana',
-            'password' =>  Hash::make('adminpas'),
-            'group' => 'admin-ob'
-        ]);
-        User::create([
-            'name' => 'admin-hr',
-            'password' =>  Hash::make('adminpas'),
-            'group' => 'admin-hr'
-        ]);
-        User::create([
-            'name' => 'admin-safety',
-            'password' =>  Hash::make('adminpas'),
-            'group' => 'admin-safety'
-        ]);
+            'employee_uuid' => '0',
+            'uuid' => '0',
+            'NIK_employee' => 'superadmin',
+            'password' =>  Hash::make('password'),
+            'role' => 'superadmin'
+        ]
+    );
+    User::create(
+    [
+        'employee_uuid' => 'employee-admin-hr-uuid',
+        'uuid' => 'admin-hr-uuid',
+        'NIK_employee' => 'admin-hr',
+        'password' =>  Hash::make('password'),
+        'role' => 'admin-hr'
+    ]
+    );
     }
 }

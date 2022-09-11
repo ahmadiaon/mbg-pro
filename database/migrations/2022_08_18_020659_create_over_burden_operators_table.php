@@ -15,10 +15,11 @@ class CreateOverBurdenOperatorsTable extends Migration
     {
         Schema::create('over_burden_operators', function (Blueprint $table) {
             $table->id();
-            $table->integer('over_burden_id')->nullable();
-            $table->integer('vehicle_id')->nullable();
-            $table->integer('operator_employee_id')->nullable();
-            $table->integer('over_burden_flit_id')->nullable();
+            $table->string('uuid')->nullable();
+            $table->string('over_burden_uuid')->nullable();
+            $table->string('vehicle_uuid')->nullable();
+            $table->string('operator_employee_uuid')->nullable();
+            $table->string('over_burden_flit_uuid')->nullable();
             $table->integer('capacity')->nullable();
             $table->timestamps();
         });

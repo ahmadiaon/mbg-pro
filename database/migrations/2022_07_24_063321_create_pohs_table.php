@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('pohs', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
+
             $table->string('name')->nullable();
             $table->integer('value')->nullable();
             $table->timestamps();

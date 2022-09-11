@@ -10,7 +10,10 @@ class CreateAbsensiEmployeesTable extends Migration
     {
         Schema::create('absensi_employees', function (Blueprint $table) {
             $table->id();
-            $table->integer('employee_id')->nullable();
+            $table->string('uuid')->nullable();
+            $table->integer('id_machine')->nullable();
+            
+            // $table->string('employee_contract_uuid')->nullable();
             $table->integer('date_year')->nullable();
             $table->integer('date_month')->nullable();
             $table->integer('date_date')->nullable();

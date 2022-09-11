@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('mines', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
 
             //foreign key
-            $table->integer('employee_id')->nullable();//head mine
+            $table->string('employee_contract_uuid')->nullable();//head mine
             $table->string('mine_name')->nullable();
             $table->timestamps();
         });

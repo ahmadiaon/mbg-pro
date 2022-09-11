@@ -2,7 +2,7 @@
     <div class="header-left">
         <div class="menu-icon bi bi-list"></div>
         <div class="search-toggle-icon bi bi-search" data-toggle="header_search"></div>
-        <div class="header-search">
+        {{-- <div class="header-search">
             <form>
                 <div class="form-group mb-0">
                     <i class="dw dw-search2 search-icon"></i>
@@ -37,7 +37,7 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div> --}}
     </div>
     <div class="header-right">
         <div class="dashboard-setting user-notification">
@@ -58,7 +58,7 @@
                         <ul>
                             <li>
                                 <a href="#">
-                                    <img src="{{ env('APP_URL') }}vendors/images/img.jpg" alt="" />
+                                    <img src="{{ env('APP_URL') }}vendors/images/mbg-logo.png" alt="" />
                                     <h3>John Doe</h3>
                                     <p>
                                         Lorem ipsum dolor sit amet, consectetur adipisicing
@@ -68,7 +68,7 @@
                             </li>
                             <li>
                                 <a href="#">
-                                    <img src="{{ env('APP_URL') }}vendors/images/photo1.jpg" alt="" />
+                                    <img src="{{ env('APP_URL') }}vendors/images/mbg-logo.png" alt="" />
                                     <h3>Lea R. Frith</h3>
                                     <p>
                                         Lorem ipsum dolor sit amet, consectetur adipisicing
@@ -125,15 +125,12 @@
             <div class="dropdown">
                 <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
                     <span class="user-icon">
-                        <img src="{{ env('APP_URL') }}vendors/images/photo1.jpg" alt="" />
+                        <img src="{{ env('APP_URL') }}vendors/images/mbg-logo.png" alt="" />
                     </span>
-                    <span class="user-name">Ross C. Lopez</span>
+                    <span class="user-name">Admin</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
-                    <a class="dropdown-item" href="profile.html"><i class="dw dw-user1"></i> Profile</a>
-                    <a class="dropdown-item" href="profile.html"><i class="dw dw-settings2"></i> Setting</a>
-                    <a class="dropdown-item" href="faq.html"><i class="dw dw-help"></i> Help</a>
-                    <a class="dropdown-item" href="login.html"><i class="dw dw-logout"></i> Log Out</a>
+                    <a class="dropdown-item" href="/login"><i class="dw dw-logout"></i> Log Out</a>
                 </div>
             </div>
         </div>

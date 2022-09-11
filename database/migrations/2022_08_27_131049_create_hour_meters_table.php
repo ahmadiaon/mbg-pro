@@ -15,8 +15,9 @@ class CreateHourMetersTable extends Migration
     {
         Schema::create('hour_meters', function (Blueprint $table) {
             $table->id();
-            $table->integer('over_burden_id')->nullable();
-            $table->integer('operator_employee_id')->nullable();
+            $table->string('uuid')->nullable();
+            $table->string('over_burden_uuid')->nullable();
+            $table->string('operator_employee_uuid')->nullable();
 
 
             $table->integer('hm_start')->nullable();

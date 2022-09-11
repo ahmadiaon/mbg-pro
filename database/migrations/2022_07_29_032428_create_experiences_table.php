@@ -10,8 +10,9 @@ return new class extends Migration
     {
         Schema::create('experiences', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
 
-            $table->integer('people_id')->nullable(); 
+            $table->integer('people_uuid')->nullable(); 
             
             $table->string('experience_place_name')->nullable();
             $table->string('experience_position')->nullable();

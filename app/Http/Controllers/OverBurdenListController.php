@@ -7,91 +7,27 @@ use App\Models\Vehicle;
 use App\Models\Employee;
 use App\Models\HourMeter;
 use App\Models\OverBurden;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\OverBurdenFlit;
 use App\Models\OverBurdenList;
+use App\Models\EmployeeContract;
 use Illuminate\Support\Facades\DB;
 
 class OverBurdenListController extends Controller
 {
     public function index($idOB){
-
-        $id_employee = session('dataUser')->employee_id;
+        $overBurden = OverBurden::getOverBurden($idOB);
         $date_now = Carbon::today()->isoFormat('D-M-Y');
-        $data = array();
-
-        $over_burden = OverBurden::where('checker_employee_id', $id_employee)
-        ->where('date', $date_now)
-        ->first();
-
-
-        $over_burden_lists = DB::table('over_burden_lists')
-        ->join('over_burden_operators', 'over_burden_operators.id', '=', 'over_burden_lists.over_burden_operator_id' )
-        ->join('employees', 'employees.id', '=', 'over_burden_operators.operator_employee_id' )
-        ->join('people', 'people.id', '=', 'employees.people_id' )
-        ->join('over_burden_flits', 'over_burden_flits.id', '=', 'over_burden_lists.over_burden_flit_id' )
-        ->join('vehicles as v', 'v.id', '=', 'over_burden_operators.vehicle_id' )
-        ->join('vehicle_groups as vg', 'vg.id', '=', 'v.vehicle_group_id' )
-        ->join('vehicles as ve', 've.id', '=','over_burden_flits.excavator_vehicle_id' )
-        ->join('vehicle_groups as vg2', 'vg2.id', '=', 've.vehicle_group_id')
+        $overBurden_uuid = $overBurden->uuid;        
+        $over_burden_lists = OverBurdenList::getListFlit($overBurden_uuid);
+        $over_burden_operator  = HourMeter::getOperator($overBurden->uuid);
+        $flits =OverBurdenFlit::getFlits($overBurden->uuid);
+        $employees = EmployeeContract::getEmployee();
+        $vehicles =  Vehicle::getAll();
         
-        ->where('over_burden_operators.over_burden_id', $idOB)
-        ->get([
-            'over_burden_operators.id',
-            'over_burden_operators.capacity',
-            'employees.NIK_employee',
-            'people.name',
-            'v.number',
-            'vg.vehicle_code',
-            'vg.vehicle_group',
-            've.number as number_excavator',
-            'vg2.vehicle_code as vehicle_code_excavator',
-            'vg2.vehicle_group as vehicle_group_excavator',
-            'over_burden_lists.over_burden_time',
-        ]);
-        // dd($over_burden_lists);
 
-
-        $over_burden_operator  = DB::table('over_burden_operators')
-            ->join('employees', 'employees.id', '=', 'over_burden_operators.operator_employee_id' )
-            ->join('people', 'people.id', '=', 'employees.people_id' )
-            ->join('vehicles', 'vehicles.id', '=', 'over_burden_operators.vehicle_id' )
-            ->join('vehicle_groups', 'vehicle_groups.id', '=', 'vehicles.vehicle_group_id' )
-            ->where('over_burden_operators.over_burden_id', $idOB)
-            ->get([
-                'over_burden_operators.id',
-                'over_burden_operators.capacity',
-                'over_burden_operators.over_burden_flit_id',
-                'employees.NIK_employee',
-                'people.name',
-                'vehicles.number',
-                'vehicle_groups.vehicle_code',
-                'vehicle_groups.vehicle_group'
-            ]);
-            // dd($over_burden_operator);
         
-            $flits = DB::table('over_burden_flits')
-            ->join('vehicles', 'vehicles.id', '=','over_burden_flits.excavator_vehicle_id' )
-            ->join('vehicle_groups', 'vehicle_groups.id', '=', 'vehicles.vehicle_group_id')
-            ->where('over_burden_flits.over_burden_id', $idOB)
-            ->get(['vehicle_groups.vehicle_code', 'vehicles.number','over_burden_flits.id']);
-            // dd($flits);
-        //global needed
-        $employees = Employee::join('people', 'people.id', '=', 'employees.people_id')
-        ->join('positions', 'positions.id', '=', 'employees.position_id')
-        ->join('employee_contracts', 'employee_contracts.employee_id', '=', 'employees.id')
-        ->get([
-            'people.name',
-            'employees.id as  employee_id',
-            'employees.NIK_employee',
-            'positions.position',
-            'employee_contracts.*'
-        ]);
-
-        $vehicles =  Vehicle::join('vehicle_groups', 'vehicle_groups.id', '=', 'vehicles.vehicle_group_id')
-        ->join('unit_groups', 'vehicle_groups.unit_group_id', '=', 'unit_groups.id')
-        ->get(['vehicle_groups.vehicle_group','vehicle_groups.vehicle_code', 'vehicles.*', 'unit_groups.unit_group']);
-    
-
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -99,7 +35,7 @@ class OverBurdenListController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'        => 'listEmployee'
+            'active'        => 'today-ob'
         ];
 
         $data = [
@@ -109,6 +45,8 @@ class OverBurdenListController extends Controller
             'flits'     => $flits,
             'layout'        => $layout,
             'idOB'          => $idOB,
+            'ob_id'          => $idOB,
+            'over_burden'          => $overBurden,
             'over_burden_operators' => $over_burden_operator,
             'over_burden_lists' => $over_burden_lists
         ];
@@ -117,14 +55,16 @@ class OverBurdenListController extends Controller
     }
 
     public function store(Request $request){
+        // return $request;
         $validatedData = $request->validate([
-            'over_burden_id'      => 'required',
-            'over_burden_flit_id'      => 'required',
-            'over_burden_operator_id'      => 'required',
+            'over_burden_uuid'      => 'required',
+            'over_burden_flit_uuid'      => 'required',
+            'over_burden_operator_uuid'      => 'required',
             'over_burden_capacity'      => 'required'
         ]);
         
         $validatedData['over_burden_time'] = Carbon::now('Asia/Jakarta')->format('H:i:s');
+        $validatedData['uuid'] = Str::uuid();
         $created = OverBurdenList::create($validatedData);
         
         return redirect('/admin-ob/ritasi/'.$request->over_burden_id)->with('success', 'Ritasi Added!');

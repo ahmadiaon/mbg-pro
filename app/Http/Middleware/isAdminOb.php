@@ -15,7 +15,7 @@ class isAdminOb
             return redirect()->route('login');
         }
         
-        if( session('dataUser')->group != 'admin-ob'){
+        if( session('dataUser')->role != 'admin-ob'){
             return redirect()->route('login');
         }
         return $next($request);

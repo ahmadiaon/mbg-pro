@@ -5,43 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\ShiftList;
 use Illuminate\Http\Request;
+use App\Models\EmployeeContract;
 use Illuminate\Support\Facades\DB;
 
 
 class ShiftListController extends Controller
 {
     public function indexProses($idShift){
-        // dd($idShift);
+    
         $checker = DB::table('shifts')
-        ->join('employees','employees.id','=', 'shifts.checker_id')
-        // ->join('employees','employees.id','=', 'shifts.checker_id')
-        ->join('people','people.id','=', 'employees.people_id')
+        ->join('employee_contracts', 'employee_contracts.uuid', '=', 'shifts.checker_uuid')
+        ->join('employees','employees.uuid','=', 'employee_contracts.employee_uuid')
+        ->join('people','people.uuid','=', 'employees.people_uuid')
         ->where('shifts.id',$idShift)
         ->get(['employees.NIK_employee','people.name','shifts.*'])
         ->first();
 
         $shiftLists = DB::table('shift_lists')
-        ->join('shifts', 'shifts.id', '=', 'shift_lists.shift_id')
-        ->join('employees', 'employees.id', '=', 'shift_lists.employee_id')
-        ->join('people', 'people.id', '=', 'employees.people_id')
-        ->join('positions', 'positions.id', '=', 'employees.position_id')
+        ->join('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
+        ->join('employee_contracts', 'employee_contracts.uuid', '=', 'shift_lists.contract_employee_uuid')
+        ->join('employees','employees.uuid','=', 'employee_contracts.employee_uuid')
+        ->join('people', 'people.uuid', '=', 'employees.people_uuid')
+        ->join('positions', 'positions.uuid', '=', 'employee_contracts.position_uuid')
         ->where('shifts.id', $idShift)
         ->get(['people.name', 'positions.position', 'shift_lists.*', 'employees.NIK_employee']);
 
-        // dd($shiftLists);
 
+        $employees = EmployeeContract::getEmployee();
 
-        $employees = Employee::join('people', 'people.id', '=', 'employees.people_id')
-        ->join('positions', 'positions.id', '=', 'employees.position_id')
-        ->join('employee_contracts', 'employee_contracts.employee_id', '=', 'employees.id')
-        ->get([
-            'people.name',
-            'employees.id as  employee_id',
-            'employees.NIK_employee',
-            'positions.position',
-            'employee_contracts.*'
-        ]);
-        
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -66,8 +57,8 @@ class ShiftListController extends Controller
 
     public function store(Request $request){
         $validatedData = $request->validate([
-            'shift_id'      => 'required',
-            'employee_id'      => 'required',
+            'shift_uuid'      => 'required',
+            'contract_employee_uuid'      => 'required',
         ]);
 
         $created = ShiftList::create($validatedData);

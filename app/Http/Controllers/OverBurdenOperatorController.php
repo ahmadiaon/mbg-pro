@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HourMeter;
 use App\Models\OverBurden;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\OverBurdenOperator;
 
@@ -12,20 +13,20 @@ class OverBurdenOperatorController extends Controller
     public function store(Request $request){
         // return $request;
         $validatedData = $request->validate([
-            'over_burden_id'      => 'required',
-            'operator_employee_id'      => 'required',
-            'over_burden_flit_id'      => 'required',
+            'over_burden_uuid'      => 'required',
+            'operator_employee_uuid'      => 'required',
+            'over_burden_flit_uuid'      => 'required',
             'capacity'      => 'required',
-            'vehicle_id'      => 'required'
+            'vehicle_uuid'      => 'required'
         ]);
         // dd($validatedData);
+        $validatedData['uuid'] = 'operator-OB-'.Str::uuid();
+
         $created = OverBurdenOperator::create($validatedData);
         
-        $over_burden = OverBurden::where('over_burdens.id', $request->over_burden_id)
-        ->join('shifts', 'shifts.checker_id', '=', 'over_burdens.checker_employee_id')
-        ->get(['shifts.shift_time', 'over_burdens.*'])
-        ->first();
-        if($over_burden->shift_time == "Malam"){
+        
+
+        if($request->shift_time == "Malam"){
             $time_start = "18:00";
             $time_stop = "5:00";
         }else{
@@ -33,16 +34,17 @@ class OverBurdenOperatorController extends Controller
             $time_stop = "17:00";
         }
         $hour_meter = [
-            'id' => $created->id,
-            'over_burden_id' =>  $validatedData['over_burden_id'],
-            'operator_employee_id' =>  $created->id,
+            'uuid'  => 'hour-meter-'.Str::uuid(),
+            'over_burden_uuid' =>  $validatedData['over_burden_uuid'],
+            'operator_employee_uuid' =>  $created->uuid,
             'time_start'    => $time_start,
             'time_stop'      => $time_stop,
         ];
         // dd($hour_meter);
         $created = HourMeter::create($hour_meter);
+        // dd($created);
 
-        return redirect('/admin-ob/hour-meter/'.$request->over_burden_id)->with('operator_added', 'Operator added!');
+        return redirect('/admin-ob/hour-meter/'.$request->ob_uuid)->with('operator_added', 'Operator added!');
 
     }
     public function addOperatorOB(Request $request){

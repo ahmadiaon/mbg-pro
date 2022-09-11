@@ -20,7 +20,7 @@ class isForeman
             return redirect()->intended('/login');
         }
        
-        if( session('dataUser.group') != 'foreman'){
+        if( session('dataUser.role') != 'foreman'){
             return redirect()->intended('/login');
         }
         return $next($request);

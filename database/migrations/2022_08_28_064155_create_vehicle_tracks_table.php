@@ -15,7 +15,9 @@ class CreateVehicleTracksTable extends Migration
     {
         Schema::create('vehicle_tracks', function (Blueprint $table) {
             $table->id();
-            $table->integer('vehicle_id')->nullable();
+            $table->string('uuid')->nullable();
+            $table->string('vehicle_uuid')->nullable();
+            
             $table->integer('hour_meter')->nullable();
             $table->dateTime('datetime')->nullable();
             $table->boolean('last')->nullable();

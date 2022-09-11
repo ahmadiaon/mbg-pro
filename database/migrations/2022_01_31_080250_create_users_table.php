@@ -16,16 +16,15 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             // primary
             $table->bigIncrements('id');
+            $table->string('uuid')->nullable();
 
-            $table->integer('employee_id')->nullable();
-            $table->string('uuid')->unique()->nullable();
+            $table->string('employee_uuid')->nullable();
             $table->string('role')->nullable();
+            
             // secondary
             $table->string('NIK_employee')->nullable();
-
-            $table->string('name')->nullable();
             $table->string('password')->nullable();
-            $table->string('group')->nullable();
+
             $table->string('auth_login')->nullable();
             $table->string('last_login_time')->nullable();
 

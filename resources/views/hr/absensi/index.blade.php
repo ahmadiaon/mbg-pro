@@ -147,7 +147,7 @@
         $('#myTablse').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '{!! url('http://192.168.8.80:8000/admin-hr/absensi-data/'.$month) !!}',
+            ajax: '{!! url(env('APP_URL').'admin-hr/absensi-data/'.$month) !!}',
             columns: [
                 { data: 'NIK_employee', name: 'NIK_employee' },
                 { data: 'name', name: 'name' },

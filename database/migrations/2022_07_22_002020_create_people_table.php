@@ -15,28 +15,25 @@ return new class extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
+            //foreigen key
+            $table->string('license_uuid')->nullable();
+            $table->string('religion_uuid')->nullable();// religion
 
             $table->string('name')->nullable();
             $table->string('NIK_number')->nullable();
             $table->string('KK_number')->nullable();
             $table->string('citizenship')->nullable();
-
-            $table->integer('religion_id')->nullable();// religion
-            
             $table->string('gender')->nullable();
 
             $table->string('place_of_birth')->nullable();
-            $table->string('date_of_birth')->nullable();
+            $table->date('date_of_birth')->nullable();
 
             $table->string('blood_group')->nullable();
             $table->string('status')->nullable();
-            
             $table->string('address')->nullable();
 
             $table->string('financial_number')->nullable();
-            $table->string('group_license')->nullable();
-            $table->string('license_number')->nullable();
-
             $table->string('bpjs_ketenagakerjaan')->nullable();
             $table->string('bpjs_kesehatan')->nullable();
             

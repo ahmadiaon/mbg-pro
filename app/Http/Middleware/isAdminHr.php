@@ -20,7 +20,7 @@ class isAdminHr
             return redirect()->intended('/login');
         }
        
-        if( session('dataUser.group') != 'admin-hr'){
+        if( session('dataUser.role') != 'admin-hr'){
             return redirect()->intended('/login');
         }
         return $next($request);

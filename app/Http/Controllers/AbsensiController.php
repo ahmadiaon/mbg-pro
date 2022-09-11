@@ -21,31 +21,36 @@ class AbsensiController extends Controller
     public function absensiData($months){
 
         $employees = DB::table('employees')
-        ->join('people', 'people.id',  '=', 'employees.people_id')
-        ->join('positions', 'positions.id',  '=', 'employees.position_id')->get(['people.name','positions.position','employees.*']);
+        ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
+        ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
+        ->join('positions', 'positions.uuid',  '=', 'employee_contracts.position_uuid')
+        
+        ->get(['people.name','positions.position','employees.*']);
 
         foreach($employees as $employee){
             $count_DS = DB::table('absensi_employees')
-            ->join('employees', 'employees.id', '=', 'absensi_employees.employee_id')
-            ->join('people', 'people.id',  '=', 'employees.people_id')
-            ->where('absensi_employees.employee_id', $employee->id)
+            ->join('employees', 'employees.machine_id', '=', 'absensi_employees.machine_id')
+            ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
+            ->where('absensi_employees.machine_id', $employee->machine_id)
             ->where('absensi_employees.date_month', $months)
             ->where('absensi_employees.status', 'DS')
             ->count();
 
+            // dd($count_DS);
+
             $count_TC = DB::table('absensi_employees')
-            ->join('employees', 'employees.id', '=', 'absensi_employees.employee_id')
-            ->join('people', 'people.id',  '=', 'employees.people_id')
-            ->where('absensi_employees.employee_id', $employee->id)
-            ->where('absensi_employees.date_month', $months)            
+            ->join('employees', 'employees.machine_id', '=', 'absensi_employees.machine_id')
+            ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
+            ->where('absensi_employees.machine_id', $employee->machine_id)
+            ->where('absensi_employees.date_month', $months)
             ->where('absensi_employees.status', 'TC')
             ->count();
 
             $count_TA = DB::table('absensi_employees')
-            ->join('employees', 'employees.id', '=', 'absensi_employees.employee_id')
-            ->join('people', 'people.id',  '=', 'employees.people_id')
-            ->where('absensi_employees.employee_id', $employee->id)
-            ->where('absensi_employees.date_month',$months)
+            ->join('employees', 'employees.machine_id', '=', 'absensi_employees.machine_id')
+            ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
+            ->where('absensi_employees.machine_id', $employee->machine_id)
+            ->where('absensi_employees.date_month', $months)
             ->where('absensi_employees.status', 'TA')
             ->count();
 
@@ -71,8 +76,9 @@ class AbsensiController extends Controller
 
     }
     public function edit(Request $request){
+        // return $request;
         $validatedData = $request->validate([
-            'employee_id'      => 'required',
+            'machine_id'      => 'required',
             'date_year'      => 'required',
             'date_month'      => 'required',
             'date_date'      => 'required',
@@ -81,7 +87,8 @@ class AbsensiController extends Controller
 
         $created = AbsensiEmployee::updateOrCreate(['id' => $request->id], $validatedData );
         // $dependent = Dependent::updateOrCreate(['id' => $request->id], $dependents );
-        return $created;
+       
+        return redirect('/admin-hr/absensi-show/'.$request->month.'/'.$request->NIK_employee);
 
 
     }
@@ -123,6 +130,13 @@ class AbsensiController extends Controller
 
     public function show($month, $nik){
         $year = 2022;
+        // dd('a');
+        // $data = DB::table('employees')
+        // ->leftJoin('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
+        // ->where('employees.NIK_employee', $nik)
+        // ->get(['employees.*']);
+
+        // dd($data);
         
 
         $lastDay = Carbon::now()->endOfMonth()->isoFormat('D');
@@ -137,25 +151,47 @@ class AbsensiController extends Controller
             $dateGet =$year.'-'.$month.'-'.$i;
 
             $data = DB::table('employees')
-           ->join('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
-           ->join('shifts', 'shifts.id', '=', 'shift_lists.shift_id')
-           ->join('absensi_employees', 'absensi_employees.employee_id','=', 'employees.id')
+            ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
+           ->leftJoin('shift_lists', 'shift_lists.contract_employee_uuid', '=', 'employee_contracts.uuid')
+           ->leftJoin('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
+           ->join('absensi_employees', 'absensi_employees.machine_id','=', 'employees.machine_id')
            ->where('employees.NIK_employee', $nik)
-           ->where('shifts.shift_date_start', '<=', $dateGet)
-           ->where('shifts.shift_date_end', '>=', $dateGet)
+        //    ->where('shifts.shift_date_start', '<=', $dateGet)
+        //    ->where('shifts.shift_date_end', '>=', $dateGet)
            ->where('absensi_employees.date_date', $i)
            ->where('absensi_employees.date_month', $month)
            ->where('absensi_employees.date_year', $year)
-           ->get(['shifts.shift_time','absensi_employees.*', 'shift_lists.shift_id as shift_id'])->first();
+           ->get([
+            'shifts.shift_time',
+            'absensi_employees.*', 
+            'shifts.shift_date_start',
+            'shifts.shift_date_end'
+            ])->first();
 
+            // dd($data);
            if(!$data){
-                $data = DB::table('employees')
-                ->join('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
-                ->join('shifts', 'shifts.id', '=', 'shift_lists.shift_id')
-                ->where('employees.NIK_employee', $nik)
-                ->where('shifts.shift_date_start', '<=', $dateGet)
-                ->where('shifts.shift_date_end', '>=', $dateGet)
-                ->get(['shifts.shift_time','employees.id as employee_id', 'shift_lists.shift_id as shift_id'])->first();
+
+            $data = DB::table('employees')
+            ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
+           ->leftJoin('shift_lists', 'shift_lists.contract_employee_uuid', '=', 'employee_contracts.uuid')
+           ->leftJoin('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
+           ->where('employees.NIK_employee', $nik)
+           ->get([
+            'shifts.shift_time',
+            'employees.machine_id', 
+            ])->first();
+            // dd($data);
+                // $data = DB::table('employees')
+                // ->join('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
+                // ->join('shifts', 'shifts.id', '=', 'shift_lists.shift_id')
+                // ->where('employees.NIK_employee', $nik)
+                // ->where('shifts.shift_date_start', '<=', $dateGet)
+                // ->where('shifts.shift_date_end', '>=', $dateGet)
+                // ->get([
+                //     'shifts.shift_time',
+                //     'employees.machine_id', 
+                //     'shift_lists.shift_id as shift_id'
+                //     ])->first();
 
 
                 $data->date_year = $year;
@@ -184,6 +220,8 @@ class AbsensiController extends Controller
         return view('hr.absensi.show', [
             'title'         => 'Absensi HR',
             'absens'    => $absens,
+            'month'     => $month,
+            'NIK_employee'     => $nik,
             'layout'        => $layout
         ]);
     }
@@ -282,6 +320,7 @@ class AbsensiController extends Controller
 
     public function store(Request $request)
     {
+       
         $this->validate($request, [
             'uploaded_file' => 'required'
         ]);
@@ -339,11 +378,11 @@ class AbsensiController extends Controller
                 $absensies = array();
                 $k=1;
                 foreach($abjads as $abjad){
-                    $employeeId = $sheet->getCell( 'C' . $i )->getValue();
+                    $machine_id = $sheet->getCell( 'C' . $i )->getValue();
                     $absensi = $sheet->getCell($abjad . $i+1)->getValue();
                     if($absensi){
-                        $statusAbsen = AbsensiController::ekstrackAbsen($year, $month,$k,  $employeeId,  $absensi);
-                        // dd($statusAbsen);
+                        $statusAbsen = AbsensiController::ekstrackAbsen($year, $month,$k,  $machine_id,  $absensi);
+                        // dd($statusAbsen); 
                         $createSheet->setCellValue($abjads[$k+1].$columnNow, $statusAbsen['status_absen']);
                         
                         $absensies[] = [
@@ -352,7 +391,8 @@ class AbsensiController extends Controller
                             'status'  =>  $statusAbsen['status_absen']
                         ];
                         $data[]=[
-                            'employee_id'   => $employeeId,
+                            'machine_id'   => $machine_id,
+                            'uuid'   => Str::uuid(),
                             'date_date' => $k+$date_start-1,
                             'date_month' => $month_start,
                             'date_year' => $year_start,
@@ -365,7 +405,7 @@ class AbsensiController extends Controller
                     $k++;
                 }
                 $employees[]=[
-                    'id'    =>$employeeId,
+                    'id'    =>$machine_id,
                     'name' => $employeeName,
                     'absensi'   => $absensies
                 ];
@@ -373,15 +413,18 @@ class AbsensiController extends Controller
                 $i = $i+2;
 
             }
+            //   dd( $data);
             $crateWriter = new Xls($createSpreadsheet);
-            // $crateWriter->save('employee.xlsx');
+        $nameExcell = Carbon::today('Asia/Jakarta')->format('y-m-d').Str::uuid();
+            $crateWriter->save($nameExcell.'.xlsx');
             // dd( $data);
 
-            DB::table('absensi_employees')->insert($data);
+           $store = DB::table('absensi_employees')->insert($data);
         } catch (Exception $e) {
             $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
+        dd($store);
         
         return back()->withSuccess('Great! Data has been successfully uploaded.');
         return $request;

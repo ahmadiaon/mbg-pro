@@ -39,6 +39,7 @@ use App\Http\Controllers\ManageBankLoanController;
 use App\Http\Controllers\ManageBusinessController;
 use App\Http\Controllers\OverBurdenFlitController;
 use App\Http\Controllers\OverBurdenListController;
+use App\Http\Controllers\SafetyEmployeeController;
 use App\Http\Controllers\ManageAdminBankController;
 use App\Http\Controllers\ManageCommunityController;
 use App\Http\Controllers\EmployeeContractController;
@@ -110,15 +111,12 @@ Route::delete('/admin/position/delete/{position}', [PositionController::class, '
 
 
 
-Route::resource('/admin/department/', DepartmentController::class);
-Route::get('/admin/department/{department}', [DepartmentController::class, 'show']);
-Route::delete('/admin/department/delete/{department}', [DepartmentController::class, 'destroy']);
-Route::get('/department-data', [DepartmentController::class, 'anyData'])->name('department-data');
+
 
 
 
 // Over Burden
-Route::resource('/admin/ob/', OverBurdenController::class);
+// Route::resource('/admin/ob/', OverBurdenController::class);
 // Route::get('/ob-data', [OverBurdenController::class, 'anyData'])->name('ob-data');
 
 
@@ -131,10 +129,17 @@ Route::get('/menu-data', [MenuController::class, 'anyData'])->name('menu-data');
 Route::middleware(['islogin'])->group(function () {
 
     Route::middleware(['isSuperAdmin'])->group(function () {
-        Route::get('/superadmin/manage-user', [UserController::class, 'manageUser']);
-        Route::get('/superadmin/manage-user/{id}', [UserController::class, 'showLevelEmployeeUser']);
-        Route::get('/superadmin/users', [UserController::class, 'anyData'])->name('users-data');
-        Route::get('superadmin', [AdminController::class, 'index']);
+        // Route::get('/superadmin/manage-user', [UserController::class, 'manageUser']);
+        // Route::get('/superadmin/manage-user/{id}', [UserController::class, 'showLevelEmployeeUser']);
+        // Route::get('/superadmin/users', [UserController::class, 'anyData'])->name('users-data');
+        // Route::get('/superadmin', [AdminController::class, 'index']);
+        
+        //reacheble
+        Route::resource('/superadmin', DepartmentController::class);
+
+        Route::get('/admin/department/{department}', [DepartmentController::class, 'show']);
+        Route::delete('/admin/department/delete/{department}', [DepartmentController::class, 'destroy']);
+        Route::get('/department-data', [DepartmentController::class, 'anyData'])->name('department-data');
     });
     Route::middleware(['isSupervisor'])->group(function () {
         Route::get('supervisor', [SupervisorController::class, 'index']);
@@ -142,9 +147,12 @@ Route::middleware(['islogin'])->group(function () {
     });
     // foreman
     Route::middleware(['isForeman'])->group(function () {
-        Route::get('/foreman', [ShiftController::class, 'indexShift']);
-        Route::get('/foreman/manage-checker', [ShiftController::class, 'manageCheckerShift']);
-        Route::post('/foreman/manage-checker', [ShiftController::class, 'storeManageCheckerShift']);
+        Route::get('/foreman', [ShiftController::class, 'index']);
+        
+        // Route::get('/foreman/manage-checker', [ShiftController::class, 'manageCheckerShift']);
+        Route::get('/foreman/shifts/create', [ShiftController::class, 'create']);
+        // Route::post('/foreman/manage-checker', [ShiftController::class, 'storeManageCheckerShift']);
+        Route::post('/foreman/shifts/', [ShiftController::class, 'store']); 
         Route::post('/foreman/manage-member-list', [ShiftListController::class, 'index']);
         Route::post('/foreman/manage-member', [ShiftListController::class, 'store']);
         Route::post('/foreman/over-burden', [OverBurdenController::class, 'forForemanOB']);
@@ -155,18 +163,19 @@ Route::middleware(['islogin'])->group(function () {
     });
     Route::middleware(['isAdminOb'])->group(function () {
         Route::get('/admin-ob', [OverBurdenController::class, 'index']);
+        Route::get('/admin-ob/create', [OverBurdenController::class, 'create']);
         Route::post('/admin-ob', [OverBurdenController::class, 'store']);
         Route::get('/admin-ob/{idOB}/show', [OverBurdenController::class, 'show']);
+
         Route::get('/admin-ob-data', [OverBurdenController::class, 'dataOverBurden'])->name('ob-data');
-        Route::get('/admin-ob/create', [OverBurdenController::class, 'create']);
+        
+         //hour-meter
+         Route::get('/admin-ob/hour-meter/{idOB}', [HourMeterController::class, 'index']);
+         Route::post('/admin-ob/hour-meter', [HourMeterController::class, 'store']);
 
         // list ob ritasi
         Route::get('/admin-ob/ritasi/{idOB}', [OverBurdenListController::class, 'index']);
         Route::post('/admin-ob/add-ritase', [OverBurdenListController::class, 'store']);
-
-        //hour-meter
-        Route::get('/admin-ob/hour-meter/{idOB}', [HourMeterController::class, 'index']);
-        Route::post('/admin-ob/hour-meter', [HourMeterController::class, 'store']);
 
         // operator
         Route::post('/admin-ob/flit', [OverBurdenFlitController::class, 'store']);
@@ -179,16 +188,32 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/ob/add-ritase', [OverBurdenListController::class, 'addListOBList']);
         
     });
+    Route::middleware(['isSafety'])->group(function () {
+        Route::get('/safety', [SafetyEmployeeController::class, 'index']);
+        Route::get('/safety/{NIK_employee}/show', [SafetyEmployeeController::class, 'show']);
+        Route::post('/safety/{NIK_employee}/store', [SafetyEmployeeController::class, 'store']);
+        Route::get('/safety-data', [SafetyEmployeeController::class, 'anyData'])->name('safety-data');
+    });
     Route::middleware(['isAdminHr'])->group(function () {
-        Route::get('/admin-hr', [AdminController::class, 'listEmployee']);
+        Route::get('/admin-hr', [EmployeeContractController::class, 'index']);
+        Route::get('/admin-hr/employee', [EmployeeController::class, 'listEmployee']);
+        Route::get('/admin-hr/employee', [EmployeeController::class, 'listEmployee']);
         // setup
-        Route::get('/admin-hr/employees', [AdminController::class, 'listEmployee']);
+        Route::get('/admin-hr/employees', [EmployeeController::class, 'indexHR']);
+        Route::get('/admin-hr/monitoring', [EmployeeContractController::class, 'index']);
+        Route::get('/admin-hr/employees/create', [EmployeeController::class, 'create']);
+        Route::post('/admin-hr/employees', [EmployeeController::class, 'store']);
+        Route::post('/admin-hr/employees/contract/store', [EmployeeContractController::class, 'store']);
+
+        // Route::get('/admin-hr/employees/create', [EmployeeController::class, 'createEmployee']);
+        Route::get('/admin-hr/employeesData', [EmployeeController::class, 'employeesData']);
         
-        Route::get('/admin-hr/employees/create', [EmployeeController::class, 'createEmployee']);
+        
 
         // Absensi
         // Route::get('/admin-hr/absensi', [EmployeeContractController::class, 'anyData']);
         Route::get('/admin-hr/absensi/{month}', [AbsensiController::class, 'index']);
+
         Route::get('/admin-hr/absensi-data/{month}', [AbsensiController::class, 'absensiData']);
         Route::get('/admin-hr/absensi-show/{month}/{nik}', [AbsensiController::class, 'show']);
         Route::get('/admin-hr/absensi-export/{month}', [AbsensiController::class, 'exportAbsen']);
@@ -197,7 +222,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/admin-hr/absensi', [AbsensiController::class, 'store']);
 
         Route::post('/admin-hr/employees/contract/create', [EmployeeContractController::class, 'createEmployeeContract']);
-        Route::post('/admin-hr/employees/contract/store', [EmployeeContractController::class, 'storeEmployeeContract']);
+        // Route::post('/admin-hr/employees/contract/store', [EmployeeContractController::class, 'storeEmployeeContract']);
         Route::get('/admin-hr/employees/contract/show/{NIK_employee}', [EmployeeContractController::class, 'showEmployeeContract']);
         
 
@@ -218,10 +243,6 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/admin/employee-contract/{people}', [EmployeeContractController::class, 'show'])->name('employee-contract-show');
     });
 });
-
-
-
-
 
 
 

@@ -21,7 +21,7 @@ class AdminController extends Controller
             'active'                        => 'listEmployee'
         ];
 
-        return view('superadmin.superadmin', [
+        return view('superadmin.index', [
             'title'         => 'Beranda',
             'layout'        => $layout
         ]);

@@ -40,14 +40,14 @@
                                 <label>Checker</label>
                                 <div class="row">
                                     <div class="col-lg-11">
-                                        <select name="checker_employee_id" class="form-control theSelect theSelect2"
-                                            id="checker_employee_id">
+                                        <select name="checker_employee_uuid" class="form-control theSelect theSelect2"
+                                            id="checker_employee_uuid">
                                             @foreach($employees as $employee)
-                                            @if(old('employee_id', $checker ) == $employee->id)
-                                            <option value="{{ $employee->id }}" selected>{{ $employee->name }}
+                                            @if(old('employee_uuid', $checker ) == $employee->uuid)
+                                            <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                             </option>
                                             @else
-                                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                            <option value="{{ $employee->uuid }}">{{ $employee->name }}</option>
                                             @endif
                                             @endforeach
                                         </select>
@@ -61,14 +61,14 @@
                                 <label>Foreman</label>
                                 <div class="row">
                                     <div class="col-11">
-                                        <select name="foreman_employee_id" class="form-control theSelect theSelect3"
-                                            id="foreman_employee_id">
+                                        <select name="foreman_employee_uuid" class="form-control theSelect theSelect3"
+                                            id="foreman_employee_uuid">
                                             @foreach($employees as $employee)
-                                            @if(old('employee_id', $foreman ) == $employee->id)
-                                            <option value="{{ $employee->id }}" selected>{{ $employee->name }}
+                                            @if(old('employee_uuid', $foreman ) == $employee->uuid)
+                                            <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                             </option>
                                             @else
-                                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                            <option value="{{ $employee->uuid }}">{{ $employee->name }}</option>
                                             @endif
                                             @endforeach
                                         </select>
@@ -82,15 +82,15 @@
                                 <label>Supervisor</label>
                                 <div class="row">
                                     <div class="col-11">
-                                        <select name="supervisor_employee_id" class="form-control theSelect theSelect4"
-                                            id="supervisor_employee_id">
+                                        <select name="supervisor_employee_uuid"
+                                            class="form-control theSelect theSelect4" id="supervisor_employee_uuid">
                                             @foreach($employees as $employee)
-                                            @if(old('employee_id', $supervisor) ==
-                                            $employee->id)
-                                            <option value="{{ $employee->id }}" selected>{{ $employee->name }}
+                                            @if(old('employee_uuid', $supervisor) ==
+                                            $employee->uuid)
+                                            <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                             </option>
                                             @else
-                                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                            <option value="{{ $employee->uuid }}">{{ $employee->name }}</option>
                                             @endif
                                             @endforeach
                                         </select>
@@ -105,13 +105,13 @@
                                 <label>Pit</label>
                                 <div class="row">
                                     <div class="col-11">
-                                        <select name="pit_id" class="form-control theSelect theSelect4" id="pit_id">
+                                        <select name="pit_uuid" class="form-control theSelect theSelect4" id="pit_uuid">
                                             @foreach($pits as $pit)
-                                            @if(old('pit_id' ) == $pit->id)
-                                            <option value="{{ $pit->id }}" selected>{{ $pit->pit_name }}
+                                            @if(old('pit_uuid' ) == $pit->uuid)
+                                            <option value="{{ $pit->uuid }}" selected>{{ $pit->pit_name }}
                                             </option>
                                             @else
-                                            <option value="{{ $pit->id }}">{{ $pit->pit_name }}</option>
+                                            <option value="{{ $pit->uuid }}">{{ $pit->pit_name }}</option>
                                             @endif
                                             @endforeach
                                         </select>
@@ -189,6 +189,7 @@
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" name="id_note" value="{{  $id_note}}">
                         <div class="col-12">
                             <textarea class="form-control" placeholder="Catatan" name="note" id="" cols="30"
                                 rows="10">{{ $note }}</textarea>

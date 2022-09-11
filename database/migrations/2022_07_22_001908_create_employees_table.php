@@ -15,13 +15,12 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
 
             
             // foreign key
-            $table->integer('people_id')->nullable();
-            $table->integer('position_id')->nullable();
-            $table->integer('department_id')->nullable();
-
+            $table->string('people_uuid')->nullable();
+            $table->string('machine_id')->nullable();
             $table->string('NIK_employee')->nullable();
             $table->integer('salary')->nullable();
             $table->integer('insentif')->nullable();

@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('education', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
 
             // foreign key
-            $table->integer('people_id')->nullable();
+            $table->integer('people_uuid')->nullable();
 
             $table->string('sd_name')->nullable();
             $table->string('sd_place')->nullable();

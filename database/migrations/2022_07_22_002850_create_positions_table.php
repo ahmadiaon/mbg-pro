@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->nullable();
+
             $table->string('position')->nullable();
             $table->timestamps();
         });
