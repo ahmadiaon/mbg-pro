@@ -18,8 +18,11 @@ return new class extends Migration
             $table->string('uuid')->nullable();
 
             //foreign key
-            $table->string('employee_contract_uuid')->nullable();//head mine
+            $table->string('employee_uuid')->nullable();//head mine
             $table->string('mine_name')->nullable();
+            $table->string('owner')->nullable();
+            $table->string('is_last')->nullable();
+
             $table->timestamps();
         });
     }

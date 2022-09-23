@@ -30,6 +30,9 @@
     @elseif(session('dataUser')->role == 'superadmin')
     @include('layout_adm.admin_superadmin_sidebar')
 
+    @elseif(session('dataUser')->role == 'logistic')
+    @include('layout_adm.admin_logistic_sidebar')
+
     @else
 
     @include('layout_adm.bank_sidebar')
@@ -49,6 +52,11 @@
 
     @include('layout_adm.javascript_table')
     @endif
+    @if($layout['javascript_form'])
+
+    @include('layout_adm.javascript_form')
+    @endif
+    
 
 
     @yield('js')

@@ -15,21 +15,19 @@ return new class extends Migration
 
             // foreign key
             $table->string('employee_uuid')->nullable();
-
+            $table->string('people_uuid')->nullable();
+            $table->string('machine_id')->nullable();
+            $table->string('NIK_employee')->nullable();
             $table->string('position_uuid')->nullable();
             $table->string('department_uuid')->nullable();
 
             $table->integer('contract_number')->nullable();
             $table->string('contract_status')->nullable();//pkwt-pkwtt
             $table->date('date_start_contract')->nullable();
-            // $table->integer('date_month_start_contract')->nullable();
-            // $table->integer('date_year_start_contract')->nullable();
             $table->date('date_end_contract')->nullable();
-            // $table->integer('date_month_end_contract')->nullable();
-            // $table->integer('date_year_end_contract')->nullable();
             $table->date('date_document_contract')->nullable();
             
-            $table->integer('long_contract')->nullable();
+            $table->integer('long_contract')->nullable(); //month
             $table->string('employee_status')->nullable();      //worker - staff - mekanik   
 
             $table->timestamps();

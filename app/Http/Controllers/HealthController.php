@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Health;
 use App\Http\Requests\StoreHealthRequest;
 use App\Http\Requests\UpdateHealthRequest;
+use Illuminate\Http\Request;
 
 class HealthController extends Controller
 {
@@ -34,7 +35,7 @@ class HealthController extends Controller
      * @param  \App\Http\Requests\StoreHealthRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreHealthRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -68,7 +69,7 @@ class HealthController extends Controller
      * @param  \App\Models\Health  $health
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateHealthRequest $request, Health $health)
+    public function update(Request $request, Health $health)
     {
         //
     }

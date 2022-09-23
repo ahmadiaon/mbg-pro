@@ -19,6 +19,12 @@ return new class extends Migration
 
             $table->string('name')->nullable();
             $table->integer('value')->nullable();
+            
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+
+            $table->string('data_status')->nullable();
+
             $table->timestamps();
         });
     }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+use Carbon\Carbon;
 
 class ResponseFormatter
 {
@@ -35,7 +36,7 @@ class ResponseFormatter
     $date_end = explode(" ", $data);
     $months = ["","Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     $result = $date_end[2]."-".array_search($date_end[1], $months)."-".$date_end[0];
-      
+    $result = Carbon::createFromFormat('Y-m-d',  $result); 
     return $result;
   }
 

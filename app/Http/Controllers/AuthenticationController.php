@@ -30,10 +30,8 @@ class AuthenticationController extends Controller
             if(Hash::check($request->password, $dataUser->password)){
                 $dataUserOld = $dataUser;
                 $dataUser = User::join('employees', 'employees.uuid', '=', 'users.employee_uuid')
-                ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
                 ->where('users.NIK_employee', $request->username)
                 ->get([
-                    'employee_contracts.uuid as employee_contract_uuid',
                     'users.*',
                 ])->first();
                 if(!$dataUser){
@@ -63,6 +61,12 @@ class AuthenticationController extends Controller
                         break;
                     case('employee'):
                         return redirect()->intended('/');
+                        break;
+                    case('logistic'):
+                        return redirect()->intended('/logistic');
+                        break;
+                    case('hauling'):
+                        return redirect()->intended('/hauling');
                         break;
                     default:
                         $msg = 'Something went wrong.';

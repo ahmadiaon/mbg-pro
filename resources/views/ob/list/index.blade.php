@@ -9,36 +9,32 @@
             @if($over_burden_operators->isNotEmpty())
             @foreach($over_burden_operators as $over_burden_operator)
 
-            <div class="col-xl-3 col-lg-3 col-md-3 mb-20">
+            <div class="col-xl-4 col-lg-4 col-md-4 mb-20">
                 <div class="card-box height-100-p widget-style3">
                     <form action="/admin-ob/add-ritase" id="ritase-form-{{ $over_burden_operator->uuid }}"
                         method="POST">
                         @csrf
                         <input type="hidden" name="over_burden_uuid" value="{{  $over_burden->uuid }}">
-                        <input type="hidden" name="over_burden_id" value="{{ $idOB }}">
-
                         <input type="hidden" name="over_burden_operator_uuid"
                             value="{{ $over_burden_operator->over_burden_operator_uuid }}">
                         <div class="d-flex flex-wrap">
                             <div class="widget-data">
                                 <div class="row">
                                     <div class="col-8">
-                                        <div class="weight-700 font-24 text-dark">{{ $over_burden_operator->vehicle_code
-                                            }}-{{
-                                            $over_burden_operator->number
-                                            }}</div>
+                                        <div class="weight-700 font-24 text-dark">
+                                            {{ $over_burden_operator->group_code }}-
+                                            {{ $over_burden_operator->number }}</div>
                                         <div class="font-14 text-secondary weight-500">
-                                            {{ $over_burden_operator->NIK_employee }} <br> {{$over_burden_operator->name
-                                            }}
+                                            {{ $over_burden_operator->NIK_employee }} <br> {{$over_burden_operator->name }}
                                         </div>
                                         <div>
                                             <select class="form-control" name="over_burden_flit_uuid"
                                                 id="over_burden_flit_uuid">
-                                                @if($flits->isNotEmpty())
-                                                @foreach($flits as $flit)
+                                                @if($over_burden_flits->isNotEmpty())
+                                                @foreach($over_burden_flits as $flit)
                                                 <option value="{{ $flit->uuid }}" {{ ($flit->uuid ==
                                                     $over_burden_operator->over_burden_flit_uuid)?'selected':'' }}>
-                                                    {{ $flit->vehicle_code }} - {{ $flit->number }}
+                                                    {{ $flit->group_code }} - {{ $flit->number }}
                                                 </option>
                                                 @endforeach
                                                 @else
@@ -115,9 +111,9 @@
                                     @foreach($over_burden_lists as $over_burden_list)
                                     <tr>
                                         <td class="table-plus">{{ $over_burden_list->name }}</td>
-                                        <td>{{ $over_burden_list->vehicle_code }} - {{ $over_burden_list->number }}</td>
+                                        <td>{{ $over_burden_list->group_code }} - {{ $over_burden_list->number }}</td>
                                         <td>{{ $over_burden_list->over_burden_time }}</td>
-                                        <td>{{ $over_burden_list->vehicle_code_excavator }} - {{
+                                        <td>{{ $over_burden_list->group_code_excavator }} - {{
                                             $over_burden_list->number_excavator }}</td>
                                         <td>
                                             <div class="dropdown">

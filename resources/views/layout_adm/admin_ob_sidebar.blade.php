@@ -102,22 +102,22 @@
             <ul id="accordion-menu">
 
                 <li class="dropdown">
-                    <a href="javascript:;" class="dropdown-toggle">
+                    <a href="javascript:;" class="dropdown-toggle ">
                         <span class="micon bi bi-house"></span><span class="mtext">OB Menu</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        <li><a href="/admin-ob">Over Burden</a></li>
-                        @if(isset($ob_id))
+                        <li><a href="/admin-ob" class="{{ ($layout['active'] == 'admin-ob' )? 'active' : '' }}">Over Burden</a></li>
+                        @if(isset($over_burden->uuid))
                         <li class="dropdown show">
                             <a class="dropdown-toggle {{ ($layout['active'] == 'today-hm' || $layout['active'] == 'today-ob')? 'active' : '' }}"
-                                href="/admin-ob/{{ $ob_id }}/show" class="dropdown-toggle" data-option="on">
+                                href="/admin-ob/{{ $over_burden->uuid }}/show" class="dropdown-toggle" data-option="on">
                                 <span class="micon fa fa-plug"></span><span class="mtext">Today</span>
                             </a>
                             <ul class="submenu child" style="display: block;">
                                 <li><a class="dropdown-toggle {{ ( $layout['active'] == 'today-hm')? 'active' : '' }}"
-                                        href="/admin-ob/hour-meter/{{ $ob_id }}">HM</a></li>
+                                        href="/admin-ob/hour-meter/{{ $over_burden->uuid }}">HM</a></li>
                                 <li><a class="dropdown-toggle {{ ( $layout['active'] == 'today-ob')? 'active' : '' }}"
-                                        href="/admin-ob/ritasi/{{ $ob_id }}">Ritasi</a></li>
+                                        href="/admin-ob/ritasi/{{ $over_burden->uuid }}">Ritasi</a></li>
                             </ul>
                         </li>
                         @endif

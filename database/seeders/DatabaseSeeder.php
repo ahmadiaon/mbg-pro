@@ -36,5 +36,14 @@ class DatabaseSeeder extends Seeder
         'role' => 'admin-hr'
     ]
     );
+    User::create(
+        [
+            'employee_uuid' => 'employee-logistic-uuid',
+            'uuid' => 'logistic-uuid',
+            'NIK_employee' => 'logistic',
+            'password' =>  Hash::make('password'),
+            'role' => 'logistic'
+        ]
+        );
     }
 }

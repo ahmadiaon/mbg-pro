@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('uuid')->nullable();
 
             // foreign key
-            $table->integer('people_uuid')->nullable();
+            $table->string('user_detail_uuid')->nullable();
 
             $table->string('sd_name')->nullable();
             $table->string('sd_place')->nullable();
@@ -42,6 +42,9 @@ return new class extends Migration
             $table->string('dll_place')->nullable();
             $table->string('dll_jurusan')->nullable();
             $table->integer('dll_year')->nullable();
+
+            $table->string('data_status')->nullable();
+
 
             $table->timestamps();
 

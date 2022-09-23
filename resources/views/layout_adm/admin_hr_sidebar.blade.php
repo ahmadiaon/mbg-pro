@@ -105,9 +105,10 @@
                         <span class="micon bi bi-house"></span><span class="mtext">Employee</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        {{-- <li><a class="{{ ($layout['active'] == 'admin-hr-employees')? 'active' : '' }}"
-                                href="/admin-hr/employees">Employees</a></li> --}}
-                        <li><a class="{{ ($layout['active'] == 'admin-hr-employees-monitoring')? 'active' : '' }}"
+                                <li><a class="{{ ($layout['active-sub'] == 'employee')? 'active' : '' }}"
+                                    href="/admin-hr">Employee</a>
+                            </li>
+                                <li><a class="{{ ($layout['active-sub'] == 'monitoring')? 'active' : '' }}"
                                 href="/admin-hr/monitoring">Monitoring</a>
                         </li>
                     </ul>

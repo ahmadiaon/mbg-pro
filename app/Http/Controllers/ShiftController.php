@@ -31,7 +31,7 @@ class ShiftController extends Controller
 
     public function create(){
         $employees = EmployeeContract::getEmployee();
-
+        
         // dd($employees);
 
         $shifts = DB::table('shifts')

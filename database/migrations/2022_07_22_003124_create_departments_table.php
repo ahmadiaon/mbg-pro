@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('uuid')->nullable();
 
             $table->string('department')->nullable();
+            $table->string('data_status')->nullable();
+
             $table->timestamps();
         });
     }

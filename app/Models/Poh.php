@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Poh extends Model
 {
     use HasFactory;
+    
 }

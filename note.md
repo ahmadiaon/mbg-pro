@@ -4,6 +4,8 @@
 -   [ ] https://github.com/octo-org/octo-repo/issues/740
 -   [ ] Add delight to the experience when all tasks are
 -   [ ] -
+# Todo List Logistic
+-   [ ] get predic number
 
 # Todo List Admin HR
 

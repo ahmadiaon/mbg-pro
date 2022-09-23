@@ -30,11 +30,15 @@
 
 
     <style>
+          @if(session('dataUser')->role == 'admin-hr')
         html {
-            zoom: 0.8;
-            /* Old IE only */
+            zoom: 0.9;
         }
-
+        @elseif(session('dataUser')->role == 'logistic')
+        html {
+            zoom: 0.0;
+        }
+        @endif 
         .modal-backdrop {
             background-color: transparent;
         }

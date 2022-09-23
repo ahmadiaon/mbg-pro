@@ -45,23 +45,22 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="form-group">
-                                                <div class="form-group">
-                                                    <label>Nomor Kartu Keluarga</label>
-                                                    <input name="KK_number"
-                                                        class="form-control @error('KK_number') is-invalid @enderror"
-                                                        value="{{ old('KK_number') }}" id="KK_number"
-                                                        placeholder="62111" type="text">
-                                                    @error('KK_number')
-                                                    <div class="invalid-feedback">
-                                                        {{ $message }}
-                                                    </div>
-                                                    @enderror
+                                                <label>Nomor Kartu Keluarga</label>
+                                                <input name="KK_number"
+                                                    class="form-control @error('KK_number') is-invalid @enderror"
+                                                    value="{{ old('KK_number') }}" id="KK_number"
+                                                    placeholder="62111" type="text">
+                                                @error('KK_number')
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
                                                 </div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
+                                            <div class="form-group">
                                             <label>Kewarganegaraan</label>
                                             <select name="citizenship"
                                                 class="form-control @error('citizenship') is-invalid @enderror">
@@ -75,6 +74,7 @@
                                                 {{ $message }}
                                             </div>
                                             @enderror
+                                            </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-group">
@@ -307,7 +307,7 @@
 
                     </div>
 
-                    <!-- Identitas Karyawan -->
+                    <!-- Identitas Karyawan license-->
                     <div class="pd-20 card-box mb-20">
                         <div class="clearfix">
                             <div class="pull-left">

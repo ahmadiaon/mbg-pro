@@ -10,29 +10,11 @@
                 <h4 class="modal-title" id="myLargeModalLabel">
                     Setup Over Burden
                 </h4>
-                @if($id)
-                <div class="alert alert-primary" role="alert">
-                    Has done setup
-                    <a href="/admin-ob/hour-meter/{{ $id }}">
-                        <button type="button" class="btn btn-primary">
-                            HM <span class="icon-copy ti-dashboard"></span>
-                        </button>
-                    </a>
-                    <a href="/admin-ob/ritasi/{{ $id }}">
-                        <button type="button" class="btn" data-bgcolor="#00b489" data-color="#ffffff"
-                            style="color: rgb(255, 255, 255); background-color: rgb(0, 180, 137);">
-                            ritasi <i class="icon-copy dw dw-truck"></i>
-                        </button>
-                    </a>
-                </div>
-
-                @endif
-
             </div>
             <form action="/admin-ob" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $id }}">
+                    <input type="hidden" name="uuid" value="">
                     <div class="row">
                         {{-- checker --}}
                         <div class="col-md-6">
@@ -43,7 +25,7 @@
                                         <select name="checker_employee_uuid" class="form-control theSelect theSelect2"
                                             id="checker_employee_uuid">
                                             @foreach($employees as $employee)
-                                            @if(old('employee_uuid', $checker ) == $employee->uuid)
+                                            @if(old('checker_employee_uuid', $checker_employee_uuid ) == $employee->uuid)
                                             <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                             </option>
                                             @else
@@ -64,7 +46,7 @@
                                         <select name="foreman_employee_uuid" class="form-control theSelect theSelect3"
                                             id="foreman_employee_uuid">
                                             @foreach($employees as $employee)
-                                            @if(old('employee_uuid', $foreman ) == $employee->uuid)
+                                            @if(old('foreman_employee_uuid') == $employee->uuid)
                                             <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                             </option>
                                             @else
@@ -85,7 +67,7 @@
                                         <select name="supervisor_employee_uuid"
                                             class="form-control theSelect theSelect4" id="supervisor_employee_uuid">
                                             @foreach($employees as $employee)
-                                            @if(old('employee_uuid', $supervisor) ==
+                                            @if(old('supervisor_employee_uuid') ==
                                             $employee->uuid)
                                             <option value="{{ $employee->uuid }}" selected>{{ $employee->name }}
                                             </option>
@@ -125,21 +107,19 @@
                             <input name="date" id="date" value="{{ $today }}" onblur="convertDate()"
                                 class="form-control date-picker" placeholder="Select Date" type="text">
                         </div>
-                        <div class="col-2">
+                        <div class="col-3">
                             <div class="form-group">
                                 <label class="weight-600">Shift</label>
                                 <div class="row">
                                     <div class="col-3 mr-20">
                                         <div class="custom-control custom-radio mb-5">
-                                            <input type="radio" id="customRadio5" {{ ($shifts=='Siang' )? 'checked' :''
-                                                }} name="shift" value="Siang" class="custom-control-input">
+                                            <input type="radio" id="customRadio5" name="shift" value="Siang" class="custom-control-input">
                                             <label class="custom-control-label" for="customRadio5">Siang</label>
                                         </div>
                                     </div>
                                     <div class="col-5">
                                         <div class="ml-10 custom-control custom-radio mb-5">
-                                            <input type="radio" id="customRadio6" {{ ($shifts=='Malam' )? 'checked' :''
-                                                }} name="shift" value="Malam" class="custom-control-input">
+                                            <input type="radio" id="customRadio6"  name="shift" value="Malam" class="custom-control-input">
                                             <label class="custom-control-label" for="customRadio6">Malam</label>
                                         </div>
                                     </div>
@@ -152,7 +132,7 @@
                                 <label>Distance</label>
                                 <input name="distance" type="text"
                                     class="form-control  @error('distance') is-invalid @enderror"
-                                    value="{{ old('distance', $distance) }}" id="distance">
+                                    value="" id="distance">
                                 @error('distance')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -167,32 +147,29 @@
                                 <div class="row">
                                     <div class="col-2 mr-10">
                                         <div class="custom-control custom-radio mb-5">
-                                            <input type="radio" id="customRadio1" {{ ($material=='OB' )? 'checked' :''
-                                                }} name="material" value="OB" class="custom-control-input">
+                                            <input type="radio" id="customRadio1"  name="material" value="OB" class="custom-control-input">
                                             <label class="custom-control-label" for="customRadio1">OB</label>
                                         </div>
                                     </div>
                                     <div class="col-3 mr-20">
                                         <div class="custom-control custom-radio mb-5">
-                                            <input type="radio" id="customRadio3" {{ ($material=='Lumpur' )? 'checked'
-                                                :'' }} name="material" value="Lumpur" class="custom-control-input">
+                                            <input type="radio" id="customRadio3" name="material" value="Lumpur" class="custom-control-input">
                                             <label class="custom-control-label" for="customRadio3">Lumpur</label>
                                         </div>
                                     </div>
                                     <div class="col-5">
                                         <div class="ml-10 custom-control custom-radio mb-5">
-                                            <input type="radio" id="customRadio2" {{ ($material=='Top Soil' )? 'checked'
-                                                :'' }} name="material" value="Top Soil" class="custom-control-input">
+                                            <input type="radio" id="customRadio2"  name="material" value="Top Soil" class="custom-control-input">
                                             <label class="custom-control-label" for="customRadio2">Top Soil</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="id_note" value="{{  $id_note}}">
+                        <input type="hidden" name="id_note" value="">
                         <div class="col-12">
                             <textarea class="form-control" placeholder="Catatan" name="note" id="" cols="30"
-                                rows="10">{{ $note }}</textarea>
+                                rows="10"></textarea>
                         </div>
                     </div>
 

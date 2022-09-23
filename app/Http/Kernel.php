@@ -74,6 +74,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'isAdminHr' => \App\Http\Middleware\isAdminHr::class,
         'isSafety' => \App\Http\Middleware\isSafety::class,
+        'isLogistic' => \App\Http\Middleware\isLogistic::class,
+        'isHauling' => \App\Http\Middleware\isHauling::class,
         'assign.guard' => \App\Http\Middleware\AssignGuard::class
     ];
 }
