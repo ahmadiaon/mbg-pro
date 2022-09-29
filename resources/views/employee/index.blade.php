@@ -1,773 +1,958 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout_adm.main')
+@section('content')
+<div class="main-container">
+   
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-    <title>iPortfolio Bootstrap Template - Index</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
-
-    <!-- Favicons -->
-    <link href="{{ env('APP_URL') }}employee/assets/img/favicon.png" rel="icon">
-    <link href="{{ env('APP_URL') }}employee/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-    <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-        rel="stylesheet">
-
-    <!-- Vendor CSS Files -->
-    <link href="{{ env('APP_URL') }}employee/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="{{ env('APP_URL') }}employee/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ env('APP_URL') }}employee/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="{{ env('APP_URL') }}employee/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="{{ env('APP_URL') }}employee/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="{{ env('APP_URL') }}employee/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-    <!-- Template Main CSS File -->
-    <link href="{{ env('APP_URL') }}employee/assets/css/style.css" rel="stylesheet">
-
-    <!-- =======================================================
-  * Template Name: iPortfolio - v3.8.1
-  * Template URL: https://bootstrapmade.com/iportfolio-bootstrap-portfolio-websites-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
-</head>
-
-<body>
-
-    <!-- ======= Mobile nav toggle button ======= -->
-    <i class="bi bi-list mobile-nav-toggle d-xl-none"></i>
-
-    <!-- ======= Header ======= -->
-    <header id="header">
-        <div class="d-flex flex-column">
-
-            <div class="profile">
-                <img src="{{ env('APP_URL') }}employee/assets/img/profile-img.jpg" alt=""
-                    class="img-fluid rounded-circle">
-                <h1 class="text-light"><a href="index.html">Alex Smith</a></h1>
-                <div class="social-links mt-3 text-center">
-                    <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-                    <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-                    <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-                    <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-                    <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+    <div class="pd-ltr-20 xs-pd-20-10">
+        <div class="min-height-200px">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="title">
+                            <h4>Profile</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="index.html">Home</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    Profile
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-30">
+                    <form action="">
 
-            <nav id="navbar" class="nav-menu navbar">
-                <ul>
-                    <li><a href="#hero" class="nav-link scrollto active"><i class="bx bx-home"></i>
-                            <span>Home</span></a></li>
-                    <li><a href="#about" class="nav-link scrollto"><i class="bx bx-user"></i> <span>About</span></a>
-                    </li>
-                    <li><a href="#resume" class="nav-link scrollto"><i class="bx bx-file-blank"></i>
-                            <span>Resume</span></a></li>
-                    <li><a href="#portfolio" class="nav-link scrollto"><i class="bx bx-book-content"></i>
-                            <span>Portfolio</span></a></li>
-                    <li><a href="#services" class="nav-link scrollto"><i class="bx bx-server"></i>
-                            <span>Services</span></a></li>
-                    <li><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope"></i>
-                            <span>Contact</span></a></li>
-                </ul>
-            </nav><!-- .nav-menu -->
-        </div>
-    </header><!-- End Header -->
-
-    <!-- ======= Hero Section ======= -->
-    <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
-        <div class="hero-container" data-aos="fade-in">
-            <h1>Alex Smith</h1>
-            <p>I'm <span class="typed" data-typed-items="Designer, Developer, Freelancer, Photographer"></span></p>
-        </div>
-    </section><!-- End Hero -->
-
-    <main id="main">
-
-        <!-- ======= About Section ======= -->
-        <section id="about" class="about">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>About</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-4" data-aos="fade-right">
-                        <img src="{{ env('APP_URL') }}employee/assets/img/profile-img.jpg" class="img-fluid" alt="">
-                    </div>
-                    <div class="col-lg-8 pt-4 pt-lg-0 content" data-aos="fade-left">
-                        <h3>UI/UX Designer &amp; Web Developer.</h3>
-                        <p class="fst-italic">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore
-                            magna aliqua.
-                        </p>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <ul>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>Birthday:</strong> <span>1 May
-                                            1995</span></li>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>Website:</strong>
-                                        <span>www.example.com</span></li>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>Phone:</strong> <span>+123 456
-                                            7890</span></li>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>City:</strong> <span>New York,
-                                            USA</span></li>
-                                </ul>
+                   
+                    <div class="pd-20 card-box height-100-p">
+                        <div class="profile-photo">
+                            <a
+                                href="modal"
+                                data-toggle="modal"
+                                data-target="#modal"
+                                class="edit-avatar"
+                                ><i class="fa fa-pencil"></i
+                            ></a>
+                            <img
+                                src="vendors/images/photo1.jpg"
+                                alt=""
+                                class="avatar-photo"
+                            />
+                            <div
+                                class="modal fade"
+                                id="modal"
+                                tabindex="-1"
+                                role="dialog"
+                                aria-labelledby="modalLabel"
+                                aria-hidden="true"
+                            >
+                                <div
+                                    class="modal-dialog modal-dialog-centered"
+                                    role="document"
+                                >
+                                    <div class="modal-content">
+                                        <div class="modal-body pd-5">
+                                            <div class="img-container">
+                                                <img
+                                                    id="image"
+                                                    src="vendors/images/photo2.jpg"
+                                                    alt="Picture"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input
+                                                type="submit"
+                                                value="Update"
+                                                class="btn btn-primary"
+                                            />
+                                            <button
+                                                type="button"
+                                                class="btn btn-default"
+                                                data-dismiss="modal"
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-lg-6">
-                                <ul>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>Age:</strong> <span>30</span></li>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>Degree:</strong> <span>Master</span>
+                        </div>
+                        <h5 class="text-center h5 mb-0">{{$user->name}}</h5>
+                        <p class="text-center text-muted font-14">
+                            {{$user->nik_employee}}
+                        </p>
+                        <div class="profile-info">
+                            <h5 class="mb-20 h5 text-blue">Contact Information</h5>
+                            <ul>
+                                <li>
+                                    <span>Email Address:</span>
+                                    FerdinandMChilds@test.com
+                                </li>
+                                <li>
+                                    <span>Phone Number:</span>
+                                    619-229-0054
+                                </li>
+                                <li>
+                                    <span>Country:</span>
+                                    America
+                                </li>
+                                <li>
+                                    <span>Address:</span>
+                                    1807 Holden Street<br />
+                                    San Diego, CA 92115
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="profile-social">
+                            <h5 class="mb-20 h5 text-blue">Social Links</h5>
+                            <ul class="clearfix">
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#3b5998"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-facebook"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#1da1f2"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-twitter"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#007bb5"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-linkedin"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#f46f30"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-instagram"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#c32361"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-dribbble"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#3d464d"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-dropbox"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#db4437"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-google-plus"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#bd081c"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-pinterest-p"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#00aff0"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-skype"></i
+                                    ></a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        class="btn"
+                                        data-bgcolor="#00b489"
+                                        data-color="#ffffff"
+                                        ><i class="fa fa-vine"></i
+                                    ></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="profile-skills">
+                            <h5 class="mb-20 h5 text-blue">Key Skills</h5>
+                            <h6 class="mb-5 font-14">HTML</h6>
+                            <div class="progress mb-20" style="height: 6px">
+                                <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: 90%"
+                                    aria-valuenow="0"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                            <h6 class="mb-5 font-14">Css</h6>
+                            <div class="progress mb-20" style="height: 6px">
+                                <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: 70%"
+                                    aria-valuenow="0"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                            <h6 class="mb-5 font-14">jQuery</h6>
+                            <div class="progress mb-20" style="height: 6px">
+                                <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: 60%"
+                                    aria-valuenow="0"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                            <h6 class="mb-5 font-14">Bootstrap</h6>
+                            <div class="progress mb-20" style="height: 6px">
+                                <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: 80%"
+                                    aria-valuenow="0"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                </div>
+                <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 mb-30">
+                    <div class="card-box height-100-p overflow-hidden">
+                        <div class="profile-tab height-100-p">
+                            <div class="tab height-100-p">
+                                <ul class="nav nav-tabs customtab" role="tablist">
+                                    <li class="nav-item">
+                                        <a
+                                            class="nav-link active"
+                                            data-toggle="tab"
+                                            href="#timeline"
+                                            role="tab"
+                                            >Timeline</a
+                                        >
                                     </li>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>PhEmailone:</strong>
-                                        <span>email@example.com</span></li>
-                                    <li><i class="bi bi-chevron-right"></i> <strong>Freelance:</strong>
-                                        <span>Available</span></li>
+                                    <li class="nav-item">
+                                        <a
+                                            class="nav-link"
+                                            data-toggle="tab"
+                                            href="#tasks"
+                                            role="tab"
+                                            >Tasks</a
+                                        >
+                                    </li>
+                                    <li class="nav-item">
+                                        <a
+                                            class="nav-link"
+                                            data-toggle="tab"
+                                            href="#setting"
+                                            role="tab"
+                                            >HM</a
+                                        >
+                                    </li>
                                 </ul>
-                            </div>
-                        </div>
-                        <p>
-                            Officiis eligendi itaque labore et dolorum mollitia officiis optio vero. Quisquam sunt
-                            adipisci omnis et ut. Nulla accusantium dolor incidunt officia tempore. Et eius omnis.
-                            Cupiditate ut dicta maxime officiis quidem quia. Sed et consectetur qui quia repellendus
-                            itaque neque. Aliquid amet quidem ut quaerat cupiditate. Ab et eum qui repellendus omnis
-                            culpa magni laudantium dolores.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End About Section -->
-
-        <!-- ======= Facts Section ======= -->
-        <section id="facts" class="facts">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Facts</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row no-gutters">
-
-                    <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up">
-                        <div class="count-box">
-                            <i class="bi bi-emoji-smile"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p><strong>Happy Clients</strong> consequuntur quae</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up"
-                        data-aos-delay="100">
-                        <div class="count-box">
-                            <i class="bi bi-journal-richtext"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p><strong>Projects</strong> adipisci atque cum quia aut</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up"
-                        data-aos-delay="200">
-                        <div class="count-box">
-                            <i class="bi bi-headset"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p><strong>Hours Of Support</strong> aut commodi quaerat</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up"
-                        data-aos-delay="300">
-                        <div class="count-box">
-                            <i class="bi bi-people"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p><strong>Hard Workers</strong> rerum asperiores dolor</p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section><!-- End Facts Section -->
-
-        <!-- ======= Skills Section ======= -->
-        <section id="skills" class="skills section-bg">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Skills</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row skills-content">
-
-                    <div class="col-lg-6" data-aos="fade-up">
-
-                        <div class="progress">
-                            <span class="skill">HTML <i class="val">100%</i></span>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                        <div class="progress">
-                            <span class="skill">CSS <i class="val">90%</i></span>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                        <div class="progress">
-                            <span class="skill">JavaScript <i class="val">75%</i></span>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-
-                        <div class="progress">
-                            <span class="skill">PHP <i class="val">80%</i></span>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                        <div class="progress">
-                            <span class="skill">WordPress/CMS <i class="val">90%</i></span>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                        <div class="progress">
-                            <span class="skill">Photoshop <i class="val">55%</i></span>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="55" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-        </section><!-- End Skills Section -->
-
-        <!-- ======= Resume Section ======= -->
-        <section id="resume" class="resume">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Resume</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-6" data-aos="fade-up">
-                        <h3 class="resume-title">Sumary</h3>
-                        <div class="resume-item pb-0">
-                            <h4>Alex Smith</h4>
-                            <p><em>Innovative and deadline-driven Graphic Designer with 3+ years of experience designing
-                                    and developing user-centered digital/print marketing material from initial concept
-                                    to final, polished deliverable.</em></p>
-                            <ul>
-                                <li>Portland par 127,Orlando, FL</li>
-                                <li>(123) 456-7891</li>
-                                <li>alice.barkley@example.com</li>
-                            </ul>
-                        </div>
-
-                        <h3 class="resume-title">Education</h3>
-                        <div class="resume-item">
-                            <h4>Master of Fine Arts &amp; Graphic Design</h4>
-                            <h5>2015 - 2016</h5>
-                            <p><em>Rochester Institute of Technology, Rochester, NY</em></p>
-                            <p>Qui deserunt veniam. Et sed aliquam labore tempore sed quisquam iusto autem sit. Ea vero
-                                voluptatum qui ut dignissimos deleniti nerada porti sand markend</p>
-                        </div>
-                        <div class="resume-item">
-                            <h4>Bachelor of Fine Arts &amp; Graphic Design</h4>
-                            <h5>2010 - 2014</h5>
-                            <p><em>Rochester Institute of Technology, Rochester, NY</em></p>
-                            <p>Quia nobis sequi est occaecati aut. Repudiandae et iusto quae reiciendis et quis Eius vel
-                                ratione eius unde vitae rerum voluptates asperiores voluptatem Earum molestiae
-                                consequatur neque etlon sader mart dila</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-                        <h3 class="resume-title">Professional Experience</h3>
-                        <div class="resume-item">
-                            <h4>Senior graphic design specialist</h4>
-                            <h5>2019 - Present</h5>
-                            <p><em>Experion, New York, NY </em></p>
-                            <ul>
-                                <li>Lead in the design, development, and implementation of the graphic, layout, and
-                                    production communication materials</li>
-                                <li>Delegate tasks to the 7 members of the design team and provide counsel on all
-                                    aspects of the project. </li>
-                                <li>Supervise the assessment of all graphic materials in order to ensure quality and
-                                    accuracy of the design</li>
-                                <li>Oversee the efficient use of production project budgets ranging from $2,000 -
-                                    $25,000</li>
-                            </ul>
-                        </div>
-                        <div class="resume-item">
-                            <h4>Graphic design specialist</h4>
-                            <h5>2017 - 2018</h5>
-                            <p><em>Stepping Stone Advertising, New York, NY</em></p>
-                            <ul>
-                                <li>Developed numerous marketing programs (logos, brochures,infographics, presentations,
-                                    and advertisements).</li>
-                                <li>Managed up to 5 projects or tasks at a given time while under pressure</li>
-                                <li>Recommended and consulted with clients on the most appropriate graphic design</li>
-                                <li>Created 4+ design presentations and proposals a month for clients and account
-                                    managers</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End Resume Section -->
-
-        <!-- ======= Portfolio Section ======= -->
-        <section id="portfolio" class="portfolio section-bg">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Portfolio</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row" data-aos="fade-up">
-                    <div class="col-lg-12 d-flex justify-content-center">
-                        <ul id="portfolio-flters">
-                            <li data-filter="*" class="filter-active">All</li>
-                            <li data-filter=".filter-app">App</li>
-                            <li data-filter=".filter-card">Card</li>
-                            <li data-filter=".filter-web">Web</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="100">
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-1.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-1.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="App 1"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-2.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-2.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="Web 3"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-3.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-3.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="App 2"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-card">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-4.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-4.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="Card 2"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-5.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-5.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="Web 2"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-6.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-6.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="App 3"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-card">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-7.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-7.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="Card 1"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-card">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-8.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-8.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="Card 3"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-                        <div class="portfolio-wrap">
-                            <img src="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-9.jpg"
-                                class="img-fluid" alt="">
-                            <div class="portfolio-links">
-                                <a href="{{ env('APP_URL') }}employee/assets/img/portfolio/portfolio-9.jpg"
-                                    data-gallery="portfolioGallery" class="portfolio-lightbox" title="Web 3"><i
-                                        class="bx bx-plus"></i></a>
-                                <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section><!-- End Portfolio Section -->
-
-        <!-- ======= Services Section ======= -->
-        <section id="services" class="services">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Services</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up">
-                        <div class="icon"><i class="bi bi-briefcase"></i></div>
-                        <h4 class="title"><a href="">Lorem Ipsum</a></h4>
-                        <p class="description">Voluptatum deleniti atque corrupti quos dolores et quas molestias
-                            excepturi sint occaecati cupiditate non provident</p>
-                    </div>
-                    <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="100">
-                        <div class="icon"><i class="bi bi-card-checklist"></i></div>
-                        <h4 class="title"><a href="">Dolor Sitema</a></h4>
-                        <p class="description">Minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                            ex ea commodo consequat tarad limino ata</p>
-                    </div>
-                    <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="200">
-                        <div class="icon"><i class="bi bi-bar-chart"></i></div>
-                        <h4 class="title"><a href="">Sed ut perspiciatis</a></h4>
-                        <p class="description">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur</p>
-                    </div>
-                    <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="300">
-                        <div class="icon"><i class="bi bi-binoculars"></i></div>
-                        <h4 class="title"><a href="">Magni Dolores</a></h4>
-                        <p class="description">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                            deserunt mollit anim id est laborum</p>
-                    </div>
-                    <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="400">
-                        <div class="icon"><i class="bi bi-brightness-high"></i></div>
-                        <h4 class="title"><a href="">Nemo Enim</a></h4>
-                        <p class="description">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
-                            praesentium voluptatum deleniti atque</p>
-                    </div>
-                    <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="500">
-                        <div class="icon"><i class="bi bi-calendar4-week"></i></div>
-                        <h4 class="title"><a href="">Eiusmod Tempor</a></h4>
-                        <p class="description">Et harum quidem rerum facilis est et expedita distinctio. Nam libero
-                            tempore, cum soluta nobis est eligendi</p>
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End Services Section -->
-
-        <!-- ======= Testimonials Section ======= -->
-        <section id="testimonials" class="testimonials section-bg">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Testimonials</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="100">
-                    <div class="swiper-wrapper">
-
-                        <div class="swiper-slide">
-                            <div class="testimonial-item" data-aos="fade-up">
-                                <p>
-                                    <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                                    Proin iaculis purus consequat sem cure digni ssim donec porttitora entum suscipit
-                                    rhoncus. Accusantium quam, ultricies eget id, aliquam eget nibh et. Maecen aliquam,
-                                    risus at semper.
-                                    <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                                </p>
-                                <img src="{{ env('APP_URL') }}employee/assets/img/testimonials/testimonials-1.jpg"
-                                    class="testimonial-img" alt="">
-                                <h3>Saul Goodman</h3>
-                                <h4>Ceo &amp; Founder</h4>
-                            </div>
-                        </div><!-- End testimonial item -->
-
-                        <div class="swiper-slide">
-                            <div class="testimonial-item" data-aos="fade-up" data-aos-delay="100">
-                                <p>
-                                    <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                                    Export tempor illum tamen malis malis eram quae irure esse labore quem cillum quid
-                                    cillum eram malis quorum velit fore eram velit sunt aliqua noster fugiat irure amet
-                                    legam anim culpa.
-                                    <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                                </p>
-                                <img src="{{ env('APP_URL') }}employee/assets/img/testimonials/testimonials-2.jpg"
-                                    class="testimonial-img" alt="">
-                                <h3>Sara Wilsson</h3>
-                                <h4>Designer</h4>
-                            </div>
-                        </div><!-- End testimonial item -->
-
-                        <div class="swiper-slide">
-                            <div class="testimonial-item" data-aos="fade-up" data-aos-delay="200">
-                                <p>
-                                    <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                                    Enim nisi quem export duis labore cillum quae magna enim sint quorum nulla quem
-                                    veniam duis minim tempor labore quem eram duis noster aute amet eram fore quis sint
-                                    minim.
-                                    <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                                </p>
-                                <img src="{{ env('APP_URL') }}employee/assets/img/testimonials/testimonials-3.jpg"
-                                    class="testimonial-img" alt="">
-                                <h3>Jena Karlis</h3>
-                                <h4>Store Owner</h4>
-                            </div>
-                        </div><!-- End testimonial item -->
-
-                        <div class="swiper-slide">
-                            <div class="testimonial-item" data-aos="fade-up" data-aos-delay="300">
-                                <p>
-                                    <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                                    Fugiat enim eram quae cillum dolore dolor amet nulla culpa multos export minim
-                                    fugiat minim velit minim dolor enim duis veniam ipsum anim magna sunt elit fore quem
-                                    dolore labore illum veniam.
-                                    <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                                </p>
-                                <img src="{{ env('APP_URL') }}employee/assets/img/testimonials/testimonials-4.jpg"
-                                    class="testimonial-img" alt="">
-                                <h3>Matt Brandon</h3>
-                                <h4>Freelancer</h4>
-                            </div>
-                        </div><!-- End testimonial item -->
-
-                        <div class="swiper-slide">
-                            <div class="testimonial-item" data-aos="fade-up" data-aos-delay="400">
-                                <p>
-                                    <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                                    Quis quorum aliqua sint quem legam fore sunt eram irure aliqua veniam tempor noster
-                                    veniam enim culpa labore duis sunt culpa nulla illum cillum fugiat legam esse veniam
-                                    culpa fore nisi cillum quid.
-                                    <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                                </p>
-                                <img src="{{ env('APP_URL') }}employee/assets/img/testimonials/testimonials-5.jpg"
-                                    class="testimonial-img" alt="">
-                                <h3>John Larson</h3>
-                                <h4>Entrepreneur</h4>
-                            </div>
-                        </div><!-- End testimonial item -->
-
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-
-            </div>
-        </section><!-- End Testimonials Section -->
-
-        <!-- ======= Contact Section ======= -->
-        <section id="contact" class="contact">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Contact</h2>
-                    <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit
-                        sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias
-                        ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-                </div>
-
-                <div class="row" data-aos="fade-in">
-
-                    <div class="col-lg-5 d-flex align-items-stretch">
-                        <div class="info">
-                            <div class="address">
-                                <i class="bi bi-geo-alt"></i>
-                                <h4>Location:</h4>
-                                <p>A108 Adam Street, New York, NY 535022</p>
-                            </div>
-
-                            <div class="email">
-                                <i class="bi bi-envelope"></i>
-                                <h4>Email:</h4>
-                                <p>info@example.com</p>
-                            </div>
-
-                            <div class="phone">
-                                <i class="bi bi-phone"></i>
-                                <h4>Call:</h4>
-                                <p>+1 5589 55488 55s</p>
-                            </div>
-
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12097.433213460943!2d-74.0062269!3d40.7101282!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xb89d1fe6bc499443!2sDowntown+Conference+Center!5e0!3m2!1smk!2sbg!4v1539943755621"
-                                frameborder="0" style="border:0; width: 100%; height: 290px;" allowfullscreen></iframe>
-                        </div>
-
-                    </div>
-
-                    <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-                        <form action="{{ env('APP_URL') }}employee/forms/contact.php" method="post" role="form"
-                            class="php-email-form">
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label for="name">Your Name</label>
-                                    <input type="text" name="name" class="form-control" id="name" required>
+                                <div class="tab-content">
+                                    <!-- Timeline Tab start -->
+                                    <div
+                                        class="tab-pane fade show active"
+                                        id="timeline"
+                                        role="tabpanel"
+                                    >
+                                        <div class="pd-20">
+                                            <div class="profile-timeline">
+                                                <div class="timeline-month">
+                                                    <h5>August, 2020</h5>
+                                                </div>
+                                                <div class="profile-timeline-list">
+                                                    <ul>
+                                                        <li>
+                                                            <div class="date">12 Aug</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-android-alarm-clock"></i> Task
+                                                                Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="date">10 Aug</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-ios-chatboxes"></i> Task Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="date">10 Aug</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-ios-clock"></i> Event Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="date">10 Aug</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-ios-clock"></i> Event Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="timeline-month">
+                                                    <h5>July, 2020</h5>
+                                                </div>
+                                                <div class="profile-timeline-list">
+                                                    <ul>
+                                                        <li>
+                                                            <div class="date">12 July</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-android-alarm-clock"></i> Task
+                                                                Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="date">10 July</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-ios-chatboxes"></i> Task Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="timeline-month">
+                                                    <h5>June, 2020</h5>
+                                                </div>
+                                                <div class="profile-timeline-list">
+                                                    <ul>
+                                                        <li>
+                                                            <div class="date">12 June</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-android-alarm-clock"></i> Task
+                                                                Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="date">10 June</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-ios-chatboxes"></i> Task Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="date">10 June</div>
+                                                            <div class="task-name">
+                                                                <i class="ion-ios-clock"></i> Event Added
+                                                            </div>
+                                                            <p>
+                                                                Lorem ipsum dolor sit amet, consectetur
+                                                                adipisicing elit.
+                                                            </p>
+                                                            <div class="task-time">09:30 am</div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Timeline Tab End -->
+                                    <!-- Tasks Tab start -->
+                                    <div class="tab-pane fade" id="tasks" role="tabpanel">
+                                        <div class="pd-20 profile-task-wrap">
+                                            <div class="container pd-0">
+                                                <!-- Open Task start -->
+                                                <div class="task-title row align-items-center">
+                                                    <div class="col-md-8 col-sm-12">
+                                                        <h5>Open Tasks (4 Left)</h5>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-12 text-right">
+                                                        <a
+                                                            href="task-add"
+                                                            data-toggle="modal"
+                                                            data-target="#task-add"
+                                                            class="bg-light-blue btn text-blue weight-500"
+                                                            ><i class="ion-plus-round"></i> Add</a
+                                                        >
+                                                    </div>
+                                                </div>
+                                                <div class="profile-task-list pb-30">
+                                                    <ul>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-1"
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-1"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet, consectetur
+                                                            adipisicing elit. Id ea earum.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2019</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-2"
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-2"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2019</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-3"
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-3"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet, consectetur
+                                                            adipisicing elit.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2019</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-4"
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-4"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet. Id ea earum.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2019</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Open Task End -->
+                                                <!-- Close Task start -->
+                                                <div class="task-title row align-items-center">
+                                                    <div class="col-md-12 col-sm-12">
+                                                        <h5>Closed Tasks</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="profile-task-list close-tasks">
+                                                    <ul>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-close-1"
+                                                                    checked=""
+                                                                    disabled=""
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-close-1"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet, consectetur
+                                                            adipisicing elit. Id ea earum.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2018</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-close-2"
+                                                                    checked=""
+                                                                    disabled=""
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-close-2"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2018</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-close-3"
+                                                                    checked=""
+                                                                    disabled=""
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-close-3"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet, consectetur
+                                                            adipisicing elit.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2018</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div
+                                                                class="custom-control custom-checkbox mb-5"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="custom-control-input"
+                                                                    id="task-close-4"
+                                                                    checked=""
+                                                                    disabled=""
+                                                                />
+                                                                <label
+                                                                    class="custom-control-label"
+                                                                    for="task-close-4"
+                                                                ></label>
+                                                            </div>
+                                                            <div class="task-type">Email</div>
+                                                            Lorem ipsum dolor sit amet. Id ea earum.
+                                                            <div class="task-assign">
+                                                                Assigned to Ferdinand M.
+                                                                <div class="due-date">
+                                                                    due date <span>22 February 2018</span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Close Task start -->
+                                                <!-- add task popup start -->
+                                                <div
+                                                    class="modal fade customscroll"
+                                                    id="task-add"
+                                                    tabindex="-1"
+                                                    role="dialog"
+                                                >
+                                                    <div
+                                                        class="modal-dialog modal-dialog-centered"
+                                                        role="document"
+                                                    >
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5
+                                                                    class="modal-title"
+                                                                    id="exampleModalLongTitle"
+                                                                >
+                                                                    Tasks Add
+                                                                </h5>
+                                                                <button
+                                                                    type="button"
+                                                                    class="close"
+                                                                    data-dismiss="modal"
+                                                                    aria-label="Close"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom"
+                                                                    title=""
+                                                                    data-original-title="Close Modal"
+                                                                >
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body pd-0">
+                                                                <div class="task-list-form">
+                                                                    <ul>
+                                                                        <li>
+                                                                            <form>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-md-4"
+                                                                                        >Task Type</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            class="form-control"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-md-4"
+                                                                                        >Task Message</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <textarea
+                                                                                            class="form-control"
+                                                                                        ></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-md-4"
+                                                                                        >Assigned to</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <select
+                                                                                            class="selectpicker form-control"
+                                                                                            data-style="btn-outline-primary"
+                                                                                            title="Not Chosen"
+                                                                                            multiple=""
+                                                                                            data-selected-text-format="count"
+                                                                                            data-count-selected-text="{0} people selected"
+                                                                                        >
+                                                                                            <option>Ferdinand M.</option>
+                                                                                            <option>Don H. Rabon</option>
+                                                                                            <option>Ann P. Harris</option>
+                                                                                            <option>
+                                                                                                Katie D. Verdin
+                                                                                            </option>
+                                                                                            <option>
+                                                                                                Christopher S. Fulghum
+                                                                                            </option>
+                                                                                            <option>
+                                                                                                Matthew C. Porter
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row mb-0">
+                                                                                    <label class="col-md-4"
+                                                                                        >Due Date</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            class="form-control date-picker"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a
+                                                                                href="javascript:;"
+                                                                                class="remove-task"
+                                                                                data-toggle="tooltip"
+                                                                                data-placement="bottom"
+                                                                                title=""
+                                                                                data-original-title="Remove Task"
+                                                                                ><i class="ion-minus-circled"></i
+                                                                            ></a>
+                                                                            <form>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-md-4"
+                                                                                        >Task Type</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            class="form-control"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-md-4"
+                                                                                        >Task Message</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <textarea
+                                                                                            class="form-control"
+                                                                                        ></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-md-4"
+                                                                                        >Assigned to</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <select
+                                                                                            class="selectpicker form-control"
+                                                                                            data-style="btn-outline-primary"
+                                                                                            title="Not Chosen"
+                                                                                            multiple=""
+                                                                                            data-selected-text-format="count"
+                                                                                            data-count-selected-text="{0} people selected"
+                                                                                        >
+                                                                                            <option>Ferdinand M.</option>
+                                                                                            <option>Don H. Rabon</option>
+                                                                                            <option>Ann P. Harris</option>
+                                                                                            <option>
+                                                                                                Katie D. Verdin
+                                                                                            </option>
+                                                                                            <option>
+                                                                                                Christopher S. Fulghum
+                                                                                            </option>
+                                                                                            <option>
+                                                                                                Matthew C. Porter
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row mb-0">
+                                                                                    <label class="col-md-4"
+                                                                                        >Due Date</label
+                                                                                    >
+                                                                                    <div class="col-md-8">
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            class="form-control date-picker"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="add-more-task">
+                                                                    <a
+                                                                        href="#"
+                                                                        data-toggle="tooltip"
+                                                                        data-placement="bottom"
+                                                                        title=""
+                                                                        data-original-title="Add Task"
+                                                                        ><i class="ion-plus-circled"></i> Add
+                                                                        More Task</a
+                                                                    >
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button
+                                                                    type="button"
+                                                                    class="btn btn-primary"
+                                                                >
+                                                                    Add
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    class="btn btn-secondary"
+                                                                    data-dismiss="modal"
+                                                                >
+                                                                    Close
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- add task popup End -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Tasks Tab End -->
+                                    <!-- Setting Tab start -->
+                                    <div
+                                        class="tab-pane fade height-100-p"
+                                        id="setting"
+                                        role="tabpanel"
+                                    >
+                                        <div class="profile-setting">
+                                            <div class="pd-20">
+                                                <div class="profile-timeline">
+                                                    <div class="timeline-month">
+                                                        <h5>Tahun 2022</h5>
+                                                    </div>
+                                                    <div class="profile-timeline-list">
+                                                        <ul>
+                                                            <li>
+                                                                 <div class="date">Agustus</div>
+                                                                @foreach($employee_total_hm_months as $price)
+                                                                   @if($price->value)
+                                                                   <div class="task-name">
+                                                                        <i class="ion-android-alarm-clock"></i>Rp. {{ $price->name}}
+                                                                    </div>
+                                                                    <p>
+                                                                    {{$price->value}} Jam<div class="btn-list inline">
+                                                                        <a href="#" class="btn btn-primary btn-lg" role="button" aria-disabled="true">Setuju</a>
+                                                                        <a href="#" class="btn btn-secondary btn-lg" role="button" aria-disabled="true">Tolak</a>
+                                                                    </div>
+                                                                    </p>
+                                                                   @endif
+                                                                   
+                                                                @endforeach
+                                                            </li>
+                                                         
+                                                        </ul>
+                                                    </div>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Setting Tab End -->
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="name">Your Email</label>
-                                    <input type="email" class="form-control" name="email" id="email" required>
-                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="name">Subject</label>
-                                <input type="text" class="form-control" name="subject" id="subject" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Message</label>
-                                <textarea class="form-control" name="message" rows="10" required></textarea>
-                            </div>
-                            <div class="my-3">
-                                <div class="loading">Loading</div>
-                                <div class="error-message"></div>
-                                <div class="sent-message">Your message has been sent. Thank you!</div>
-                            </div>
-                            <div class="text-center"><button type="submit">Send Message</button></div>
-                        </form>
+                        </div>
                     </div>
-
                 </div>
-
-            </div>
-        </section><!-- End Contact Section -->
-
-    </main><!-- End #main -->
-
-    <!-- ======= Footer ======= -->
-    <footer id="footer">
-        <div class="container">
-            <div class="copyright">
-                &copy; Copyright <strong><span>iPortfolio</span></strong>
-            </div>
-            <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/iportfolio-bootstrap-portfolio-websites-template/ -->
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
             </div>
         </div>
-    </footer><!-- End  Footer -->
+        <div class="footer-wrap pd-20 mb-20 card-box">
+            DeskApp - Bootstrap 4 Admin Template By
+            <a href="https://github.com/dropways" target="_blank"
+                >Ankit Hingarajiya</a
+            >
+        </div>
+    </div>
+</div>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
+@endsection
 
-    <!-- Vendor JS Files -->
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/aos/aos.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/typed.js/typed.min.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/waypoints/noframework.waypoints.js"></script>
-    <script src="{{ env('APP_URL') }}employee/assets/vendor/php-email-form/validate.js"></script>
+@section('js')
+<script src="{{ env('APP_URL') }}src/plugins/cropperjs/dist/cropper.js"></script>
+<script>
+    window.addEventListener("DOMContentLoaded", function () {
+        var image = document.getElementById("image");
+        var cropBoxData;
+        var canvasData;
+        var cropper;
 
-    <!-- Template Main JS File -->
-    <script src="{{ env('APP_URL') }}employee/assets/js/main.js"></script>
-
-</body>
-
-</html>
+        $("#modal")
+            .on("shown.bs.modal", function () {
+                cropper = new Cropper(image, {
+                    autoCropArea: 0.5,
+                    dragMode: "move",
+                    aspectRatio: 3 / 3,
+                    restore: false,
+                    guides: false,
+                    center: false,
+                    highlight: false,
+                    cropBoxMovable: false,
+                    cropBoxResizable: false,
+                    toggleDragModeOnDblclick: false,
+                    ready: function () {
+                        cropper.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+                    },
+                });
+            })
+            .on("hidden.bs.modal", function () {
+                cropBoxData = cropper.getCropBoxData();
+                canvasData = cropper.getCanvasData();
+                cropper.destroy();
+            });
+    });
+</script>
+@endsection

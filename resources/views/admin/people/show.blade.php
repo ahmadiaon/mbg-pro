@@ -44,7 +44,7 @@
                                     class="rounded-circle" width="150" />
                                 <div class="mt-3">
                                     <h4>{{ $people->name }}</h4>
-                                    <p class="text-secondary mb-1">{{ $people->NIK_employee }}</p>
+                                    <p class="text-secondary mb-1">{{ $people->nik_employee }}</p>
                                     <p class="text-muted font-size-sm">
                                         {{ $people->department }}, {{ $people->position }}
                                     </p>

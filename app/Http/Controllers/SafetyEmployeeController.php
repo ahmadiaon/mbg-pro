@@ -23,7 +23,7 @@ class SafetyEmployeeController extends Controller
         ->join('safety_employees','safety_employees.employee_contract_uuid', '=', 'employee_contracts.uuid')
         ->get([ 
             'people.name',
-            'employees.NIK_employee',
+            'employees.nik_employee',
             'safety_employees.*',
             'positions.position',
         ]);
@@ -33,7 +33,7 @@ class SafetyEmployeeController extends Controller
 
         return Datatables::of($employees)
         ->addColumn('action', function ($model) {
-            return '<a class="text-decoration-none" href="/safety/' . $model->NIK_employee . '/show">
+            return '<a class="text-decoration-none" href="/safety/' . $model->nik_employee . '/show">
                             <button class="btn btn-secondary py-1 px-2 mr-1">
                                 <i class="icon-copy bi bi-eye-fill"></i>
                             </button>
@@ -58,19 +58,19 @@ class SafetyEmployeeController extends Controller
         ]);
     }
 
-    public function show($NIK_employee){
+    public function show($nik_employee){
         $employee = DB::table('employee_contracts')
         ->join('employees', 'employees.uuid', '=', 'employee_contracts.employee_uuid')
         ->join('departments', 'departments.uuid', '=', 'employee_contracts.department_uuid')
         ->join('people', 'people.uuid', '=', 'employees.people_uuid')
         ->join('positions', 'positions.uuid', '=', 'employee_contracts.position_uuid')
         ->join('safety_employees','safety_employees.employee_contract_uuid', '=', 'employee_contracts.uuid')
-        ->where('employees.NIK_employee', $NIK_employee )
+        ->where('employees.nik_employee', $nik_employee )
         ->get([ 
             'people.name',
             'employee_contracts.uuid as employee_contract_uuid',
             'departments.department',
-            'employees.NIK_employee',
+            'employees.nik_employee',
             'safety_employees.*',
             'positions.position',
         ])
@@ -92,7 +92,7 @@ class SafetyEmployeeController extends Controller
         ]);
     }
 
-    public function store(Request $request, $NIK_employee){
+    public function store(Request $request, $nik_employee){
         $validateData = $request->validate([
             'employee_contract_uuid' => '',
 

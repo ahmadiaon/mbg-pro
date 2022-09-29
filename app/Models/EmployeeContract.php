@@ -20,7 +20,7 @@ class EmployeeContract extends Model
             'people.name',
             'employee_contracts.uuid',
             'employees.id as  employee_id',
-            'employees.NIK_employee',
+            'employees.nik_employee',
             'positions.position',
         ]);
 

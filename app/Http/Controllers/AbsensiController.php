@@ -65,7 +65,7 @@ class AbsensiController extends Controller
 
         return Datatables::of($employees)
         ->addColumn('action', function ($model) {
-            return '<a class="text-decoration-none" href="/admin-hr/absensi-show/'.$model->month.'/' . $model->NIK_employee . '">
+            return '<a class="text-decoration-none" href="/admin-hr/absensi-show/'.$model->month.'/' . $model->nik_employee . '">
                             <button class="btn btn-secondary py-1 px-2 mr-1">
                                 <i class="icon-copy bi bi-eye-fill"></i>
                             </button>
@@ -88,7 +88,7 @@ class AbsensiController extends Controller
         $created = AbsensiEmployee::updateOrCreate(['id' => $request->id], $validatedData );
         // $dependent = Dependent::updateOrCreate(['id' => $request->id], $dependents );
        
-        return redirect('/admin-hr/absensi-show/'.$request->month.'/'.$request->NIK_employee);
+        return redirect('/admin-hr/absensi-show/'.$request->month.'/'.$request->nik_employee);
 
 
     }
@@ -117,7 +117,7 @@ class AbsensiController extends Controller
 
         return Datatables::of($employees)
         ->addColumn('action', function ($model) {
-            return '<a class="text-decoration-none" href="/admin-hr/absensi/' . $model->NIK_employee . '">
+            return '<a class="text-decoration-none" href="/admin-hr/absensi/' . $model->nik_employee . '">
                             <button class="btn btn-secondary py-1 px-2 mr-1">
                                 <i class="icon-copy bi bi-eye-fill"></i>
                             </button>
@@ -133,7 +133,7 @@ class AbsensiController extends Controller
         // dd('a');
         // $data = DB::table('employees')
         // ->leftJoin('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
-        // ->where('employees.NIK_employee', $nik)
+        // ->where('employees.nik_employee', $nik)
         // ->get(['employees.*']);
 
         // dd($data);
@@ -155,7 +155,7 @@ class AbsensiController extends Controller
            ->leftJoin('shift_lists', 'shift_lists.contract_employee_uuid', '=', 'employee_contracts.uuid')
            ->leftJoin('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
            ->join('absensi_employees', 'absensi_employees.machine_id','=', 'employees.machine_id')
-           ->where('employees.NIK_employee', $nik)
+           ->where('employees.nik_employee', $nik)
         //    ->where('shifts.shift_date_start', '<=', $dateGet)
         //    ->where('shifts.shift_date_end', '>=', $dateGet)
            ->where('absensi_employees.date_date', $i)
@@ -175,7 +175,7 @@ class AbsensiController extends Controller
             ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
            ->leftJoin('shift_lists', 'shift_lists.contract_employee_uuid', '=', 'employee_contracts.uuid')
            ->leftJoin('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
-           ->where('employees.NIK_employee', $nik)
+           ->where('employees.nik_employee', $nik)
            ->get([
             'shifts.shift_time',
             'employees.machine_id', 
@@ -184,7 +184,7 @@ class AbsensiController extends Controller
                 // $data = DB::table('employees')
                 // ->join('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
                 // ->join('shifts', 'shifts.id', '=', 'shift_lists.shift_id')
-                // ->where('employees.NIK_employee', $nik)
+                // ->where('employees.nik_employee', $nik)
                 // ->where('shifts.shift_date_start', '<=', $dateGet)
                 // ->where('shifts.shift_date_end', '>=', $dateGet)
                 // ->get([
@@ -221,7 +221,7 @@ class AbsensiController extends Controller
             'title'         => 'Absensi HR',
             'absens'    => $absens,
             'month'     => $month,
-            'NIK_employee'     => $nik,
+            'nik_employee'     => $nik,
             'layout'        => $layout
         ]);
     }

@@ -204,11 +204,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>NIK Employee</label>
-                                        <input name="NIK_employee"
-                                            class="form-control @error('NIK_employee') is-invalid @enderror"
-                                            value="{{ old('NIK_employee') }}" id="NIK_employee"
+                                        <input name="nik_employee"
+                                            class="form-control @error('nik_employee') is-invalid @enderror"
+                                            value="{{ old('nik_employee') }}" id="nik_employee"
                                             placeholder="6210000" type="text">
-                                        @error('NIK_employee')
+                                        @error('nik_employee')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>
@@ -419,10 +419,10 @@
         var company_uuid = document.getElementById("company_uuid").innerText;
         
         var contract =  ('000' + {{$contract_number}}).substr(-3)+"/"+contract_status+"/"+company_uuid+"/"+monthRomawi[parseInt(month)-1]+"/"+result[2]
-        var NIK_employee = company_uuid+"-"+result[2]+month+result[0]+ ('000' +{{$NIK_employee}}).substr(-3)
+        var nik_employee = company_uuid+"-"+result[2]+month+result[0]+ ('000' +{{$nik_employee}}).substr(-3)
         var date = new Date(month+' '+result[0]+' '+result[2]);
         $("#contract_number").val(contract);
-        $("#NIK_employee").val(NIK_employee);
+        $("#nik_employee").val(nik_employee);
         // Add ten days to specified date
         date.setMonth(date.getMonth() + parseInt(long) );
 

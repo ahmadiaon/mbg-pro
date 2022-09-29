@@ -23,7 +23,7 @@ class AuthController extends Controller
     }
     public function Login(Request $request){
         $validator = Validator::make($request->all(), [
-            'NIK_employee'         => 'required',
+            'nik_employee'         => 'required',
             'password'        => 'required'
         ]);
         if ($validator->fails()) {
@@ -39,7 +39,7 @@ class AuthController extends Controller
             ];
             return response()->json($response, 201);
         }
-        $user = User::where('NIK_employee', $request->NIK_employee)->first();
+        $user = User::where('nik_employee', $request->nik_employee)->first();
         if($user){
             if(Hash::check($request->password, $user->password) ){
                 $token = JWTAuth::fromUser($user);

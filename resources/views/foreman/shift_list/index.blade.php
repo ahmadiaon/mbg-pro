@@ -11,10 +11,10 @@
                     <input type="hidden" name="shift_id" id="" value="{{ $checker->id }}">
 
                     <input type="hidden" name="shift_uuid" id="" value="{{ $checker->uuid }}">
-                    <input type="hidden" name="NIK_employee_checker" id="" value="{{ $checker->NIK_employee }}">
+                    <input type="hidden" name="nik_employee_checker" id="" value="{{ $checker->nik_employee }}">
                     <label for="">Checker : </label>
                     <h5>
-                        {{ $checker->name }} | {{ $checker->NIK_employee }} | {{ $checker->shift_time }} </h5> <br>
+                        {{ $checker->name }} | {{ $checker->nik_employee }} | {{ $checker->shift_time }} </h5> <br>
                     <div class="form-group mt-20">
                         <label>Choose Operator/Driver</label>
                         <div class="row">
@@ -87,7 +87,7 @@
                                                 data-color="#265ed7" style="color: rgb(187, 210, 36);">
                                                 <i class="icon-copy fi-list"></i>
                                             </a> --}}
-                                            <a href="/foreman/manage-member-list/delete/{{ $checker->NIK_employee }}"
+                                            <a href="/foreman/manage-member-list/delete/{{ $checker->nik_employee }}"
                                                 data-color="#e95959" style="color: rgb(233, 89, 89);"><i
                                                     class="icon-copy dw dw-delete-3"></i></a>
                                         </div>

@@ -33,6 +33,15 @@
     @elseif(session('dataUser')->role == 'logistic')
     @include('layout_adm.admin_logistic_sidebar')
 
+    @elseif(session('dataUser')->role == 'employee')
+    @include('layout_adm.admin_employee_sidebar')
+
+    @elseif(session('dataUser')->role == 'engineer')
+    @include('layout_adm.admin_engineer_sidebar')
+
+    @elseif(session('dataUser')->role == 'payrol')
+    @include('layout_adm.admin_payrol_sidebar')
+
     @else
 
     @include('layout_adm.bank_sidebar')

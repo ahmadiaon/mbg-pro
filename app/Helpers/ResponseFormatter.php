@@ -46,5 +46,8 @@ class ResponseFormatter
       
     return $result;
   }
+  public static function getNumArray($index, $array){
+    return array_search($index, $array);
+  }
 
 }

@@ -21,6 +21,8 @@ use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\VehicleGroupController;
 use App\Http\Controllers\AbsensiExcellController;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\Employee\EmployeeTotalHmMonth;
+use App\Http\Controllers\Employee\EmployeeTotalHmMonthController;
 use App\Http\Controllers\OverBurden\OverBurdenFlitController;
 use App\Http\Controllers\OverBurden\OverBurdenListController;
 use App\Http\Controllers\SafetyEmployeeController;
@@ -28,10 +30,23 @@ use App\Http\Controllers\EmployeeContractController;
 use App\Http\Controllers\Hauling\HaulingSetupController;
 use App\Http\Controllers\LogisticController;
 use App\Http\Controllers\OverBurden\OverBurdenOperatorController;
+use App\Http\Controllers\OverBurden\OverBurdenRitaseController;
 use App\Http\Controllers\UserDetail\UserDetailController;
 use App\Http\Controllers\UserDetail\UserEducationController;
 use App\Http\Controllers\UserDetail\UserExperienceController;
 use App\Http\Controllers\Vehicle\VehicleController as VehicleVehicleController;
+use App\Models\UserDetail\UserDetail;
+
+
+Route::get('/', [UserDetailController::class, 'login']);
+
+
+
+
+
+
+
+
 
 Route::get('pdf-generate', [PDFController::class, 'generatePDF']);
 Route::get('pdf-show', [PDFController::class, 'showPDF']);
@@ -104,7 +119,6 @@ Route::get('/menu-data', [MenuController::class, 'anyData'])->name('menu-data');
 
 
 Route::middleware(['islogin'])->group(function () {
-
     Route::middleware(['isSuperAdmin'])->group(function () {
         // Route::get('/superadmin/manage-user', [UserController::class, 'manageUser']);
         // Route::get('/superadmin/manage-user/{id}', [UserController::class, 'showLevelEmployeeUser']);
@@ -125,7 +139,11 @@ Route::middleware(['islogin'])->group(function () {
     // foreman
     Route::middleware(['isForeman'])->group(function () {
         Route::prefix('/foreman')->group(function () {
-            Route::get('/', [ShiftController::class, 'index']);
+            Route::get('/', [OverBurdenController::class, 'indexForeman']);
+            Route::get('/hour-meter/{over_burden_uuid}', [HourMeterController::class, 'indexForeman']);
+            Route::post('/hour-meter', [HourMeterController::class, 'store']);
+            Route::get('/ritase/{over_burden_uuid}', [OverBurdenListController::class, 'indexForeman']);
+
         });
         
         
@@ -137,7 +155,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/foreman/manage-member', [ShiftListController::class, 'store']);
         Route::post('/foreman/over-burden', [OverBurdenController::class, 'forForemanOB']);
         // Route::post('/foreman/over-burden', [OverBurdenListController::class, 'forForeman']);
-        Route::post('/foreman/hour-meter', [HourMeterController::class, 'listHMforForeman']);
+        // Route::post('/foreman/hour-meter', [HourMeterController::class, 'listHMforForeman']);
         Route::get('/foreman-ob-data/{checkerId}', [OverBurdenController::class, 'dataOverBurdenForeman'])->name('dataOverBurdenForeman');
         Route::get('/foreman/over-burden/{obID}/show', [OverBurdenListController::class, 'listOBforForeman']);
     });
@@ -159,15 +177,15 @@ Route::middleware(['islogin'])->group(function () {
         
         
         
-
-        Route::get('/admin-ob-data', [OverBurdenController::class, 'dataOverBurden'])->name('ob-data');
-        
         Route::post('/admin-ob/flit', [OverBurdenFlitController::class, 'store']);        
     });
+
+    Route::get('/admin-ob-data', [OverBurdenController::class, 'dataOverBurden'])->name('ob-data');
+    
     Route::middleware(['isSafety'])->group(function () {
         Route::get('/safety', [SafetyEmployeeController::class, 'index']);
-        Route::get('/safety/{NIK_employee}/show', [SafetyEmployeeController::class, 'show']);
-        Route::post('/safety/{NIK_employee}/store', [SafetyEmployeeController::class, 'store']);
+        Route::get('/safety/{nik_employee}/show', [SafetyEmployeeController::class, 'show']);
+        Route::post('/safety/{nik_employee}/store', [SafetyEmployeeController::class, 'store']);
         Route::get('/safety-data', [SafetyEmployeeController::class, 'anyData'])->name('safety-data');
     });
     Route::middleware(['isAdminHr'])->group(function () {
@@ -218,7 +236,7 @@ Route::middleware(['islogin'])->group(function () {
 
         Route::post('/admin-hr/employees/contract/create', [EmployeeContractController::class, 'createEmployeeContract']);
         // Route::post('/admin-hr/employees/contract/store', [EmployeeContractController::class, 'storeEmployeeContract']);
-        Route::get('/admin-hr/employees/contract/show/{NIK_employee}', [EmployeeContractController::class, 'showEmployeeContract']);
+        Route::get('/admin-hr/employees/contract/show/{nik_employee}', [EmployeeContractController::class, 'showEmployeeContract']);
         
 
         // HR Hour Meter Employee
@@ -258,15 +276,41 @@ Route::middleware(['islogin'])->group(function () {
             Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);
         });
     });
+    Route::middleware(['isEmployee'])->group(function () {
+            Route::get('/me/{nik_employee}', [UserDetailController::class, 'indexUser']);
+            Route::get('/cuti', [UserDetailController::class, 'indexUser']);
+            Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);
+     
+    });
+    Route::middleware(['isEngineer'])->group(function () {
+        Route::prefix('/engineer')->group(function () {
+            Route::get('/', [OverBurdenController::class, 'indexEngineer']);
+            Route::get('/ritase/{over_burden_uuid}', [OverBurdenRitaseController::class, 'create']);
+        });
+    });
+    Route::middleware(['isPayrol'])->group(function () {
+        Route::prefix('/payrol')->group(function () {
+            Route::post('/store', [EmployeeTotalHmMonthController::class, 'storePayrol']);
+            Route::get('/hour-meter/{date}', [EmployeeTotalHmMonthController::class, 'indexPayrol']);
+            Route::get('/month/{month}', [EmployeeTotalHmMonthController::class, 'indexPayrol']);
+            Route::get('/ritase/{over_burden_uuid}', [OverBurdenRitaseController::class, 'create']);
+            Route::get('/dataHourMeterMonth/{month}', [EmployeeTotalHmMonthController::class, 'dataHourMeterMonth'])->name('dataHourMeterMonth');
+            Route::get('/month/{month}/export', [EmployeeTotalHmMonthController::class, 'exportPayrol']);
+            Route::post('/month/{month}/import', [EmployeeTotalHmMonthController::class, 'importPayrol']);
+
+        });
+    });
+
 });
 
 
+Route::get('/eee/{uuu}', [EmployeeTotalHmMonthController::class, 'dataHourMeterMonth']);
 
 
 
 // employee
 
-Route::get('/', [EmployeeController::class, 'index']);
+
 Route::get('/sign-in', [EmployeeContractController::class, 'loginEC']);
 Route::post('/sign-in', [AuthenticationController::class, 'login']);
 

@@ -18,7 +18,7 @@ class PublicController extends Controller
         ->join('positions', 'employees.position_id', '=', 'positions.id')
         ->join('people', 'employees.people_id', '=', 'people.id')
         ->join('departments', 'employees.department_id', '=', 'departments.id')
-        ->where('people.NIK_number', $nik)
+        ->where('people.nik_number', $nik)
         ->get()
         ->first();
 

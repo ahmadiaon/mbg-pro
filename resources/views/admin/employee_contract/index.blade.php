@@ -64,7 +64,7 @@
             ajax: '{!! route('employee-contract-data') !!}',
             columns: [
                 { data: 'contract_number', name: 'contract_number' },
-                { data: 'NIK_employee', name: 'NIK_employee' },
+                { data: 'nik_employee', name: 'nik_employee' },
                 { data: 'name', name: 'name' },
                 { data: 'position', name: 'position' },
                 { data: 'date_start_contract', name: 'date_start_contract' },

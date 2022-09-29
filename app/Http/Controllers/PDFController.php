@@ -31,12 +31,12 @@ class PDFController extends Controller
             // return $data;
           $data1 = [
            'name'=> $data->name,
-           'NIK_number'=> $data->NIK_number,
+           'nik_number'=> $data->nik_number,
            'phone_number'=> $data->phone_number,
            'salary'=> $data->salary,
            'position'=> $data->position,
            'department'=> $data->department,
-           'NIK_employee'=> $data->NIK_employee,
+           'nik_employee'=> $data->nik_employee,
 
            'date_start_contract'=> $data->date_start_contract,
            'date_start_contract'=> $data->date_start_contract,
@@ -71,12 +71,12 @@ class PDFController extends Controller
             // return $data;
           $data1 = [
            'name'=> $data->name,
-           'NIK_number'=> $data->NIK_number,
+           'nik_number'=> $data->nik_number,
            'phone_number'=> $data->phone_number,
            'salary'=> $data->salary,
            'position'=> $data->position,
            'department'=> $data->department,
-           'NIK_employee'=> $data->NIK_employee,
+           'nik_employee'=> $data->nik_employee,
 
            'date_start_contract'=> $data->date_start_contract,
            'date_start_contract'=> $data->date_start_contract,

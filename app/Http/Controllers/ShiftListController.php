@@ -18,7 +18,7 @@ class ShiftListController extends Controller
         ->join('employees','employees.uuid','=', 'employee_contracts.employee_uuid')
         ->join('people','people.uuid','=', 'employees.people_uuid')
         ->where('shifts.id',$idShift)
-        ->get(['employees.NIK_employee','people.name','shifts.*'])
+        ->get(['employees.nik_employee','people.name','shifts.*'])
         ->first();
 
         $shiftLists = DB::table('shift_lists')
@@ -28,7 +28,7 @@ class ShiftListController extends Controller
         ->join('people', 'people.uuid', '=', 'employees.people_uuid')
         ->join('positions', 'positions.uuid', '=', 'employee_contracts.position_uuid')
         ->where('shifts.id', $idShift)
-        ->get(['people.name', 'positions.position', 'shift_lists.*', 'employees.NIK_employee']);
+        ->get(['people.name', 'positions.position', 'shift_lists.*', 'employees.nik_employee']);
 
 
         $employees = EmployeeContract::getEmployee();

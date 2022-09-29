@@ -24,7 +24,7 @@ class PeopleController extends Controller
     {
         return Datatables::of(People::query())
         ->addColumn('action', function ($model) {
-            return '<a class="text-decoration-none" href="/admin/people/' . $model->NIK_number . '"><button class="btn btn-secondary py-1 px-2 mr-1"><i class="icon-copy bi bi-eye-fill"></i></button></a>
+            return '<a class="text-decoration-none" href="/admin/people/' . $model->nik_number . '"><button class="btn btn-secondary py-1 px-2 mr-1"><i class="icon-copy bi bi-eye-fill"></i></button></a>
             <a class="text-decoration-none" href="/admin/' . $model->id . '/edit"><button class="btn btn-warning py-1 px-2 mr-1"><i class="icon-copy dw dw-pencil"></i></button></a>
             <button onclick="myFunction(' . $model->id . ')"  type="button" class="btn btn-danger  py-1 px-2"><i class="icon-copy dw dw-trash"></i></button>';
         })
@@ -84,8 +84,8 @@ class PeopleController extends Controller
             'date_of_birth'         => 'required',
             'blood_group'         => 'required',
             'status'         => 'required',
-            'KK_number'         => 'required',
-            'NIK_number'         => 'required',
+            'kk_number'         => 'required',
+            'nik_number'         => 'required',
             'address'         => 'required',
             
             'financial_number'         => 'required',
@@ -199,7 +199,7 @@ class PeopleController extends Controller
             'health_care_place'         => '',
             'year_health'         => '',
 
-            'NIK_employee'         => 'required',
+            'nik_employee'         => 'required',
             'salary'         => '',
             'insentif'         => '',
             'premi_bk'         => '',
@@ -213,9 +213,9 @@ class PeopleController extends Controller
             'id' => $request->id], 
             [
             'name' => $request->name,
-            'NIK_number' => $request->NIK_number,
+            'nik_number' => $request->nik_number,
             
-            'KK_number' => $request->KK_number,
+            'kk_number' => $request->kk_number,
             'citizenship' => $request->citizenship,
             'religion_id' => $request->religion_id,
             'gender' => $request->gender,
@@ -407,7 +407,7 @@ class PeopleController extends Controller
            // employee
         if($request->salary){
             $employees = [
-                'NIK_employee' =>$request->NIK_employee,
+                'nik_employee' =>$request->nik_employee,
                 'salary' =>$request->salary,
                 'insentif' =>$request->insentif,
                 'premi_bk' =>$request->premi_bk,
@@ -424,20 +424,20 @@ class PeopleController extends Controller
             $employee = Employee::updateOrCreate(['id' => $request->id], $employees );
 
           }
-          $isUser = User::where('NIK_employee',$request->NIK_employee)->first();
+          $isUser = User::where('nik_employee',$request->nik_employee)->first();
           
           if($isUser){
             User::updateOrCreate(['id' => $isUser->id], [
-                'NIK_employee' => $request->NIK_employee,
+                'nik_employee' => $request->nik_employee,
                 'name' => $request->name,
-                'password' => Hash::make($people->NIK_number),
+                'password' => Hash::make($people->nik_number),
                 'group'     => 'employee'
             ] );
           }else{
             User::create([
-                'NIK_employee' => $request->NIK_employee,
+                'nik_employee' => $request->nik_employee,
                 'name' => $request->name,
-                'password' => Hash::make($request->NIK_number),
+                'password' => Hash::make($request->nik_number),
                 'group'     => 'employee'
             ]);
           }
@@ -448,7 +448,7 @@ class PeopleController extends Controller
           $peoples =   DB::table('employees')
             ->join('people', 'people.id', '=', 'employees.people_id')
             ->where('employees.id',$employee->id)
-            ->get(['people.name','employees.id as  employee_id','employees.NIK_employee'])
+            ->get(['people.name','employees.id as  employee_id','employees.nik_employee'])
             ->first();
         // return $peoples;
             $layout = [
@@ -485,7 +485,7 @@ class PeopleController extends Controller
         ->join('positions', 'employees.position_id', '=', 'positions.id')
         ->join('people', 'employees.people_id', '=', 'people.id')
         ->join('departments', 'employees.department_id', '=', 'departments.id')
-        ->where('people.NIK_number', $nik)
+        ->where('people.nik_number', $nik)
         ->get()
         ->first();
 

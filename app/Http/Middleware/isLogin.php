@@ -17,10 +17,13 @@ class isLogin
      */
     public function handle(Request $request, Closure $next)
     {
+        
         if(!session('dataUser')){
+            
             return redirect()->intended('/login');
         }
         if( session('dataUser') == '0'){
+            
             return redirect()->intended('/login');
         }
         return $next($request);

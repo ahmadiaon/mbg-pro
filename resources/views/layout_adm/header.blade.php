@@ -1,7 +1,12 @@
 <div class="header">
     <div class="header-left">
         <div class="menu-icon bi bi-list"></div>
-        <div class="search-toggle-icon bi bi-search" data-toggle="header_search"></div>
+        <div class="">
+            <form>
+            <h6>Mitra Barito Group</h6>
+            </form>
+        </div>
+        {{-- <div class="search-toggle-icon bi bi-search" data-toggle="header_search"></div> --}}
         {{-- <div class="header-search">
             <form>
                 <div class="form-group mb-0">
@@ -40,13 +45,13 @@
         </div> --}}
     </div>
     <div class="header-right">
-        <div class="dashboard-setting user-notification">
+        {{-- <div class="dashboard-setting user-notification">
             <div class="dropdown">
                 <a class="dropdown-toggle no-arrow" href="javascript:;" data-toggle="right-sidebar">
                     <i class="dw dw-settings2"></i>
                 </a>
             </div>
-        </div>
+        </div> --}}
         <div class="user-notification">
             <div class="dropdown">
                 <a class="dropdown-toggle no-arrow" href="#" role="button" data-toggle="dropdown">

@@ -17,14 +17,15 @@
                         <form action="/admin-ob/hour-meter" id="hour-meter-{{ $over_burden_operator->uuid }}"
                             method="POST">
                             @csrf
-                            <input type="hidden" name="uuid" value="{{ $over_burden_operator->uuid }}">
+                            <input type="hidden" name="uuid" value="{{ $over_burden_operator->uuid}}">
                             <input type="hidden" name="over_burden_uuid" value="{{ $over_burden->uuid}}">
                             <input type="hidden" name="vehicle_uuid" value="{{ $over_burden_operator->vehicle_uuid}}">
+                            <input type="hidden" name="over_burden_operator_uuid" value="{{ $over_burden_operator->over_burden_operator_uuid}}">
                             <div class="card-box pricing-card-style2">
                                 <div class="pricing-card-header">
                                     <div class="left">
                                         <h5>{{$over_burden_operator->name}}</h5>
-                                        <p> {{ $over_burden_operator->NIK_employee }}</p>
+                                        <p> {{ $over_burden_operator->nik_employee }}</p>
                                     </div>
                                     <div class="right">
                                         <div class="pricing-price"> {{ $over_burden_operator->group_code }}<span> {{
@@ -148,7 +149,7 @@
                                 </div>
                                 <div class="cta">
                                     <a onclick="document.forms['hour-meter-{{ $over_burden_operator->uuid }}'].submit();"
-                                        style="cursor: pointer" class="btn btn-primary btn-rounded btn-lg">Unsave</a>
+                                        style="cursor: pointer" class="btn btn-primary btn-rounded btn-lg ">Unsave</a>
                                 </div>
                             </div>
                         </form>
@@ -182,7 +183,7 @@
                                 <div class="pricing-card-header">
                                     <div class="left">
                                         <h5>{{$over_burden_operator->name}}</h5>
-                                        <p> {{ $over_burden_operator->NIK_employee }}</p>
+                                        <p> {{ $over_burden_operator->nik_employee }}</p>
                                     </div>
                                     <div class="right">
                                         <div class="pricing-price"> {{ $over_burden_operator->group_code }}<span> {{

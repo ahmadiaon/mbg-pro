@@ -64,8 +64,8 @@
             ajax: '{!! route('users-data') !!}',
             columns: [
                 { data: 'name', name: 'name' },
-                { data: 'NIK_number', name: 'NIK_number' },
-                { data: 'NIK_employee', name: 'NIK_employee' },
+                { data: 'nik_number', name: 'nik_number' },
+                { data: 'nik_employee', name: 'nik_employee' },
                 { data: 'group', name: 'group' },
                 { data: 'statusPass', name: 'statusPass' },
                 { data: 'action', name: 'action' },

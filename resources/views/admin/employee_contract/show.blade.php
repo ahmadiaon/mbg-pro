@@ -36,7 +36,7 @@
                         {{-- @dd($employeeData) --}}
                         <h5 class="text-center h5 mb-0">{{ $employeeData['identity']->name}}</h5>
                         <p class="text-center text-muted font-14">
-                            {{ $employeeData['employees']->NIK_employee }} <br>
+                            {{ $employeeData['employees']->nik_employee }} <br>
                             {{ $employeeData['employees']->department }}-{{$employeeData['employees']->position }}
                         </p>
                         <div class="profile-info">

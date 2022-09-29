@@ -38,7 +38,7 @@ class ShiftController extends Controller
         ->join('employee_contracts','employee_contracts.uuid','=', 'shifts.checker_uuid')
         ->join('employees','employees.uuid','=', 'employee_contracts.employee_uuid')
         ->join('people','people.uuid','=', 'employees.people_uuid')
-        ->get(['employees.NIK_employee','people.name','shifts.*']);
+        ->get(['employees.nik_employee','people.name','shifts.*']);
 
         
         $layout = [

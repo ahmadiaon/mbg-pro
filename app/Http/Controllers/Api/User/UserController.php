@@ -104,8 +104,8 @@ class UserController extends Controller
         $employee = DB::table('users')
         ->join('employees', 'employees.id', '=',  'users.employee_id')
         ->join('people', 'people.id', '=',  'employees.people_id')
-        ->where('employees.NIK_employee', $id)
-        ->get(['employees.NIK_employee', 'people.NIK_number', 'employees.id', 'people.name', 'users.group'])
+        ->where('employees.nik_employee', $id)
+        ->get(['employees.nik_employee', 'people.nik_number', 'employees.id', 'people.name', 'users.group'])
         ->first();
         // dd($employee);
         $layout = [
@@ -127,9 +127,9 @@ class UserController extends Controller
         return Datatables::of(DB::table('users')
         ->join('employees', 'employees.id', '=',  'users.employee_id')
         ->join('people', 'people.id', '=',  'employees.people_id')
-        ->get(['employees.NIK_employee', 'people.NIK_number', 'employees.id', 'people.name', 'users.group']))
+        ->get(['employees.nik_employee', 'people.nik_number', 'employees.id', 'people.name', 'users.group']))
         ->addColumn('action', function ($model) {
-            $id = $model->NIK_employee;
+            $id = $model->nik_employee;
          
             // $textId = "'".$id."'";
             return '

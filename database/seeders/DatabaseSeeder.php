@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'employee_uuid' => '0',
             'uuid' => '0',
-            'NIK_employee' => 'superadmin',
+            'nik_employee' => 'superadmin',
             'password' =>  Hash::make('password'),
             'role' => 'superadmin'
         ]
@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
     [
         'employee_uuid' => 'employee-admin-hr-uuid',
         'uuid' => 'admin-hr-uuid',
-        'NIK_employee' => 'admin-hr',
+        'nik_employee' => 'admin-hr',
         'password' =>  Hash::make('password'),
         'role' => 'admin-hr'
     ]
@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
         [
             'employee_uuid' => 'employee-logistic-uuid',
             'uuid' => 'logistic-uuid',
-            'NIK_employee' => 'logistic',
+            'nik_employee' => 'logistic',
             'password' =>  Hash::make('password'),
             'role' => 'logistic'
         ]

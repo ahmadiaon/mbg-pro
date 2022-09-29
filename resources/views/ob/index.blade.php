@@ -23,6 +23,7 @@
                     <thead>
                         <tr>
                             <th class="">Date</th>
+                            <th class="">Name</th>
                             <th class="">Shift</th>
                             <th>Action</th>
                         </tr>
@@ -50,6 +51,7 @@
             ajax: '{!! route('ob-data') !!}',
             columns: [
                 { data: 'date', name: 'date' },
+                { data: 'name', name: 'name' },
                 { data: 'shift', name: 'shift' },
                 { data: 'action', name: 'action' }
             ]

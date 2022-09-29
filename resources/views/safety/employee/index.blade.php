@@ -64,7 +64,7 @@
             ajax: '{!! route('safety-data') !!}',
             columns: [
                 { data: 'no_reg', name: 'no_reg' },
-                { data: 'NIK_employee', name: 'NIK_employee' },
+                { data: 'nik_employee', name: 'nik_employee' },
                 { data: 'name', name: 'name' },
                 { data: 'boots_size', name: 'boots_size' },
                 { data: 'helm_color', name: 'helm_color' },

@@ -255,7 +255,7 @@
                     <div class="card-box h-100 mr-20 pd-20">
                         <div class="row">
                             <div class="col-7">
-                                <h6 class="h5 mb-10">{{ $over_burden_operator->NIK_employee }}</h6>
+                                <h6 class="h5 mb-10">{{ $over_burden_operator->nik_employee }}</h6>
                                 <h6 class="h5 mb-10"> {{$over_burden_operator->name }}</h6>
                                 <div class="row">
                                     <div class="col">

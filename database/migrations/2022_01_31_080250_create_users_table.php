@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('role')->nullable();
             
             // secondary
-            $table->string('NIK_employee')->nullable();
+            $table->string('nik_employee')->nullable();
             $table->string('password')->nullable();
 
             $table->string('auth_login')->nullable();

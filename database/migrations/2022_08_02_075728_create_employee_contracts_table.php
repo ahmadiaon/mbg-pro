@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('employee_uuid')->nullable();
             $table->string('people_uuid')->nullable();
             $table->string('machine_id')->nullable();
-            $table->string('NIK_employee')->nullable();
+            $table->string('nik_employee')->nullable();
             $table->string('position_uuid')->nullable();
             $table->string('department_uuid')->nullable();
 

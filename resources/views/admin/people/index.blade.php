@@ -85,7 +85,7 @@
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'phone_number', name: 'phone_number' },
-                { data: 'NIK_number', name: 'NIK_number' },
+                { data: 'nik_number', name: 'nik_number' },
                 { data: 'poh_place', name: 'poh_place' },
                 { data: 'action', name: 'action' }
             ]

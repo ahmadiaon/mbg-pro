@@ -31,11 +31,11 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label>NIK</label>
-                                            <input name="NIK_number"
-                                                class="form-control @error('NIK_number') is-invalid @enderror"
-                                                value="{{ old('NIK_number') }}" id="NIK_number" placeholder="6210000"
+                                            <input name="nik_number"
+                                                class="form-control @error('nik_number') is-invalid @enderror"
+                                                value="{{ old('nik_number') }}" id="nik_number" placeholder="6210000"
                                                 type="text">
-                                            @error('NIK_number')
+                                            @error('nik_number')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
@@ -46,11 +46,11 @@
                                         <div class="form-group">
                                             <div class="form-group">
                                                 <label>Nomor Kartu Keluarga</label>
-                                                <input name="KK_number"
-                                                    class="form-control @error('KK_number') is-invalid @enderror"
-                                                    value="{{ old('KK_number') }}" id="KK_number" placeholder="62111"
+                                                <input name="kk_number"
+                                                    class="form-control @error('kk_number') is-invalid @enderror"
+                                                    value="{{ old('kk_number') }}" id="kk_number" placeholder="62111"
                                                     type="text">
-                                                @error('KK_number')
+                                                @error('kk_number')
                                                 <div class="invalid-feedback">
                                                     {{ $message }}
                                                 </div>
@@ -1682,11 +1682,11 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>NIK Employee</label>
-                                <input name="NIK_employee"
-                                    class="form-control @error('NIK_employee') is-invalid @enderror"
-                                    value="{{ old('NIK_employee') }}" id="NIK_employee" placeholder="MBLE-29990"
+                                <input name="nik_employee"
+                                    class="form-control @error('nik_employee') is-invalid @enderror"
+                                    value="{{ old('nik_employee') }}" id="nik_employee" placeholder="MBLE-29990"
                                     type="text">
-                                @error('NIK_employee')
+                                @error('nik_employee')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>

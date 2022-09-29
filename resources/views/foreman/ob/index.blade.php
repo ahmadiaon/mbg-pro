@@ -3,11 +3,11 @@
 <div class="main-container">
     <div class="xs-pd-20-10 pd-ltr-20">
 
-        <div class="pd-20 col-6 card-box mb-30">
+        <div class="pd-20 col-10 card-box mb-30">
             <div class="pd-20">
                 <div class="row">
                     <div class="col-6">
-                        <h4 class="text-blue h4">Over Burden</h4>
+                        <h4 class="text-blue h4">Over Burden Foreman</h4>
                     </div>
                     <div class="col">
                         <div class="mb-0 float-right">
@@ -23,6 +23,7 @@
                     <thead>
                         <tr>
                             <th class="">Date</th>
+                            <th class="">Checker</th>
                             <th class="">Shift</th>
                             <th>Action</th>
                         </tr>
@@ -47,9 +48,10 @@
         $('#myTablse').DataTable({
             processing: true,
             serverSide: true,
-            ajax:'{!! url('http://192.168.8.80:8000/foreman-ob-data/'.$checker_id) !!}',
+            ajax: '{!! route('ob-data') !!}',
             columns: [
                 { data: 'date', name: 'date' },
+                { data: 'name', name: 'name' },
                 { data: 'shift', name: 'shift' },
                 { data: 'action', name: 'action' }
             ]

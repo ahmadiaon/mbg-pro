@@ -25,7 +25,7 @@
                                             {{ $over_burden_operator->group_code }}-
                                             {{ $over_burden_operator->number }}</div>
                                         <div class="font-14 text-secondary weight-500">
-                                            {{ $over_burden_operator->NIK_employee }} <br> {{$over_burden_operator->name }}
+                                            {{ $over_burden_operator->nik_employee }} <br> {{$over_burden_operator->name }}
                                         </div>
                                         <div>
                                             <select class="form-control" name="over_burden_flit_uuid"

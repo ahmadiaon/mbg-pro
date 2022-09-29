@@ -149,7 +149,7 @@
             serverSide: true,
             ajax: '{!! url('http://192.168.8.80:8000/admin-hr/absensi-data/'.$month) !!}',
             columns: [
-                { data: 'NIK_employee', name: 'NIK_employee' },
+                { data: 'nik_employee', name: 'nik_employee' },
                 { data: 'name', name: 'name' },
                 { data: 'position', name: 'position' },
                 { data: 'count_ds', name: 'count_ds' },

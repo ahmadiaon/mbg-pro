@@ -31,11 +31,11 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label>NIK Karyawan</label>
-                                            <input name="NIK_employee"
-                                                class="form-control @error('NIK_employee') is-invalid @enderror"
-                                                value="{{ old('NIK_employee',$employee->NIK_employee) }}"
-                                                id="NIK_employee" placeholder="6210000" type="text">
-                                            @error('NIK_employee')
+                                            <input name="nik_employee"
+                                                class="form-control @error('nik_employee') is-invalid @enderror"
+                                                value="{{ old('nik_employee',$employee->nik_employee) }}"
+                                                id="nik_employee" placeholder="6210000" type="text">
+                                            @error('nik_employee')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>

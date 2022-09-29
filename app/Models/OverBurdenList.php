@@ -23,7 +23,7 @@ class OverBurdenList extends Model
         ->get([
             'over_burden_operators.uuid',
             'over_burden_operators.capacity',
-            'employees.NIK_employee',
+            'employees.nik_employee',
             'people.name',
             'vehicles.number',
             'vehicle_groups.vehicle_code',
@@ -46,7 +46,7 @@ class OverBurdenList extends Model
         ->get([
             'over_burden_operators.uuid',
             'over_burden_operators.capacity',
-            'employees.NIK_employee',
+            'employees.nik_employee',
             'people.name',
             'v.number',
             'vg.vehicle_code',

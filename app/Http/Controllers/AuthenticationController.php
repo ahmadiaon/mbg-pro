@@ -24,20 +24,21 @@ class AuthenticationController extends Controller
         ]);
 
         
-         $dataUser = User::where('NIK_employee', $request->username)->get()->first();
+         $dataUser = User::where('nik_employee', $request->username)->get()->first();
         //  dd($aa = Hash::check($request->password, $dataUser->password));
         if($dataUser){
             if(Hash::check($request->password, $dataUser->password)){
                 $dataUserOld = $dataUser;
-                $dataUser = User::join('employees', 'employees.uuid', '=', 'users.employee_uuid')
-                ->where('users.NIK_employee', $request->username)
+               $dataUser = User::join('employees', 'employees.uuid', '=', 'users.employee_uuid')
+                ->where('users.nik_employee', $request->username)
                 ->get([
                     'users.*',
+                    'employees.uuid as employee_uuid'
                 ])->first();
                 if(!$dataUser){
                     $dataUser =$dataUserOld;
                 }
-               
+            //    dd($dataUser);
                 $request->session()->put('dataUser', $dataUser);
                 switch($dataUser->role) {
                     case('admin-hr'):
@@ -53,21 +54,28 @@ class AuthenticationController extends Controller
                         case('foreman'):
                             return redirect()->intended('/foreman');
                             break;
-                case('admin-ob'):
+                    case('admin-ob'):
                         return redirect()->intended('/admin-ob');
                         break;
                     case('superadmin'):
                         return redirect()->intended('/superadmin');
                         break;
                     case('employee'):
-                        return redirect()->intended('/');
+                        return redirect()->intended('/me/'.session('dataUser')->nik_employee);
                         break;
                     case('logistic'):
                         return redirect()->intended('/logistic');
                         break;
+                    case('engineer'):
+                        return redirect('/engineer');
+                        break;
                     case('hauling'):
                         return redirect()->intended('/hauling');
                         break;
+                        case('payrol'):
+                            return redirect()->intended('/payrol');
+                            break;
+                    
                     default:
                         $msg = 'Something went wrong.';
                 }

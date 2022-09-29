@@ -76,6 +76,9 @@ class Kernel extends HttpKernel
         'isSafety' => \App\Http\Middleware\isSafety::class,
         'isLogistic' => \App\Http\Middleware\isLogistic::class,
         'isHauling' => \App\Http\Middleware\isHauling::class,
+        'isEmployee' => \App\Http\Middleware\isEmployee::class,
+        'isEngineer' => \App\Http\Middleware\isEngineer::class,
+        'isPayrol' => \App\Http\Middleware\isPayrol::class,
         'assign.guard' => \App\Http\Middleware\AssignGuard::class
     ];
 }
