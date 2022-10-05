@@ -106,11 +106,12 @@
                         <span class="micon bi bi-house"></span><span class="mtext">Safety Menu</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        <li><a class=" {{ ($layout['active'] == 'manage-checker')? 'active' : '' }}"
-                                href="/foreman/manage-checker">List Karyawan</a></li>
+                        <li><a class=" {{ ($layout['active'] == 'employee-list')? 'active' : '' }}"
+                            href="/safety/employee-list">List Karyawan</a></li>
+                        <li><a class=" {{ ($layout['active'] == 'manage')? 'active' : '' }}"
+                                href="/safety/manage">Manage</a></li>
                     </ul>
                 </li>
-
             </ul>
         </div>
     </div>

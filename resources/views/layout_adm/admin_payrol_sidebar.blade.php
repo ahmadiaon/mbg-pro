@@ -102,15 +102,69 @@
             <ul id="accordion-menu">
                 <li>
                     <a href="sitemap.html" class="dropdown-toggle no-arrow {{ ($layout['active'] == 'employee' || $layout['active'] == 'logistic')? 'active' : '' }}">
-                        <span class="micon bi bi-diagram-3"></span><span class="mtext">Engineer</span>
+                        <span class="micon bi bi-diagram-3"></span><span class="mtext">Total</span>
                     </a>
                 </li>
                 <li class="dropdown">
-                    <a href="javascript:;" class="dropdown-toggle">
-                        <span class="micon bi bi-house"></span><span class="mtext">Hour Meter</span>
+                    <a href="javascript:;" class="dropdown-toggle {{ ($layout['active'] == 'employee-list')? 'active' : '' }}">
+                        <span class="micon bi bi-house"></span><span class="mtext">Karyawan</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        <li><a href="/payrol/hour-meter/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Bulanan</a></li>
+                        <li><a href="/payrol">Manage</a></li>
+                        <li><a class="{{ ($layout['active'] == 'absensi')? 'active' : '' }}" href="/payrol/absensi/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Absen</a></li>
+                    </ul>
+                </li>
+                
+                <li class="dropdown" style="display:block">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <span class="micon bi bi-hdd-stack"></span
+                        ><span class="mtext">Allowance</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/payrol/total">Total</a></li>
+                        <li class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle">
+                                <span class="micon fa fa-plug"></span
+                                ><span class="mtext">Kegiatan</span>
+                            </a>
+                            <ul class="submenu child" style="display:block">
+                                <li>
+                                    <a class="{{ ($layout['active'] == 'payment')? 'active' : '' }}" href="/payrol/payment/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">
+                                        Perkegiatan
+                                    </a>
+                                </li>
+                                <li><a class="{{ ($layout['active'] == 'payment-employee')? 'active' : '' }}" href="/payrol/payment-employee/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Perorang</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle">
+                                <span class="micon fa fa-plug"></span
+                                ><span class="mtext">HM</span>
+                            </a>
+                            <ul class="submenu child">
+                                <li><a href="/payrol/hour-meter/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Perorang</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="javascript:;">Level 1</a></li>
+                    </ul>
+                </li>
+                {{-- <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <span class="micon bi bi-house"></span><span class="mtext">Allowance</span>
+                    </a>
+                    <ul class="submenu   " style="display:block">
+                        <li><a href="/payrol/hour-meter/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Hour Meter</a></li>
+                        <li><a class="{{ ($layout['active'] == 'payment-employee')? 'active' : '' }}" href="/payrol/payment/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Pembayaran Karyawan</a></li>
+                    </ul>
+                </li> --}}
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <span class="micon bi bi-house"></span><span class="mtext">Database</span>
+                    </a>
+                    <ul class="submenu " style="display:block">
+                        <li><a href="/payrol/database/absen">Absen</a></li>
+                        <li><a href="/payrol/database/payment-group">Pembayaran</a></li>
+                        <li><a href="/payrol/database/hour-meter-price">Group HM</a></li>
                     </ul>
                 </li>
             </ul>

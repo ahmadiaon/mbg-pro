@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHourMeterPricesTable extends Migration
+class CreateAtributsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,12 @@ class CreateHourMeterPricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('hour_meter_prices', function (Blueprint $table) {
+        Schema::create('atributs', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->nullable();
+            $table->string('atribut_group_uuid')->nullable();
             $table->string('name')->nullable();
-            $table->string('value')->nullable();
-            $table->string('key_excel')->nullable();
-            $table->date('last_use')->nullable();
-            $table->string('is_last')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ class CreateHourMeterPricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hour_meter_prices');
+        Schema::dropIfExists('atributs');
     }
 }

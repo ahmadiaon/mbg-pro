@@ -46,7 +46,7 @@ class AuthenticationController extends Controller
                         break;
                     case('safety'):
                         // dd('as');
-                        return redirect()->intended('/safety');
+                        return redirect()->intended('/safety/manage');
                         break;
                     case('supervisor'):
                         return redirect()->intended('/supervisor');
@@ -72,9 +72,15 @@ class AuthenticationController extends Controller
                     case('hauling'):
                         return redirect()->intended('/hauling');
                         break;
-                        case('payrol'):
-                            return redirect()->intended('/payrol');
-                            break;
+                    case('payrol'):
+                        return redirect()->intended('/payrol');
+                        break;
+                    case('purchase-order'):
+                        return redirect()->intended('/purchase-order');
+                        break;
+                    case('purchase-public'):
+                        return redirect()->intended('/penerimaan-barang-po');
+                        break;
                     
                     default:
                         $msg = 'Something went wrong.';

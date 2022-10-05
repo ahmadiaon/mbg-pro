@@ -12,9 +12,13 @@ class Employee extends Model
 
     public static function getAll(){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
+        ->join('positions','positions.uuid','=','employees.position_uuid')
+
         ->get([
             'user_details.name',
-            'employees.uuid'
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee'
         ]);
     }
 }

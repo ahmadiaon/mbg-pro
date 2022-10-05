@@ -258,11 +258,11 @@ class AbsensiController extends Controller
         $timeB = false; //from 06 to 12
         $timeC = false; //from 12 to 17
         $timeD = false; //from 17 to 24
-        $statusAbsen;
+        // $statusAbsen;
         $cek_log =null;
         $dates = $year.'-'.$month.'-'.$date;
 
-        $ketAbsensi;
+        // $ketAbsensi;
         $hourEvening = array();
         $hourMorning = array();
         $length = Str::length( $absensi);

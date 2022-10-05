@@ -21,20 +21,34 @@ use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\VehicleGroupController;
 use App\Http\Controllers\AbsensiExcellController;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\Employee\EmployeeAbsenController;
+use App\Http\Controllers\Employee\EmployeeMobilisasiController;
 use App\Http\Controllers\Employee\EmployeeTotalHmMonth;
 use App\Http\Controllers\Employee\EmployeeTotalHmMonthController;
 use App\Http\Controllers\OverBurden\OverBurdenFlitController;
 use App\Http\Controllers\OverBurden\OverBurdenListController;
 use App\Http\Controllers\SafetyEmployeeController;
 use App\Http\Controllers\EmployeeContractController;
+use App\Http\Controllers\Employee\EmployeeSalaryController;
 use App\Http\Controllers\Hauling\HaulingSetupController;
+use App\Http\Controllers\HourMeterPriceController;
 use App\Http\Controllers\LogisticController;
 use App\Http\Controllers\OverBurden\OverBurdenOperatorController;
 use App\Http\Controllers\OverBurden\OverBurdenRitaseController;
+use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\Payment\PaymentEmployeeController;
+use App\Http\Controllers\Payment\PaymentGroupController;
+use App\Http\Controllers\PurchaseOrder\GaleryController;
+use App\Http\Controllers\PurchaseOrder\PurchaseOrderController;
+use App\Http\Controllers\Safety\AtributController;
+use App\Http\Controllers\Safety\AtributEmployeeController;
+use App\Http\Controllers\StatusAbsenController;
+use App\Http\Controllers\TotalController;
 use App\Http\Controllers\UserDetail\UserDetailController;
 use App\Http\Controllers\UserDetail\UserEducationController;
 use App\Http\Controllers\UserDetail\UserExperienceController;
 use App\Http\Controllers\Vehicle\VehicleController as VehicleVehicleController;
+use App\Models\Employee\EmployeeSalary;
 use App\Models\UserDetail\UserDetail;
 
 
@@ -183,7 +197,10 @@ Route::middleware(['islogin'])->group(function () {
     Route::get('/admin-ob-data', [OverBurdenController::class, 'dataOverBurden'])->name('ob-data');
     
     Route::middleware(['isSafety'])->group(function () {
-        Route::get('/safety', [SafetyEmployeeController::class, 'index']);
+        Route::prefix('/safety')->group(function () {
+            Route::get('/manage', [AtributController::class, 'index']);
+            Route::get('/employee-list', [AtributEmployeeController::class, 'index']);
+        });
         Route::get('/safety/{nik_employee}/show', [SafetyEmployeeController::class, 'show']);
         Route::post('/safety/{nik_employee}/store', [SafetyEmployeeController::class, 'store']);
         Route::get('/safety-data', [SafetyEmployeeController::class, 'anyData'])->name('safety-data');
@@ -208,6 +225,20 @@ Route::middleware(['islogin'])->group(function () {
             Route::get('/employee/create', [EmployeeController::class, 'create']);
             Route::post('/employee', [EmployeeController::class, 'store']);
         });
+                // Absensi
+        // Route::get('/admin-hr/absensi', [EmployeeContractController::class, 'anyData']);
+        Route::get('/admin-hr/absensi/{month}', [AbsensiController::class, 'index']);
+
+        Route::get('/admin-hr/absensi-data/{month}', [AbsensiController::class, 'absensiData']);
+        Route::get('/admin-hr/absensi-show/{month}/{nik}', [AbsensiController::class, 'show']);
+        Route::get('/admin-hr/absensi-export/{month}', [AbsensiController::class, 'exportAbsen']);
+        Route::post('/admin-hr/absensi-edit', [AbsensiController::class, 'edit']);
+        
+        Route::post('/admin-hr/absensi', [AbsensiController::class, 'store']);
+
+
+
+
         // Route::get('/admin-hr', [EmployeeContractController::class, 'index']);
         Route::get('/admin-hr/employee', [EmployeeController::class, 'listEmployee']);
         Route::get('/admin-hr/employee', [EmployeeController::class, 'listEmployee']);
@@ -223,16 +254,6 @@ Route::middleware(['islogin'])->group(function () {
         
         
 
-        // Absensi
-        // Route::get('/admin-hr/absensi', [EmployeeContractController::class, 'anyData']);
-        Route::get('/admin-hr/absensi/{month}', [AbsensiController::class, 'index']);
-
-        Route::get('/admin-hr/absensi-data/{month}', [AbsensiController::class, 'absensiData']);
-        Route::get('/admin-hr/absensi-show/{month}/{nik}', [AbsensiController::class, 'show']);
-        Route::get('/admin-hr/absensi-export/{month}', [AbsensiController::class, 'exportAbsen']);
-        Route::post('/admin-hr/absensi-edit', [AbsensiController::class, 'edit']);
-        
-        Route::post('/admin-hr/absensi', [AbsensiController::class, 'store']);
 
         Route::post('/admin-hr/employees/contract/create', [EmployeeContractController::class, 'createEmployeeContract']);
         // Route::post('/admin-hr/employees/contract/store', [EmployeeContractController::class, 'storeEmployeeContract']);
@@ -290,6 +311,7 @@ Route::middleware(['islogin'])->group(function () {
     });
     Route::middleware(['isPayrol'])->group(function () {
         Route::prefix('/payrol')->group(function () {
+            Route::get('/', [EmployeeSalaryController::class, 'indexPayrol']);
             Route::post('/store', [EmployeeTotalHmMonthController::class, 'storePayrol']);
             Route::get('/hour-meter/{date}', [EmployeeTotalHmMonthController::class, 'indexPayrol']);
             Route::get('/month/{month}', [EmployeeTotalHmMonthController::class, 'indexPayrol']);
@@ -298,13 +320,79 @@ Route::middleware(['islogin'])->group(function () {
             Route::get('/month/{month}/export', [EmployeeTotalHmMonthController::class, 'exportPayrol']);
             Route::post('/month/{month}/import', [EmployeeTotalHmMonthController::class, 'importPayrol']);
 
+            Route::prefix('/absensi')->group(function () {//payrol/absensi
+                Route::get('/month/{year_month}', [EmployeeAbsenController::class, 'indexPayrol']);
+                Route::get('/month/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'showPayrol']);
+                Route::get('/month-data/{year_month}', [EmployeeAbsenController::class, 'dataEmployeeAbsen']);
+                Route::post('/month/{year_month}', [EmployeeAbsenController::class, 'importPayrol']);
+                Route::get('/month/export/{year_month}/export', [EmployeeAbsenController::class, 'exportPayrol']);
+            });
+
+            Route::prefix('/payment')->group(function () {//payrol/absensi
+                Route::post('/store', [PaymentController::class, 'storePayrol']);
+                Route::get('/month/{year_month}', [PaymentController::class, 'indexPayrol']);//payrol/database/payment
+                Route::get('/month-data/{year_month}',[PaymentController::class, 'dataPayment']);
+                Route::get('/create', [PaymentController::class, 'createPayrol']);
+                Route::get('/show/{uuid}', [PaymentController::class, 'editPayrol']);
+                Route::post('/show', [PaymentController::class, 'showPayrol']);
+            });
+
+            Route::prefix('/payment-employee')->group(function () {//payrol/absensi
+                Route::get('/month/{year_month}', [PaymentEmployeeController::class, 'indexPayrol']);      
+                Route::post('/show', [PaymentEmployeeController::class, 'showEmployeePayrol']);                
+                Route::post('/store', [PaymentEmployeeController::class, 'storePayrol']);                
+            });
+
+            Route::get('/total/{year_month}', [TotalController::class, 'indexPayrol']);
+
+          
+            Route::prefix('/database')->group(function () {//payrol/absensi
+                Route::get('/absen', [StatusAbsenController::class, 'indexPayrol']);///payrol/database/status-absen
+                Route::post('/status-absen', [StatusAbsenController::class, 'storePayrol']);///payrol/database/status-absen
+                Route::get('/absen/{uuid}/edit', [StatusAbsenController::class, 'showPayrol']);
+
+                Route::get('/hour-meter-price', [HourMeterPriceController::class, 'indexPayrol']);//
+                Route::post('/hour-meter-price', [HourMeterPriceController::class, 'storePayrol']);///payrol/database/status-absen
+                Route::get('/hour-meter-price/{uuid}/edit', [HourMeterPriceController::class, 'showPayrol']);
+                
+                Route::get('/payment-group', [PaymentGroupController::class, 'indexPayrol']);//payrol/database/payment
+                Route::get('/payment-group/{uuid}/edit', [PaymentGroupController::class, 'showPayrol']);
+                Route::post('/payment-group', [PaymentGroupController::class, 'storePayrol']);
+                Route::get('/payment-group/{uuid}/delete', [PaymentGroupController::class, 'deletePayrol']);
+
+                Route::get('/month/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'showPayrol']);
+                Route::get('/month-data/{year_month}', [EmployeeAbsenController::class, 'dataEmployeeAbsen']);
+                Route::post('/month/{year_month}', [EmployeeAbsenController::class, 'importPayrol']);
+            });
         });
     });
-
+    Route::middleware(['isPurchaseOrder'])->group(function () {
+        Route::prefix('/purchase-order')->group(function () {
+           
+            Route::post('/store', [PurchaseOrderController::class, 'storeAdmin']);
+            Route::get('/', [PurchaseOrderController::class, 'indexAdmin']);
+            Route::get('/create', [PurchaseOrderController::class, 'createAdmin']);
+            Route::get('/show/{uuid}', [PurchaseOrderController::class, 'editAdmin']);
+            Route::post('/show', [PurchaseOrderController::class, 'showAdmin']);
+        });
+        Route::prefix('/galery')->group(function () {
+            Route::get('/data', [GaleryController::class, 'anyData']);
+            Route::post('/store', [GaleryController::class, 'storeAdmin']);
+            Route::post('/delete', [GaleryController::class, 'deleteAdmin']);
+            Route::get('/', [GaleryController::class, 'indexAdmin']);
+            Route::get('/show/{uuid}', [GaleryController::class, 'editAdmin']);
+            Route::post('/show', [GaleryController::class, 'showAdmin']);
+        });
+    });
+});
+Route::get('/purchase-order/data', [PurchaseOrderController::class, 'anyData']);
+Route::prefix('/penerimaan-barang-po')->group(function () {
+    Route::get('/', [PurchaseOrderController::class, 'indexPublic']);
+    Route::get('/detail/{po_number}', [PurchaseOrderController::class, 'showPublic']);
 });
 
 
-Route::get('/eee/{uuu}', [EmployeeTotalHmMonthController::class, 'dataHourMeterMonth']);
+Route::get('/eee/{uuu}', [PaymentController::class, 'dataPayment']);
 
 
 

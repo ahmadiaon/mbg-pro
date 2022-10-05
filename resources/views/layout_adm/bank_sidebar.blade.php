@@ -102,14 +102,11 @@
             <ul id="accordion-menu">
                 <li class="dropdown">
                     <a href="javascript:;" class="dropdown-toggle">
-                        <span class="micon bi bi-house"></span><span class="mtext">My Bank</span>
+                        <span class="micon bi bi-house"></span><span class="mtext">Kosong</span>
                     </a>
                     <ul class="submenu " style="display:block">
-                        <li><a href="/bank-admin/kur">KUR</a></li>
-                        <li><a href="/superadmin/grafik">Grafik</a></li>
-                        <li><a href="/superadmin/tentang">Tentang TPAKD</a></li>
-                        <li><a href="/superadmin/berita">Berita</a></li>
-                        <li><a href="/superadmin/berita">Berita</a></li>
+                        <li><a href="/bank-admin/kur">Kosong</a></li>
+                       
                     </ul>
                 </li>
 

@@ -27,7 +27,31 @@
         href="{{ env('APP_URL') }}src/plugins/datatables/css/responsive.bootstrap4.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ env('APP_URL') }}vendors/styles/style.css" />
 
-
+    <style>
+        #loader {
+            border: 12px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 12px solid #444444;
+            width: 70px;
+            height: 70px;
+            animation: spin 1s linear infinite;
+        }
+          
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+          
+        .center {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+    </style>
 
     <style>
           @if(session('dataUser')->role == 'admin-hr')

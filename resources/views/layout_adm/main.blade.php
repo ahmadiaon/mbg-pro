@@ -11,8 +11,8 @@
 @yield('head')
 </head>
 
-<body>
-
+<body id="body">
+    {{-- <div id="loader" class="center"></div> --}}
     @include('layout_adm.header')
 
     @if(session('dataUser')->role == 'admin-ob')
@@ -42,9 +42,12 @@
     @elseif(session('dataUser')->role == 'payrol')
     @include('layout_adm.admin_payrol_sidebar')
 
+    @elseif(session('dataUser')->role == 'purchase-order')
+    @include('layout_adm.admin_purchase_order_sidebar')
+
     @else
 
-    @include('layout_adm.bank_sidebar')
+    @include('layout_adm.admin_purchase_order_sidebar')
 
     @endif
 

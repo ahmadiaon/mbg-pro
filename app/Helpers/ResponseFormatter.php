@@ -50,4 +50,8 @@ class ResponseFormatter
     return array_search($index, $array);
   }
 
+  public static function toJson($data, $message = "success"){
+    return response()->json(['code'=>200, 'message'=>$message,'data' => $data], 200);
+  }
+
 }

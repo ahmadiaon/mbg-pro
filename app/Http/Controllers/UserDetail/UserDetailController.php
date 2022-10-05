@@ -76,6 +76,7 @@ class UserDetailController extends Controller
         
         'employee_total_hm_months.value'
         ]);
+        // return $hm;
         // dd($hm);
         $layout = [
             'head_core'            => true,
