@@ -377,7 +377,6 @@ Route::middleware(['islogin'])->group(function () {
     });
     Route::middleware(['isPurchaseOrder'])->group(function () {
         Route::prefix('/purchase-order')->group(function () {
-           
             Route::post('/store', [PurchaseOrderController::class, 'storeAdmin']);
             Route::get('/', [PurchaseOrderController::class, 'indexAdmin']);
             Route::get('/create', [PurchaseOrderController::class, 'createAdmin']);

@@ -1,7 +1,7 @@
 @include('layout_adm.head')
 
-@if($layout['head_form'])
-@include('layout_adm.head_form')
+@if(!empty($layout['head_form']) )
+    @include('layout_adm.head_form')
 @endif
 
 @if($layout['head_datatable'])

@@ -197,8 +197,8 @@ class PurchaseOrderController extends Controller
             $travel_document_path = "'".$model->travel_document_path."'";
             return '
             <div class="form-inline">
-            <button type="button" onclick="showdoc('.$po_path.')" class="btn btn-primary mr-1">po</button>
-            <button type="button" onclick="showdoc('.$travel_document_path.')" class="btn btn-primary">Surat Jalan</button>
+            <button type="button" onclick="showdoc('.$po_path.')" class="btn btn-primary mr-1">Lihat PO</button>
+            <button type="button" onclick="showdoc('.$travel_document_path.')" class="btn btn-primary">Lihat SJ</button>
         </div>'
             ;
         })
