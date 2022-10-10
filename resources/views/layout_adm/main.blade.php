@@ -47,7 +47,7 @@
 
     @else
 
-    @include('layout_adm.admin_purchase_order_sidebar')
+    @include('layout_adm.public_purchase_order_sidebar')
 
     @endif
 

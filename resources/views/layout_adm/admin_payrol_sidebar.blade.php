@@ -109,13 +109,13 @@
                     <a href="javascript:;" class="dropdown-toggle {{ ($layout['active'] == 'employee-list')? 'active' : '' }}">
                         <span class="micon bi bi-house"></span><span class="mtext">Karyawan</span>
                     </a>
-                    <ul class="submenu " style="display:block">
+                    <ul class="submenu " >
                         <li><a href="/payrol">Manage</a></li>
                         <li><a class="{{ ($layout['active'] == 'absensi')? 'active' : '' }}" href="/payrol/absensi/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Absen</a></li>
                     </ul>
                 </li>
                 
-                <li class="dropdown" style="display:block">
+                <li class="dropdown" >
                     <a href="javascript:;" class="dropdown-toggle">
                         <span class="micon bi bi-hdd-stack"></span
                         ><span class="mtext">Allowance</span>
@@ -127,7 +127,7 @@
                                 <span class="micon fa fa-plug"></span
                                 ><span class="mtext">Kegiatan</span>
                             </a>
-                            <ul class="submenu child" style="display:block">
+                            <ul class="submenu child" >
                                 <li>
                                     <a class="{{ ($layout['active'] == 'payment')? 'active' : '' }}" href="/payrol/payment/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">
                                         Perkegiatan
@@ -142,6 +142,7 @@
                                 ><span class="mtext">HM</span>
                             </a>
                             <ul class="submenu child">
+                                <li><a class="{{ ($layout['active'] == 'hour-meter-day')? 'active' : '' }}" href="/payrol/hour-meter-day/month/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Perhari</a></li>
                                 <li><a href="/payrol/hour-meter/{{ \Carbon\Carbon::now()->isoFormat('Y-M') }}">Perorang</a></li>
                             </ul>
                         </li>

@@ -22,6 +22,7 @@ use App\Http\Controllers\VehicleGroupController;
 use App\Http\Controllers\AbsensiExcellController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\Employee\EmployeeAbsenController;
+use App\Http\Controllers\Employee\EmployeeHourMeterDayController;
 use App\Http\Controllers\Employee\EmployeeMobilisasiController;
 use App\Http\Controllers\Employee\EmployeeTotalHmMonth;
 use App\Http\Controllers\Employee\EmployeeTotalHmMonthController;
@@ -328,6 +329,12 @@ Route::middleware(['islogin'])->group(function () {
                 Route::get('/month/export/{year_month}/export', [EmployeeAbsenController::class, 'exportPayrol']);
             });
 
+            Route::prefix('/hour-meter-day')->group(function () {//payrol/absensi
+                Route::get('/month/{year_month}', [EmployeeHourMeterDayController::class, 'indexPayrol']);
+                Route::post('/store', [EmployeeHourMeterDayController::class, 'storePayrol']);
+
+            });
+
             Route::prefix('/payment')->group(function () {//payrol/absensi
                 Route::post('/store', [PaymentController::class, 'storePayrol']);
                 Route::get('/month/{year_month}', [PaymentController::class, 'indexPayrol']);//payrol/database/payment
@@ -336,6 +343,8 @@ Route::middleware(['islogin'])->group(function () {
                 Route::get('/show/{uuid}', [PaymentController::class, 'editPayrol']);
                 Route::post('/show', [PaymentController::class, 'showPayrol']);
             });
+
+       
 
             Route::prefix('/payment-employee')->group(function () {//payrol/absensi
                 Route::get('/month/{year_month}', [PaymentEmployeeController::class, 'indexPayrol']);      

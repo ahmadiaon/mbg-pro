@@ -21,4 +21,16 @@ class Employee extends Model
             'employees.nik_employee'
         ]);
     }
+    public static function where_employee_uuid($employee_uuid){
+        return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
+        ->join('positions','positions.uuid','=','employees.position_uuid')
+        ->where('employees.uuid', $employee_uuid)
+        ->get([
+            'user_details.name',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee'
+        ])
+        ->first();
+    }
 }

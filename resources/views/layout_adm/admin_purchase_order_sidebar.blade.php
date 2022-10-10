@@ -101,7 +101,7 @@
         <div class="sidebar-menu">
             <ul id="accordion-menu">
                 <li>
-                    <a href="/penerimaan-barang-po" class="dropdown-toggle no-arrow {{ ($layout['active'] == 'purchase-order')? 'active' : '' }}">
+                    <a href="/purchase-order" class="dropdown-toggle no-arrow {{ ($layout['active'] == 'purchase-order')? 'active' : '' }}">
                         <span class="micon bi bi-diagram-3"></span><span class="mtext">List</span>
                     </a>
                 </li>               

@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateEmployeeHourMeterDaysTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('employee_hour_meter_days', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->nullable();
+            $table->string('employee_uuid')->nullable();
+            $table->string('hour_meter_price_uuid')->nullable();
+            $table->date('date')->nullable();
+            $table->string('value')->nullable();//di kertas
+            $table->string('full_value')->nullable();//bonus
+            $table->string('pay_uuid')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('employee_hour_meter_days');
+    }
+}
