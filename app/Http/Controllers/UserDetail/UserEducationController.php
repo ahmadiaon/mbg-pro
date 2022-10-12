@@ -9,7 +9,7 @@ use App\Models\UserDetail\UserEducation;
 class UserEducationController extends Controller
 {
     //
-    public function create(){
+    public function create($user_detail_uuid){
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -17,13 +17,12 @@ class UserEducationController extends Controller
             'javascript_datatable'  => false,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'admin-hr',
-            'active-sub'                        => 'employee'
+            'active'                        => 'karyawan',
         ];
         
-        return view('hr.user.education.create', [
-            'title'         => 'Add People',
-            'user_detail_uuid' => session('user_detail_uuid'),
+        return view('user_detail.education.hr.create', [
+            'title'         => 'Tambah Karyawan',
+            'user_detail_uuid' => $user_detail_uuid,
             'layout'    => $layout
         ]);
     }
@@ -57,10 +56,12 @@ class UserEducationController extends Controller
             'dll_jurusan'=>'',
             'dll_year'=>'',  
         ]);
-        $validateData['uuid'] = 'education-'.Str::uuid();
+        if(empty($request->uuid)){
+            $dependents['uuid'] = 'education-'.Str::uuid();
+        }
         $store = UserEducation::create($validateData);
 
-        return redirect()->intended('/admin-hr/experience/create')->with('user_detail_uuid',$store->user_detail_uuid);
+        return redirect()->intended('/admin-hr/experience/create/'.$store->user_detail_uuid);
 
     }
     

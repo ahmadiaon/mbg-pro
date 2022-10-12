@@ -13,7 +13,7 @@
                     </div>
                     <div class="col">
                         <div class="mb-0 float-right">
-                            <a href="/admin-hr/create" class="btn btn-primary">add</a>
+                            <a href="/admin-hr/user/create" class="btn btn-primary">add</a>
                         </div>
                     </div>
                 </div>

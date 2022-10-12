@@ -9,7 +9,7 @@ use App\Models\UserDetail\UserExperience;
 
 class UserExperienceController extends Controller
 {
-    public function create(){
+    public function create($user_detail_uuid){
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -17,13 +17,12 @@ class UserExperienceController extends Controller
             'javascript_datatable'  => false,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'admin-hr',
-            'active-sub'                        => 'employee'
+            'active'                        => 'karyawan',
         ];
         
-        return view('hr.user.experience.create', [
-            'title'         => 'Add People',
-            'user_detail_uuid' => session('user_detail_uuid'),
+        return view('user_detail.experience.hr.create', [
+            'title'         => 'Tambah Karyawan',
+            'user_detail_uuid' =>$user_detail_uuid,
             'layout'    => $layout
         ]);
     }
@@ -87,17 +86,8 @@ class UserExperienceController extends Controller
             $experience_4 =UserExperience::create($experiences_4 );
 
           }
-        //   $data = [
-        //     'data_1' => $experience,
-        //     'data_2'    => $experience_2,
-        //     'data_3'    => $experience_3,
-        //     'data_4'    =>$experience_4
-        //   ];
-
-          return redirect()->intended('/admin-hr/employee/create')->with('user_detail_uuid',$request->user_detail_uuid);
 
 
-        return redirect()->intended('/admin-hr/license/create')->with('user_detail_uuid',$request->user_detail_uuid);
-
+          return redirect()->intended('/admin-hr/licence/create/'.$request->user_detail_uuid);
     }
 }

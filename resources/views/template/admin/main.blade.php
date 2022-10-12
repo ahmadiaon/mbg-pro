@@ -25,6 +25,9 @@
 	@elseif(session('dataUser')->role == 'purchase-order')
 		@include('template.admin.sidebar.purchase')
 
+	@elseif(session('dataUser')->role == 'admin-hr')
+		@include('template.admin.sidebar.admin_hr')
+
 	@else
 		@include('layout_adm.public_purchase_order_sidebar')
 	@endif
@@ -58,6 +61,22 @@
 	@if(!empty($layout['head_form']) )
 		@include('template.admin.javascript.form')
 	@endif
+	<script>
+		function isRequired(id){
+			var err = 0;
+			console.log(id)
+			id.forEach(element => {
+				if ($('#'+element).val() == "") {
+					$('#req-'+element).show();
+					err++
+				}else{
+					$('#req-'+element).hide()
+				}
+			});
+			return err;
+			
+		}
+	</script>
 	@yield('js')
 </body>
 

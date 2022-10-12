@@ -21,6 +21,7 @@ class CreatePurchaseOrdersTable extends Migration
             $table->string('description')->nullable();
             $table->string('travel_document_path')->nullable();
             $table->string('po_path')->nullable();
+            $table->string('user_uuid')->nullable();
             $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
         });

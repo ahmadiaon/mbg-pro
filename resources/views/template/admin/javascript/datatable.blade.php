@@ -12,3 +12,4 @@
 <script src="{{env('APP_URL')}}src/plugins/datatables/js/vfs_fonts.js"></script> --}}
 <!-- Datatable Setting js -->
 <script src="{{env('APP_URL')}}vendors/scripts/datatable-setting.js"></script>
+<script src="{{ env('APP_URL') }}src/plugins/fancybox/dist/jquery.fancybox.js"></script>

@@ -6,6 +6,7 @@ use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\PurchaseOrder\Galery;
 use App\Models\PurchaseOrder\PurchaseOrder;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Str;
@@ -156,22 +157,35 @@ class PurchaseOrderController extends Controller
             'layout'    => $layout
         ]);
     }
+    public function deleteAdmin(Request $request)
+   {
+        $data = ['deleted_at'=>Carbon::now('Asia/Jakarta')];
+        $store = PurchaseOrder::updateOrCreate(['uuid' => $request->uuid], $data);
+
+        return response()->json(['code'=>200, 'message'=>'Data get','data' => $store], 200);   
+   }
 
     public function anyData(){
-        $data = PurchaseOrder::all();
+        $data = PurchaseOrder::whereNull('deleted_at')->get();
 
         
         return Datatables::of($data)
         ->addColumn('action', function ($model) {
             $uuid = $model->uuid;
+            $delete = "'".$uuid."'";
             $url = "/purchase-order/";
             $url_edit =$url.'show/'.$uuid;
             $url_delete = $url."delete/".$uuid;
             return '
             <div class="form-inline">          
-            <a class="mr-3" href="'.$url_edit.'"
-                ><i class="dw dw-edit2"></i> </a
-            >
+                <a class="mr-2" href="'.$url_edit.'">
+                    <button type="button" class="btn btn-secondary  py-1 px-2">
+                    <i class="dw dw-edit2"></i>
+                    </button>
+                </a>
+                <button onclick="confirmDelete(' .$delete. ')"  type="button" class="btn btn-danger  py-1 px-2">
+                    <i class="icon-copy dw dw-trash"></i>
+                </button>
             </div>
             '
             ;

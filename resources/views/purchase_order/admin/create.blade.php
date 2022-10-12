@@ -109,7 +109,7 @@
             <div class="min-height-200px">
                 <!-- Identitas Karyawan -->
                 <div class="row">
-                    <div class="col-md-7">
+                    <div class="col-md-12">
                         <div class="pd-20 card-box mb-20">
                             <div class="clearfix mb-5">
                                 <div class="row">
@@ -138,12 +138,18 @@
                                         <div class="form-group ">
                                             <label for="">Nomor PO</label>
                                             <input type="text" class="form-control" name="po_number" id="po_number">
+                                            <div class="invalid-feedback" id="req-po_number">
+                                                Data tidak boleh kosong
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Tanggal Update</label>
                                             <input name="date" id="date" type="date" class="form-control">
+                                            <div class="invalid-feedback" id="req-date">
+                                                Data tidak boleh kosong
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -151,6 +157,9 @@
                                             <label for="">Dokumen PO <a id="po_path" class="ml-20"
                                                     href="#">lihat</a></label>
                                             <input type="hidden" class="form-control" name="po_path" id="po_path">
+                                            <div class="invalid-feedback" id="req-po_file">
+                                                Data tidak boleh kosong
+                                            </div>
                                             <input type="file" class="form-control" name="po_file" id="po_file">
                                         </div>
                                     </div>
@@ -162,6 +171,9 @@
                                                 class="form-control">
                                             <input name="td_file" id="td_file" placeholder="udin" type="file"
                                                 class="form-control">
+                                                <div class="invalid-feedback" id="req-td_file">
+                                                    Data tidak boleh kosong
+                                                </div>
                                         </div>
                                     </div>
 
@@ -169,64 +181,14 @@
                                         <div class="form-group ">
                                             <label for="">Keterangan</label>
                                             <textarea class="form-control" name="description" id="description" cols="30" rows="10"></textarea>
+                                            <div class="invalid-feedback" id="req-description">
+                                                Data tidak boleh kosong
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </form>
 
-                        </div>
-                    </div>
-
-                    <div class="col-md-5">
-                        <div class="pd-20 card-box mb-20">
-                            <form action="" enctype="multipart/form-data" id="upload_galery" method="POST">
-                                @csrf
-                                <input type="hidden" name="purchase_order_uuid" id="purchase_order_uuid" value="">
-                                <input type="hidden" name="galery_uuid" id="galery_uuid" value="">
-                                <div class="clearfix">
-                                    <div class="row">
-                                        <div class="col-3">
-                                            <h4 class="text-blue h4">Galery</h4>
-                                        </div>
-                                        <div class="col-9 text-right">
-                                            <div class="btn-group">
-                                                <div class="btn-group dropdown">
-                                                    <button type="button" onclick="resetGalery()"
-                                                        class="btn btn-secondary mr-10">Reset</button>
-                                                    <button type="button" onclick="storeGalery()"
-                                                        class="btn btn-success">Simpans</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="karyawan">
-                                    <div class="row" id="row-people-12">
-                                        <div class="col-md-12" id="col-md-8-people-12">
-                                            <div class="form-group">
-                                                <label for="">Judul</label>
-                                                <input type="text" id="title" class="form-control"
-                                                    name="title">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group ">
-                                                <label for="">Gambar</label>
-                                                <input onchange="previewImage()" name="image_galery" id="image_galery"
-                                                    placeholder="udin" type="file" class="form-control mb-10">
-                                                <div class="da-card box-shadow">
-                                                    <div class="da-card-photo">
-                                                        <img id="galery-view"
-                                                            src="{{ env('APP_URL') }}vendors/images/default.jpg"
-                                                            alt="" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -236,7 +198,7 @@
             <div class="min-height-200px">
                 <div class="page-header">
                     <div class="row">
-                        <div class="col-md-12 col-sm-12">
+                        <div class="col-md-6 col-sm-6">
                             <div class="title">
                                 <h4>Gallery</h4>
                             </div>
@@ -250,6 +212,11 @@
                                     </li>
                                 </ol>
                             </nav>
+                        </div>
+                        <div class="col-md-6 col-sm-6 text-right">
+                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addGalerry">
+                                Tambah Gambar <i class="icon-copy fi-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -284,6 +251,63 @@
             </div>
         </div>
     </div>
+
+        <!-- Modal HTML -->
+        <div id="addGalerry" class="modal fade">
+            <div class="modal-dialog modal-confirm">
+                <div class="modal-content">                   
+                        <form action="" enctype="multipart/form-data" id="upload_galery" method="POST">
+                            @csrf
+                            <input type="hidden" name="purchase_order_uuid" id="purchase_order_uuid" value="">
+                            <input type="hidden" name="galery_uuid" id="galery_uuid" value="">
+                            <div class="clearfix">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <h4 class="text-blue h4">Galery</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="karyawan">
+                                <div class="row" id="row-people-12">
+                                    <div class="col-md-12" id="col-md-8-people-12">
+                                        <div class="form-group">
+                                            <label for="">Judul</label>
+                                            <input type="text" id="title" class="form-control"
+                                                name="title">
+                                            <div class="invalid-feedback" id="req-title">
+                                                Masukan Judul terlebih dahulu
+                                                </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group ">
+                                            <label for="">Gambar</label>
+                                            <input onchange="previewImage()" name="image_galery" id="image_galery"
+                                                placeholder="udin" type="file" class="form-control mb-10">
+                                            <div class="invalid-feedback" id="req-image_galery">
+                                                Masukan Judul terlebih dahulu
+                                                </div>    
+                                            <div class="da-card box-shadow">
+                                                <div class="da-card-photo">
+                                                    <img id="galery-view"
+                                                        src="{{ env('APP_URL') }}vendors/images/default.jpg"
+                                                        alt="" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                
+                    <div class="modal-footer justify-content-center">
+                        <button onclick="resetGalery()" type="button" class="btn btn-secondary" data-dismiss="modal">Reset</button>
+                        <button onclick="storeGalery()" type="button" class="btn btn-success">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     <!-- Modal -->
     <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
         aria-hidden="true">
@@ -336,7 +360,7 @@
 
         function getPayment(uuid) {
             let _token = $('meta[name="csrf-token"]').attr('content');
-            let _url = "/purchase-order/show/";
+            let _url = "/purchase-order/show";
 
             $.ajax({
                 url: _url,
@@ -375,9 +399,6 @@
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="btn"  href="#"><i class="icon-copy ion-android-create"></i></a>
-                                                            </li>
-                                                            <li>
                                                                 <a onclick="confirmDeleteGalery('${element.uuid}')" class="btn" href="#myModal"data-toggle="modal"><i class="icon-copy ion-android-delete"></i></a>
                                                             </li>
                                                         </ul>
@@ -411,6 +432,12 @@
             let _url = "/purchase-order/store";
             var po_file = $('#po_file')[0].files;
 
+            let muchErr =isRequired(['po_number','date','description','td_file','po_file'])
+            console.log('req'+muchErr)
+
+            if(muchErr > 0){
+                return false;
+            }
 
             var form = $('#upload_form')[0];
             console.log(form);
@@ -440,9 +467,15 @@
         function storeGalery() {
             let _token = $('meta[name="csrf-token"]').attr('content');
             let _url = "/galery/store";
+            let complite = false;
 
+            let mucherr =isRequired(['title','image_galery'])
+            console.log('req'+mucherr)
 
-            var form = $('#upload_galery')[0];
+            if(mucherr > 0){
+                return false;
+            }else{
+                var form = $('#upload_galery')[0];
             console.log(form);
             var form_data = new FormData(form);
             console.log('form_data');
@@ -456,9 +489,10 @@
                 data: form_data,
                 success: function(response) {
                     data = response.data
+                    console.log(data)
                     $('#galery_uuid').val(data.galery_uuid)
 
-                    var new_image = `<li class="col-lg-4 col-md-6 col-sm-12" id="${data.uuid}" >
+                    var new_image = `<li class="col-lg-4 col-md-6 col-sm-12" id="${data.galery_uuid}" >
                                         <div class="da-card box-shadow">
                                             <div class="da-card-photo">
                                                 <img src="{{ env('APP_URL') }}purchase/image/${data.galery_path}" alt="" />
@@ -468,15 +502,13 @@
                         data.title + `</h5>
                                                         <ul class="clearfix">
                                                             <li>
-                                                                <a href="{{ env('APP_URL') }}purchase/image/${data.galery_path}"
+                                                                <a class="btn" href="{{ env('APP_URL') }}purchase/image/${data.galery_path}"
                                                                     data-fancybox="images">
-                                                                    show
+                                                                    <i class="fa fa-picture-o"></i>
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="#">
-                                                                    edit
-                                                                </a>
+                                                                <a onclick="confirmDeleteGalery('${data.galery_uuid}')" class="btn" href="#myModal"data-toggle="modal"><i class="icon-copy ion-android-delete"></i></a>
                                                             </li>
                                                         </ul>
                                                     </div>p
@@ -494,6 +526,8 @@
                     console.log(response)
                 }
             });
+            }
+            
         }
 
         function previewImage() {

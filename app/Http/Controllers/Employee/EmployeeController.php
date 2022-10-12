@@ -20,7 +20,7 @@ class EmployeeController extends Controller
     public function index(){
         return Employee::getAll();
     }
-    public function create(){
+    public function create($user_detail_uuid){
         $contract_number = '001';
         $nik_employee = "001";
         $machine_id = 1;
@@ -35,6 +35,7 @@ class EmployeeController extends Controller
         if($employee->count() > 0){
             // return $employee;
             $nik_employees = $employee->nik_employee;
+            $nik_employees = 'MBLE-20220528001';
             $nik_employee = $nik_employees[13].$nik_employees[14].$nik_employees[15] + 1;
             $machine_id = $employee->machine_id + 1;
             $contract_number = $employee->contract_number + 1;
@@ -67,9 +68,9 @@ class EmployeeController extends Controller
             'active'                        => 'admin-hr-employees'
         ];
         
-        return view('hr.employee.create', [
+        return view('employee.hr.create', [
             'title'         => 'Add People',
-            'user_detail_uuid' => session('user_detail_uuid'),
+            'user_detail_uuid' => $user_detail_uuid,
             'layout'    => $layout,
             'pohs' => $pohs,
             'positions' => $positions,
@@ -112,9 +113,8 @@ class EmployeeController extends Controller
         // $validateData['contract_number'] = 'education-'.Str::uuid();
         // dd($validateData);
         $store = Employee::create($validateData);
-        dd($store);
 
-        // return redirect()->intended('/admin-hr/experience/create')->with('user_detail_uuid',$store->user_detail_uuid);
+        return redirect()->intended('/admin-hr')->with('success',"Karyawan Ditambahkan");
 
     }
 

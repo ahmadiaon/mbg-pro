@@ -103,15 +103,14 @@ class UserDetailController extends Controller
             'javascript_datatable'  => false,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'admin-hr',
-            'active-sub'                        => 'employee'
+            'active'                        => 'karyawan',
         ];
 
         $religions = Religion::all();
         $pohs = Poh::all();
         
-        return view('hr.user.create', [
-            'title'         => 'Add People',
+        return view('user_detail.hr.create', [
+            'title'         => 'Tambah Karyawan',
             'religions' => $religions,
             'pohs' => $pohs,
             'layout'    => $layout
@@ -152,7 +151,7 @@ class UserDetailController extends Controller
             'religion_uuid' => '',
         ]);
 
-        $validateDataUser['uuid'] = 'people-'.$request->name.'-'.Str::uuid();
+        $validateDataUser['uuid'] = 'people-'.Str::uuid();
         $validateDataUser['date_of_birth'] = ResponseFormatter::toDate($request->date_of_birth);
         $storeUser = UserDetail::create($validateDataUser);
 
@@ -165,10 +164,7 @@ class UserDetailController extends Controller
         $validateDataUserReligion['user_detail_uuid'] = $storeUser->uuid;
         $storeUserReligion = UserReligion::create($validateDataUserReligion);
 
-
-
-        return redirect()->intended('/admin-hr/education/create')->with('user_detail_uuid',$storeUser->uuid);
-
+        return redirect()->intended('/admin-hr/dependent/create/'.$storeUser->uuid);
     }
 
     public function anyData()

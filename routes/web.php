@@ -23,8 +23,6 @@ use App\Http\Controllers\AbsensiExcellController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\Employee\EmployeeAbsenController;
 use App\Http\Controllers\Employee\EmployeeHourMeterDayController;
-use App\Http\Controllers\Employee\EmployeeMobilisasiController;
-use App\Http\Controllers\Employee\EmployeeTotalHmMonth;
 use App\Http\Controllers\Employee\EmployeeTotalHmMonthController;
 use App\Http\Controllers\OverBurden\OverBurdenFlitController;
 use App\Http\Controllers\OverBurden\OverBurdenListController;
@@ -45,12 +43,13 @@ use App\Http\Controllers\Safety\AtributController;
 use App\Http\Controllers\Safety\AtributEmployeeController;
 use App\Http\Controllers\StatusAbsenController;
 use App\Http\Controllers\TotalController;
+use App\Http\Controllers\UserDetail\UserDependentController;
 use App\Http\Controllers\UserDetail\UserDetailController;
 use App\Http\Controllers\UserDetail\UserEducationController;
 use App\Http\Controllers\UserDetail\UserExperienceController;
+use App\Http\Controllers\UserDetail\UserLicenseController;
+use App\Http\Controllers\UserDetail\UserHealthController;
 use App\Http\Controllers\Vehicle\VehicleController as VehicleVehicleController;
-use App\Models\Employee\EmployeeSalary;
-use App\Models\UserDetail\UserDetail;
 
 
 Route::get('/', [UserDetailController::class, 'login']);
@@ -208,22 +207,30 @@ Route::middleware(['islogin'])->group(function () {
     });
     Route::middleware(['isAdminHr'])->group(function () {
         Route::prefix('/admin-hr')->group(function () {
-            Route::get('/create', [UserDetailController::class, 'create']);
-            Route::post('/', [UserDetailController::class, 'store']);
+            // =============== u s e r   d e t a i l
+            Route::get('/user/create', [UserDetailController::class, 'create']);
+            Route::post('/user', [UserDetailController::class, 'store']);
+
+            Route::get('/dependent/create/{user_detail_uuid}', [UserDependentController::class, 'create']);
+            Route::post('/dependent', [UserDependentController::class, 'store']);
+
+            Route::get('/education/create/{user_detail_uuid}', [UserEducationController::class, 'create']);
+            Route::post('/education', [UserEducationController::class, 'store']);
+
+            Route::get('/experience/create/{user_detail_uuid}', [UserExperienceController::class, 'create']);
+            Route::post('/experience', [UserExperienceController::class, 'store']);
+
+            Route::get('/licence/create/{user_detail_uuid}', [UserLicenseController::class, 'create']);
+            Route::post('/licence', [UserLicenseController::class, 'store']);
+
+            Route::get('/health/create/{user_detail_uuid}', [UserHealthController::class, 'create']);
+            Route::post('/health', [UserHealthController::class, 'store']);
+
             Route::get('/', [UserDetailController::class, 'index']);
             Route::get('/data-user', [UserDetailController::class, 'anyData'])->name('data-user');
 
-            Route::get('/education/create', [UserEducationController::class, 'create']);
-            Route::post('/education', [UserEducationController::class, 'store']);
-
-            Route::get('/experience/create', [UserExperienceController::class, 'create']);
-            Route::post('/experience', [UserExperienceController::class, 'store']);
-
-            Route::get('/experience/create', [UserExperienceController::class, 'create']);
-            Route::post('/experience', [UserExperienceController::class, 'store']);
-
             // =============== e m p l o y e e
-            Route::get('/employee/create', [EmployeeController::class, 'create']);
+            Route::get('/employee/create/{user_detail_uuid}', [EmployeeController::class, 'create']);
             Route::post('/employee', [EmployeeController::class, 'store']);
         });
                 // Absensi
@@ -379,6 +386,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::prefix('/purchase-order')->group(function () {
             Route::post('/store', [PurchaseOrderController::class, 'storeAdmin']);
             Route::get('/', [PurchaseOrderController::class, 'indexAdmin']);
+            Route::post('/delete', [PurchaseOrderController::class, 'deleteAdmin']);
             Route::get('/create', [PurchaseOrderController::class, 'createAdmin']);
             Route::get('/show/{uuid}', [PurchaseOrderController::class, 'editAdmin']);
             Route::post('/show', [PurchaseOrderController::class, 'showAdmin']);
