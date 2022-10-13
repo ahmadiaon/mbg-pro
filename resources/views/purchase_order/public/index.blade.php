@@ -62,6 +62,10 @@
            $('#myTablse').DataTable({
                processing: true,
                serverSide: true,
+               responsive: true,
+                rowReorder: {
+                    selector: 'td:nth-child(2)'
+                },
                ajax: '{{ url(env('APP_URL').'purchase-order/data') }}',
                columns: [
                    { data: 'po_number', name: 'po_number' },
