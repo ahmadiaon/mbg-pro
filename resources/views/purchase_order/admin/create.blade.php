@@ -606,14 +606,6 @@
                     } else {
                         console.log(galeries)
                     }
-
-
-                    // $('#po_number').attr("onchange", "storePO()"),
-                    // $('#date').attr("onchange", "storePO()"),
-                    // $('#travel_document_path').attr("onchange", "storePO()"),
-                    // $('#po_path').attr("onchange", "storePO()"),
-                    // $('#description').attr("onchange", "storePO()")
-                    // console.log(data)
                 },
                 error: function(response) {
                     console.log(response)

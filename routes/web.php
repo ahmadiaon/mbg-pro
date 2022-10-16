@@ -37,11 +37,14 @@ use App\Http\Controllers\OverBurden\OverBurdenRitaseController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Payment\PaymentEmployeeController;
 use App\Http\Controllers\Payment\PaymentGroupController;
+use App\Http\Controllers\Privilege\PrivilegeController;
+use App\Http\Controllers\Privilege\UserPrivilegeController;
 use App\Http\Controllers\PurchaseOrder\GaleryController;
 use App\Http\Controllers\PurchaseOrder\PurchaseOrderController;
 use App\Http\Controllers\Safety\AtributController;
 use App\Http\Controllers\Safety\AtributEmployeeController;
 use App\Http\Controllers\StatusAbsenController;
+use App\Http\Controllers\SuperadminController;
 use App\Http\Controllers\TotalController;
 use App\Http\Controllers\UserDetail\UserDependentController;
 use App\Http\Controllers\UserDetail\UserDetailController;
@@ -133,6 +136,44 @@ Route::get('/menu-data', [MenuController::class, 'anyData'])->name('menu-data');
 
 
 Route::middleware(['islogin'])->group(function () {
+    Route::get('/user', [EmployeeController::class, 'index']);
+    Route::get('/user-data', [EmployeeController::class, 'anyData']);
+    Route::post('/user/nik', [EmployeeController::class, 'show']);
+    Route::get('/user/profile/{nik}', [EmployeeController::class, 'profile']);
+    
+
+    Route::get('/user-privilege', [UserPrivilegeController::class, 'index']);
+    Route::post('/user-privilege/store', [UserPrivilegeController::class, 'store']);
+    Route::get('/user-privilege-data', [UserPrivilegeController::class, 'anyData']);
+
+    Route::prefix('/admin-hr')->group(function () {
+        // =============== u s e r   d e t a i l
+        Route::get('/user/create', [UserDetailController::class, 'create']);
+        Route::post('/user', [UserDetailController::class, 'store']);
+
+        Route::get('/dependent/create/{user_detail_uuid}', [UserDependentController::class, 'create']);
+        Route::post('/dependent', [UserDependentController::class, 'store']);
+
+        Route::get('/education/create/{user_detail_uuid}', [UserEducationController::class, 'create']);
+        Route::post('/education', [UserEducationController::class, 'store']);
+
+        Route::get('/experience/create/{user_detail_uuid}', [UserExperienceController::class, 'create']);
+        Route::post('/experience', [UserExperienceController::class, 'store']);
+
+        Route::get('/licence/create/{user_detail_uuid}', [UserLicenseController::class, 'create']);
+        Route::post('/licence', [UserLicenseController::class, 'store']);
+
+        Route::get('/health/create/{user_detail_uuid}', [UserHealthController::class, 'create']);
+        Route::post('/health', [UserHealthController::class, 'store']);
+
+        Route::get('/', [UserDetailController::class, 'index']);
+        Route::get('/data-user', [UserDetailController::class, 'anyData'])->name('data-user');
+
+        // =============== e m p l o y e e
+        Route::get('/employee/create/{user_detail_uuid}', [EmployeeController::class, 'create']);
+        Route::post('/employee', [EmployeeController::class, 'store']);
+    });
+
     Route::middleware(['isSuperAdmin'])->group(function () {
         // Route::get('/superadmin/manage-user', [UserController::class, 'manageUser']);
         // Route::get('/superadmin/manage-user/{id}', [UserController::class, 'showLevelEmployeeUser']);
@@ -140,7 +181,15 @@ Route::middleware(['islogin'])->group(function () {
         // Route::get('/superadmin', [AdminController::class, 'index']);
         
         //reacheble
-        Route::resource('/superadmin', DepartmentController::class);
+        // Route::resource('/superadmin', DepartmentController::class);
+
+        Route::get('/superadmin/privilege', [PrivilegeController::class, 'index']);
+        Route::get('/superadmin/database', [SuperadminController::class, 'index']);
+        Route::post('/superadmin/database/store', [PrivilegeController::class, 'store']);
+        Route::post('/superadmin/database/delete', [PrivilegeController::class, 'delete']);
+        Route::post('/superadmin/database/show', [PrivilegeController::class, 'show']);
+
+        Route::get('/superadmin/database-data', [PrivilegeController::class, 'anyData']);
 
         Route::get('/admin/department/{department}', [DepartmentController::class, 'show']);
         Route::delete('/admin/department/delete/{department}', [DepartmentController::class, 'destroy']);
@@ -205,34 +254,34 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/safety/{nik_employee}/store', [SafetyEmployeeController::class, 'store']);
         Route::get('/safety-data', [SafetyEmployeeController::class, 'anyData'])->name('safety-data');
     });
-    Route::middleware(['isAdminHr'])->group(function () {
-        Route::prefix('/admin-hr')->group(function () {
-            // =============== u s e r   d e t a i l
-            Route::get('/user/create', [UserDetailController::class, 'create']);
-            Route::post('/user', [UserDetailController::class, 'store']);
 
-            Route::get('/dependent/create/{user_detail_uuid}', [UserDependentController::class, 'create']);
-            Route::post('/dependent', [UserDependentController::class, 'store']);
+        // Route::prefix('/admin-hr')->group(function () {
+        //     // =============== u s e r   d e t a i l
+        //     Route::get('/user/create', [UserDetailController::class, 'create']);
+        //     Route::post('/user', [UserDetailController::class, 'store']);
 
-            Route::get('/education/create/{user_detail_uuid}', [UserEducationController::class, 'create']);
-            Route::post('/education', [UserEducationController::class, 'store']);
+        //     Route::get('/dependent/create/{user_detail_uuid}', [UserDependentController::class, 'create']);
+        //     Route::post('/dependent', [UserDependentController::class, 'store']);
 
-            Route::get('/experience/create/{user_detail_uuid}', [UserExperienceController::class, 'create']);
-            Route::post('/experience', [UserExperienceController::class, 'store']);
+        //     Route::get('/education/create/{user_detail_uuid}', [UserEducationController::class, 'create']);
+        //     Route::post('/education', [UserEducationController::class, 'store']);
 
-            Route::get('/licence/create/{user_detail_uuid}', [UserLicenseController::class, 'create']);
-            Route::post('/licence', [UserLicenseController::class, 'store']);
+        //     Route::get('/experience/create/{user_detail_uuid}', [UserExperienceController::class, 'create']);
+        //     Route::post('/experience', [UserExperienceController::class, 'store']);
 
-            Route::get('/health/create/{user_detail_uuid}', [UserHealthController::class, 'create']);
-            Route::post('/health', [UserHealthController::class, 'store']);
+        //     Route::get('/licence/create/{user_detail_uuid}', [UserLicenseController::class, 'create']);
+        //     Route::post('/licence', [UserLicenseController::class, 'store']);
 
-            Route::get('/', [UserDetailController::class, 'index']);
-            Route::get('/data-user', [UserDetailController::class, 'anyData'])->name('data-user');
+        //     Route::get('/health/create/{user_detail_uuid}', [UserHealthController::class, 'create']);
+        //     Route::post('/health', [UserHealthController::class, 'store']);
 
-            // =============== e m p l o y e e
-            Route::get('/employee/create/{user_detail_uuid}', [EmployeeController::class, 'create']);
-            Route::post('/employee', [EmployeeController::class, 'store']);
-        });
+        //     Route::get('/', [UserDetailController::class, 'index']);
+        //     Route::get('/data-user', [UserDetailController::class, 'anyData'])->name('data-user');
+
+        //     // =============== e m p l o y e e
+        //     Route::get('/employee/create/{user_detail_uuid}', [EmployeeController::class, 'create']);
+        //     Route::post('/employee', [EmployeeController::class, 'store']);
+        // });
                 // Absensi
         // Route::get('/admin-hr/absensi', [EmployeeContractController::class, 'anyData']);
         Route::get('/admin-hr/absensi/{month}', [AbsensiController::class, 'index']);
@@ -283,7 +332,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/admin/employee-contract', [EmployeeContractController::class, 'index']);
         Route::get('/admin/employee-contract/create', [EmployeeContractController::class, 'create'])->name('employee-contract');
         Route::get('/admin/employee-contract/{people}', [EmployeeContractController::class, 'show'])->name('employee-contract-show');
-    });
+   
     Route::middleware(['isLogistic'])->group(function () {
         Route::get('/logistic', [LogisticController::class, 'index']);
         Route::prefix('/logistic')->group(function () {
@@ -382,6 +431,8 @@ Route::middleware(['islogin'])->group(function () {
             });
         });
     });
+
+    
     Route::middleware(['isPurchaseOrder'])->group(function () {
         Route::prefix('/purchase-order')->group(function () {
             Route::post('/store', [PurchaseOrderController::class, 'storeAdmin']);
@@ -401,6 +452,8 @@ Route::middleware(['islogin'])->group(function () {
         });
     });
 });
+
+
 Route::get('/purchase-order/data', [PurchaseOrderController::class, 'anyData']);
 Route::prefix('/penerimaan-barang-po')->group(function () {
     Route::get('/', [PurchaseOrderController::class, 'indexPublic']);
@@ -417,91 +470,6 @@ Route::get('/eee/{uuu}', [PaymentController::class, 'dataPayment']);
 
 Route::get('/sign-in', [EmployeeContractController::class, 'loginEC']);
 Route::post('/sign-in', [AuthenticationController::class, 'login']);
-
-
-
-
-
-// Route::get('/i-am-forgot-login-admin', [AuthAdminController::class, 'forgot']);
-// Route::get('reset/{uuid}', [AuthAdminController::class, 'reset']);
-// Route::get('/login-admin', [AuthAdminController::class, 'index'])->name('login');
-// Route::post('/forgot', [AuthAdminController::class, 'forgot_proses']);
-// Route::post('/login-admin', [AuthAdminController::class, 'store']);
-// Route::post('/new-password', [AuthAdminController::class, 'new_pass']);
-
-// Route::get('com', [ManageCommunityController::class, 'listCommunities']);
-
-
-// Route::middleware(['islogin'])->group(function () {
-//     Route::get('/', [DashboardController::class, 'index']);
-//     Route::get('bank', [ManageBankController::class, 'index']);
-//     Route::get('bank/create', [ManageBankController::class, 'create']);
-//     Route::get('/bank-data', [ManageBankController::class, 'anyData'])->name('bank-data');
-//     Route::delete('bank/{financialService}', [ManageBankController::class, 'destroy']);
-//     Route::post('bank/', [ManageBankController::class, 'store']);
-//     Route::put('bank/{financialService}', [ManageBankController::class, 'update']);
-//     Route::get('bank/edit/{financialService}', [ManageBankController::class, 'edit']);
-//     Route::get('/logout', [AuthAdminController::class, 'logout']);
-
-
-
-//     Route::resource('/users', ManageUserController::class);
-//     Route::get('/-data', [ManageUserController::class, 'anyData'])->name('data');
-
-//     Route::resource('/admin-bank', ManageAdminBankController::class);
-//     Route::get('/admin-bank-data', [ManageAdminBankController::class, 'anyData'])->name('admin-bank-data');
-
-//     Route::resource('/galleries', ManageGalerryController::class);
-//     Route::get('/galleries-data', [ManageGalerryController::class, 'anyData'])->name('galleries_data');
-
-//     Route::resource('/admin', ManageAdminController::class);
-//     Route::get('/admin-data', [ManageAdminController::class, 'anyData'])->name('admin-data');
-
-
-//     Route::resource('/slides', ManageSlideController::class);
-//     Route::get('/slide-data', [ManageSlideController::class, 'anyData'])->name('slide-data');
-
-//     Route::resource('/youtube', ManageYoutubeController::class);
-//     Route::get('/youtube-data', [ManageYoutubeController::class, 'anyData'])->name('youtube-data');
-
-//     Route::resource('/news', ManageNewsController::class);
-//     Route::get('/news-data', [ManageNewsController::class, 'anyData'])->name('news-data');
-
-//     Route::resource('/business-category', ManageBusinessCategoryController::class);
-//     Route::get('/business-category-data', [ManageBusinessCategoryController::class, 'anyData'])->name('business-category-data');
-
-//     Route::resource('/business', ManageBusinessController::class);
-//     Route::get('/business-data', [ManageBusinessController::class, 'anyData'])->name('business-data');
-
-//     Route::resource('/tour', ManageTourController::class);
-//     Route::get('/tour-data', [ManageTourController::class, 'anyData'])->name('tour-data');
-//     Route::get('/api-data', [ManageTourController::class, 'listTourUser']);
-
-//     Route::resource('/community-category', ManageCommunityCategoryController::class);
-//     Route::get('/community-category-data', [ManageCommunityCategoryController::class, 'anyData'])->name('community-category-data');
-
-//     Route::resource('/community', ManageCommunityController::class);
-//     Route::get('/community-data', [ManageCommunityController::class, 'anyData'])->name('community-data');
-
-//     Route::resource('/community-registers', ManageCommunityRegisterController::class);
-//     Route::get('/community-registers-data', [ManageCommunityRegisterController::class, 'anyData'])->name('community-registers-data');
-
-//     Route::resource('/review', ManageReviewController::class);
-//     Route::get('/review-data', [ManageReviewController::class, 'anyData'])->name('review-data');
-
-//     Route::delete('bank-register/{financialServiceRegister}', [ManageBankRegisterController::class, 'destroy']);
-//     Route::resource('/bank-register', ManageBankRegisterController::class);
-//     Route::get('/bank-register-data', [ManageBankRegisterController::class, 'anyData'])->name('bank-register-data');
-//     Route::post('/bank-send', [ManageBankRegisterController::class, 'sendData']);
-
-
-//     Route::delete('bank-loan/{financialServiceRegister}', [ManageBankLoanController::class, 'destroy']);
-//     Route::resource('/bank-loan', ManageBankLoanController::class);
-//     Route::get('/bank-loan-data', [ManageBankLoanController::class, 'anyData'])->name('bank-loan-data');
-
-// });
-// Route::get('/report', [ManageBankLoanController::class, 'report']);
-
 
 Route::get('generate-excel', [AbsensiExcellController::class, 'index']);
 

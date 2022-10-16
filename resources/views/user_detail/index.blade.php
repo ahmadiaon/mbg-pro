@@ -1,16 +1,18 @@
 @extends('template.admin.main_privilege')
-
+@section('css')
+    
+@endsection
 @section('content')
     <div class="card-box mb-30 " >
         <div class="row pd-20">
             <div class="col-3">
-                <h4 class="text-blue h4">Karyawan</h4>
+                <h4 class="text-blue h4">Database</h4>
             </div>
             <div class="col-9 text-right">
                 <div class="btn-group">
                     <div class="btn-group dropdown">
                         {{-- <a href="/purchase-order/create"> --}}
-                        <button onclick="create()" class="btn btn-primary mr-10">Tambah</button>
+                        <button onclick="showCreateModal()" class="btn btn-primary mr-10">Tambah</button>
                         {{-- </a>                      --}}
                     </div>
                 </div>
@@ -20,10 +22,8 @@
             <table id="table-privilege" class="display nowrap stripe hover table" style="width:100%">
                 <thead>
                     <tr>
-                        <th>Nama</th>
+                        <th>Nama/Jabatan</th>
                         <th>NIK</th>
-                        <th>Jabatan</th>
-                        <th>Status Karyawan</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -78,9 +78,10 @@
 
 @section('js')
     <script>
-        showDataTableUser('user-data', ['nik_employee', 'position','employee_status'], 'table-privilege')
-        function create(){
-            location.href = '/user/profile/'+nik_employee;
+        showDataTable('superadmin/database-data', ['uuid', 'privilege', 'action'], 'table-privilege')
+        function showCreateModal(){
+            $('#createModal').modal('show')
+            $('#form-privilege')[0].reset();
         }
        function store(idForm){
             if(isRequired(['uuid','privilege'])    > 0){ return false; }
@@ -118,8 +119,6 @@
                 }
             });
        }
-       function show(nik_employee){
-            location.href = '/user/profile/'+nik_employee;
-       }
+       
     </script>
 @endsection

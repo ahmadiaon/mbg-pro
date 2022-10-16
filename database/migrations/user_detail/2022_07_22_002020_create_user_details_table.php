@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('status')->nullable();//
             $table->string('address')->nullable();//
 
+            $table->string('npwp_number')->nullable();//
             $table->string('financial_number')->nullable();//
             $table->string('bpjs_ketenagakerjaan')->nullable();//
             $table->string('bpjs_kesehatan')->nullable();//

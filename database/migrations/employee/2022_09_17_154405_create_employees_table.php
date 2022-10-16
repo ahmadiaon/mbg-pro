@@ -31,7 +31,7 @@ class CreateEmployeesTable extends Migration
             $table->date('date_document_contract')->nullable();
             
             $table->integer('long_contract')->nullable(); //month
-            $table->string('employee_status')->nullable();      //worker - staff - mekanik   
+            $table->string('employee_status')->nullable();      //profesional training
             $table->string('is_last')->nullable(); 
 
             $table->timestamps();

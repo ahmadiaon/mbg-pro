@@ -97,19 +97,17 @@ class UserDetailController extends Controller
     }
     public function create(){
         $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => false,
-            'javascript_datatable'  => false,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'karyawan',
+            'active'                        => 'employees-index',
         ];
 
         $religions = Religion::all();
         $pohs = Poh::all();
         
-        return view('user_detail.hr.create', [
+        return view('user_detail.create', [
             'title'         => 'Tambah Karyawan',
             'religions' => $religions,
             'pohs' => $pohs,
@@ -117,34 +115,35 @@ class UserDetailController extends Controller
         ]);
     }
     public function store(Request $request){
+        
         $validateDataUser = $request->validate([
-            'name' => '',
-            'nik_number' => '',
-            'kk_number' => '',
-            'citizenship' => '',
-            'gender' => '',//pkwt-pkwtt
+            'name' => 'required',
+            'nik_number' => 'required',
+            'kk_number' => 'required',
+            'citizenship' => 'required',
+            'gender' => 'required',//pkwt-pkwtt
 
-           'place_of_birth' => '',
-           'date_of_birth' => '',
+           'place_of_birth' => 'required',
+           'date_of_birth' => 'required',
             
-           'blood_group' => '',
-            'status' => '',  
-            
+           'blood_group' => 'required',
+            'status' => 'required',  
+            'npwp_number' => '',
             'financial_number' => '',
             'bpjs_ketenagakerjaan' => '',  
             'bpjs_kesehatan' => '',  
 
             'phone_number' => '',  
         ]);
-
+       
         $validateDataUserAddress = $request->validate([
             'poh_uuid' => '',
-            'desa' => '',
+            'desa' => 'required',
             'rt' => '',
             'rw' => '',
             'kecamatan' => '',//pkwt-pkwtt
 
-           'kabupaten' => '',
+           'kabupaten' => 'required',
            'provinsi' => '',
         ]);
         $validateDataUserReligion = $request->validate([

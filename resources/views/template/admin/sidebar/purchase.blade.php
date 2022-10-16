@@ -4,6 +4,7 @@
 	<div class="menu-block customscroll">
 		<div class="sidebar-menu">
 			<ul id="accordion-menu">
+				@if(!empty(session('roleUser')->read_purchase_order))
 				<li class="dropdown">
 					<a href="javascript:;" class="dropdown-toggle">
 						<span class="micon bi bi-file-earmark-text"></span><span class="mtext">Purchase Order</span>
@@ -12,6 +13,7 @@
 						<li><a class="active" href="/purchase-order">List</a></li>
 					</ul>
 				</li>
+				@endif
 			</ul>
 		</div>
 	</div>

@@ -58,7 +58,7 @@ class AuthenticationController extends Controller
                         return redirect()->intended('/admin-ob');
                         break;
                     case('superadmin'):
-                        return redirect()->intended('/superadmin');
+                        return redirect()->intended('/superadmin/database');
                         break;
                     case('employee'):
                         return redirect()->intended('/me/'.session('dataUser')->nik_employee);

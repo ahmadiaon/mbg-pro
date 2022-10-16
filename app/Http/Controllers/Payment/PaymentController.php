@@ -41,9 +41,9 @@ class PaymentController extends Controller
         ]);
     }
    public function createPayrol(){
-    $employees = Employee::getAll();
+        $employees = Employee::getAll();
     
-    $payment_groups = PaymentGroup::all();
+        $payment_groups = PaymentGroup::all();
         $layout = [
                 'head_core'            => true,
                 'javascript_core'       => true,
@@ -61,6 +61,7 @@ class PaymentController extends Controller
                 'layout'    => $layout
             ]);
     }
+
     public function storePayrol(Request $request){
         $validatedData = $request->validate([
             'uuid' => '',

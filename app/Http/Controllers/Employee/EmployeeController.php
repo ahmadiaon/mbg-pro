@@ -11,14 +11,29 @@ use App\Models\Religion;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Company;
+use App\Models\Privilege\UserPrivilege;
 use App\Models\Roaster;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Yajra\Datatables\Datatables;
 
 class EmployeeController extends Controller
 {
     public function index(){
-        return Employee::getAll();
+        // return Employee::getAll();
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => false,
+            'active'                        => 'employees-index'
+        ];
+        return view('employee.index', [
+            'title'         => 'Daftar Karyawan',
+            'layout'    => $layout,
+        ]);
     }
     public function create($user_detail_uuid){
         $contract_number = '001';
@@ -110,12 +125,67 @@ class EmployeeController extends Controller
         $validateData['date_end_contract'] = ResponseFormatter::toDate($request->date_end_contract);
         $validateData['date_document_contract'] = ResponseFormatter::toDate($request->date_start_contract);
         $validateData['uuid'] = 'employe-'.Str::uuid();
+
+        $validateDataUser['uuid'] = 'User-'.Str::uuid();
+        $validateDataUser['employee_uuid'] =   $validateData['uuid'];
+        $validateDataUser['role'] = 'employee';
+        $validateDataUser['nik_employee'] = $validateData['nik_employee'];;
+        $validateDataUser['password'] = Hash::make('password');
+        $storeUser = User::create(
+            $validateDataUser
+        );
+
+
+
+
         // $validateData['contract_number'] = 'education-'.Str::uuid();
         // dd($validateData);
         $store = Employee::create($validateData);
 
-        return redirect()->intended('/admin-hr')->with('success',"Karyawan Ditambahkan");
+        return redirect()->intended('/user')->with('success',"Karyawan Ditambahkan");
 
+    }
+
+    public function show(Request $request){
+        $data = Employee::where_employee_nik_employee($request->uuid);
+        $userPrivileges = UserPrivilege::where('nik_employee', $request->uuid)->get();
+        if(!empty($userPrivileges)){
+            $data->user_privileges = $userPrivileges;
+        }
+       
+
+        return ResponseFormatter::toJson($data, 'Data Privilege');
+    }
+
+    public function profile($nik_employee){
+        $data = Employee::where_employee_nik_employee($nik_employee);
+        // dd($data);
+        $userPrivileges = UserPrivilege::where('nik_employee', $nik_employee)->get();
+        if(!empty($userPrivileges)){
+            $data->user_privileges = $userPrivileges;
+        }
+
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employees-index'
+        ];
+        return view('employee.show', [
+            'title'         => 'Profile Karyawan',
+            'data'  => $data,
+            'layout'    => $layout,
+        ]);
+    }
+
+    public function anyData(){
+
+        $data = Employee::getAll();
+        // return $data;
+
+        return Datatables::of($data)     
+        ->make(true);
     }
 
 

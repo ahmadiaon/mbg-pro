@@ -33,6 +33,21 @@ class UserDependentController extends Controller
 
     public function store(Request $request){
         // dd($request);
+        $validateDataUser = $request->validate([
+            'user_detail_uuid' =>  'required',
+            'mother_name' =>  'required',
+            'mother_gender' =>  'required',
+            'mother_education' =>  'required',
+            'mother_place_birth' =>  'required',
+            'mother_date_birth' =>  'required',
+
+            'father_name' =>  'required',
+            'father_gender' =>  'required',
+            'father_education' =>  'required',
+            'father_place_birth' =>  'required',
+            'father_date_birth' =>  'required'
+        ]);
+       
        
         $dependents = [
             'user_detail_uuid' =>  $request->user_detail_uuid,

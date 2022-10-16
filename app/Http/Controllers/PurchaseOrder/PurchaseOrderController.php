@@ -179,11 +179,19 @@ class PurchaseOrderController extends Controller
             return '
             <div class="form-inline">          
                 <a class="mr-2" href="'.$url_edit.'">
-                    <button type="button" class="btn btn-secondary  py-1 px-2">
+                    <button type="button" class="btn btn-secondary  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
+                    title="Lihat detail">
                     <i class="dw dw-edit2"></i>
                     </button>
                 </a>
-                <button onclick="confirmDelete(' .$delete. ')"  type="button" class="btn btn-danger  py-1 px-2">
+                <a class="mr-2" href="'.$url_edit.'">
+                    <button type="button" class="btn btn-secondary  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
+                    title="Edit data">
+                    <i class="icon-copy bi bi-eye"></i>
+                    </button>
+                </a>    
+                <button onclick="confirmDelete(' .$delete. ')"  type="button" class="btn btn-danger  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
+                title="Hapus Data">
                     <i class="icon-copy dw dw-trash"></i>
                 </button>
             </div>
