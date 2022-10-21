@@ -23,15 +23,18 @@ class CreateEmployeesTable extends Migration
             $table->string('nik_employee')->nullable();
             $table->string('position_uuid')->nullable();
             $table->string('department_uuid')->nullable();
+            $table->string('company_uuid')->nullable();
 
             $table->integer('contract_number')->nullable();
+            $table->string('contract_number_full')->nullable();
             $table->string('contract_status')->nullable();//pkwt-pkwtt
             $table->date('date_start_contract')->nullable();
             $table->date('date_end_contract')->nullable();
             $table->date('date_document_contract')->nullable();
             
             $table->integer('long_contract')->nullable(); //month
-            $table->string('employee_status')->nullable();      //profesional training
+            $table->string('employee_status')->nullable();  
+            $table->string('file_path')->nullable();      //profesional training
             $table->string('is_last')->nullable(); 
 
             $table->timestamps();

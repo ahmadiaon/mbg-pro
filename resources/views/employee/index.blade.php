@@ -6,15 +6,18 @@
             <div class="col-3">
                 <h4 class="text-blue h4">Karyawan</h4>
             </div>
-            <div class="col-9 text-right">
-                <div class="btn-group">
-                    <div class="btn-group dropdown">
-                        {{-- <a href="/purchase-order/create"> --}}
-                        <button onclick="create()" class="btn btn-primary mr-10">Tambah</button>
-                        {{-- </a>                      --}}
+            @if(!empty(session('dataUser')->create_employee))
+                <div class="col-9 text-right">
+                    <div class="btn-group">
+                        <div class="btn-group dropdown">
+                            {{-- <a href="/purchase-order/create"> --}}
+                            <button onclick="create()" class="btn btn-primary mr-10">Tambah</button>
+                            {{-- </a>                      --}}
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
+            
         </div>
         <div class="pb-20" id="tablePrivilege">
             <table id="table-privilege" class="display nowrap stripe hover table" style="width:100%">
@@ -80,7 +83,7 @@
     <script>
         showDataTableUser('user-data', ['nik_employee', 'position','employee_status'], 'table-privilege')
         function create(){
-            location.href = '/user/profile/'+nik_employee;
+            location.href = '/user/create';
         }
        function store(idForm){
             if(isRequired(['uuid','privilege'])    > 0){ return false; }

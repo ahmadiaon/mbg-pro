@@ -11,6 +11,7 @@ use App\Models\Religion;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Company;
+use App\Models\Employee\EmployeeSalary;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\Roaster;
 use App\Models\User;
@@ -36,6 +37,11 @@ class EmployeeController extends Controller
         ]);
     }
     public function create($user_detail_uuid){
+        $d = Carbon::today('Asia/Jakarta')->isoFormat('D');
+        $m = Carbon::today('Asia/Jakarta')->isoFormat('M');
+        $y = Carbon::today('Asia/Jakarta')->isoFormat('Y');
+
+
         $contract_number = '001';
         $nik_employee = "001";
         $machine_id = 1;
@@ -46,32 +52,28 @@ class EmployeeController extends Controller
         $companies = Company::all();
         $roasters = Roaster::all();
 
-        $employee = Employee::latest()->first();
+       $employee = Employee::where('nik_employee', '!=',null)->where('created_at', '!=',null)->latest()->first();
         if($employee->count() > 0){
             // return $employee;
             $nik_employees = $employee->nik_employee;
-            $nik_employees = 'MBLE-20220528001';
-            $nik_employee = $nik_employees[13].$nik_employees[14].$nik_employees[15] + 1;
+            $nik_suggest = explode('-', $nik_employees);
+            $nik = $nik_suggest[1][4].$nik_suggest[1][5].$nik_suggest[1][6] + 1;
             $machine_id = $employee->machine_id + 1;
             $contract_number = $employee->contract_number + 1;
-        }else{
-            $contract_number = '001';
-            $nik_employee = "001";
-            $machine_id =1;
         }
 
         // dd($employee);
 
-        $d = Carbon::today('Asia/Jakarta')->isoFormat('D');
-        $m = Carbon::today('Asia/Jakarta')->isoFormat('M');
-        $y = Carbon::today('Asia/Jakarta')->isoFormat('Y');
+        
 
          $date_now = $d.' '.ResponseFormatter::getMonthName($m).' '.$y;
+         $date_now =  $y.'-'.$m.'-'.$d;
 
         $d = Carbon::today()->addDays(90)->isoFormat('D');
         $m = Carbon::today()->addDays(90)->isoFormat('M');
         $y = Carbon::today()->addDays(90)->isoFormat('Y');
         $date_add = $d.' '.ResponseFormatter::getMonthName($m).' '.$y;
+        $date_adds = $y.'-'.$m.'-'.$d;
         // dd($positions);
         $layout = [
             'head_core'            => true,
@@ -95,11 +97,35 @@ class EmployeeController extends Controller
             'departments' => $departments,
             'date_now'  =>$date_now,
             'long'      => 3,
-            'date_add'  => $date_add,
+            'date_add'  => $date_adds,
             'contract_number'   => $contract_number,
-            'nik_employee'      => $nik_employee,
+            'nik_employee'      => $nik,
             'machine_id'    =>$machine_id
         ]);
+    }
+    public function storeFile(Request $request){
+        $validatedData = $request->validate([
+            'nik_employee_file' => '',
+        ]);
+        // return ResponseFormatter::toJson($validatedData, 'da');
+        if($request->file('user_file')) {
+            $imageName =   $validatedData['nik_employee_file']. '.'.$request->user_file->getClientOriginalExtension();
+            $name = 'file/user/'.$imageName;
+            if(file_exists($name)){
+                $name = mt_rand(5, 99985) .'-'.$imageName;
+                $name = 'file/user/'.$imageName;
+            }
+            
+            $isMoved = $request->user_file->move('file/user/',$name);
+
+            if($isMoved){
+                $validatedData['file_path'] = $imageName;
+            }
+            $store = Employee::updateOrCreate(['nik_employee' => $validatedData['nik_employee_file']], $validatedData);
+        }
+      
+        
+        return ResponseFormatter::toJson($validatedData, 'file store');
     }
     public function store(Request $request){
         // dd($request);
@@ -119,51 +145,76 @@ class EmployeeController extends Controller
            'long_contract'=>'', //month
            'employee_status' => '',      //trainer
         ]);
+
+        $validateDataSalaries = $request->validate([
+           'salary' => '',
+           'insentif' => '',
+           'premi_bk' => '',
+           'premi_nbk' => '',
+           'premi_kayu' => '',
+           'premi_mb' => '',
+           'premi_rj' => '',
+           'insentif_hm' => '',
+           'deposit_hm' => '',
+           'tonase' => '',
+            'date_start' => '',
+            'date_end' => '',
+         ]);
+        
+   
+
+
         $contract_numbers = explode("/",$request->contract_number);
         $validateData['contract_number'] =$contract_numbers[0];
-        $validateData['date_start_contract'] = ResponseFormatter::toDate($request->date_start_contract);
-        $validateData['date_end_contract'] = ResponseFormatter::toDate($request->date_end_contract);
-        $validateData['date_document_contract'] = ResponseFormatter::toDate($request->date_start_contract);
-        $validateData['uuid'] = 'employe-'.Str::uuid();
+        if(empty($request->uuid)){
+            $validateData['uuid'] = $validateData['nik_employee'];           
+        }
 
-        $validateDataUser['uuid'] = 'User-'.Str::uuid();
+        $store = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        
+
+        $validateDataUser['uuid'] =$store->uuid;
         $validateDataUser['employee_uuid'] =   $validateData['uuid'];
         $validateDataUser['role'] = 'employee';
         $validateDataUser['nik_employee'] = $validateData['nik_employee'];;
         $validateDataUser['password'] = Hash::make('password');
-        $storeUser = User::create(
-            $validateDataUser
-        );
+        $store = User::updateOrCreate(['uuid' => $validateDataUser['uuid']], $validateDataUser );
+        
+        $validateDataSalaries['uuid'] = $validateData['uuid'];
+        $validateDataSalaries['employee_uuid'] = $validateData['uuid'];
+        $validateDataSalaries['date_start'] = Carbon::today('Asia/Jakarta');
+
+        $store = EmployeeSalary::updateOrCreate(['uuid' => $validateDataSalaries['uuid']], $validateDataSalaries );
 
 
-
-
-        // $validateData['contract_number'] = 'education-'.Str::uuid();
-        // dd($validateData);
-        $store = Employee::create($validateData);
-
+        $abc = [
+            'validateDataUser' => $validateDataUser,
+            'validateData' => $validateData,
+            'validateDataSalaries' => $validateDataSalaries,
+        ];
+        dd($abc);
         return redirect()->intended('/user')->with('success',"Karyawan Ditambahkan");
-
     }
 
     public function show(Request $request){
-        $data = Employee::where_employee_nik_employee($request->uuid);
+        $data = Employee::where_employee_nik_employee_nullable($request->uuid);
         $userPrivileges = UserPrivilege::where('nik_employee', $request->uuid)->get();
         if(!empty($userPrivileges)){
             $data->user_privileges = $userPrivileges;
         }
-       
-
         return ResponseFormatter::toJson($data, 'Data Privilege');
     }
 
     public function profile($nik_employee){
-        $data = Employee::where_employee_nik_employee($nik_employee);
-        // dd($data);
-        $userPrivileges = UserPrivilege::where('nik_employee', $nik_employee)->get();
-        if(!empty($userPrivileges)){
-            $data->user_privileges = $userPrivileges;
+        $data = Employee::where_employee_nik_employee_nullable($nik_employee);        
+        if(!empty($data->user_privileges)){
+            foreach($data->user_privileges as $item){
+                $thiss = $item->privilege_uuid;
+                $data->$thiss = 1;
+            }
         }
+         
+
 
         $layout = [
             'head_datatable'        => true,
@@ -182,7 +233,6 @@ class EmployeeController extends Controller
     public function anyData(){
 
         $data = Employee::getAll();
-        // return $data;
 
         return Datatables::of($data)     
         ->make(true);

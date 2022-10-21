@@ -2,14 +2,14 @@
    /admin-hr/experience
     
 --}}
-@extends('template.admin.main')
+@extends('template.admin.main_privilege')
 @section('content')
     <div class="card-box mb-30">
-        <form action="/admin-hr/employee" method="POST">
+        <form action="/user-employee/store" method="POST">
             @csrf
 
-            <input type="hidden" name="user_detail_uuid" id="user_detail_uuid" value="{{$user_detail_uuid}}">
-            <input type="hidden" name="machine_id" id="machine_id" value="{{$machine_id}}">
+            <input type="text" name="user_detail_uuid" id="user_detail_uuid" value="{{$user_detail_uuid}}">
+            <input type="text" name="machine_id" id="machine_id" value="{{$machine_id}}">
             <div class="min-height-200px">
 
                 <!-- Identitas Karyawan -->
@@ -164,11 +164,11 @@
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label>Tanggal Mulai Kontrak</label>
-                                            <input onblur="changeEnd()" id="date_start_contract"
+                                            <input onchange="changeEnd()" id="date_start_contract"
                                                 name="date_start_contract"
-                                                class="form-control date-picker  @error('date_start_contract') is-invalid @enderror"
+                                                class="form-control  @error('date_start_contract') is-invalid @enderror"
                                                 value="{{ old('date_start_contract', $date_now) }}"
-                                                placeholder="Select Date" type="text" />
+                                                placeholder="Select Date" type="date" />
                                             @error('date_start_contract')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -179,7 +179,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>Lama</label>
-                                            <input onchange="changeEnd()" id="long_contract" name="long_contract"
+                                            <input onkeyup="changeEnd()" id="long_contract" name="long_contract"
                                                 class="form-control  @error('long_contract') is-invalid @enderror"
                                                 value="{{ old('long_contract',  $long ) }}" type="text" />
                                             @error('long_contract')
@@ -193,9 +193,9 @@
                                         <div class="form-group">
                                             <label>Kontrak Berakhir</label>
                                             <input id="date_end_contract" name="date_end_contract"
-                                                class="form-control date-picker  @error('date_end_contract') is-invalid @enderror"
+                                                class="form-control  @error('date_end_contract') is-invalid @enderror"
                                                 value="{{ old('date_end_contract',  $date_add ) }}"
-                                                placeholder="Select Date" type="text" />
+                                                placeholder="Select Date" type="date" />
                                             @error('date_end_contract')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -395,36 +395,41 @@
 
 @section('js')
 <script>
-    console.log(zeroFilled = ('000' + 2).substr(-3))
-    changeEnd();
-    function getNumericMonth(monthAbbr) {
-      return (String(["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"].indexOf(monthAbbr) + 1).padStart(2, '0'))
-    }
-    // console.log(getNumericMonth('september'));
-    
     function changeEnd(){
         var inputVal = document.getElementById("date_start_contract").value;
-        const result = inputVal.trim().split(/\s+/);
-        month1 = result[1].toLowerCase();
-        var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        
-        var month = getNumericMonth(month1)
-        var monthRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-        console.log(parseInt(month))
         var long = document.getElementById("long_contract").value;
-        var contract_status = document.getElementById("contract_status").value;
+        var someDate = new Date(inputVal);
+        console.log('date start :'+ inputVal)
+        console.log('long :'+long)
         
-        var company_uuid = document.getElementById("company_uuid").value;
-        console.log(company_uuid)
-        var contract =  ('000' + {{$contract_number}}).substr(-3)+"/"+contract_status+"/"+company_uuid+"/"+monthRomawi[parseInt(month)-1]+"/"+result[2]
-        var nik_employee = company_uuid+"-"+result[2]+month+result[0]+ ('000' +{{$nik_employee}}).substr(-3)
-        var date = new Date(month+' '+result[0]+' '+result[2]);
-        $("#contract_number").val(contract);
-        $("#nik_employee").val(nik_employee);
-        // Add ten days to specified date
-        date.setMonth(date.getMonth() + parseInt(long) );
-
-        $("#date_end_contract").val(date.getDate()+' '+months[date.getMonth()]+' '+date.getFullYear());
+        someDate.setMonth(someDate.getMonth() + parseInt(long));
+        let month_s =someDate.getMonth()+1;
+        let full_month ='00' +month_s;
+        let date_suggest = someDate.getFullYear()+'-'+full_month.substr(-2)+'-'+someDate.getDate();
+        console.log('date_suggest :'+date_suggest)
+        $("#date_end_contract").val(date_suggest);    
     }
 </script>
+@endsection
+
+@section('js_ready')
+var monthRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+var contract_status = document.getElementById("contract_status").value;
+let company = $('#company_uuid').val()
+let today = @json($date_now);
+let month = today.charAt(5)+today.charAt(6);
+let year = today.charAt(0)+today.charAt(1)+today.charAt(2)+today.charAt(3);
+let month_number = parseInt(month);
+let contract_number = @json($contract_number);
+let full_contract_number ='000' +contract_number;
+let contract_number_suggest = full_contract_number.substr(-3)+'/'+contract_status+'/'+company+'/'+monthRomawi[month_number-1]+'/'+year;
+let nik_employee = @json($nik_employee);
+
+let nik_employee_suggest = company+'-'+today.charAt(2)+today.charAt(3)+today.charAt(5)+today.charAt(6)+nik_employee;
+$("#nik_employee").val(nik_employee_suggest);
+$("#contract_number").val(contract_number_suggest);
+
+console.log('pkwt :')
+
+changeEnd();
 @endsection

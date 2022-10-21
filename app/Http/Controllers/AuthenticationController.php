@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Employee\Employee;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -29,15 +31,22 @@ class AuthenticationController extends Controller
         if($dataUser){
             if(Hash::check($request->password, $dataUser->password)){
                 $dataUserOld = $dataUser;
-               $dataUser = User::join('employees', 'employees.uuid', '=', 'users.employee_uuid')
-                ->where('users.nik_employee', $request->username)
-                ->get([
-                    'users.*',
-                    'employees.uuid as employee_uuid'
-                ])->first();
+
+               $dataUser = Employee::where_employee_nik_employee_nullable($dataUser->nik_employee);
+               if(!empty($dataUser->user_privileges)){
+                    foreach($dataUser->user_privileges as $item){
+                        $thiss = $item->privilege_uuid;
+                        $dataUser->$thiss = 1;
+                    }
+                }
                 if(!$dataUser){
                     $dataUser =$dataUserOld;
+                    $request->session()->put('dataUser', $dataUser);
+                }else{
+                    $request->session()->put('dataUser', $dataUser);
+                    return redirect()->intended('/me/'.$dataUser->nik_employee);
                 }
+
             //    dd($dataUser);
                 $request->session()->put('dataUser', $dataUser);
                 switch($dataUser->role) {
@@ -90,11 +99,7 @@ class AuthenticationController extends Controller
                 return back()->with('loginError', 'Login Failed!');
             }
         }else{
-            $request->session()->put('isAdmin','0');
+            return back()->with('loginError', 'Login Failed!');
         }
-        return back()->with('loginError', 'Login Failed!');;
-        
     }
-
-
 }

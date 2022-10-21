@@ -32,7 +32,8 @@
 					<span class="user-icon">
 						<img src="{{ env('APP_URL') }}vendors/images/mbg-logo.png" alt="" />
 					</span>
-					<span class="user-name">{{session('dataUser')->name}}</span>
+					
+					<span class="user-name">{{session('dataUser')->user_details->name}}</span>
 				</a>
 				<div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
 					<a class="dropdown-item" href="#"><i class="dw dw-user1"></i> Profile</a>
@@ -43,3 +44,4 @@
 	
 	</div>
 </div>
+{{-- @dd() --}}

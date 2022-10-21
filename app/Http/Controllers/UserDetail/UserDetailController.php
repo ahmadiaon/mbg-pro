@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserDetail;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeTotalHmMonth;
 use App\Models\HourMeterPrice;
 use App\Models\Poh;
@@ -14,6 +15,7 @@ use App\Models\UserDetail\UserReligion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Replace;
 use Yajra\Datatables\Datatables;
 
 class UserDetailController extends Controller
@@ -107,16 +109,56 @@ class UserDetailController extends Controller
         $religions = Religion::all();
         $pohs = Poh::all();
         
-        return view('user_detail.create', [
+        return view('user_detail.edit', [
             'title'         => 'Tambah Karyawan',
             'religions' => $religions,
             'pohs' => $pohs,
+            'data'  => null,
             'layout'    => $layout
         ]);
     }
+
+    public function show($nik_employee){
+        $data = Employee::where_employee_nik_employee_nullable($nik_employee);
+        $data->isEdit = 1;
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employees-index',
+        ];
+
+        $religions = Religion::all();
+        $pohs = Poh::all();
+        
+        return view('user_detail.edit', [
+            'title'         => 'Tambah Karyawan',
+            'religions' => $religions,
+            'data'  => $data,
+            'pohs' => $pohs,
+            'layout'    => $layout
+        ]);
+        return $nik_employee;
+    }
+
+    
+
     public function store(Request $request){
+
+        //user_detail
+        //user_religion
+        //user_address
+        //
+
+        // dd($request);
+        $isEdit = false;
         
         $validateDataUser = $request->validate([
+            'user_detail_uuid'  => '',
+            'user_religion_uuid'    => '',
+            'user_address_uuid' =>'',
+
             'name' => 'required',
             'nik_number' => 'required',
             'kk_number' => 'required',
@@ -146,24 +188,46 @@ class UserDetailController extends Controller
            'kabupaten' => 'required',
            'provinsi' => '',
         ]);
+
         $validateDataUserReligion = $request->validate([
+            'uuid'  => '',
             'religion_uuid' => '',
+            'user_detail_uuid' => '',
         ]);
 
-        $validateDataUser['uuid'] = 'people-'.Str::uuid();
-        $validateDataUser['date_of_birth'] = ResponseFormatter::toDate($request->date_of_birth);
-        $storeUser = UserDetail::create($validateDataUser);
+        if($validateDataUser['user_detail_uuid'] == null){
+            $user_detail_uuid = strtolower(str_replace(' ','-',$validateDataUser['name'] ) .'-'.rand(99,9999));
+            $validateDataUser['uuid'] = $user_detail_uuid;
+            $validateDataUserAddress['uuid'] = 'address-'.$user_detail_uuid;
+            $validateDataUserReligion['uuid'] = 'religion-'.$user_detail_uuid;            
+        }else{
+            $isEdit = true;
+            $validateDataUser['uuid'] =  $validateDataUser['user_detail_uuid'];
+            $validateDataUserAddress['uuid'] = $validateDataUser['user_address_uuid'];
+            $validateDataUserReligion['uuid'] = $validateDataUser['user_religion_uuid'];
+        }
 
-        $validateDataUserAddress['uuid'] = 'address-'.$request->name.'-'.Str::uuid();
+        $storeUser = UserDetail::updateOrCreate(['uuid' => $validateDataUser['uuid']],$validateDataUser);
+
         $validateDataUserAddress['user_detail_uuid'] = $storeUser->uuid;
         $validateDataUserAddress['is_last'] = '1';
-        $storeUserAddress = UserAddress::create($validateDataUserAddress);
 
-        $validateDataUserReligion['uuid'] = 'religion-'.$request->name.'-'.Str::uuid();
+        $storeUserAddress = UserAddress::updateOrCreate(['uuid' => $validateDataUserAddress['uuid']],$validateDataUserAddress);
+
         $validateDataUserReligion['user_detail_uuid'] = $storeUser->uuid;
-        $storeUserReligion = UserReligion::create($validateDataUserReligion);
 
-        return redirect()->intended('/admin-hr/dependent/create/'.$storeUser->uuid);
+
+        $storeUserReligion = UserReligion::updateOrCreate(['uuid' => $validateDataUserReligion['uuid']],$validateDataUserReligion);
+        $das = [
+            'religion'  => $storeUserReligion,
+            'user'  => $storeUser,
+            'address'   => $storeUserAddress
+        ];
+        
+        if($isEdit == true){
+            return redirect()->intended('/user/profile/'.$request->nik_employee);
+        }
+        return redirect()->intended('/user-dependent/create/'.$storeUser->uuid);
     }
 
     public function anyData()

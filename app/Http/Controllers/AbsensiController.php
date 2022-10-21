@@ -18,63 +18,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class AbsensiController extends Controller
 {
-    public function absensiData($months){
-
-        $employees = DB::table('employees')
-        ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
-        ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
-        ->join('positions', 'positions.uuid',  '=', 'employee_contracts.position_uuid')
-        
-        ->get(['people.name','positions.position','employees.*']);
-
-        foreach($employees as $employee){
-            $count_DS = DB::table('absensi_employees')
-            ->join('employees', 'employees.machine_id', '=', 'absensi_employees.machine_id')
-            ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
-            ->where('absensi_employees.machine_id', $employee->machine_id)
-            ->where('absensi_employees.date_month', $months)
-            ->where('absensi_employees.status', 'DS')
-            ->count();
-
-            // dd($count_DS);
-
-            $count_TC = DB::table('absensi_employees')
-            ->join('employees', 'employees.machine_id', '=', 'absensi_employees.machine_id')
-            ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
-            ->where('absensi_employees.machine_id', $employee->machine_id)
-            ->where('absensi_employees.date_month', $months)
-            ->where('absensi_employees.status', 'TC')
-            ->count();
-
-            $count_TA = DB::table('absensi_employees')
-            ->join('employees', 'employees.machine_id', '=', 'absensi_employees.machine_id')
-            ->join('people', 'people.uuid',  '=', 'employees.people_uuid')
-            ->where('absensi_employees.machine_id', $employee->machine_id)
-            ->where('absensi_employees.date_month', $months)
-            ->where('absensi_employees.status', 'TA')
-            ->count();
-
-            
-
-            $employee->count_ds = $count_DS;
-            $employee->count_tc = $count_TC;
-            $employee->count_ta = $count_TA;
-            $employee->month = $months;
-        }
-        // dd($employees);
-
-        return Datatables::of($employees)
-        ->addColumn('action', function ($model) {
-            return '<a class="text-decoration-none" href="/admin-hr/absensi-show/'.$model->month.'/' . $model->nik_employee . '">
-                            <button class="btn btn-secondary py-1 px-2 mr-1">
-                                <i class="icon-copy bi bi-eye-fill"></i>
-                            </button>
-                        </a>';
-        })
-        
-        ->make(true);  
-
-    }
+  
     public function edit(Request $request){
         // return $request;
         $validatedData = $request->validate([
@@ -126,104 +70,6 @@ class AbsensiController extends Controller
         
         ->make(true);  
 
-    }
-
-    public function show($month, $nik){
-        $year = 2022;
-        // dd('a');
-        // $data = DB::table('employees')
-        // ->leftJoin('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
-        // ->where('employees.nik_employee', $nik)
-        // ->get(['employees.*']);
-
-        // dd($data);
-        
-
-        $lastDay = Carbon::now()->endOfMonth()->isoFormat('D');
-        // return $today = Carbon::now('Asia/Jakarta')->isoFormat('MMMM Do YYYY, h:mm:ss a');;
-
-        DB::table('shifts')
-        ->where('shift_date_start', '<', '24-08-2022')
-        ->get();
-        
-        for($i=1; $i <= $lastDay; $i++){
-
-            $dateGet =$year.'-'.$month.'-'.$i;
-
-            $data = DB::table('employees')
-            ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
-           ->leftJoin('shift_lists', 'shift_lists.contract_employee_uuid', '=', 'employee_contracts.uuid')
-           ->leftJoin('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
-           ->join('absensi_employees', 'absensi_employees.machine_id','=', 'employees.machine_id')
-           ->where('employees.nik_employee', $nik)
-        //    ->where('shifts.shift_date_start', '<=', $dateGet)
-        //    ->where('shifts.shift_date_end', '>=', $dateGet)
-           ->where('absensi_employees.date_date', $i)
-           ->where('absensi_employees.date_month', $month)
-           ->where('absensi_employees.date_year', $year)
-           ->get([
-            'shifts.shift_time',
-            'absensi_employees.*', 
-            'shifts.shift_date_start',
-            'shifts.shift_date_end'
-            ])->first();
-
-            // dd($data);
-           if(!$data){
-
-            $data = DB::table('employees')
-            ->join('employee_contracts', 'employee_contracts.employee_uuid', '=', 'employees.uuid')
-           ->leftJoin('shift_lists', 'shift_lists.contract_employee_uuid', '=', 'employee_contracts.uuid')
-           ->leftJoin('shifts', 'shifts.uuid', '=', 'shift_lists.shift_uuid')
-           ->where('employees.nik_employee', $nik)
-           ->get([
-            'shifts.shift_time',
-            'employees.machine_id', 
-            ])->first();
-            // dd($data);
-                // $data = DB::table('employees')
-                // ->join('shift_lists', 'shift_lists.employee_id', '=', 'employees.id')
-                // ->join('shifts', 'shifts.id', '=', 'shift_lists.shift_id')
-                // ->where('employees.nik_employee', $nik)
-                // ->where('shifts.shift_date_start', '<=', $dateGet)
-                // ->where('shifts.shift_date_end', '>=', $dateGet)
-                // ->get([
-                //     'shifts.shift_time',
-                //     'employees.machine_id', 
-                //     'shift_lists.shift_id as shift_id'
-                //     ])->first();
-
-
-                $data->date_year = $year;
-                $data->date_month = $month;
-                $data->date_date = $i;
-                $data->status = "Null";
-                $data->cek_log = "";
-                $data->id = "";
-                // dd($data);
-           }
-            
-           $absens[] = $data;
-        }
-        // dd($absens);
-        
-
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => true,
-            'javascript_datatable'  => true,
-            'head_form'             => false,
-            'javascript_form'       => false,
-            'active'                        => 'admin-hr-absensi'
-        ];
-        return view('hr.absensi.show', [
-            'title'         => 'Absensi HR',
-            'absens'    => $absens,
-            'month'     => $month,
-            'nik_employee'     => $nik,
-            'layout'        => $layout
-        ]);
     }
 
     public function index($month){
@@ -300,17 +146,8 @@ class AbsensiController extends Controller
             }else{
                 $cek_log = "'".$absen."'";
             }
-            
-            //sore true
-            //pagi true
         }
-        // dd($hourEvening);
-        // AbsensiEmployee::create([
-        //     'employee_id'   => $id,
-        //     'date'      => $dates,
-        //     'status'    => $statusAbsen,
-        //     'cek_log'   => $absensi
-        // ]);
+
         $data = [
             'cek_log' => $cek_log,
             'status_absen' => $statusAbsen
@@ -408,10 +245,8 @@ class AbsensiController extends Controller
                     'id'    =>$machine_id,
                     'name' => $employeeName,
                     'absensi'   => $absensies
-                ];
-                
+                ];                
                 $i = $i+2;
-
             }
             //   dd( $data);
             $crateWriter = new Xls($createSpreadsheet);

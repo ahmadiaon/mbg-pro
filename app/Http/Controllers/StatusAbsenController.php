@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class StatusAbsenController extends Controller
 {
     public function indexPayrol(){
+        // return 'aa';
         $status_absen = StatusAbsen::all();
         $layout = [
             'head_core'            => true,
@@ -16,9 +17,9 @@ class StatusAbsenController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'mobilisasi'
+            'active'                        => 'database-status-absen'
         ];
-        return view('status_absen.payrol.index', [
+        return view('status_absen.index', [
             'title'         => 'Status Absen',
             'status_absen' => $status_absen,
             'layout'    => $layout

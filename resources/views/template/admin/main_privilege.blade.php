@@ -28,7 +28,7 @@
 		<div class="min-height-200px">
 			{{-- //CONTENT --}}
 			@yield('content')
-			
+			{{-- @dd(session('dataUser')) --}}
 		</div>
 		{{-- // FOOTER --}}
 		@include('template.admin.footer')
@@ -204,8 +204,15 @@
 				}
 			});
 		}
+		var months = ["","Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 	</script>
 	@yield('js')
+	<script>
+		$( document ).ready(function() {
+			@yield('js_ready')
+		});
+	</script>
+	
 </body>
 
 </html>

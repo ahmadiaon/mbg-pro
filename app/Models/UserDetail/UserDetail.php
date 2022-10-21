@@ -18,8 +18,21 @@ class UserDetail extends Model
         $userModels = UserDetail::hydrate($data);
         return $userModels;
     }
+
+    public static function where_user_detail_uuid($user_detail_uuid){
+        $data = UserDetail::where('uuid', $user_detail_uuid)
+        ->get([
+            'user_details.uuid as user_detail_uuid',
+            'user_details.*',
+        ])
+        ->first();
+        if(!empty($data)){
+            return $data;
+        }else{
+            return $data = null;
+        }
+
+    }
 }
 
-// $data = DB::select(
-//     'select DISTINCT(user_details.name), user_addresses.desa, employees.nik_employee, positions.position, employees.employee_status from user_details inner join employees on employees.user_detail_uuid = user_details.uuid inner join user_addresses on user_addresses.user_detail_uuid = user_details.uuid left join positions on positions.uuid = employees.position_uuid'
-//     );
+

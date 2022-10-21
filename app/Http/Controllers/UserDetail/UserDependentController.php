@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UserDetail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 use App\Models\UserDetail\UserDependent;
 use App\Models\UserDetail\UserDetail;
 
@@ -12,7 +13,6 @@ class UserDependentController extends Controller
 {
     public function create($user_detail_uuid){
         $data = UserDetail::where('uuid', $user_detail_uuid)->get()->first();
-        // return $data;
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -23,12 +23,35 @@ class UserDependentController extends Controller
             'active'                        => 'karyawan',
         ];
         
-        return view('user_detail.dependent.hr.create', [
+        return view('user_detail.dependent.create', [
             'title'         => 'Tambah Karyawan',
+            'data'  =>'',
             'status'    => $data->status,
             'user_detail_uuid' =>$user_detail_uuid,
             'layout'    => $layout
         ]);
+    }
+    public function show($nik_employee){
+        $data = Employee::where_employee_nik_employee_nullable($nik_employee);
+        
+        $data->isEdit = 1;
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employees-index',
+        ];
+
+        
+        return view('user_detail.dependent.create', [
+            'title'         => 'Tambah Karyawan',
+            'data'  => $data,
+            'status'    => $data->status,
+            'user_detail_uuid' => $data->user_detail_uuid,
+            'layout'    => $layout
+        ]);
+        return $nik_employee;
     }
 
     public function store(Request $request){
@@ -108,13 +131,19 @@ class UserDependentController extends Controller
             $dependents['child3_education'] = $request->child3_education;
         }
 
-        if(empty($request->uuid)){
-            $dependents['uuid'] = 'dependent-'.Str::uuid();
+        if(empty($request->user_dependent_uuid)){
+            $dependents['uuid'] = 'dependent-'.$request->user_detail_uuid;            
+        }else{
+            $dependents['uuid'] = $request->user_dependent_uuid;
         }
         // dd($dependents);
-
-        
         $dependent = UserDependent::updateOrCreate(['uuid' => $dependents['uuid']], $dependents );
-        return redirect()->intended('/admin-hr/education/create/'.$request->user_detail_uuid);
+        // dd($dependents);
+        if($request->isEdit == 1){
+            return redirect()->intended('/user/profile/'.$request->nik_employee);
+        }
+        
+      
+        return redirect()->intended('/user-education/create/'.$request->user_detail_uuid);
     }
 }

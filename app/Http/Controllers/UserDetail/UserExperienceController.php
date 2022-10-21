@@ -20,10 +20,11 @@ class UserExperienceController extends Controller
             'active'                        => 'karyawan',
         ];
         
-        return view('user_detail.experience.hr.create', [
+        return view('user_detail.experience.create', [
             'title'         => 'Tambah Karyawan',
             'user_detail_uuid' =>$user_detail_uuid,
-            'layout'    => $layout
+            'layout'    => $layout,
+            'data'  => ''
         ]);
     }
 
@@ -86,8 +87,18 @@ class UserExperienceController extends Controller
             $experience_4 =UserExperience::create($experiences_4 );
 
           }
+          if(empty($request->user_dependent_uuid)){
+            $dependents['uuid'] = 'dependent-'.$request->user_detail_uuid;            
+        }else{
+            $dependents['uuid'] = $request->user_dependent_uuid;
+        }
+        $dependent = UserExperience::updateOrCreate(['uuid' => $dependents['uuid']], $dependents );
+        // dd($dependents);
+        if($request->isEdit == 1){
+            return redirect()->intended('/user/profile/'.$request->nik_employee);
+        }
 
 
-          return redirect()->intended('/admin-hr/licence/create/'.$request->user_detail_uuid);
+          return redirect()->intended('/user-licence/create/'.$request->user_detail_uuid);
     }
 }

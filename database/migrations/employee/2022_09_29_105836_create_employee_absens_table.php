@@ -20,6 +20,7 @@ class CreateEmployeeAbsensTable extends Migration
             $table->date('date')->nullable();
             $table->string('status_absen_uuid')->nullable();
             $table->string('cek_log')->nullable();
+            $table->string('edited')->nullable();
             $table->timestamps();
         });
     }
