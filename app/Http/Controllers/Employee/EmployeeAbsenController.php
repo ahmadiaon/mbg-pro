@@ -47,8 +47,8 @@ class EmployeeAbsenController extends Controller
             'months'    => $month,
             'layout'    => $layout
         ]);
-   }
-   public function export($year_month){
+    }
+    public function export($year_month){
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
@@ -228,7 +228,7 @@ class EmployeeAbsenController extends Controller
                             $absensies= [
                                 'employee_uuid'  => $employeeName,
                                 'machine_id'   => $machine_id,
-                                'uuid'  => $abjad.'-'.$machine_id,
+                                'uuid'  => $abjad.'-'.$employeeName,
                                 'date' => $abjad,
                                 'status_absen_uuid'     => $statusAbsen['status_absen'],
                                 'count_zone'     => $statusAbsen['count_zone'],
@@ -283,136 +283,22 @@ class EmployeeAbsenController extends Controller
         ->make(true);
     }
 
-
-   public function exportPayrol($year_month){
-        $date = explode("-", $year_month);
-        $year = $date[0];
-        $month = $date[1];
-
-        return response()->download('7.xlsx');
-
-        $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH'];
-        $createSpreadsheet = new spreadsheet();
-        $createSheet = $createSpreadsheet->getActiveSheet();
-        $createSheet->setCellValue('A1', 'nama');
-
-        $data = EmployeeTotalHmMonth::join('employees','employees.uuid','employee_total_hm_months.employee_uuid')
-        ->join('user_details','user_details.uuid','employees.user_detail_uuid')
-        ->join('positions','positions.uuid','employees.position_uuid')
-        ->join('hour_meter_prices','hour_meter_prices.uuid', 'employee_total_hm_months.hour_meter_price_uuid')
-        ->where('employee_total_hm_months.month', 9)
-        ->orderBy('user_details.name')
-        ->get([
-            'user_details.name',
-            'hour_meter_prices.uuid as name_hm',
-            'employee_total_hm_months.value',
-            'employees.nik_employee as nik_employee',
-            'positions.position',
-            'employees.uuid as employee_uuid'
+    public function store(Request $request){
+        $validatedData = $request->validate([
+            'employee_uuid' => '',
+            'date' =>'',
+            'status_absen_uuid' =>'',
         ]);
-        $hour_meter_priceses = HourMeterPrice::all();
-        $count = $data->count()/$hour_meter_priceses->count();
-        
-        $dataHM= array();
 
-        $j = 0;
-        for($i=0; $i< $count;$i++){
-            foreach($hour_meter_priceses as $prices){
-                $d[$data[$j]->name_hm]= $data[$j]->value;
-                $j++;
-            }
-            $dataHM[]=[
-                'name'  => $data[$j-1]->name,
-                'employee_uuid' => $data[$j-1]->employee_uuid,
-                'position'  =>$data[$j-1]->position,
-                'nik_employee'=> $data[$j-1]->nik_employee,
-                'hm'    => $d,
-            ];
-
-        }
-        // dd($dataHM);
-            $createSheet->setCellValue('A1', 'NIK');
-            $createSheet->setCellValue('B1', 'NAMA');
-            $createSheet->setCellValue('C1', 'JABATAN');
-            $i = 3;
-            foreach($hour_meter_priceses as $p){
-                $createSheet->setCellValue($abjads[$i++].'1', $p->name);
-            }
-            
-            $j = 2;
-            foreach($dataHM as $d){
-                
-                $createSheet->setCellValue($abjads[0].$j, $d['nik_employee']);
-                $createSheet->setCellValue($abjads[1].$j, $d['name']);
-                $createSheet->setCellValue($abjads[2].$j, $d['position']);
-                $i = 4;
-                // dd($d['hm']);
-                foreach($hour_meter_priceses as $p){
-                    $createSheet->setCellValue($abjads[$i++].$j, $d['hm'][$p->uuid]);
-                }
-                $j++;
-            }
-
-            $crateWriter = new Xls($createSpreadsheet);
-            $crateWriter->save('7.xlsx');
-        return "done";
-
+        $validatedData['uuid']  = $validatedData['date'].'-'.$validatedData['employee_uuid'];
+        $validatedData['edited'] = 'edited';
+        $store = EmployeeAbsen::updateOrCreate(['uuid' =>$validatedData['uuid']],$validatedData);
+        return ResponseFormatter::toJson($store, "data stored");
     }
-   public function importPayrol(Request $request, $year_month){
-        $date = explode("-", $year_month);
-        $year = $date[0];
-        $month = $date[1];
 
-    $this->validate($request, [
-        'uploaded_file' => 'required'
-    ]);
-    $the_file = $request->file('uploaded_file');
-    
+
    
-    try{
-        $spreadsheet = IOFactory::load($the_file->getRealPath());
-        $sheet        = $spreadsheet->getActiveSheet();
-        $row_limit    = $sheet->getHighestDataRow(); //283
-        $column_limit = $sheet->getHighestDataColumn();//M
-
-        $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH'];
-
-        $numColumn = ResponseFormatter::getNumArray($column_limit, $abjads);
-
-        // get key_excell get all date
-        for($i=4; $i<=$numColumn; $i++){
-            $key_excel[] = $sheet->getCell( $abjads[$i] . 1 )->getValue();
-        }
-
-        $up = array();
-        $errors = array();
-        $updside = array();
-        // alll employee
-        for($i=2; $i <= $row_limit; $i++){
-            $nik_employee = $sheet->getCell( 'A' . $i )->getValue();
-            
-            $day = 1;
-            foreach($key_excel as $k_excel){
-                $employee =  [
-                    'uuid'  => 'absensi-'.$year.'-'.$month.'-'.$day.'-'.$nik_employee,
-                    'employee_uuid'  => 'employee-'.$nik_employee,
-                    'date' => $year.'-'.$month.'-'.$day,
-                    'status_absen_uuid'=> $sheet->getCell( $abjads[$day+3]. $i )->getValue(),
-                ];
-                $up[] = $employee;
-                $store = EmployeeAbsen::create($employee);
-                if(!$store){
-                    $errors[] = $employee;
-                }
-                $day++;
-            }
-        }
-        return $up;
-        } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
-            return back()->withErrors('There was a problem uploading the data!');
-        }
-   }
+   
       
    public function showPayrol($year_month, $employee_uuid){
         $nik_employeess = Employee::where_uuid($employee_uuid);
@@ -469,8 +355,6 @@ class EmployeeAbsenController extends Controller
             'months'    => $month,
             'layout'    => $layout
         ]);
-       
-       
-   }
+    }
 
 }

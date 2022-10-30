@@ -17,6 +17,7 @@ class CreateCompaniesTable extends Migration
             $table->id();
             
             $table->string('uuid')->nullable();
+            $table->string('coal_type_uuid')->nullable();
             $table->string('name')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();

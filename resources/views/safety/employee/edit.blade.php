@@ -49,10 +49,10 @@
                                 </div>
                             </div>
                         </div>
-                        <h5 class="text-center h5 mb-0">{{ $employee->name }}</h5>
+                        <h5 class="text-center h5 mb-0">h5>
                         <p class="text-center text-muted font-14">
-                            {{ $employee->nik_employee }} <br>
-                            {{ $employee->department }}-{{$employee->position }}
+                             <br>
+                            employee->position }}
                         </p>
                         <div class="profile-info">
                             <h5 class="mb-20 h5 text-blue">Contact Information</h5>
@@ -302,8 +302,7 @@
                                                 <!-- Open Task start -->
                                                 <div class="task-title row align-items-center">
                                                     <div class="col-md-8 col-sm-12">
-                                                        <h5>No registrasi : {{ ($employee->no_reg)?
-                                                            $employee->no_reg:'Un Register'
+                                                        <h5>No registrasi : Register'
                                                             }}</h5>
                                                     </div>
                                                     <div class="col-md-4 col-sm-12 text-right">
@@ -316,68 +315,48 @@
                                                     <ul>
                                                         <li>
                                                             <div class="custom-control custom-checkbox mb-5">
-                                                                <input disabled type="checkbox" {{
-                                                                    ($employee->helm_color)?
-                                                                'checked':'' }}
+                                                                <input disabled type="checkbox"
                                                                 class="custom-control-input" id="task-1" />
                                                                 <label class="custom-control-label"
                                                                     for="task-1"></label>
                                                             </div>
                                                             <div class="task-type">Helm</div>
-                                                            {{
-                                                            ($employee->helm_color)?
-                                                            $employee->helm_color:'un chosse' }}
+                                                            
                                                             <div class="task-assign">
-                                                                Assigned to {{ $employee->name }}
+                                                                Assigned to 
                                                                 <div class="due-date">
-                                                                    date <span> {{
-                                                                        ($employee->helm_date)?
-                                                                        $employee->helm_date:'pending' }} </span>
+                                                                    date <span>   </span>
                                                                 </div>
                                                             </div>
                                                         </li>
                                                         <li>
                                                             <div class="custom-control custom-checkbox mb-5">
-                                                                <input disabled type="checkbox" {{
-                                                                    ($employee->rompi_status)?
-                                                                'checked':''
-                                                                }} class="custom-control-input"
+                                                                <input disabled type="checkbox" class="custom-control-input"
                                                                 id="task-2" />
                                                                 <label class="custom-control-label"
                                                                     for="task-2"></label>
                                                             </div>
                                                             <div class="task-type">Rompi</div>
-                                                            {{
-                                                            ($employee->rompi_status)?
-                                                            'Rompi Safety':'un chosse' }}
-                                                            <div class="task-assign">
-                                                                Assigned to {{ $employee->name }}
+                                                             class="task-assign">
+                                                                Assigned to 
                                                                 <div class="due-date">
-                                                                    date <span> {{
-                                                                        ($employee->rompi_date)?
-                                                                        $employee->rompi_date:'pending' }} </span>
+                                                                    date <span>   </span>
                                                                 </div>
                                                             </div>
                                                         </li>
                                                         <li>
                                                             <div class="custom-control custom-checkbox mb-5">
-                                                                <input disabled type="checkbox" {{
-                                                                    ($employee->boots_size)?
-                                                                'checked':'' }}
+                                                                <input disabled type="checkbox"
                                                                 class="custom-control-input" id="task-3" />
                                                                 <label class="custom-control-label"
                                                                     for="task-3"></label>
                                                             </div>
                                                             <div class="task-type">Sepatu</div>
-                                                            Ukuran Sepatu {{
-                                                            ($employee->boots_size)?
-                                                            $employee->boots_size:'un chosse' }}
+                                                            Ukuran Sepatu 
                                                             <div class="task-assign">
-                                                                Assigned to {{ $employee->name }}
+                                                                Assigned to 
                                                                 <div class="due-date">
-                                                                    date <span> {{
-                                                                        ($employee->boots_date)?
-                                                                        $employee->boots_date:'pending' }} </span>
+                                                                    date <span>   </span>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -396,69 +375,48 @@
                                                         <li>
                                                             <div class="custom-control custom-checkbox mb-5">
                                                                 <input disabled type="checkbox"
-                                                                    class="custom-control-input" {{
-                                                                    ($employee->blue_size)?
-                                                                'checked':''
-                                                                }} id="task-4" />
+                                                                    class="custom-control-input" id="task-4" />
                                                                 <label class="custom-control-label"
                                                                     for="task-4"></label>
                                                             </div>
                                                             <div class="task-type">Kemeja Biru</div>
-                                                            Ukuran {{
-                                                            ($employee->blue_size)?
-                                                            $employee->blue_size:'un chosse' }}
+                                                            Ukuran 
                                                             <div class="task-assign">
-                                                                Assigned to {{ $employee->name }}
+                                                                Assigned to 
                                                                 <div class="due-date">
-                                                                    date <span> {{
-                                                                        ($employee->blue_date)?
-                                                                        $employee->blue_date:'pending' }} </span>
+                                                                    date <span>   </span>
                                                                 </div>
                                                             </div>
                                                         </li>
                                                         <li>
                                                             <div class="custom-control custom-checkbox mb-5">
                                                                 <input disabled type="checkbox"
-                                                                    class="custom-control-input" {{
-                                                                    ($employee->orange_size)?
-                                                                'checked':''
-                                                                }}
+                                                                    class="custom-control-input"
                                                                 id="task-5" />
                                                                 <label class="custom-control-label"
                                                                     for="task-5"></label>
                                                             </div>
                                                             <div class="task-type">Kemeja Orange</div>
-                                                            Ukuran {{
-                                                            ($employee->orange_size)?
-                                                            $employee->orange_size:'un chosse' }}
+                                                            Ukuran 
                                                             <div class="task-assign">
-                                                                Assigned to {{ $employee->name }}
+                                                                Assigned to 
                                                                 <div class="due-date">
-                                                                    date <span> {{
-                                                                        ($employee->orange_date)?
-                                                                        $employee->orange_date:'pending' }} </span>
+                                                                    date <span>   </span>
                                                                 </div>
                                                             </div>
                                                         </li>
                                                         <li>
                                                             <div class="custom-control custom-checkbox mb-5">
-                                                                <input type="checkbox" {{ ($employee->shirt_size)?
-                                                                'checked':''
-                                                                }} disabled
-                                                                class="custom-control-input" id="task-6" />
+                                                                <input type="checkbox" custom-control-input" id="task-6" />
                                                                 <label class="custom-control-label"
                                                                     for="task-6"></label>
                                                             </div>
                                                             <div class="task-type">Kaos Olahraga</div>
-                                                            Ukuran {{
-                                                            ($employee->shirt_size)?
-                                                            $employee->shirt_size:'un chosse' }}
+                                                            Ukuran 
                                                             <div class="task-assign">
-                                                                Assigned to {{ $employee->name }}
+                                                                Assigned to 
                                                                 <div class="due-date">
-                                                                    date <span> {{
-                                                                        ($employee->shirt_date)?
-                                                                        $employee->shirt_date:'pending' }} </span>
+                                                                    date <span>   </span>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -477,8 +435,8 @@
                                                 @csrf
 
                                                 <input type="hidden" name="employee_contract_uuid" id=""
-                                                    value="{{ $employee->employee_contract_uuid }}">
-                                                <input type="hidden" name="uuid" id="" value="{{ $employee->uuid }}">
+                                                    value="
+                                                <input type="hidden" name="uuid" id="" value="
                                                 <div class="container">
                                                     <h4 class="text-blue text-center h5 mb-20">
                                                         No Registrasi
@@ -495,10 +453,7 @@
                                                             <label>Warna Helm</label>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5 mr-10">
-                                                                    <input type="radio" value="Putih" id="Putih" {{
-                                                                        ($employee->helm_color == 'Putih')?'checked':''
-                                                                    }}
-                                                                    name="helm_color" value="Putih"
+                                                                    <input type="radio" value="Putih" id="Putih" ="helm_color" value="Putih"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="Putih">Putih</label>
@@ -506,15 +461,11 @@
                                                                 <div class="custom-control custom-radio mb-10">
                                                                     <input type="radio" value="Biru" id="Biru"
                                                                         name="helm_color" class="custom-control-input"
-                                                                        {{ ($employee->helm_color == 'Biru')?
-                                                                    'checked':''
-                                                                    }}/>
-                                                                    <label class="custom-control-label weight-400"
+                                                                        class="custom-control-label weight-400"
                                                                         for="Biru">Biru</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ ($employee->helm_color == 'Orange')?
-                                                                    'checked':'' }} type="radio" value="Orange"
+                                                                    <input ="radio" value="Orange"
                                                                     id="Orange"
                                                                     name="helm_color"
                                                                     class="custom-control-input" />
@@ -524,8 +475,7 @@
                                                             </div>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ ($employee->helm_color == 'Kuning')?
-                                                                    'checked':'' }} type="radio" value="Kuning"
+                                                                    <input ="radio" value="Kuning"
                                                                     id="Kuning"
                                                                     name="helm_color"
                                                                     class="custom-control-input" />
@@ -533,8 +483,7 @@
                                                                         for="Kuning">Kuning</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ ($employee->helm_color == 'Hijau') ?
-                                                                    'checked':'' }} type="radio" value="Hijau"
+                                                                    <input type="radio" value="Hijau"
                                                                     id="Hijau"
                                                                     name="helm_color"
                                                                     class="custom-control-input" />
@@ -542,8 +491,7 @@
                                                                         for="Hijau">Hijau</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ ($employee->helm_color == 'Merah')?
-                                                                    'checked':'' }} type="radio" value="Merah"
+                                                                    <input ="radio" value="Merah"
                                                                     id="Merah"
                                                                     name="helm_color"
                                                                     class="custom-control-input" />
@@ -554,7 +502,7 @@
 
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ (!$employee->helm_color) ? 'checked':'' }}
+                                                                    <input 
                                                                     type="radio" value="" id="None"
                                                                     name="helm_color"
                                                                     class="custom-control-input" value=""/>
@@ -568,25 +516,19 @@
                                                             <label>Ukuran Sepatu</label>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5 mr-10">
-                                                                    <input type="radio" id="6" {{ ($employee->boots_size
-                                                                    == '6') ?
-                                                                    'checked':'' }} value="6"name="boots_size"
+                                                                    <input type="radio" id="6" value="6"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="6">6</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="7" {{ ($employee->boots_size
-                                                                    == '7') ?
-                                                                    'checked':'' }} value="7"name="boots_size"
+                                                                    <input type="radio" id="7" value="7"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="7">7</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="8" {{ ($employee->boots_size
-                                                                    == '8') ?
-                                                                    'checked':'' }} value="8"name="boots_size"
+                                                                    <input type="radio" id="8" value="8"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="8">8</label>
@@ -594,25 +536,19 @@
                                                             </div>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="9" {{ ($employee->boots_size
-                                                                    == '9') ?
-                                                                    'checked':'' }} value="9"name="boots_size"
+                                                                    <input type="radio" id="9" value="9"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="9">9</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="10" {{
-                                                                        ($employee->boots_size == '10') ?
-                                                                    'checked':'' }} value="10"name="boots_size"
+                                                                    <input type="radio" id="10"  value="10"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="10">10</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="11" {{
-                                                                        ($employee->boots_size == '11') ?
-                                                                    'checked':'' }} value="11"name="boots_size"
+                                                                    <input type="radio" id="11"  value="11"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="11">11</label>
@@ -621,24 +557,19 @@
 
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="12" {{
-                                                                        ($employee->boots_size == '12') ?
-                                                                    'checked':'' }} value="12"name="boots_size"
+                                                                    <input type="radio" id="12"  value="12"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="12">12</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="13" {{
-                                                                        ($employee->boots_size == '13') ?
-                                                                    'checked':'' }} value="13"name="boots_size"
+                                                                    <input type="radio" id="13"  value="13"name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="13">13</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ (!$employee->boots_size) ?
-                                                                    'checked':'' }} value="" type="radio" id="None"
+                                                                    <input  value="" type="radio" id="None"
                                                                     name="boots_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
@@ -650,8 +581,7 @@
                                                             <label>Rompi</label>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5 mr-20">
-                                                                    <input {{ ($employee->rompi_status == '1') ?
-                                                                    'checked':'' }} type="radio"
+                                                                    <input type="radio"
                                                                     id="rompi_status_checked"
                                                                     name="rompi_status" value="1"
                                                                     class="custom-control-input" />
@@ -659,8 +589,7 @@
                                                                         for="rompi_status_checked">Checked</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ (!$employee->rompi_status) ?
-                                                                    'checked':'' }} value="0" type="radio"
+                                                                    <input  value="0" type="radio"
                                                                     id="unchecked"
                                                                     name="rompi_status"
                                                                     class="custom-control-input" />
@@ -693,25 +622,19 @@
                                                             <label>Ukuran Baju Biru</label>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="S" {{ ($employee->blue_size
-                                                                    == 'S') ?
-                                                                    'checked':'' }} value="S" name="blue_size"
+                                                                    <input type="radio" id="S" value="S" name="blue_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="S">S</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="M" {{ ($employee->blue_size
-                                                                    == 'M') ?
-                                                                    'checked':'' }} value="M" name="blue_size"
+                                                                    <input type="radio" id="M" value="M" name="blue_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="M">M</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="L" {{ ($employee->blue_size
-                                                                    == 'L') ?
-                                                                    'checked':'' }} value="L" name="blue_size"
+                                                                    <input type="radio" id="L" value="L" name="blue_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="L">L</label>
@@ -719,24 +642,19 @@
                                                             </div>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="XL" {{ ($employee->blue_size
-                                                                    == 'XL') ?
-                                                                    'checked':'' }} value="XL" name="blue_size"
+                                                                    <input type="radio" id="XL" value="XL" name="blue_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="XL">XL</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="XLL" {{
-                                                                        ($employee->blue_size == 'XLL') ?
-                                                                    'checked':'' }} value="XLL" name="blue_size"
+                                                                    <input type="radio" id="XLL"  value="XLL" name="blue_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="XLL">XLL</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ (!$employee->blue_size) ?
-                                                                    'checked':'' }} value="" type="radio"
+                                                                    <input  value="" type="radio"
                                                                     id="blue_size_none"
                                                                     name="blue_size"
                                                                     class="custom-control-input" />
@@ -749,28 +667,19 @@
                                                             <label>Ukuran Baju Orange</label>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="orange_blue_S" {{
-                                                                        ($employee->orange_size
-                                                                    == 'S') ?
-                                                                    'checked':'' }} value="S" name="orange_size"
+                                                                    <input type="radio" id="orange_blue_S"  value="S" name="orange_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="orange_blue_S">S</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="orange_blue_M" {{
-                                                                        ($employee->orange_size
-                                                                    == 'M') ?
-                                                                    'checked':'' }} value="M" name="orange_size"
+                                                                    <input type="radio" id="orange_blue_M"  value="M" name="orange_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="orange_blue_M">M</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="orange_blue_L" {{
-                                                                        ($employee->orange_size
-                                                                    == 'L') ?
-                                                                    'checked':'' }} value="L" name="orange_size"
+                                                                    <input type="radio" id="orange_blue_L"  value="L" name="orange_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="orange_blue_L">L</label>
@@ -778,25 +687,19 @@
                                                             </div>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="orange_blue_XL" {{
-                                                                        ($employee->orange_size
-                                                                    == 'XL') ?
-                                                                    'checked':'' }} value="XL" name="orange_size"
+                                                                    <input type="radio" id="orange_blue_XL"  value="XL" name="orange_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="orange_blue_XL">XL</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="orange_blue_XLL" {{
-                                                                        ($employee->orange_size == 'XLL') ?
-                                                                    'checked':'' }} value="XLL" name="orange_size"
+                                                                    <input type="radio" id="orange_blue_XLL"  value="XLL" name="orange_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="orange_blue_XLL">XLL</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ ($employee->orange_size == null) ?
-                                                                    'checked':'' }} value="" type="radio"
+                                                                    <input value="" type="radio"
                                                                     id="orange_blue_orange_size_none"
                                                                     name="orange_size"
                                                                     class="custom-control-input" />
@@ -809,28 +712,19 @@
                                                             <label>Ukuran Baju Kaos</label>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="kaos_S" {{
-                                                                        ($employee->shirt_size
-                                                                    == 'S') ?
-                                                                    'checked':'' }} value="S" name="shirt_size"
+                                                                    <input type="radio" id="kaos_S"  value="S" name="shirt_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="kaos_S">S</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="kaos_M" {{
-                                                                        ($employee->shirt_size
-                                                                    == 'M') ?
-                                                                    'checked':'' }} value="M" name="shirt_size"
+                                                                    <input type="radio" id="kaos_M"  value="M" name="shirt_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="kaos_M">M</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="kaos_L" {{
-                                                                        ($employee->shirt_size
-                                                                    == 'L') ?
-                                                                    'checked':'' }} value="L" name="shirt_size"
+                                                                    <input type="radio" id="kaos_L"  value="L" name="shirt_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="kaos_L">L</label>
@@ -838,25 +732,19 @@
                                                             </div>
                                                             <div class="d-flex">
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="kaos_XL" {{
-                                                                        ($employee->shirt_size
-                                                                    == 'XL') ?
-                                                                    'checked':'' }} value="XL" name="shirt_size"
+                                                                    <input type="radio" id="kaos_XL"  value="XL" name="shirt_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="kaos_XL">XL</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input type="radio" id="kaos_XLL" {{
-                                                                        ($employee->shirt_size == 'XLL') ?
-                                                                    'checked':'' }} value="XLL" name="shirt_size"
+                                                                    <input type="radio" id="kaos_XLL"  value="XLL" name="shirt_size"
                                                                     class="custom-control-input" />
                                                                     <label class="custom-control-label weight-400"
                                                                         for="kaos_XLL">XLL</label>
                                                                 </div>
                                                                 <div class="custom-control custom-radio mb-5">
-                                                                    <input {{ (!$employee->shirt_size) ?
-                                                                    'checked':'' }} value="" type="radio"
+                                                                    <input  value="" type="radio"
                                                                     id="kaos_size_none"
                                                                     name="shirt_size"
                                                                     class="custom-control-input" />

@@ -11,6 +11,7 @@ use App\Models\Religion;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Company;
+use App\Models\Employee\EmployeeCompany;
 use App\Models\Employee\EmployeeSalary;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\Roaster;
@@ -171,7 +172,7 @@ class EmployeeController extends Controller
         }
 
         $store = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
-        
+        $store_employee_company = EmployeeCompany::updateOrCreate(['uuid' => $validateData['uuid']], ['employee_uuid' => $store->uuid,'company_uuid'=>$request->company_uuid]);
 
         $validateDataUser['uuid'] =$store->uuid;
         $validateDataUser['employee_uuid'] =   $validateData['uuid'];
@@ -192,7 +193,7 @@ class EmployeeController extends Controller
             'validateData' => $validateData,
             'validateDataSalaries' => $validateDataSalaries,
         ];
-        dd($abc);
+        // dd($abc);
         return redirect()->intended('/user')->with('success',"Karyawan Ditambahkan");
     }
 

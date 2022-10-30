@@ -3,6 +3,7 @@
 namespace App\Models\Employee;
 
 use App\Models\Privilege\UserPrivilege;
+use App\Models\Safety\SafetyEmployee;
 use App\Models\UserDetail\UserAddress;
 use App\Models\UserDetail\UserDependent;
 use App\Models\UserDetail\UserDetail;
@@ -158,6 +159,7 @@ class Employee extends Model
             $item->user_dependents =$dataUserDependent = UserDependent::where_user_detail_uuid($item->user_detail_uuid);
             $item->user_privileges =$dataUserPrivilege = UserPrivilege::where_nik_employee($item->uuid);
             $item->employee_salaries =$dataEmployeeSalary = EmployeeSalary::where_nik_employee($item->uuid);
+            $item->user_safety = SafetyEmployee::where('employee_uuid',$item->uuid)->get()->first();
         }
         return $employees;
 

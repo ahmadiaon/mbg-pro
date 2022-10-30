@@ -1,7 +1,7 @@
 {{-- loading modal --}}
 
 
-<div class="modal fade" id="loading-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+<div class="modal fade" id="loading-modal" tabindex="1"  role="dialog" aria-labelledby="myLargeModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -83,37 +83,43 @@
 <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-body text-center font-18">
-                
-                <h4 class="padding-top-30 mb-30 weight-500">
-                    <input type="hidden" id="uuid_delete" name="uuid_delete">
-                    <input type="hidden" id="url_delete" name="url_delete">
-                    <input type="hidden" id="table_reload" name="table_reload">
-                    Are you sure you want to continue?
-                </h4>
-                <div class="padding-bottom-30 row" style="max-width: 170px; margin: 0 auto">
-                    <div class="col-6">
-                        <button type="button" class="btn btn-secondary border-radius-100 btn-block confirmation-btn"
-                            data-dismiss="modal">
-                            <i class="fa fa-times"></i>
-                        </button>
-                        NO
-                    </div>
-                    <div class="col-6">
-                        <button  onclick="deleteConfirmed()"  type="button" class="btn btn-primary border-radius-100 btn-block confirmation-btn"
-                            data-dismiss="modal">
-                            <i class="fa fa-check"></i>
-                        </button>
-                        YES
+            <form action="" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body text-center font-18">
+                    
+                    <h4 class="padding-top-30 mb-30 weight-500">
+                        <input type="hidden" id="uuid_delete" name="uuid_delete">
+                        <input type="hidden" id="url_delete" name="url_delete">
+                        <input type="hidden" id="table_reload" name="table_reload">
+                        Are you sure you want to continue?
+                    </h4>
+                    
+                    <div class="padding-bottom-30 row" style="max-width: 170px; margin: 0 auto">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-secondary border-radius-100 btn-block confirmation-btn"
+                                data-dismiss="modal">
+                                <i class="fa fa-times"></i>
+                            </button>
+                            NO
+                        </div>
+                        <div class="col-6">
+                            <button  onclick="deleteConfirmed()"  type="button" class="btn btn-primary border-radius-100 btn-block confirmation-btn"
+                                data-dismiss="modal">
+                                <i class="fa fa-check"></i>
+                            </button>
+                            YES
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
+
+
 {{-- alert modal --}}
-<div class="modal fade" id="alert-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+<div class="modal fade" id="alert-modal" role="dialog" aria-labelledby="myLargeModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content bg-danger text-white">
@@ -128,6 +134,66 @@
                     Ok
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+{{-- modal add create payment-group --}}
+<div class="modal fade" id="modal-create-payment-group"   role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="/database/payment-group/store" id="form-payment-group" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="text" name="uuid" id="uuid">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Payment-group
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="">Nama</label>
+                        <input type="text" name="payment_group" id="payment_group" class="form-control">
+                        <div class="invalid-feedback" id="req-payment_group">
+                            Data tidak boleh kosong
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row justify-content-md-center">
+                            <div class="col-12 text-center mb-5">
+                                <h4 class="mb-5">Data Status</h4>
+                            </div>
+                            <div class="col-auto">
+                                <div class="custom-control custom-radio mb-5">
+                                    <input type="radio"  id="Aktif" checked name="status_data"
+                                        class="custom-control-input" value="Aktif"  />
+                                    <label class="custom-control-label" for="Aktif"  >Aktif</label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="custom-control custom-radio mb-5">
+                                    <input type="radio"  id="Non-Aktif" name="status_data"
+                                        class="custom-control-input" value="Non Aktif"  />
+                                    <label class="custom-control-label" for="Non-Aktif"  >Non Aktif</label>
+                                </div>
+                            </div>
+                          </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" onclick="storeWithValidate('payment-group')" class="btn btn-primary">
+                        Save changes
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

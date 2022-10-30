@@ -14,7 +14,7 @@ class HaulingSetupController extends Controller
     //
     public function index(){
         //  "dd";
-        return $hauling_setup = HaulingSetup::getAll();
+        $hauling_setup = HaulingSetup::getAll();
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,

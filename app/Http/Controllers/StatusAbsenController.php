@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\StatusAbsen;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
 
 class StatusAbsenController extends Controller
 {
@@ -25,6 +27,26 @@ class StatusAbsenController extends Controller
             'layout'    => $layout
         ]);
    }
+   public function anyData(){
+        $data = StatusAbsen::orderBy('updated_at', 'asc')->get();
+
+        return Datatables::of($data)
+        ->addColumn('action', function ($model) {
+            $uuid = $model->uuid;
+            $delete = "'".$uuid."'";
+            return '
+            <div class="form-inline"> 
+                <button onclick="edit('.$delete.')" type="button" class="btn btn-outline-primary mr-1">
+                <i class="icon-copy ion-wrench"></i>
+                </button>
+                <button onclick="deletePrivilege(' .$delete. ')"  type="button" class="btn btn-outline-danger">
+                <i class="icon-copy ion-trash-b"></i> 
+                </button>
+            </div>'
+            ;
+        })      
+        ->make(true);
+    }
    public function storePayrol(Request $request)
    {
     $validatedData = $request->validate([
@@ -45,4 +67,11 @@ class StatusAbsenController extends Controller
 
         return response()->json(['code'=>200, 'message'=>'Data get','data' => $status_absen], 200);   
    }
+   public function delete(Request $request)
+    {
+         $data = ['deleted_at'=>Carbon::now('Asia/Jakarta')];
+         $store = StatusAbsen::where('uuid',$request->uuid)->delete();
+ 
+         return response()->json(['code'=>200, 'message'=>'Data Deleted','data' => $store], 200);   
+    }
 }

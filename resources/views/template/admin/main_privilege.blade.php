@@ -64,6 +64,7 @@
 		}
 	</script>
 	<script>
+		let isDeleted = false;
 		function showDataTableUser(url,dataTable,id){	
 			let data	=[];
 			var elements = {
@@ -144,6 +145,76 @@
 					columns:  data
 				});			
 		}	
+		function showDataTableAction(url,dataTable,id){	
+			let data	=[];
+			dataTable.forEach(element => {
+				var dataElement = {data: element, name:element}
+				data.push(dataElement)
+			});
+			var elements = {
+					mRender: function (data, type, row) {
+						
+						return `
+									<div class="form-inline"> 
+										<button onclick="editData('`+ row.uuid +`')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
+											<i class="icon-copy ion-gear-b"></i>
+										</button>
+										<button onclick="deleteData('`+ row.uuid +`')" type="button" class="btn btn-danger mr-1  py-1 px-2">
+											<i class="icon-copy ion-trash-b"></i>
+										</button>
+									</div>`
+					}
+				};
+			data.push(elements)
+
+			let urls = '{{env('APP_URL')}}'+url
+			console.log(urls)
+				$('#table-'+id).DataTable({
+					processing: true,
+					serverSide: true,
+					responsive: true,
+						rowReorder: {
+							selector: 'td:nth-child(2)'
+						},
+					ajax: urls,
+					columns:  data
+				});			
+		}
+		function showDataTableActions(url,dataTable,id){	
+			let data	=[];
+			dataTable.forEach(element => {
+				var dataElement = {data: element, name:element}
+				data.push(dataElement)
+			});
+			var elements = {
+					mRender: function (data, type, row) {
+						
+						return `
+									<div class="form-inline"> 
+										<button onclick="editData('`+ row.uuid +`')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
+											<i class="icon-copy ion-gear-b"></i>
+										</button>
+										<button onclick="deleteData('`+ row.uuid +`')" type="button" class="btn btn-danger mr-1  py-1 px-2">
+											<i class="icon-copy ion-trash-b"></i>
+										</button>
+									</div>`
+					}
+				};
+			data.push(elements)
+
+			let urls = '{{env('APP_URL')}}'+url
+			console.log(urls)
+				$('#table-'+id).DataTable({
+					processing: true,
+					serverSide: true,
+					responsive: true,
+						rowReorder: {
+							selector: 'td:nth-child(2)'
+						},
+					ajax: urls,
+					columns:  data
+				});			
+		}	
 		function stopLoading(){
 			console.log('stop loading')
 			$('.modal').modal('hide')
@@ -156,11 +227,15 @@
 			console.log('start loading')
 			$('#alert-modal').modal('show')
 		}
+		function modalCreateGlobal(id){
+            $('#modal-create-'+id).modal('show')
+            $('#form-'+id)[0].reset();
+        }
 		function globalStore(idForm){
 			let _url = $('#form-'+idForm).attr('action');
-
             var form = $('#form-'+idForm)[0];
             var form_data = new FormData(form);
+			
 			startLoading();
             $.ajax({
                 url: _url,
@@ -172,6 +247,55 @@
                     $('#success-modal').modal('show')
 					console.log(response)
 					$('#table-'+idForm).DataTable().ajax.reload();
+                },
+                error: function(response) {
+                    alertModal()					
+				}
+            });
+		}
+		function storeWithValidate(idForm){
+			let _url = $('#form-'+idForm).attr('action');
+            var form = $('#form-'+idForm)[0];
+            var form_data = new FormData(form);
+			var err = 0;
+			
+
+
+			for(let [name, value] of form_data) {
+				
+				// console.log('name  : '+name+' value  : '+value);
+				if(name != 'uuid'){
+					if ($('#'+name).val() == "") {
+						$('#req-'+name).show();
+						err++
+					}else{
+						$('#req-'+name).hide()
+					}
+				}
+			}
+			if(err > 0){
+				return false;
+			}
+
+			$('#modal-create-'+idForm).modal('hide');
+			startLoading();
+            $.ajax({
+                url: _url,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function(response) {
+                    $('#success-modal').modal('show')
+					console.log(response)
+					$('#table-'+idForm).DataTable().ajax.reload();
+				
+					
+						
+							$('#payment_group_uuid').append(`<option value="${response.data.uuid}">
+                                       ${response.data.payment_group}
+                                  </option>`);
+				
                 },
                 error: function(response) {
                     alertModal()					
@@ -197,6 +321,9 @@
 				success: function(response) {
 					$('#success-modal').modal('show')
 					$('#table-'+idTable).DataTable().ajax.reload();
+					console.log('response delete :')
+					$('#form-employee-payment-'+idTable).remove();
+					console.log(response)
 				},
 				error: function(response) {
 					console.log(response)

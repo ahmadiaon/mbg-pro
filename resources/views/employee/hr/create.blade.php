@@ -409,6 +409,7 @@
         console.log('date_suggest :'+date_suggest)
         $("#date_end_contract").val(date_suggest);    
     }
+    
 </script>
 @endsection
 

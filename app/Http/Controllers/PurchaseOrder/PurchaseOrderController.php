@@ -13,9 +13,7 @@ use Illuminate\Support\Str;
 
 class PurchaseOrderController extends Controller
 {
-    // indexAdmin
-    public function indexPublic(){
-        
+    public function indexAdmin(){        
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -23,22 +21,7 @@ class PurchaseOrderController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'purchase-order'
-        ];
-        return view('purchase_order.public.index', [
-            'title'         => 'Purchase Order',
-            'layout'    => $layout
-        ]);
-   }
-     public function indexAdmin(){        
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => true,
-            'javascript_datatable'  => true,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'                        => 'purchase-order'
+            'active'                        => 'list-purchase-order'
         ];
         return view('purchase_order.admin.index', [
             'title'         => 'Purchase Order',
@@ -56,7 +39,7 @@ class PurchaseOrderController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'purchase-order'
+            'active'                        => 'list-purchase-order'
         ];
         return view('purchase_order.public.show', [
             'title'         => 'Purchase Order',
@@ -74,7 +57,7 @@ class PurchaseOrderController extends Controller
                 'javascript_datatable'  => true,
                 'head_form'             => true,
                 'javascript_form'       => true,
-                'active'                        => 'purchase-order'
+                'active'                        => 'list-purchase-order'
             ];
         return view('purchase_order.admin.create', [
             'title'         => 'purchase order',
@@ -148,7 +131,7 @@ class PurchaseOrderController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'purchase-order'
+            'active'                        => 'list-purchase-order'
         ];
         return view('purchase_order.admin.create', [
             'title'         => 'purchase order',
@@ -157,74 +140,19 @@ class PurchaseOrderController extends Controller
             'layout'    => $layout
         ]);
     }
-    public function deleteAdmin(Request $request)
-   {
+    public function deleteAdmin(Request $request){
         $data = ['deleted_at'=>Carbon::now('Asia/Jakarta')];
         $store = PurchaseOrder::updateOrCreate(['uuid' => $request->uuid], $data);
 
         return response()->json(['code'=>200, 'message'=>'Data get','data' => $store], 200);   
-   }
+    }
 
     public function anyData(){
         $data = PurchaseOrder::whereNull('deleted_at')->get();
 
         
         return Datatables::of($data)
-        ->addColumn('action', function ($model) {
-            $uuid = $model->uuid;
-            $delete = "'".$uuid."'";
-            $url = "/purchase-order/";
-            $url_edit =$url.'show/'.$uuid;
-            $url_delete = $url."delete/".$uuid;
-            return '
-            <div class="form-inline">          
-                <a class="mr-2" href="'.$url_edit.'">
-                    <button type="button" class="btn btn-secondary  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
-                    title="Lihat detail">
-                    <i class="dw dw-edit2"></i>
-                    </button>
-                </a>
-                <a class="mr-2" href="'.$url_edit.'">
-                    <button type="button" class="btn btn-secondary  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
-                    title="Edit data">
-                    <i class="icon-copy bi bi-eye"></i>
-                    </button>
-                </a>    
-                <button onclick="confirmDelete(' .$delete. ')"  type="button" class="btn btn-danger  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
-                title="Hapus Data">
-                    <i class="icon-copy dw dw-trash"></i>
-                </button>
-            </div>
-            '
-            ;
-        })
-        ->addColumn('actionPublic', function ($model) {
-            $url = "/penerimaan-barang-po/";
-            $url_edit =$url.'detail/'.$model->uuid;
-            return '
-            <div class="form-inline">          
-            <a class="mr-3" href="'.$url_edit.'"
-                ><i class="dw dw-edit2"></i> </a
-            >
-            </div>
-            '
-            ;
-        })
-        ->addColumn('document', function ($model) {
-            $uuid = $model->uuid;
-            $url = "/logistic/unit/";
-            $url_edit =$url.$uuid;
-            $url_delete = $url."delete/".$uuid;
-            $po_path = "'".$model->po_path."'";
-            $travel_document_path = "'".$model->travel_document_path."'";
-            return '
-            <div class="form-inline">
-            <button type="button" onclick="showdoc('.$po_path.')" class="btn btn-primary mr-1">Lihat PO</button>
-            <button type="button" onclick="showdoc('.$travel_document_path.')" class="btn btn-primary">Lihat SJ</button>
-        </div>'
-            ;
-        })
-        ->escapeColumns('document')
+       
         ->make(true);
     }
 }

@@ -1,114 +1,11 @@
-@extends('template.admin.main')
-@section('css')
-    <style>
-        .modal-confirm {
-            color: #636363;
-            width: 400px;
-        }
-
-        .modal-confirm .modal-content {
-            padding: 20px;
-            border-radius: 5px;
-            border: none;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .modal-confirm .modal-header {
-            border-bottom: none;
-            position: relative;
-        }
-
-        .modal-confirm h4 {
-            text-align: center;
-            font-size: 26px;
-            margin: 30px 0 -10px;
-        }
-
-        .modal-confirm .close {
-            position: absolute;
-            top: -5px;
-            right: -2px;
-        }
-
-        .modal-confirm .modal-body {
-            color: #999;
-        }
-
-        .modal-confirm .modal-footer {
-            border: none;
-            text-align: center;
-            border-radius: 5px;
-            font-size: 13px;
-            padding: 10px 15px 25px;
-        }
-
-        .modal-confirm .modal-footer a {
-            color: #999;
-        }
-
-        .modal-confirm .icon-box {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-            border-radius: 50%;
-            z-index: 9;
-            text-align: center;
-            border: 3px solid #f15e5e;
-        }
-
-        .modal-confirm .icon-box i {
-            color: #f15e5e;
-            font-size: 46px;
-            display: inline-block;
-            margin-top: 13px;
-        }
-
-        .modal-confirm .btn,
-        .modal-confirm .btn:active {
-            color: #fff;
-            border-radius: 4px;
-            background: #60c7c1;
-            text-decoration: none;
-            transition: all 0.4s;
-            line-height: normal;
-            min-width: 120px;
-            border: none;
-            min-height: 40px;
-            border-radius: 3px;
-            margin: 0 5px;
-        }
-
-        .modal-confirm .btn-secondary {
-            background: #c1c1c1;
-        }
-
-        .modal-confirm .btn-secondary:hover,
-        .modal-confirm .btn-secondary:focus {
-            background: #a8a8a8;
-        }
-
-        .modal-confirm .btn-danger {
-            background: #f15e5e;
-        }
-
-        .modal-confirm .btn-danger:hover,
-        .modal-confirm .btn-danger:focus {
-            background: #ee3535;
-        }
-
-        .trigger-btn {
-            display: inline-block;
-            margin: 100px auto;
-        }
-    </style>
-@endsection
+@extends('template.admin.main_privilege')
 @section('content')
     <div class="card-box mb-30 ">
         <div class="row mb-30 pd-20">
             <div class="col-3">
                 <h4 class="text-blue h4">Pembayaran</h4>
             </div>
+            @if (!empty(session('dataUser')->create_purchase_order))
             <div class="col-9 text-right">
                 <div class="btn-group">
                     <div class="btn-group dropdown">
@@ -118,9 +15,10 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
         <div class="pb-20">
-            <table id="myTablse" class="display nowrap pd-10" style="width:100%">
+            <table id="table-user-privilege"  class="display nowrap stripe hover table" style="width:100%">
                 <thead>
                     <tr>
                         <th>Nomor PO</th>
@@ -199,6 +97,83 @@
 
 @section('js')
     <script>
+        function showDataTableUserPrivilege(url,dataTable,id){	
+			let data	=[];
+            let datas = @json(session('dataUser'));
+                        console.log(datas);
+			
+			dataTable.forEach(element => {
+				var dataElement = {data: element, name:element}
+				data.push(dataElement)
+			});
+            var elements_doc = {
+					mRender: function (data, type, row) {       
+                        console.log(row)               
+                           let btn =  `<div class="form-inline">
+                                                        <button type="button" onclick="showdoc('${row.po_path}')" class="btn btn-sm btn-primary mr-1">Lihat PO</button>
+                                                        <button type="button" onclick="showdoc('${row.travel_document_path}')" class="btn btn-sm btn-primary">Lihat SJ</button>
+                                                    </div>`;
+                          
+						
+						return btn;
+					}
+				};
+			data.push(elements_doc)
+			
+			var elements = {
+					mRender: function (data, type, row) {                      
+                           let btn_edit =  `<a class="mr-2" href="/purchase-order/show/${row.uuid}">
+                                                <button type="button" class="btn btn-secondary  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
+                                                title="Lihat detail">
+                                                <i class="dw dw-edit2"></i>
+                                                </button>
+                                            </a>`;
+                            let btn_show = `<a class="mr-2" href="/purchase-order/detail/${row.uuid}">
+                                                    <button type="button" class="btn btn-success  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
+                                                    title="Edit data">
+                                                    <i class="icon-copy bi bi-eye"></i>
+                                                    </button>
+                                                </a>`;
+                            let btn_delete = `<button onclick="confirmDelete('${row.uuid}')"  type="button" class="btn btn-danger  py-1 px-2" data-toggle="tooltip" data-placement="bottom"
+                                                            title="Hapus Data">
+                                                            <i class="icon-copy dw dw-trash"></i>
+                                                        </button>`;
+
+                            let datas = @json(session('dataUser'));
+                            let group_btn ='';
+                            if(typeof datas.read_purchase_order  !== "undefined" ){
+                                group_btn = group_btn+btn_show
+                            }
+                            if(typeof datas.edit_purchase_order !== "undefined" ){
+                                group_btn = group_btn+btn_edit
+                            }
+                            if(typeof datas.delete_purchase_order !== "undefined" ){
+                                group_btn = group_btn+btn_delete
+                            }
+               
+						
+						return `<div class="form-inline"> `+
+										group_btn
+									+`</div>`
+					}
+				};
+			data.push(elements)
+
+			let urls = '{{env('APP_URL')}}'+url
+			console.log(urls)
+				$('#'+id).DataTable({
+					processing: true,
+					serverSide: true,
+					responsive: true,
+						rowReorder: {
+							selector: 'td:nth-child(2)'
+						},
+					ajax: urls,
+					columns:  data
+				});			
+		}
+        showDataTableUserPrivilege('purchase-order/data', ['po_number', 'date'], 'table-user-privilege')
+        
         $( document ).ready(function() {
             $('.sorting_1').addClass('table-plus')
             
@@ -207,35 +182,6 @@
             $('#path_doc').attr("src", "{{ env('APP_URL') }}purchase/pdf/" + path)
             $('#doc').modal('show')
         }
-        $(function() {
-            $('#myTablse').DataTable({
-                processing: true,
-                // responsive: true,
-                serverSide: true,
-                responsive: true,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
-                ajax: '{{ url(env('APP_URL') . 'purchase-order/data') }}',
-                columns: [{
-                        data: 'po_number',
-                        name: 'po_number'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date'
-                    },
-                    {
-                        data: 'document',
-                        name: 'document'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action'
-                    }
-                ]
-            });
-        });
 
         function deleteItem() {
             var uuid = $('#uuid').val()

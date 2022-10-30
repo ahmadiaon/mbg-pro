@@ -1,4 +1,4 @@
-@extends('template.admin.main')
+@extends('template.admin.main_privilege')
 
 
 @section('content')
@@ -117,7 +117,7 @@
                 console.log(path)
                 var shows ="";
                 shows = `<div class="product-slide">
-                    ${element.galery_path}
+                   
                                         <img src="{{env('APP_URL')}}purchase/image/`+path+`" alt="" />
                                     </div>`
                 $('#shows').append(shows);

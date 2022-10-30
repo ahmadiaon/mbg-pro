@@ -1,4 +1,4 @@
-@extends('template.admin.main')
+@extends('template.admin.main_privilege')
 @section('css')
     <style>
         .modal-confirm {

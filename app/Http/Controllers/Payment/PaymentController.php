@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Payment;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeePayment;
 use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentGroup;
 use Carbon\Carbon;
@@ -14,6 +15,58 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    public function store(Request $request){
+        $validatedData = $request->validate([
+            'uuid' => '',
+            'payment_group_uuid' => '',
+            'date' => '',
+            'date_end' => '',
+            'long' => '',
+            'employee_create_uuid' => '',
+            'employee_know_uuid' => '',
+            'employee_approve_uuid' => '',
+            'description' => '',
+        ]);
+        
+
+
+        if(empty($validatedData['uuid'])){
+            $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['payment_group_uuid'].'-'.rand(99,999);
+        }
+        // return ResponseFormatter::toJson($validatedData, "request");
+        $store = Payment::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
+        return ResponseFormatter::toJson($store, "request");
+        
+    }
+
+    public function show($uuid){
+        $payment = Payment::where('uuid', $uuid)->get()->first();
+        $employee_payments = EmployeePayment::where('payment_uuid', $uuid)->get();
+
+        $employees = Employee::getAll();
+        $payment_groups = PaymentGroup::where('status_data','Aktif')->get();
+
+        $layout = [
+            'head_core'            => true,
+            'javascript_core'       => true,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employee-payment'
+        ];
+        return view('employee_payment.create', [
+            'title'         => 'Tonase',
+            'employees' => $employees,
+            'payment'   => $payment,
+            'employee_payments'     => $employee_payments,
+            'payment_groups' => $payment_groups,
+            'layout'    => $layout
+        ]);
+
+    }
+    
+
     public function indexPayrol($year_month){
         $date = explode("-", $year_month);
         $year = $date[0];
@@ -40,9 +93,9 @@ class PaymentController extends Controller
             'layout'    => $layout
         ]);
     }
-   public function createPayrol(){
+    public function createPayrol(){
         $employees = Employee::getAll();
-    
+
         $payment_groups = PaymentGroup::all();
         $layout = [
                 'head_core'            => true,
