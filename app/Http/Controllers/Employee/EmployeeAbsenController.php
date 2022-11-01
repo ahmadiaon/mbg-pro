@@ -258,27 +258,46 @@ class EmployeeAbsenController extends Controller
         }
     }
     public function anyData($year_month){
-        $status_absen = StatusAbsen::all();
+        
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
-        $employees = Employee::getAll();
-        
-        foreach($employees as $employee){       
-            // $data = EmployeeAbsen::whereYear('employee_absens.date', $year)
-            // ->whereMonth('employee_absens.date', $month)
-            // ->where('employee_absens.employee_uuid', 'Cici_Yunisa')
-            // ->get();   
-                $data = EmployeeAbsen::whereYear('employee_absens.date', $year)
-                ->whereMonth('employee_absens.date', $month)
-                ->where('employee_absens.employee_uuid', $employee->machine_id)
-                ->where('employee_absens.status_absen_uuid', "DS")
-                ->count();
+        $employees = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid','employees.position_uuid')
+        ->get([
+            'employees.nik_employee',
+            'user_details.photo_path',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee',
+            'employees.machine_id',
+            'user_details.name',
+        ]);
 
-                $uud ="DS";
-                $employee->$uud = $data;
-                $employee->date = $year_month;
+        foreach($employees as $employee){
+            $employee->pay = EmployeeAbsen::join('status_absens', 'status_absens.uuid','employee_absens.status_absen_uuid')
+            ->where('employee_absens.employee_uuid', $employee->machine_id)
+            ->whereYear('employee_absens.date', $year)
+            ->where('status_absens.math', 'pay')
+            ->whereMonth('employee_absens.date', $month)
+            ->count();
+            $employee->unpay = EmployeeAbsen::join('status_absens', 'status_absens.uuid','employee_absens.status_absen_uuid')
+            ->where('employee_absens.employee_uuid', $employee->machine_id)
+            ->whereYear('employee_absens.date', $year)
+            ->where('status_absens.math', 'unpay')
+            ->whereMonth('employee_absens.date', $month)
+            ->count();
+            $employee->cut = EmployeeAbsen::join('status_absens', 'status_absens.uuid','employee_absens.status_absen_uuid')
+            ->where('employee_absens.employee_uuid', $employee->machine_id)
+            ->whereYear('employee_absens.date', $year)
+            ->where('status_absens.math', 'cut')
+            ->whereMonth('employee_absens.date', $month)
+            ->count();
+
         }
+        
+        // return view('datatableshow', [ 'data'         => $employees]);
+       
         return Datatables::of($employees)
         ->make(true);
     }
@@ -297,10 +316,37 @@ class EmployeeAbsenController extends Controller
     }
 
 
-   
+   public function anyDataEmployee($year_month, $nik_employee){
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+        $data = Employee::join('employee_absens','employee_absens.employee_uuid','employees.machine_id')
+        ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid','employees.position_uuid')
+        ->where('employees.nik_employee', $nik_employee)
+        ->whereYear('employee_absens.date', $year)
+        ->whereMonth('employee_absens.date', $month)
+        ->orderBy('employee_absens.date')
+        ->get([
+            'employees.nik_employee',
+            'user_details.photo_path',
+            'employee_absens.date',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee',
+            'employees.machine_id',
+            'user_details.name',
+            'employee_absens.status_absen_uuid',
+            'employee_absens.cek_log'
+        ]);
+        return Datatables::of($data)
+        ->make(true);
+        return ResponseFormatter::toJson($data, 'udin');
+        return view('datatableshow', [ 'data'         => $data]);
+   }
    
       
-   public function showPayrol($year_month, $employee_uuid){
+    public function showPayrol($year_month, $employee_uuid){
         $nik_employeess = Employee::where_uuid($employee_uuid);
         $employee = Employee::where_employee_nik_employee_nullable($nik_employeess->nik_employee); 
         $status_absen = StatusAbsen::all();
@@ -348,10 +394,96 @@ class EmployeeAbsenController extends Controller
         return view('employee.absensi.show', [
             'title'         => 'Absensi Karyawan',
             'month'     => $year.'-'.$month,
+            'year_month' => $year_month,
             'year'      => $year,
             'employee'  => $employee,
             'status_absen'  => $status_absen,
             'absens'    => $data_absens,
+            'is'            => 'admin',
+            'months'    => $month,
+            'layout'    => $layout
+        ]);
+    }
+    public function show($nik_employee){
+
+         $employee = Employee::where_employee_nik_employee_nullable($nik_employee); 
+         
+         $layout = [
+             'head_datatable'        => true,
+             'javascript_datatable'  => true,
+             'head_form'             => true,
+             'javascript_form'       => true,
+             'active'                        => 'list-employees-absensi'
+         ];
+         
+         $year_month = Carbon::today('Asia/Jakarta')->isoFormat('Y-M');
+
+         //  dd($data_absens);
+         return view('employee.absensi.detail', [
+             'title'         => 'Absensi Karyawan',
+             'year_month' => $year_month,
+             'status_absen' => '',
+             'nik_employee'  => $nik_employee,
+             'employee'  => $employee,
+             'is'            => 'me',
+             'layout'    => $layout
+         ]);
+     }
+    public function showEmployee($year_month, $nik_employee){
+       $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+        $employee = Employee::where_employee_nik_employee_nullable($nik_employee); 
+        $status_absen = StatusAbsen::all();
+        
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'list-employees-absensi'
+        ];
+        
+        // for get last date (30/31)
+        $datetime = Carbon::createFromFormat('Y-m', $year.'-'.$month);
+        $lastDay = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+
+        for($i=1; $i <= $lastDay; $i++){
+            $day_date =$year.'-'.$month.'-'.$i;
+            $data_absen_day = EmployeeAbsen::join('status_absens','status_absens.uuid','employee_absens.status_absen_uuid')
+            ->where('employee_uuid', $employee->machine_id)
+            ->where('date', $day_date)->get([
+                'status_absens.status_absen_code',
+                'status_absens.math',
+                'employee_absens.*'
+            ])->first();           
+            // dd($data_absen_day);
+            
+            if(!$data_absen_day){
+                $data_absen_day =collect([
+                    'date'=> $day_date,
+                    'cek_log'=> '',
+                    'status_absen_code'=> 'NULL',
+                    'math'=>  ''
+                ]) ;
+            }else{
+                if($data_absen_day['cek_log'] == ''){
+                    $data_absen_day['cek_log'] = "NULL";
+                }
+            }
+            $data_absens[] = $data_absen_day;
+        }
+        //  dd($data_absens);
+        return view('employee.absensi.detail', [
+            'title'         => 'Absensi Karyawan',
+            'month'     => $year.'-'.$month,
+            'year_month' => $year_month,
+            'nik_employee'  => $nik_employee,
+            'year'      => $year,
+            'employee'  => $employee,
+            'status_absen'  => $status_absen,
+            'absens'    => $data_absens,
+            'is'            => 'admin',
             'months'    => $month,
             'layout'    => $layout
         ]);

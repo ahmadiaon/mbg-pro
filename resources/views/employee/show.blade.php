@@ -126,9 +126,6 @@
                                     <a class="nav-link" data-toggle="tab" href="#background" role="tab">Background</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#safety" role="tab">Safety</a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link" data-toggle="tab" href="#karyawan" role="tab">Karyawan</a>
                                 </li>
                             </ul>
@@ -1309,13 +1306,7 @@
                                     </div>                                    
                                 </div>
                                 <!-- background Tab End -->
-                                <!-- Setting Tab start -->
-                                <div class="tab-pane fade height-100-p" id="safety" role="tabpanel">
-                                    <div class="profile-setting">
-                                       
-                                    </div>
-                                </div>
-                                <!-- Setting Tab End -->
+                                
                             </div>
                         </div>
                     </div>

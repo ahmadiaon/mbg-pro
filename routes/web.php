@@ -115,6 +115,7 @@ Route::get('/menu-data', [MenuController::class, 'anyData'])->name('menu-data');
 Route::middleware(['islogin'])->group(function () {
   
     Route::get('/me/{nik_employee}', [EmployeeController::class, 'profile']);
+    Route::get('/me/{nik_employee}/absensi', [EmployeeAbsenController::class, 'show']);
     Route::get('/cuti', [UserDetailController::class, 'indexUser']);
     Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);     
     
@@ -160,8 +161,21 @@ Route::middleware(['islogin'])->group(function () {
     Route::prefix('/hour-meter')->group(function () {
         Route::get('/create', [EmployeeHourMeterDayController::class, 'create']);
         Route::get('/data', [EmployeeHourMeterDayController::class, 'anyData']);
+        Route::get('/data-all', [EmployeeHourMeterDayController::class, 'anyDataAll']);
+        Route::get('/data/{year_month}', [EmployeeHourMeterDayController::class, 'anyDataMonth']);
+        Route::get('/data-day/{year_month_day}', [EmployeeHourMeterDayController::class, 'anyDataDay']);
         Route::post('/store', [EmployeeHourMeterDayController::class, 'store']);
         Route::post('/edit', [EmployeeHourMeterDayController::class, 'show']);
+        Route::post('/delete', [EmployeeHourMeterDayController::class, 'delete']);
+
+        Route::get('/show/{hour_meter_uuid}', [EmployeeHourMeterDayController::class, 'showUuid']);
+        Route::get('/data-uuid/{hour_meter_uuid}', [EmployeeHourMeterDayController::class, 'anyDataUuid']);
+        
+        Route::get('/show/{nik_employee}/{year_month}', [EmployeeHourMeterDayController::class, 'showMonth']);
+        Route::get('/data/employee-month/{nik_employee}/{year_month}', [EmployeeHourMeterDayController::class, 'anyDataMonthEmployee']);
+
+
+        Route::get('/', [EmployeeHourMeterDayController::class, 'index']);
     });
     Route::prefix('/tonase')->group(function () {
         Route::get('/', [EmployeeTonseController::class, 'index']);
@@ -174,11 +188,9 @@ Route::middleware(['islogin'])->group(function () {
     Route::prefix('/payment')->group(function () {
         Route::get('/', [EmployeePaymentController::class, 'index']);
         Route::get('/create', [EmployeePaymentController::class, 'create']);
-        Route::get('/data', [EmployeeTonseController::class, 'anyData']);
         Route::get('/show/{payment_uuid}', [PaymentController::class, 'show']);
         Route::get('/data/{year_month}', [EmployeePaymentController::class, 'anyDataMonth']);
         Route::post('/store', [PaymentController::class, 'store']);
-        Route::post('/edit', [EmployeeHourMeterDayController::class, 'show']);
     });
     Route::prefix('/employee-payment')->group(function () {
         Route::post('/store', [EmployeePaymentController::class, 'store']);
@@ -192,10 +204,11 @@ Route::middleware(['islogin'])->group(function () {
             show every month
         */
         Route::get('/', [EmployeeAbsenController::class, 'index']);
-        Route::get('/detail/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'showPayrol']);
+        Route::get('/detail/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'showEmployee']);
         Route::get('/export/{year_month}', [EmployeeAbsenController::class, 'export']);
         Route::post('/import', [EmployeeAbsenController::class, 'import']);
         Route::get('/data/{year_month}', [EmployeeAbsenController::class, 'anyData']);
+        Route::get('/data-employee/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'anyDataEmployee']);
         Route::post('/store', [EmployeeAbsenController::class, 'store']);
     });
 
@@ -267,23 +280,6 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/month/{month}/export', [EmployeeTotalHmMonthController::class, 'exportPayrol']);
         Route::post('/month/{month}/import', [EmployeeTotalHmMonthController::class, 'importPayrol']);
 
-
-        Route::prefix('/payment')->group(function () {//payrol/absensi
-            Route::post('/store', [PaymentController::class, 'storePayrol']);
-            Route::get('/month/{year_month}', [PaymentController::class, 'indexPayrol']);//payrol/database/payment
-            Route::get('/month-data/{year_month}',[PaymentController::class, 'dataPayment']);
-            Route::get('/create', [PaymentController::class, 'createPayrol']);
-            Route::get('/show/{uuid}', [PaymentController::class, 'editPayrol']);
-            Route::post('/show', [PaymentController::class, 'showPayrol']);
-        });
-
-   
-
-        Route::prefix('/payment-employee')->group(function () {//payrol/absensi
-            Route::get('/month/{year_month}', [PaymentEmployeeController::class, 'indexPayrol']);      
-            Route::post('/show', [PaymentEmployeeController::class, 'showEmployeePayrol']);                
-            Route::post('/store', [PaymentEmployeeController::class, 'storePayrol']);                
-        });
 
         Route::get('/total/{year_month}', [TotalController::class, 'indexPayrol']);
 

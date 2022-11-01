@@ -15,6 +15,7 @@
 					</ul>
 				</li>
 				@endif
+				@if (!empty(session('dataUser')->read_list_employee))
 				<li class="dropdown">
 					<a href="javascript:;" class="dropdown-toggle">
 						<span class="micon bi bi-file-earmark-text"></span><span class="mtext">Karyawan</span>
@@ -30,6 +31,7 @@
 					</ul>
 
 				</li>
+				@endif
 				@if(!empty(session('dataUser')->read_list_allowance))
 				<li class="dropdown">
 					<a href="javascript:;" class="dropdown-toggle">
@@ -40,7 +42,7 @@
 						
 						@if (!empty(session('dataUser')->create_employee_hour_meter))
 							<li><a class="{{ $layout['active'] == 'employee-hour-meter' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
-								title="Hour Meter" href="/hour-meter/create">Hour Meter</a></li>
+								title="Hour Meter" href="/hour-meter">Hour Meter</a></li>
 							<li><a class="{{ $layout['active'] == 'employee-tonase' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 								title="Hour Meter" href="/tonase">Tonase</a></li>
 							<li><a class="{{ $layout['active'] == 'employee-payment' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
@@ -67,7 +69,7 @@
 
 				</li>
 				@endif
-				
+				@if (!empty(session('dataUser')->superadmin))
 				<li class="dropdown">
 					<a href="javascript:;" class="dropdown-toggle">
 						<span class="micon bi bi-bug"></span><span class="mtext">Database</span>
@@ -83,6 +85,18 @@
 						</ul>
 					@endif
 					
+				</li>
+				@endif
+				<li>
+					<a href="/me/{{session('dataUser')->nik_employee}}" class="dropdown-toggle no-arrow {{ $layout['active'] == 'employees-profile' ? 'active' : '' }}">
+						<span class="micon bi bi-person-square"></span><span class="mtext">Profil</span>
+					</a>
+				</li>
+				<li>
+					<a href="/me/{{session('dataUser')->nik_employee}}/absensi" 
+						class="dropdown-toggle no-arrow {{ $layout['active'] == 'employees-absensi' ? 'active' : '' }}">
+						<span class="micon bi bi-calendar4-week"></span><span class="mtext">Absensi</span>
+					</a>
 				</li>
 				{{-- @endif --}}
 			</ul>

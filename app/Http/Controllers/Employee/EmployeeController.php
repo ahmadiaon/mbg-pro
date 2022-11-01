@@ -222,7 +222,7 @@ class EmployeeController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'employees-index'
+            'active'                        => 'employees-profile'
         ];
         return view('employee.show', [
             'title'         => 'Profile Karyawan',

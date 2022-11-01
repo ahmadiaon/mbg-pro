@@ -17,7 +17,7 @@ class CreateHourMeterPricesTable extends Migration
             $table->id();
             $table->string('uuid')->nullable();
             $table->string('name')->nullable();
-            $table->string('value')->nullable();
+            $table->float('value')->nullable();
             $table->string('key_excel')->nullable();            
             $table->date('use_start')->nullable();
             $table->date('use_end')->nullable();

@@ -735,19 +735,19 @@
 
 @section('js')
 <script>
-    $(function() {
-        $('#myTablse').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: '{!! route('people-data') !!}',
-            columns: [
-                { data: 'name', name: 'name' },
-                { data: 'phone_number', name: 'phone_number' },
-                { data: 'NIK', name: 'NIK' },
-                { data: 'address', name: 'address' },
-                { data: 'phone_number', name: 'phone_number' }
-            ]
-        });
-    });
+    // $(function() {
+    //     $('#myTablse').DataTable({
+    //         processing: true,
+    //         serverSide: true,
+    //         ajax: '{!! route('people-data') !!}',
+    //         columns: [
+    //             { data: 'name', name: 'name' },
+    //             { data: 'phone_number', name: 'phone_number' },
+    //             { data: 'NIK', name: 'NIK' },
+    //             { data: 'address', name: 'address' },
+    //             { data: 'phone_number', name: 'phone_number' }
+    //         ]
+    //     });
+    // });
 </script>
 @endsection

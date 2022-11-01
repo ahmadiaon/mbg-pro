@@ -23,8 +23,8 @@ class CreateEmployeeHourMeterDaysTable extends Migration
             $table->string('hour_meter_price_uuid')->nullable();
             $table->date('date')->nullable();
             $table->string('shift')->nullable();
-            $table->string('value')->nullable();//di kertas
-            $table->string('full_value')->nullable();//bonus
+            $table->float('value')->nullable();//di kertas
+            $table->float('full_value')->nullable();//bonus
             $table->string('pay_uuid')->nullable();
             $table->timestamps();
         });

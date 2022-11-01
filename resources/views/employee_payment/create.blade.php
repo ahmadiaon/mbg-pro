@@ -853,8 +853,8 @@
                     full_value = value_hm * 0.15
                     full_value = full_value + value_hm
                 }
-                if (value_hm >= 15) {
-                    full_value = value_hm * 0.3 + value_hm
+                if (value_hm >= 14) {
+                    full_value = value_hm * 0.5 + value_hm
                 }
                 $('#full_value').val(full_value)
                 console.log(value_hm)

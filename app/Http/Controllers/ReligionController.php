@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\people;
 use App\Models\Religion;
 use Yajra\Datatables\Datatables;
-use App\Http\Requests\StoreReligionRequest;
-use App\Http\Requests\UpdateReligionRequest;
 
 class ReligionController extends Controller
 {
@@ -37,59 +34,7 @@ public function anyData()
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreReligionRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreReligionRequest $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Religion  $religion
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Religion $religion)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Religion  $religion
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Religion $religion)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateReligionRequest  $request
-     * @param  \App\Models\Religion  $religion
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateReligionRequest $request, Religion $religion)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Religion  $religion
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Religion $religion)
-    {
-        //
-    }
+   
 }

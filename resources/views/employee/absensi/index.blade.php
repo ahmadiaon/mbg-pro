@@ -4,7 +4,7 @@
     <div class="card-box mb-30 " >
         <div class="row pd-20">
             <div class="col-auto">
-                <h4 class="text-blue h4">Absensi</h4>
+                <h4 class="text-blue h4">Absensi Karyawan per bulan</h4>
             </div>
             <div class="col text-right">
                 <div class="btn-group">
@@ -77,7 +77,6 @@
                     <thead>
                         <tr>
                             <th>Nama</th>
-                            <th>NIK</th>
                             <th>Dibayar</th>
                             <th>Tidak Dibayar</th>
                             <th>Potongan</th>
@@ -134,12 +133,12 @@
         let year_month = @json($month);
         console.log('year:'+year_month)
         let _url = 'user/absensi/data/'+year_month;
-        showDataTableUserPrivilege(_url, ['nik_employee', 'DS', 'DS', 'DS'], 'table-privilege')
+        showDataTableUserPrivilege(_url, [ 'pay', 'unpay', 'cut'], 'table-privilege')
 
         
 
         console.log(months);
-         function showDataTableUserPrivilege(url,dataTable,id){	
+        function showDataTableUserPrivilege(url,dataTable,id){	
 			let data	=[];
 			var elements = {
 					mRender: function (data, type, row) {
@@ -157,6 +156,7 @@
 										<div class="txt">
 											<div class="weight-600">${row.name}</div>
                                             <span>${row.position}</span>
+                                            <div class="weight-600">${row.nik_employee}</div>
 										</div>
 									</div>`
 					}
@@ -173,7 +173,7 @@
                         let v_month = $('#btn-month').val();
 						return `
 									<div class="form-inline"> 
-                                        <a href="/user/absensi/detail/${v_year}-${v_month}/${row.uuid}">
+                                        <a href="/user/absensi/detail/${v_year}-${v_month}/${row.nik_employee}">
 										<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
 											<i class="dw dw-edit2"></i>
 										</button>
@@ -220,7 +220,6 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Nama</th>
-                                                        <th>NIK</th>
                                                         <th>Dibayar</th>
                                                         <th>Tidak Dibayar</th>
                                                         <th>Potongan</th>
@@ -237,7 +236,7 @@
             $('#btn-export').attr('href', '/user/absensi/export/'+v_year+'-'+v_month)
             console.log('year:'+year_month)
             let _url = 'user/absensi/data/'+year_month;
-            showDataTableUserPrivilege(_url, ['nik_employee', 'DS', 'DS', 'DS'], 'table-privilege')
+            showDataTableUserPrivilege(_url, [ 'pay', 'unpay', 'cut'], 'table-privilege')
         }
     </script>
 @endsection

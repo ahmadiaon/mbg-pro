@@ -10,11 +10,16 @@
                       <input type="hidden" name="uuid" id="uuid">
                       <div class="pd-20">
                           <div class="row">
-                              <div class="col-md-4">
+                              <div class="col">
                                   <h4 class="text-blue h4">Tambah HM Karyawan</h4>
                               </div>
-                              <div class="col-md-8">
-                                  <div class="button-group text-right">											
+                              <div class="col text-center">
+                                <div class="alert alert-warning" id="isEdit" role="alert">
+                                    Edit Mode !
+                                </div>	
+                              </div>
+                              <div class="col text-right">
+                                  <div class="button-group text-right">			
                                       <button type="button" onclick="resetData()" class="btn btn-secondary">Reset</button>
                                       <button type="button" onclick="store('hour-meter')" class="btn btn-primary">
                                           Simpan
@@ -77,57 +82,68 @@
                               <div class="col-md-6">
                                   <div class="form-group">
                                       <label for="date">Tanggal</label>
-                                      <input type="date" name="date" id="date" value="2020-09-09" class="form-control">
+                                      <input type="date" name="date" id="date" value="" class="form-control">
+                                      <div class="invalid-feedback" id="req-date">
+                                        Data tidak boleh kosong
+                                    </div>
                                   </div>
                               </div>
-                              <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="">Shift</label>
-                                    <div>
-                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                            <label id="lbl-Siang" class="btn btn-outline-primary">
-                                                <input type="radio" name="shift" id="Siang" value="Siang" checked="checked" autocomplete="off" >
-                                                Siang
-                                            </label>
+                              <div class="col-md-12">
+                                <div class="row justify-content-md-center">
+                                    <div class="col-auto">
+                                        <div class="form-group">
+                                            <label for="">Shift</label>
+                                            <div>
+                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                    <label id="lbl-Siang" class="btn btn-outline-primary">
+                                                        <input type="radio" name="shift" id="Siang" value="Siang" checked="checked" autocomplete="off" >
+                                                        Siang
+                                                    </label>
+                                                
+                                                    <label id="lbl-Malam" class="btn btn-outline-primary">
+                                                        <input type="radio" name="shift" id="Malam" value="Malam" autocomplete="off">
+                                                        Malam
+                                                    </label>
+                                                </div>
+                                            </div>
                                         
-                                            <label id="lbl-Malam" class="btn btn-outline-primary">
-                                                <input type="radio" name="shift" id="Malam" value="Malam" autocomplete="off">
-                                                Malam
-                                            </label>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-auto text-center">
+                                        <div class="form-group">
+                                            <label for="value">Nilai HM</label>
+                                            <input onkeyup="fullValue()" type="text" name="value" id="value" value="" class="form-control">
+                                            <div class="invalid-feedback" id="req-value">
+                                                Data tidak boleh kosong
+                                            </div>
                                         </div>
                                     </div>
-                                   
-                                </div>
-                                
-                              </div>
-                              <div class="col-md-4 text-center">
-                                  <div class="form-group">
-                                      <label for="value">Nilai HM</label>
-                                      <input onkeyup="fullValue()" type="text" name="value" id="value" value="" class="form-control">
+                                    <div class="col-auto text-center">
+                                        <div class="form-group">
+                                            <label for="full_value" class="mr-1">Aktifkan Bonus? </label>
+                                            <input
+                                            type="checkbox"
+                                            onchange="fullValue()"
+                                            checked
+                                            name="isBonusAktive"
+                                            class="switch-btn" data-size="small"
+                                            data-color="#0099ff" id="isBonusAktive"
+                                        />
+                                            <input type="text" name="full_value" id="full_value" class="form-control">
+                                        </div>
+                                    </div>
                                   </div>
                               </div>
-                              <div class="col-md-3 text-center">
-                                  <div class="form-group">
-                                      <label for="full_value" class="mr-1">Aktifkan Bonus? </label>
-                                      <input
-                                      type="checkbox"
-                                      onchange="fullValue()"
-                                      checked
-                                      name="isBonusAktive"
-                                      class="switch-btn" data-size="small"
-                                      data-color="#0099ff" id="isBonusAktive"
-                                  />
-                                      <input type="text" name="full_value" id="full_value" class="form-control">
-                                  </div>
-                              </div>
-                              <div class="col-md-3"></div>
+                              
                               <div class="col-md-12">
                                   <div class="form-group">
-                                      <label class="weight-600">Harga HM</label>
-                                      <div class="row">
+                                      
+                                      <div class="row justify-content-md-center">
+                                        <div class="col-12 text-center"><label class="weight-600 ">Harga HM</label></div>
                                         <input type="hidden" id="hour_meter_price_uuid">
                                           @foreach($hour_meter_prices as $item)
-                                          <div class="col-md-2 col-sm-2">
+                                          <div class="col-auto">
                                               <div class="custom-control custom-radio mb-5">
                                                   <input onchange="updatehour_meter_price_uuid('{{$item->uuid}}')" type="radio"  id="{{$item->uuid}}" name="hour_meter_price_uuid"
                                                       class="custom-control-input" value="{{$item->uuid}}"  />
@@ -153,13 +169,12 @@
                       <h4 class="text-blue h4">Baru ditambahkan</h4>
                   </div>
                   <div class="pb-20">
-                      <table id="table-hour-meter" class="display nowrap stripe hover table" >
+                      <table id="table-hour-meter" class="display nowrap stripe hover table"  style="width:100%">
                           <thead>
                               <tr>
-                                  <th class="table-plus datatable-nosort">Name</th>
+                                  <th>Name</th>
                                   <th>Tanggal</th>
-                                  <th>Nilai HM</th>
-                                  <th>HM + Bonus</th>
+                                  <th>HM/+Bonus</th>
                                   <th>Harga</th>
                                   <th>Update At</th>
                                   <th class="datatable-nosort">Action</th>
@@ -175,41 +190,83 @@
 @endsection
 @section('js')
 <script>
-
+    $('#isEdit').hide();
     function showDataTableUserPrivilege(url,dataTable,id){	
         let data	=[];
+        
+        // name
         var elements = {
-                mRender: function (data, type, row) {	
-                    console.log('aaa')
-                    console.log(row)					
-                    return `${row.name} <small>${row.position}</small>`
+                mRender: function(data, type, row) {
+                    if (row.photo_path == null) {
+                        row.photo_path = '/vendors/images/photo4.jpg';
+                    }
+                    if (row.photo_path == null) {
+                        row.photo_path = '/vendors/images/photo4.jpg';
+                    }
+                    console.log(row.photo_path);
+                    return `<div class="name-avatar d-flex align-items-center">
+										<div class="avatar mr-2 flex-shrink-0">
+											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
+												height="40" alt="" />
+										</div>
+										<div class="txt">
+											<div class="weight-600">${row.name}</div>
+											<small>${row.position}</small></br>
+											<small>${row.nik_employee}</small>
+										</div>
+									</div>`
                 }
             };
-        data.push(elements)
-        dataTable.forEach(element => {
-            var dataElement = {data: element, name:element}
-            data.push(dataElement)
-        });
-        
-        var elements = {
+            data.push(elements)
+            // date
+            elements = {
+                mRender: function(data, type, row) {
+                    return `<label for="">${row.date}</label>`
+                }
+            };
+            data.push(elements)
+            // hour_meter_value 
+            elements = {
+                mRender: function(data, type, row) {
+                    return `<label for="">${row.hour_meter_value} / ${row.hour_meter_full_value}</label>`
+                }
+            };
+            data.push(elements)
+            //price
+            elements = {
+                mRender: function(data, type, row) {
+                    return `<label for="">${row.hour_meter_price}</label>`
+                }
+            };
+            data.push(elements)
+            // loop
+            dataTable.forEach(element => {
+                var dataElement = {data: element, name:element}
+                data.push(dataElement)
+            });
+            
+
+            elements = {
                 mRender: function (data, type, row) {
                     
                     return `
                                 <div class="form-inline"> 
-                                    <button onclick="editHm('`+ row.uuid +`')" type="button" class="btn btn-secondary">
-                                        <i class="dw dw-edit2"></i>
+                                    <button onclick="editHm('`+ row.hour_meter_uuid +`')" type="button" class="btn btn-secondary mr-1">
+                                        <i class="icon-copy ion-gear-b"></i>
+                                    </button>
+                                    <button onclick="deleteData('`+ row.hour_meter_uuid +`')" type="button" class="btn btn-danger">
+                                        <i class="icon-copy ion-trash-b"></i>
                                     </button>
                                 </div>`
                 }
             };
-        data.push(elements)
-
+            data.push(elements)
         let urls = '{{env('APP_URL')}}'+url
         console.log(urls)
             $('#'+id).DataTable({
-                order: [['5', 'desc']],
+                order: [['4', 'desc']],
                 columnDefs: [
-                                        { "visible": false, "targets": 5 }
+                                        { "visible": false, "targets": 4 }
                                     ],
                 processing: true,
                 serverSide: true,
@@ -221,7 +278,22 @@
                 columns:  data
             });			
     }
-    showDataTableUserPrivilege('hour-meter/data', ['date','value','full_value','hour_meter_value','updated_at'], 'table-hour-meter')
+    let year_month = @json($year_month);
+    let nik_employee = @json($nik_employee);
+    let hour_meter_uuid = @json($hour_meter_uuid);
+    let _url_data ='';
+
+    if(hour_meter_uuid){
+        console.log('hour_meter_uuid');
+        _url_data = 'hour-meter/data-uuid/'+hour_meter_uuid;
+    }else if(year_month){
+        console.log('year_month');
+        _url_data = 'hour-meter/data/employee-month/'+nik_employee+'/'+year_month;
+    }else{
+        console.log('global');
+        _url_data = 'hour-meter/data';
+    }
+    showDataTableUserPrivilege( _url_data, ['updated_at'], 'table-hour-meter')
         
 	$('#loading').hide();
     function globalStoreHm(idForm){
@@ -249,9 +321,10 @@
 
     function store(idForm){
         console.log(idForm)
-        if(isRequired(['employee_uuid','employee_checker_uuid','employee_foreman_uuid'])    > 0){ return false; }
+        if(isRequired(['employee_uuid','employee_checker_uuid','employee_foreman_uuid','value','date'])    > 0){ return false; }
         var isStored = globalStoreHm(idForm) 
         resetData();
+       
         $('#sa-custom-position').click();           
     }
 
@@ -275,7 +348,7 @@
 			let _token   = $('meta[name="csrf-token"]').attr('content');
 			let _url = "/hour-meter/edit";
 
-			
+			$('#isEdit').show();
 
 			$('#loading').show();
 
@@ -301,6 +374,7 @@
                 $('.btn-outline-primary').attr( 'class', ' btn btn-outline-primary' );
                 $('#lbl-'+data.shift).attr( 'class', ' btn btn-outline-primary active' );
                 $('#value').val(data.value).trigger('change');
+                $('#date').val(data.date);
 				$('#loading').hide();
 				
               },
@@ -320,8 +394,11 @@
 				full_value = value_hm * 0.15
 				full_value = full_value + value_hm
 			}
-			if(value_hm >= 15){
+			if(value_hm >= 14){
 				full_value = value_hm * 0.3 + value_hm
+			}
+            if(value_hm >= 16){
+				full_value = value_hm * 0.5 + value_hm
 			}
 			$('#full_value').val(full_value)
 			console.log(value_hm)
@@ -333,6 +410,7 @@
 	
 
 	function resetData(){
+        $('#isEdit').hide();
 		console.log('resetData')
         $('#uuid').val('')
         $('.btn-outline-primary').attr( 'class', ' btn btn-outline-primary' );
@@ -346,6 +424,14 @@
         $('#lbl-Siang').attr( 'class', ' btn btn-outline-primary active' );
 
 	});
+
+    function deleteData(uuid){
+            let _url = '/hour-meter/delete'
+            $('#confirm-modal').modal('show')
+            $('#uuid_delete').val(uuid)
+            $('#url_delete').val(_url)
+            $('#table_reload').val('hour-meter')
+       }
 	
 </script>
 @endsection
