@@ -85,7 +85,7 @@ class EmployeeController extends Controller
             'javascript_form'       => true,
             'active'                        => 'admin-hr-employees'
         ];
-        
+        // return Carbon::today('Asia/Jakarta')->isoFormat('YYYY-MM-DD');
         return view('employee.hr.create', [
             'title'         => 'Add People',
             'user_detail_uuid' => $user_detail_uuid,
@@ -96,7 +96,7 @@ class EmployeeController extends Controller
             'companies' => $companies,
             'roasters' => $roasters,
             'departments' => $departments,
-            'date_now'  =>$date_now,
+            'date_now'  => Carbon::today('Asia/Jakarta')->isoFormat('YYYY-MM-DD'),
             'long'      => 3,
             'date_add'  => $date_adds,
             'contract_number'   => $contract_number,

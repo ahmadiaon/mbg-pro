@@ -14,12 +14,15 @@
                                     <h4 class="text-blue h4">Tambah Tonase Karyawan</h4>
                                 </div>
                                 <div class="col-md-8">
-                                    <div class="form-group text-right">
-                                        <div class="col text-center">
-                                            <div class="alert alert-warning" id="isEdit" role="alert">
-                                                Edit Mode !
-                                            </div>	
-                                          </div>
+                                    <div class="button-group text-right">
+                                        <button type="button" onclick="resetData()"
+                                            class="btn btn-secondary">Reset</button>
+                                        <button type="button" onclick="store('tonase')" class="btn btn-primary">
+                                            Simpan
+                                            <div class="spinner-border" id="loading" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -64,7 +67,7 @@
                                 </div>
                             </div>
                             <div class="row justify-content-md-center">
-                                <div class="col-md-3 timbangan">
+                                <div class="col-md-4 timbangan">
                                     <div class="form-group">
                                         <label for="vehicle_uuid">Pilih Unit</label>
                                         <select name="vehicle_uuid" id="vehicle_uuid" class="custom-select2 form-control">
@@ -78,7 +81,7 @@
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label for="employee_uuid">Pilih Karyawan</label>
-                                        <select onchange="cekBonus()" name="employee_uuid" id="employee_uuid" class="custom-select2 form-control">
+                                        <select name="employee_uuid" id="employee_uuid" class="custom-select2 form-control">
                                             <option value="">karyawan</option>
                                         </select>
                                         <div class="invalid-feedback" id="req-employee_uuid">
@@ -86,17 +89,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="date">Tanggal</label>
-                                        <input onchange="cekBonus()" type="date" name="date" id="date" value="{{ $today }}"
-                                            class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-2 timbangan">
-                                    <div class="form-group">
-                                        <label for="date">Rit Hari ini</label>
-                                        <input onchange="cekBonus()" type="text" name="prev-ritase" id="prev-ritase" value=""
+                                        <input type="date" name="date" id="date" value="{{ $today }}"
                                             class="form-control">
                                     </div>
                                 </div>
@@ -137,7 +133,7 @@
                                 <div class="col-md-3 ">
                                     <div class="form-group ">
                                         <label for="">Total Rit</label>
-                                        <input onchange="fullValue()" type="text" class="form-control" id="ritase" name="ritase">
+                                        <input type="text" class="form-control" name="ritase">
 
                                     </div>
                                 </div>
@@ -213,20 +209,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row justify-content-md-center">
-                                <div class="col-auto">
-                                    <div class="button-group">
-                                        <button type="button" onclick="resetData()"
-                                            class="btn btn-secondary">Reset</button>
-                                        <button type="button" onclick="store('tonase')" class="btn btn-primary">
-                                            Simpan
-                                            <div class="spinner-border" id="loading" role="status">
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -247,20 +229,16 @@
 @endsection
 @section('js')
     <script>
-        $('#isEdit').hide();
         $('.timbangan').hide();
-        let year_month = @json($year_month);
-        let year_month_day = @json($year_month_day);
-        let nik_employee = @json($nik_employee);
+        let year_month = '';
+        let year_month_day = '';
+        let nik_employee = '';
         // create 
         let today = @json($today);
 
-        console.log('year_month : '+ year_month);
-        console.log('year_month_day : '+ year_month_day);
-        console.log('nik_employee : '+ nik_employee);
+
 
         function companies() {
-            $('#element-companies').empty();
             let companies = @json($companies);
             console.log('companies');
             console.log(companies);
@@ -270,7 +248,7 @@
                                         <div class="col-md-auto">
                                             <div class="custom-control custom-radio mb-5">
                                                 <input onchange="chooseCoalFrom('${i}')" type="radio"  id="${element.uuid}" name="company"
-                                                    class="custom-control-input" value="${i}"  />
+                                                    class="custom-control-input" value="${element.uuid}"  />
                                                 <label class="custom-control-label" for="${element.uuid}"  >${element.name}</label>
                                             </div>
                                         </div>`;
@@ -282,30 +260,26 @@
         companies();
 
         function chooseCoalFrom(uuid) {
-            console.log(uuid);
             $("#element-coal-from").empty();
             let companies = @json($companies);
             let coal_from = companies[uuid].coal_from;
-            // console.log(coal_from);
+            console.log(coal_from);
             coal_from.forEach(element => {
                 let element_company = `
                                         <div class="col-md-auto">
                                             <div class="custom-control custom-radio mb-5">
-                                                <input onblur="chooseCoalFroms('${element.uuid}')" type="radio"  id="id-${element.uuid}" name="coal_from_uuid"
+                                                <input onblur="chooseCoalFroms('${element.uuid}')" type="radio"  id="${element.uuid}" name="coal_from"
                                                     class="custom-control-input" value="${element.uuid}"  />
-                                                <label class="custom-control-label" for="id-${element.uuid}"  >${element.coal_from}</label>
+                                                <label class="custom-control-label" for="${element.uuid}"  >${element.coal_from}</label>
                                             </div>
                                         </div>`;
                 $('#element-coal-from').append(element_company);
             });
-            
-            // $('#id-6').attr('checked', true);
         }
 
 
         function chooseCoalFroms(uuid) {
             $('#coal_from_uuid').val(uuid);
-            // console.log(uuid);
         }
 
         $('#loading').hide();
@@ -342,23 +316,29 @@
             var el_1 = {
                 mRender: function(data, type, row) {
                     let element_action = '';
-                    // console.log(row);
-                    element_action = `
-                                <div class="form-inline"> 
-                                    <a onclick="editEmployeeTonase('${row.employee_tonase_uuid}')">
-                                        <button  type="button" class="btn btn-primary mr-1  py-1 px-2">
-                                            <small>detail</small>
-                                        </button>
-                                    </a>
-                                </div>`;
+                    if (year_month_day != '') {
+                        element_action = `
+									<div class="form-inline"> 
+                                        <a onclick="setNikEmployee('${row.nik_employee}')" href="#">
+											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
+												<small>detail</small>
+											</button>
+										</a>
+									</div>`;
+                    } else {
+                        element_action = `
+									<div class="form-inline"> 
+										<a onclick="setNikEmployee('${row.nik_employee}')">
+											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
+												<small>detail</small>
+											</button>
+										</a>
+									</div>`;
+                    }
                     return element_action;
                 }
             };
             data.push(el_1)
-            console.log('table year_month : '+ year_month);
-            console.log('table year_month_day : '+ year_month_day);
-            console.log('table nik_employee : '+ nik_employee);
-            
 
             $('#' + id).DataTable({
                 order: [['0', 'desc']],
@@ -384,8 +364,8 @@
 
                 },
                 success: function(response) {
-                    // $('#success-modal').modal('show')
-					// console.log(response)
+                    $('#success-modal').modal('show')
+					console.log(response)
 					// $('#table-'+idForm).DataTable().ajax.reload();
                 },
                 error: function(response) {
@@ -402,7 +382,7 @@
             // if(isRequired(['employee_uuid','employee_create_uuid','employee_know_uuid'])    > 0){ return false; }
             var isStored = globalStore(idForm)
             resetData();
-            showDataTableUserTonase('aa', ['updated_at','name','date', 'total_sell', 'total_sells', 'coal_from'], 'table-tonases');
+            showDataTableUserTonase('aa', ['name','date', 'total_sell', 'total_sells', 'coal_from'], 'table-tonases');
             $('#sa-custom-position').click();
         }
 
@@ -420,13 +400,14 @@
         }
 
 
-        function editEmployeeTonase(uuid) {
+        function editHm(uuid) {
             let _token = $('meta[name="csrf-token"]').attr('content');
             let _url = "/tonase/edit";
-            $('#isEdit').show();
 
-            console.log(uuid);
-            // return false;
+
+
+            $('#loading').show();
+
             $.ajax({
                 url: _url,
                 type: "POST",
@@ -438,21 +419,19 @@
                     data = response.data
                     console.log('data')
                     console.log(data)
-                    companies();
-                    // return false;
                     $('#employee_uuid').val(data.employee_uuid).trigger('change');
                     $('#uuid').val(data.uuid).trigger('change');
-                    // $('#employee_create_uuid').val(data.employee_create_uuid).trigger('change');
-                    // $('#employee_know_uuid').val(data.employee_know_uuid).trigger('change');
-                    $('#ritase').val(data.amount_ritase).trigger('change');
-                    $('#date').val(data.date).trigger('change');
-                    $('#'+data.company_uuid).attr('checked', true);
-                    $('#tonase_value').val(data.total_tonase_value);
-                    $('#tonase_full_value').val(data.total_tonase_full_value);
+                    $('#employee_create_uuid').val(data.employee_create_uuid).trigger('change');
+                    $('#employee_know_uuid').val(data.employee_know_uuid).trigger('change');
+                    $('#employee_approve_uuid').val(data.employee_approve_uuid).trigger('change');
+                    $('#full_value').val(data.full_value).trigger('change');
+                    $('#' + data.hour_meter_price_uuid).attr('checked', true);
+                    $('#' + data.shift).attr('checked', true);
+                    $('.btn-outline-primary').attr('class', ' btn btn-outline-primary');
+                    $('#lbl-' + data.shift).attr('class', ' btn btn-outline-primary active');
+                    $('#value').val(data.value).trigger('change');
+                    $('#loading').hide();
 
-                    chooseCoalFrom($('#'+data.company_uuid).val());
-
-                    $('#id-'+data.coal_from_uuid).attr('checked', true);
                 },
 
                 error: function(response) {
@@ -463,17 +442,16 @@
 
         function fullValue() {
             let isBonusAktive = $('#isBonusAktive')[0].checked
-            let tonase_full_value;
-            let amount_ritase = $('#ritase').val();
+            let tonase_full_value
             if (isBonusAktive == true) {
                 let value_hm = parseInt($('#tonase_value').val())
-                if (amount_ritase > 4) {
+                if (value_hm >= 10) {
                     tonase_full_value = value_hm * 0.15
                     tonase_full_value = tonase_full_value + value_hm
-                }else{
-                    tonase_full_value = value_hm
                 }
-                
+                if (value_hm >= 15) {
+                    tonase_full_value = value_hm * 0.3 + value_hm
+                }
                 $('#tonase_full_value').val(tonase_full_value)
                 console.log(value_hm)
             } else {
@@ -481,18 +459,10 @@
             }
         }
 
-        function cekBonus(){
-            let employee_uuid = $('#employee_uuid').val();
-            let date = $('#date').val();
 
-            if(date && employee_uuid){
-                console.log('date : '+date+' employee_uuid : '+employee_uuid);
-            }
-        }
 
         function resetData() {
             console.log('resetData')
-            $('#isEdit').hide();
             $('#uuid').val('')
             $('.btn-outline-primary').attr('class', ' btn btn-outline-primary');
             $('#lbl-Siang').attr('class', ' btn btn-outline-primary active');

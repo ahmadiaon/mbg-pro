@@ -91,21 +91,6 @@
                                         <label for=""></label>
                                     </div>
                                 </div>
-                                <div class="btn-group dropdown">
-                                    <button type="button" class="btn btn-primary dropdown-toggle waves-effect"
-                                        data-toggle="dropdown" aria-expanded="false">
-                                        Menu <span class="caret"></span>
-                                    </button>
-
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="/tonase/create">Tambah</a>
-                                        <a class="dropdown-item" id="btn-export"disabled
-                                            href="/user/absensi/export/">Export</a>
-                                        <a class="dropdown-item" id="btn-import" data-toggle="modal"
-                                            data-target="#import-modal" href="">Import</a>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -124,7 +109,7 @@
     <script>
         let companies = @json($companies);
         let element_coal_from = '';
-        let nik_employee = '';
+        let nik_employee = @json($nik_employee);
         companies.forEach(element => {
             element_coal_from = element_coal_from + `<optgroup label="${element.name}">`;
             element.coal_froms.forEach(element_coal_froms => {
@@ -134,7 +119,7 @@
             element_coal_from = element_coal_from + `</optgroup>`;
         });
 
-        // console.log(element_coal_from);
+
         $('#select_coal_froms').empty();
         $('#select_coal_froms').append(element_coal_from);
     </script>
@@ -167,7 +152,6 @@
                                                         <th>Rit</th>
                                                         <th>Ton</th>
                                                         <th>Ton + Bonus</th>
-                                                        <th class="datatable-nosort">Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -184,29 +168,14 @@
                 data.push(dataElement)
             });
 
-            var el_1 = {
-                mRender: function(data, type, row) {
-                    let element_action = '';
-                    
-                    element_action = `
-                                <div class="form-inline"> 
-                                    <a onclick="setNikEmployee('${row.nik_employee}')">
-                                        <button  type="button" class="btn btn-primary mr-1  py-1 px-2">
-                                            <small>detail</small>
-                                        </button>
-                                    </a>
-                                </div>`;
-                    
-                    return element_action;
-                }
-            };
-            data.push(el_1)
 
             let vall = $('#select_coal_froms').val();
             let urls = '{{ env('APP_URL') }}' + url;
             setDates(y, m)
             console.log('nik_employee : '+nik_employee);
             console.log('year_month_day:'+year_month_day)
+
+            
             $('#' + id).DataTable({
                 processing: true,
                 serverSide: true,
@@ -292,7 +261,6 @@
                 return false;
             }
             year_month_day = '';
-            nik_employee = '';
             $('#btn-day').html("Perbulan");
             setDates(v_year, v_month);
 
@@ -371,24 +339,5 @@
             showDataTableUserTonase(_url, ['name','ritase', 'total_sell', 'total_sells',], 'table-tonases')
         }
 
-        function setNikEmployee(nik){
-            nik_employee = nik;
-
-            if(year_month_day){
-                _url = '/tonase/detail/'+nik_employee+'/'+year_month_day;
-            }else{
-                _url = '/tonase/detail/'+nik_employee+'/'+year_month;
-            }
-
-           
-            
-            console.log('_url : '+_url);
-            console.log('nik_employee : '+nik_employee);
-            console.log('year_month : '+year_month);
-            console.log('year_month_day : '+year_month_day);
-            window.location.href = _url; 
-
-
-        }
     </script>
 @endsection

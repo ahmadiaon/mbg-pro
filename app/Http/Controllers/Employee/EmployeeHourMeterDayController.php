@@ -119,6 +119,7 @@ class EmployeeHourMeterDayController extends Controller
             'employees.nik_employee',
             'user_details.name',
             'employee_hour_meter_days.date',
+            'employee_hour_meter_days.shift',
             'employee_hour_meter_days.value')
         ->select( 
             'employee_hour_meter_days.updated_at',
@@ -127,6 +128,7 @@ class EmployeeHourMeterDayController extends Controller
             'user_details.name',
             'user_details.photo_path',
             'positions.position',
+            'employee_hour_meter_days.shift',
             'employees.uuid',
             'employees.nik_employee',
             'hour_meter_prices.value as hour_meter_price',
@@ -257,9 +259,28 @@ class EmployeeHourMeterDayController extends Controller
             'active'                        => 'employee-hour-meter'
         ];
         return view('employee_hour_meter_day.index', [
+            'title'         => 'Hour Meter',
+            'year_month'        => Carbon::today()->isoFormat('Y-M'),
+            'layout'    => $layout,
+            'nik_employee' => ''
+        ]);
+    }
+    public function indexForEmployee($nik_employee){
+        $employee = Employee::where('nik_employee',$nik_employee)->get()->first();
+        $layout = [
+            'head_core'            => true,
+            'javascript_core'       => true,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'hour-meter-price-me'
+        ];
+        return view('employee_hour_meter_day.employee.index', [
             'title'         => 'Tonase',
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
-            'layout'    => $layout
+            'layout'    => $layout,
+            'nik_employee' => $employee->uuid
         ]);
     }
 
@@ -380,6 +401,49 @@ class EmployeeHourMeterDayController extends Controller
         ->make(true);
     }
 
+    public function anyDataForEmployee($nik_employee, $year_month){
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+
+        
+        $data = EmployeeHourMeterDay::leftJoin('employees','employees.uuid','employee_hour_meter_days.employee_uuid')
+        ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid','employees.position_uuid')
+        ->leftJoin('hour_meter_prices','hour_meter_prices.uuid','employee_hour_meter_days.hour_meter_price_uuid')
+        ->where('employees.nik_employee', $nik_employee)
+        ->whereYear('employee_hour_meter_days.date', $year)
+        ->whereMonth('employee_hour_meter_days.date', $month)
+        ->groupBy(
+            'employees.nik_employee',
+            'user_details.photo_path',
+            'hour_meter_prices.value',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee',
+            'user_details.name',
+            // 'MONTH(employee_hour_meter_days.date)'
+            // 'new_date'
+           )
+        ->select( 
+            'user_details.name',
+            'user_details.photo_path',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee',
+            'hour_meter_prices.value as hour_meter_price',
+            // DB::raw("(DATE_FORMAT(employee_hour_meter_days.date, '%Y-%m')) as month_year"),
+            DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
+            DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
+            DB::raw("DATE_FORMAT(employee_hour_meter_days.created_at, '%Y-%m') new_date"),  DB::raw('YEAR(employee_hour_meter_days.created_at) as year, MONTH(employee_hour_meter_days.created_at) as month'),
+            DB::raw("SUM(employee_hour_meter_days.full_value) as hour_meter_full_value"),
+        )
+        ->get();
+        return view('datatableshow', [ 'data'         => $data]);
+        // dd($data);
+        return Datatables::of($data)
+        ->make(true);
+    }
 
 
     public function indexPayrol($year_month){

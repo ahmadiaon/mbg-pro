@@ -166,14 +166,8 @@
                                             <label>Tanggal Mulai Kontrak</label>
                                             <input onchange="changeEnd()" id="date_start_contract"
                                                 name="date_start_contract"
-                                                class="form-control  @error('date_start_contract') is-invalid @enderror"
-                                                value="{{ old('date_start_contract', $date_now) }}"
+                                                class="form-control"
                                                 placeholder="Select Date" type="date" />
-                                            @error('date_start_contract')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -395,19 +389,23 @@
 
 @section('js')
 <script>
+    
     function changeEnd(){
-        var inputVal = document.getElementById("date_start_contract").value;
-        var long = document.getElementById("long_contract").value;
+        var inputVal = $("#date_start_contract").val();
+        var long = $("#long_contract").val();
         var someDate = new Date(inputVal);
-        console.log('date start :'+ inputVal)
-        console.log('long :'+long)
+        console.log('date start :'+ inputVal);
+        console.log('long :'+long);
         
         someDate.setMonth(someDate.getMonth() + parseInt(long));
         let month_s =someDate.getMonth()+1;
+        let dd = someDate.getDate();
+
+        if (dd < 10) dd = '0' + dd;
         let full_month ='00' +month_s;
-        let date_suggest = someDate.getFullYear()+'-'+full_month.substr(-2)+'-'+someDate.getDate();
-        console.log('date_suggest :'+date_suggest)
-        $("#date_end_contract").val(date_suggest);    
+        let date_suggest = someDate.getFullYear()+'-'+full_month.substr(-2)+'-'+dd;
+        console.log('date_suggest ss:'+date_suggest)
+        $("#date_end_contract").val(String(date_suggest));    
     }
     
 </script>
@@ -418,7 +416,9 @@ var monthRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'
 var contract_status = document.getElementById("contract_status").value;
 let company = $('#company_uuid').val()
 let today = @json($date_now);
+$("#date_start_contract").val(today);
 let month = today.charAt(5)+today.charAt(6);
+
 let year = today.charAt(0)+today.charAt(1)+today.charAt(2)+today.charAt(3);
 let month_number = parseInt(month);
 let contract_number = @json($contract_number);

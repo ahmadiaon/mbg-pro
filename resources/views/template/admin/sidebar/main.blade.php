@@ -94,9 +94,22 @@
 				</li>
 				<li>
 					<a href="/me/{{session('dataUser')->nik_employee}}/absensi" 
-						class="dropdown-toggle no-arrow {{ $layout['active'] == 'employees-absensi' ? 'active' : '' }}">
+						class="dropdown-toggle no-arrow {{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}">
 						<span class="micon bi bi-calendar4-week"></span><span class="mtext">Absensi</span>
 					</a>
+				</li>
+				<li class="dropdown">
+					<a href="javascript:;" class="dropdown-toggle">
+						<span class="micon bi bi-bug"></span><span class="mtext">My Allowance</span>
+					</a>
+					<ul class="submenu">
+						<li><a class="{{ $layout['active'] == 'hour-meter-price-me' ? 'active' : '' }}" 
+							href="/me/{{session('dataUser')->nik_employee}}/hour-meter">Hour Meter</a>
+						</li>
+						<li><a class="{{ $layout['active'] == 'tonase-employee-me' ? 'active' : '' }}" 
+							href="/me/{{session('dataUser')->nik_employee}}/tonase">Tonase</a>
+						</li>
+					</ul>
 				</li>
 				{{-- @endif --}}
 			</ul>

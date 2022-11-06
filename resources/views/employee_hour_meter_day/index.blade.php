@@ -4,8 +4,9 @@
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-auto">
-                <h4 class="text-blue h4">Pembayaran Karyawan</h4>
+                <h4 class="text-blue h4">HM karywan</h4>
             </div>
+            @if(empty($nik_employee))
             <div class="col text-right">
                 <div class="btn-group">
                     <div class="btn-group dropdown">
@@ -87,6 +88,7 @@
 
                 </div>
             </div>
+            @endif
         </div>
         <div id="the-table">
             <div class="pb-20" id="tablePrivilege">
@@ -108,6 +110,12 @@
 
 @section('js')
     <script>
+        let nik_employee = @json($nik_employee);
+        if(nik_employee){
+            console.log(nik_employee);
+        }else{
+            console.log('kosong');
+        }
         let year_month = @json($year_month);
         let arr_year_month = year_month.split("-")
         $('#btn-year').html(arr_year_month[0]);
@@ -134,6 +142,7 @@
                     if (row.photo_path == null) {
                         row.photo_path = '/vendors/images/photo4.jpg';
                     }
+                    console.log('aaa');
                     return `<div class="name-avatar d-flex align-items-center">
 										<div class="avatar mr-2 flex-shrink-0">
 											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
@@ -147,7 +156,7 @@
 									</div>`
                 }
             };
-            data.push(elements)
+            data.push(elements);
             var elem = {
                 mRender: function(data, type, row) {
 
@@ -178,7 +187,7 @@
 									<div class="form-inline"> 
 										<a href="/hour-meter/show/${row.hour_meter_uuid}">
 											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
-												<small>edit</small>
+												<small>detail</small>
 											</button>
 										</a>
 									</div>`;
@@ -187,7 +196,7 @@
 									<div class="form-inline"> 
 										<a href="/hour-meter/show/${row.uuid}/${year_month}">
 											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
-												<small>edit</small>
+												<small>detail</small>
 											</button>
 										</a>
 									</div>`;

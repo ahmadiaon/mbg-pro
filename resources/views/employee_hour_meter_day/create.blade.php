@@ -278,6 +278,7 @@
                 columns:  data
             });			
     }
+    
     let year_month = @json($year_month);
     let nik_employee = @json($nik_employee);
     let hour_meter_uuid = @json($hour_meter_uuid);
