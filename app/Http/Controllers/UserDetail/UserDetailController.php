@@ -17,6 +17,11 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Calculation\TextData\Replace;
 use Yajra\Datatables\Datatables;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use Illuminate\Support\Facades\Storage;
 
 class UserDetailController extends Controller
 {
@@ -114,6 +119,49 @@ class UserDetailController extends Controller
             'religions' => $religions,
             'pohs' => $pohs,
             'data'  => null,
+            'layout'    => $layout
+        ]);
+    }
+
+    public function export(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employees-index',
+        ];
+
+        $religions = Religion::all();
+        $pohs = Poh::all();
+
+        $column_table_employees = DB::getSchemaBuilder()->getColumnListing('employees');
+        $column_table_user_details = DB::getSchemaBuilder()->getColumnListing('user_details');
+        $data = UserDetail::leftJoin('employees', 'employees.user_detail_uuid', 'user_details.uuid')
+        // ->leftJoin()
+        ->get([
+            'user_details.*',
+            'user_details.uuid as user_detail_uuid',
+            'employees.*',
+            'employees.uuid as employee_uuid'
+        ]);
+        $data = [
+            'tables' => [
+                'employees',
+                'user_details'
+            ],
+            'column_tables' => [
+                'employees' => $column_table_employees,
+                'user_details' => $column_table_user_details
+            ],
+            'data'  => $data
+        ];
+        
+        return view('employee.hr.export', [
+            'title'         => 'Tambah Karyawan',
+            'religions' => $religions,
+            'pohs' => $pohs,
+            'data'  => $data,
             'layout'    => $layout
         ]);
     }
@@ -245,6 +293,100 @@ class UserDetailController extends Controller
         })
         ->make(true);
             
+    }
+
+    public function exportAction(Request $request){
+        $requests = $request->all();
+        $arr_column=[];
+        // dd($requests);
+        $arr_only_null = [];
+        $arr_all = [];
+        $arr_all_name = [];
+        $arr_only_be = [];
+        $arr_off = [];
+        foreach($requests as $req=>$val){
+            // dd($val);
+            $arr_column[] = $req;
+            $arr_index = explode('-', $req);
+            if($val == 'only-null'){
+                $arr_only_null[] = $arr_index[0].'.'.$arr_index[1];
+            }
+            if($val == 'off'){
+                $arr_off[] = $arr_index[0].'.'.$arr_index[1];
+            }
+            if($val == 'all'){
+                $arr_all[] = $arr_index[0].'.'.$arr_index[1];
+                $arr_all_name[] = $arr_index[1];
+            }
+            if($val == 'only-be'){
+                $arr_all[] = $arr_index[0].'.'.$arr_index[1];
+                $arr_all_name[] = $arr_index[1];
+                $arr_only_be[] = $arr_index[0].'.'.$arr_index[1];
+            }
+        }
+
+        $columns = [
+            'arr_only_null' => $arr_only_null,
+            'off'   => $arr_off,
+            'all'   =>  $arr_all,
+            'only_be'   => $arr_only_be
+        ];
+        // dd($columns);
+
+        $column_table_employees = DB::getSchemaBuilder()->getColumnListing('employees');
+        $column_table_user_details = DB::getSchemaBuilder()->getColumnListing('user_details');
+        $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR'];
+
+        $empty_null = UserDetail::leftJoin('employees', 'employees.user_detail_uuid', 'user_details.uuid');
+
+        foreach($arr_only_null as $arr){
+            $empty_null = $empty_null->whereNull($arr);
+        }
+
+        foreach($arr_only_be as $arr){
+            $empty_null = $empty_null->whereNotNull($arr);
+        }
+
+        $data_employee = $empty_null->get($arr_all);
+
+        $data = [
+            'tables' => [
+                'employees',
+                'user_details'
+            ],
+            'column_tables' => [
+                'employees' => $column_table_employees,
+                'user_details' => $column_table_user_details
+            ],
+            'data'  => $data_employee
+        ];
+
+
+        // ======================================                                   EXTRACT TO EXCELL
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        // -----------------------------------------------------------------------nama column
+        $row = 0;
+        foreach($arr_all_name as $column_header){
+            $createSheet->setCellValue($abjads[$row].'4', $column_header);           
+            $row++;
+        }
+
+        $column = 5;
+        foreach($data_employee as $d){
+            $row = 0;
+            foreach($arr_all_name as $column_header){
+                $createSheet->setCellValue($abjads[$row].$column, $d->$column_header);
+                $row++;
+            }
+            $column++;
+        }
+
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/extrack-karyawan-'.rand(99,9999).'-file.xlsx';
+        $crateWriter->save($name);
+
+        return response()->download($name);
     }
     
 

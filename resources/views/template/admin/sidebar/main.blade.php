@@ -23,10 +23,17 @@
 					
 					<ul class="submenu">
 						@if (!empty(session('dataUser')->read_list_employee))
-							<li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}" href="/user">Daftar Karyawan</a></li>
-						@endif
-						@if (!empty(session('dataUser')->read_list_absensi_employee))
-							<li><a class="{{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}" href="/user/absensi">Absensi Karyawan</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle {{ $layout['active'] == 'employees-index' ? 'active' : '' }}">
+								<span class="micon bi bi-hdd-stack"></span><span class="mtext">Karyawan</span>
+							</a>
+							<ul class="submenu">
+								<li><a href="/user" class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}">Daftar Karyawan</a></li>
+								<li><a href="javascript:;">Monitoring PKWT</a></li>
+								<li><a href="javascript:;">Tanpa BPJS Kesehatan</a></li>
+								
+							</ul>
+						</li>
 						@endif
 					</ul>
 
@@ -39,7 +46,6 @@
 					</a>
 					
 					<ul class="submenu">
-						
 						@if (!empty(session('dataUser')->create_employee_hour_meter))
 							<li><a class="{{ $layout['active'] == 'employee-hour-meter' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 								title="Hour Meter" href="/hour-meter">Hour Meter</a></li>
@@ -48,6 +54,10 @@
 							<li><a class="{{ $layout['active'] == 'employee-payment' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 								title="Hour Meter" href="/payment">Payment</a></li>
 						@endif
+						@if (!empty(session('dataUser')->read_list_absensi_employee))
+							<li><a class="{{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}" href="/user/absensi">Absensi Karyawan</a></li>
+						@endif
+						<li><a class="{{ $layout['active'] == 'employee-allowance' ? 'active' : '' }}" href="/allowance">Total</a></li>
 					</ul>
 
 				</li>

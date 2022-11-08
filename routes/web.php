@@ -7,6 +7,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AllowanceController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\PositionController;
@@ -123,6 +124,13 @@ Route::middleware(['islogin'])->group(function () {
     
 
     //    allowance
+
+    Route::prefix('/allowance')->group(function () {
+        Route::get('/', [AllowanceController::class, 'index']);
+        Route::get('/test', [AllowanceController::class, 'anyData']);
+        Route::post('/data', [AllowanceController::class, 'anyData']);
+        
+    });
     Route::prefix('/hour-meter')->group(function () {
         Route::get('/create', [EmployeeHourMeterDayController::class, 'create']);
         Route::get('/data', [EmployeeHourMeterDayController::class, 'anyData']);
@@ -401,13 +409,18 @@ Route::middleware(['islogin'])->group(function () {
         // hour-meter
         
         // user
-        Route::get('/user', [EmployeeController::class, 'index']);
-        Route::post('/user', [UserDetailController::class, 'store']);
+        Route::prefix('/user')->group(function () {
+            Route::get('/', [EmployeeController::class, 'index']);
+            Route::post('/', [UserDetailController::class, 'store']);
+            
+            Route::get('/create', [UserDetailController::class, 'create']);
+            Route::get('/{nik_employee}/edit', [UserDetailController::class, 'show']);
+
+            Route::get('/export', [UserDetailController::class, 'export']);
+            Route::post('/export', [UserDetailController::class, 'exportAction']);
+        });
+
         Route::post('/user-file/store', [EmployeeController::class, 'storeFile']);
-        Route::get('/user/create', [UserDetailController::class, 'create']);
-        Route::get('/user/{nik_employee}/edit', [UserDetailController::class, 'show']);
-        
-        
         Route::get('/user-data', [EmployeeController::class, 'anyData']);
         Route::post('/user/nik', [EmployeeController::class, 'show']);
         Route::get('/user/profile/{nik}', [EmployeeController::class, 'profile']);

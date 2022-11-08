@@ -37,6 +37,7 @@ class EmployeeController extends Controller
             'layout'    => $layout,
         ]);
     }
+
     public function create($user_detail_uuid){
         $d = Carbon::today('Asia/Jakarta')->isoFormat('D');
         $m = Carbon::today('Asia/Jakarta')->isoFormat('M');
@@ -237,6 +238,38 @@ class EmployeeController extends Controller
 
         return Datatables::of($data)     
         ->make(true);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // 
+    public function allowance(){
+        $layout = [
+        'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => false,
+            'active'                        => 'employees-index'
+        ];
+        return view('employee.allowance.index', [
+            'title'         => 'Daftar Karyawan',
+            'layout'    => $layout,
+        ]);
+
     }
 
 
