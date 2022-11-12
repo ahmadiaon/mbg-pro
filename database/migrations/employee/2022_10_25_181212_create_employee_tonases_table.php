@@ -33,6 +33,7 @@ class CreateEmployeeTonasesTable extends Migration
             $table->date('time_come')->nullable();
 
             $table->string('pay_uuid')->nullable();
+            $table->date('valid_until')->nullable();
             $table->timestamps();
         });
     }

@@ -142,6 +142,7 @@
 
 
         function showDataTableUserTonase(url, dataTable, id) {
+            
             $('#tablePrivilege').remove();
             var table_element = ` 
                                         <div class="pb-20" id="tablePrivilege">
@@ -159,6 +160,7 @@
 
             $('#the-table').append(table_element);
             let data = [];
+         
             
             dataTable.forEach(element => {
                 var dataElement = {

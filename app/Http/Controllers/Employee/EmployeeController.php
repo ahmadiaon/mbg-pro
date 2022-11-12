@@ -38,6 +38,12 @@ class EmployeeController extends Controller
         ]);
     }
 
+    public function cekNikEmployee(Request $request){
+        $data = Employee::where('nik_employee', $request->nik_employee)->get()->first();
+        
+        return ResponseFormatter::toJson($data, 'data nik');
+    }
+
     public function create($user_detail_uuid){
         $d = Carbon::today('Asia/Jakarta')->isoFormat('D');
         $m = Carbon::today('Asia/Jakarta')->isoFormat('M');
@@ -134,7 +140,7 @@ class EmployeeController extends Controller
         $validateData = $request->validate([
            'user_detail_uuid' => '',
            'machine_id' => '',
-           'nik_employee' => '',
+           'nik_employee' => 'unique:employees',
            'position_uuid' => '',
            'department_uuid' => '',
 
@@ -208,7 +214,9 @@ class EmployeeController extends Controller
     }
 
     public function profile($nik_employee){
-        $data = Employee::where_employee_nik_employee_nullable($nik_employee);        
+        $data = Employee::where_employee_nik_employee_nullable($nik_employee);  
+        
+        // dd($data);
         if(!empty($data->user_privileges)){
             foreach($data->user_privileges as $item){
                 $thiss = $item->privilege_uuid;

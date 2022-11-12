@@ -33,6 +33,8 @@ class CreateEmployeeSalariesTable extends Migration
             $table->date('date_end')->nullable();
             $table->string('data_status')->nullable();
             $table->string('is_last')->nullable();
+            
+            $table->date('valid_until')->nullable();
             $table->timestamps();
         });
     }

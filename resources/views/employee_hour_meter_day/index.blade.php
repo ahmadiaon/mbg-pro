@@ -110,6 +110,7 @@
 
 @section('js')
     <script>
+        
         let nik_employee = @json($nik_employee);
         if(nik_employee){
             console.log(nik_employee);
@@ -142,7 +143,7 @@
                     if (row.photo_path == null) {
                         row.photo_path = '/vendors/images/photo4.jpg';
                     }
-                    console.log('aaa');
+                    // console.log('aaa');
                     return `<div class="name-avatar d-flex align-items-center">
 										<div class="avatar mr-2 flex-shrink-0">
 											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"

@@ -388,6 +388,23 @@ class UserDetailController extends Controller
 
         return response()->download($name);
     }
+
+
+    public function monitoring(){
+        $layout = [
+            'head_core'            => true,
+            'javascript_core'       => true,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'user-monitoring',
+        ];
+        return view('employee.monitoring.index', [
+            'title'         => 'Employee',
+            'layout'    => $layout
+        ]);
+    }
     
 
 }

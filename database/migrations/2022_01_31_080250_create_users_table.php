@@ -28,8 +28,8 @@ class CreateUsersTable extends Migration
             $table->string('auth_login')->nullable();
             $table->string('last_login_time')->nullable();
 
-            $table->string('phone_number')->unique()->nullable();
-            $table->string('email')->unique()->nullable();
+            $table->string('phone_number')->nullable();
+            $table->string('email')->nullable();
 
             $table->string('photo_path')->nullable();
             $table->string('facebook')->nullable();

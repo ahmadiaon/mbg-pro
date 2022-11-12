@@ -100,13 +100,7 @@
 										<button onclick="show('`+ row.nik_employee +`')" type="button" class="btn btn-info mr-1  py-1 px-2">
 											<i class="icon-copy ion-android-list"></i>
 										</button>
-										<div class="form-inline"> 
-										<button onclick="editPrivilege('`+ row.nik_employee +`')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
-											<i class="dw dw-edit2"></i>
-										</button>
-										<button onclick="deletePrivilege(' .$delete. ')"  type="button" class="btn btn-danger  py-1 px-2">
-											<i class="icon-copy dw dw-trash"></i>
-										</button>
+										
 									</div>`
 					}
 				};

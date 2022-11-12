@@ -20,6 +20,7 @@ class CreateEmployeeTotalHmMonthsTable extends Migration
             $table->string('hour_meter_price_uuid')->nullable();
             $table->string('month')->nullable();
             $table->string('value')->nullable();
+            $table->date('valid_until')->nullable();
             $table->timestamps();
         });
     }

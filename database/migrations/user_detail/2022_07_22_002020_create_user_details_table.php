@@ -37,7 +37,7 @@ return new class extends Migration
 
             $table->string('phone_number')->nullable();
             $table->string('photo_path')->nullable();
-            $table->string('is_last')->nullable();
+            $table->date('valid_until')->nullable();
             
             $table->timestamps();
         });

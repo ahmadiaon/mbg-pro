@@ -76,7 +76,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Company</label>
-                                            <select name="company_uuid" id="company_uuid" class="selectpicker form-control">
+                                            <select onchange="nikChangge()" name="company_uuid" id="company_uuid" class="selectpicker form-control">
                                                 @foreach($companies as $company)
                                                 @if(old('company_uuid' ) == $company->uuid)
                                                 <option value="{{ $company->uuid }}" selected>{{
@@ -100,7 +100,7 @@
                                         <div class="form-group">
                                             <div class="form-group">
                                                 <label>Contract Status</label>
-                                                <select name="contract_status" id="contract_status"
+                                                <select onchange="nikChangge()" name="contract_status" id="contract_status"
                                                     class="selectpicker form-control @error('contract_status') is-invalid @enderror">
                                                     <option value="PKWT" {{ (old('contract_status')=='PKWT'
                                                         )?'selected':'' }}>PKWT</option>
@@ -198,21 +198,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>NIK Employee</label>
-                                    <input name="nik_employee"
+                                <div class="form-group" id="nik_employee-form">
+                                    <label>NIK Employeeeee</label>
+                                    <input onkeyup="cekNikEmployee()" name="nik_employee"
                                         class="form-control @error('nik_employee') is-invalid @enderror"
                                         value="{{ old('nik_employee') }}" id="nik_employee"
                                         placeholder="6210000" type="text">
-                                    @error('nik_employee')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                    @enderror
+                                        
                                 </div>
                                 <div class="form-group">
                                     <label>Contract Number</label>
-                                    <input name="contract_number"
+                                    <input  name="contract_number"
                                         class="form-control @error('contract_number') is-invalid @enderror"
                                         value="{{ old('contract_number') }}" id="contract_number"
                                         placeholder="MBLE-00010001" type="text">
@@ -388,7 +384,45 @@
 
 
 @section('js')
+
+
 <script>
+    function cekNikEmployee(){
+        let nik_employee = $('#nik_employee').val();
+
+        $.ajax({
+                url: '/user-employee/cekNikEmployee',
+                type: "POST",
+                data:  {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        nik_employee: nik_employee
+                    },
+                success: function(response) {
+                    data = response.data
+					console.log(data)
+                    if(data){
+                        $('#nik_employee-forms').remove();
+                        let ddat = `
+                        <p id="nik_employee-forms" class="">
+                                          <code>nik sudah ada</code>
+                                        </p>
+                                    `;
+                        $('#nik_employee-form').append(ddat);
+                        console.log('aaaaaa');
+                    }else{
+                        $('#nik_employee-forms').remove();
+                        console.log('bbbb');
+                    }
+
+					// $('#table-'+idForm).DataTable().ajax.reload();
+                },
+                error: function(response) {
+                    alertModal()					
+				}
+            });
+
+        console.log(nik_employee);
+    }
     
     function changeEnd(){
         var inputVal = $("#date_start_contract").val();
@@ -406,6 +440,26 @@
         let date_suggest = someDate.getFullYear()+'-'+full_month.substr(-2)+'-'+dd;
         console.log('date_suggest ss:'+date_suggest)
         $("#date_end_contract").val(String(date_suggest));    
+    }
+
+    function nikChangge(){
+        var monthRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+        var contract_status = document.getElementById("contract_status").value;
+        let company = $('#company_uuid').val()
+        let today = @json($date_now);
+        $("#date_start_contract").val(today);
+        let month = today.charAt(5)+today.charAt(6);
+
+        let year = today.charAt(0)+today.charAt(1)+today.charAt(2)+today.charAt(3);
+        let month_number = parseInt(month);
+        let contract_number = @json($contract_number);
+        let full_contract_number ='000' +contract_number;
+        let contract_number_suggest = full_contract_number.substr(-3)+'/'+contract_status+'/'+company+'/'+monthRomawi[month_number-1]+'/'+year;
+        let nik_employee = @json($nik_employee);
+
+        let nik_employee_suggest = company+'-'+today.charAt(2)+today.charAt(3)+today.charAt(5)+today.charAt(6)+nik_employee;
+        $("#nik_employee").val(nik_employee_suggest);
+        $("#contract_number").val(contract_number_suggest);
     }
     
 </script>

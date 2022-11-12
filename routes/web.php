@@ -7,6 +7,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AllowanceController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Employee\EmployeeController;
@@ -68,6 +69,7 @@ Route::delete('/admin/religion/delete/{religion}', [ReligionController::class, '
 
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
 Route::post('/login', [AuthenticationController::class, 'login']);
+Route::get('/', [AuthenticationController::class, 'index']);
 
 // Route::get('admin/people/', [PeopleController::class, 'index']);
 
@@ -403,7 +405,7 @@ Route::middleware(['islogin'])->group(function () {
 
 
 
-
+        Route::get('/me-only/{table_name}', [AdminController::class, 'exportTable']);
         Route::get('/cuti', [UserDetailController::class, 'indexUser']);
         Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);    
         // hour-meter
@@ -418,6 +420,11 @@ Route::middleware(['islogin'])->group(function () {
 
             Route::get('/export', [UserDetailController::class, 'export']);
             Route::post('/export', [UserDetailController::class, 'exportAction']);
+
+            Route::get('/monitoring', [UserDetailController::class, 'monitoring']);
+        });
+        Route::prefix('/roaster')->group(function () {
+            Route::get('/', [EmployeeController::class, 'index']);
         });
 
         Route::post('/user-file/store', [EmployeeController::class, 'storeFile']);
@@ -450,6 +457,8 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/user-employee/create/{user_detail_uuid}', [EmployeeController::class, 'create']);
         Route::get('/user-employee/{nik_employee}/edit', [EmployeeController::class, 'show']);
         Route::post('/user-employee/store', [EmployeeController::class, 'store']);
+
+        Route::post('/user-employee/cekNikEmployee', [EmployeeController::class, 'cekNikEmployee']);
 });
 
 

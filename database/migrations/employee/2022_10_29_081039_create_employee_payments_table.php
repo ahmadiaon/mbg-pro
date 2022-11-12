@@ -21,6 +21,7 @@ class CreateEmployeePaymentsTable extends Migration
             $table->float('value')->nullable();
             $table->string('link_absen')->nullable();
             $table->string('is_last')->nullable();
+            $table->date('valid_until')->nullable();
             $table->timestamps();
         });
     }

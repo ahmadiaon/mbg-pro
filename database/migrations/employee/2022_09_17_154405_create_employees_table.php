@@ -36,6 +36,7 @@ class CreateEmployeesTable extends Migration
             $table->string('employee_status')->nullable();  
             $table->string('file_path')->nullable();      //profesional training
             $table->string('is_last')->nullable(); 
+            $table->date('valid_until')->nullable();
 
             $table->timestamps();
         });

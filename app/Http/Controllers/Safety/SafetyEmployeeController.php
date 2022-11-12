@@ -23,11 +23,12 @@ class SafetyEmployeeController extends Controller
     
     public function anyData()
     {
-        $employees = Employee::leftJoin('user_details','user_details.uuid','=','employees.user_detail_uuid')
+        $employees = Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
         ->leftJoin('user_licenses','user_licenses.user_detail_uuid','=','user_details.uuid')
         ->leftJoin('user_healths','user_healths.user_detail_uuid','=','user_details.uuid')
         ->leftJoin('positions','positions.uuid','=','employees.position_uuid')
         ->leftJoin('safety_employees','safety_employees.employee_uuid','=','employees.nik_employee')
+        
         ->get([
             'user_details.name',
             'user_details.photo_path',
@@ -38,17 +39,12 @@ class SafetyEmployeeController extends Controller
             'employees.nik_employee',
             'safety_employees.*'
         ]);
+
+     
+
+        // return view('datatableshow', [ 'data'         => $employees]);
         
-        // return $employees;
-        // foreach($employees as $item){
-            // if($item->nik_employee == 'MBLE-2210100'){
-            //     dd($item) ;
-            // }
-            // $item->user_details = $dataUserDetail = UserDetail::where_user_detail_uuid($item->user_detail_uuid);
-            // $item->user_licenses =$dataUserLicense = UserLicense::where_user_detail_uuid($item->user_detail_uuid);
-            // $item->user_healths =$dataUserHealth = UserHealth::where_user_detail_uuid($item->user_detail_uuid);
-            // $item->user_safety = SafetyEmployee::where('employee_uuid',$item->uuid)->get()->first();
-        // }
+
 
         return Datatables::of($employees)
         ->make(true);
@@ -199,7 +195,7 @@ class SafetyEmployeeController extends Controller
         $validateData['no_reg'] = $no_reg;
         $validateData['uuid'] = $validateData['nik_employee'];
         $validateData['employee_uuid'] = $validateData['nik_employee'];
-        $store = SafetyEmployee::create($validateData);
+        $store = SafetyEmployee::updateOrCreate(['uuid'=> $validateData['uuid']],$validateData);
 
         return redirect()->intended('/safety/edit/'.$validateData['nik_employee'])->with('success', 'data stored');
     }
