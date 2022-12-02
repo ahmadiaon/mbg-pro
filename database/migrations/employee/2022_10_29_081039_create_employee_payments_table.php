@@ -20,8 +20,8 @@ class CreateEmployeePaymentsTable extends Migration
             $table->string('payment_uuid')->nullable();
             $table->float('value')->nullable();
             $table->string('link_absen')->nullable();
-            $table->string('is_last')->nullable();
-            $table->date('valid_until')->nullable();
+            
+            $table->string('pay_uuid')->nullable();
             $table->timestamps();
         });
     }

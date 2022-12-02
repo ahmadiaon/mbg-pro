@@ -20,8 +20,6 @@ class CreateEmployeeRoastersTable extends Migration
             $table->string('roaster_uuid')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
-            $table->string('is_last')->nullable();
-            $table->date('valid_until')->nullable();
             $table->timestamps();
         });
     }

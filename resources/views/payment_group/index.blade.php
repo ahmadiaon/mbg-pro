@@ -21,7 +21,6 @@
                 <thead>
                     <tr>
                         <th>Payment Group</th>
-                        <th>Status Data</th>
                         <th class="datatable-nosort">Action</th>
                     </tr>
                 </thead>
@@ -34,7 +33,7 @@
 
 @section('js')
     <script>
-        showDataTableActions('database/payment-group/data', ['payment_group','status_data'], 'payment-group')
+        showDataTableActions('database/payment-group/data', ['payment_group'], 'payment-group')
         
 
        function deleteData(uuid){
@@ -61,7 +60,6 @@
                     console.log(data)
                     $('#uuid').val(data.uuid),
                     $('#payment_group').val(data.payment_group)    
-                    $('#status_data').val(data.status_data)    
                     $('#modal-create-payment-group').modal('show')  
                     return true;
                 },

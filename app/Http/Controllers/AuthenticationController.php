@@ -25,14 +25,16 @@ class AuthenticationController extends Controller
             'password'          => 'required'
         ]);
 
-        
          $dataUser = User::where('nik_employee', $request->username)->get()->first();
+        // dd($dataUser);
         //  dd($aa = Hash::check($request->password, $dataUser->password));
         if($dataUser){
+            // dd($request->password);
             if(Hash::check($request->password, $dataUser->password)){
                 $dataUserOld = $dataUser;
 
                $dataUser = Employee::where_employee_nik_employee_nullable($dataUser->nik_employee);
+               
                if(!empty($dataUser->user_privileges)){
                     foreach($dataUser->user_privileges as $item){
                         $thiss = $item->privilege_uuid;
@@ -99,6 +101,7 @@ class AuthenticationController extends Controller
                 return back()->with('loginError', 'Login Failed!');
             }
         }else{
+            
             return back()->with('loginError', 'Login Failed!');
         }
     }

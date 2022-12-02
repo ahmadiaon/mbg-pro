@@ -52,6 +52,8 @@
                             <a class="dropdown-item" id="btn-export"disabled href="/user/absensi/export/">Export</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                 href="">Import</a>
+                            {{-- <a class="dropdown-item" id="btn-import-mobilisasi" data-toggle="modal"
+                                data-target="#import-modal-loading" href="">Import loading</a> --}}
                         </div>
                     </div>
 
@@ -145,6 +147,63 @@
             </div>
         </div>
     </div>
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-import" action="/payment/import" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import Pembayaran</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih File Pembayaran</label>
+                            <input name="uploaded_file" type="file"
+                                class="form-control-file form-control height-auto" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" onclick="startLoading()" class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="import-modal-loading" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-import" action="/payment/import" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import Loading</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih File Pembayaran Loading</label>
+                            <input name="uploaded_file" type="file"
+                                class="form-control-file form-control height-auto" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" onclick="startLoading()" class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('js')
@@ -230,6 +289,7 @@
                 columns: data
             });
         }
+
         function refreshTable(val_year = null, val_month = null) {
             console.log(val_year);
             let v_year = $('#btn-year').html();
@@ -270,11 +330,11 @@
 
             $('#the-table').append(table_element);
 
-            $('#btn-export').attr('href', 'payment/data/' + year_month)
+            $('#btn-export').attr('href', 'payment/export/' + year_month)
             console.log('year:' + year_month)
             let _url = 'payment/data/' + year_month;
             showDataTableUserPrivilege(_url, ['date', 'value'],
-            'table-employee-payment')
+                'table-employee-payment')
         }
     </script>
 @endsection

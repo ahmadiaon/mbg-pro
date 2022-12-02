@@ -47,7 +47,9 @@ return new class extends Migration
             $table->date('mekanik_date')->nullable();
             
             $table->date('id_card_date')->nullable();
-            $table->string('is_last')->nullable();
+            
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
             
             $table->timestamps();
         });

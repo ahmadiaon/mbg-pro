@@ -58,7 +58,7 @@ class HourMeterPriceController extends Controller
             'use_end' =>'',
         ]);
         if(empty($request->uuid)){
-            $validatedData['uuid']  = strtolower(str_replace(' ','-',$validatedData['key_excel'] ) .'-'.rand(99,9999));
+            $validatedData['uuid']  = strtolower(str_replace(' ','-',str_replace('.','-',$validatedData['key_excel'] )) .'-'.rand(99,9999));
         }
 
         $store = HourMeterPrice::updateOrCreate(['uuid'=> $validatedData['uuid']], $validatedData);

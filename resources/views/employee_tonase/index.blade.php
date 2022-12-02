@@ -119,6 +119,36 @@
             
         </div>
     </div>
+
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="form-import" action="/tonase/import" method="post" enctype="multipart/form-data">
+            @csrf
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Import Tonase</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Pilih Tonase</label>
+                    <input name="uploaded_file"
+                        type="file"
+                        class="form-control-file form-control height-auto"
+                    />
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+              <button type="submit" onclick="startLoading()" class="btn btn-primary">Upload</button>
+            </div>
+          </div>
+        </form>
+        </div>
+      </div>
 @endsection
 @section('js')
     <script>
@@ -126,7 +156,7 @@
         let element_coal_from = '';
         let nik_employee = '';
         companies.forEach(element => {
-            element_coal_from = element_coal_from + `<optgroup label="${element.name}">`;
+            element_coal_from = element_coal_from + `<optgroup label="${element.company}">`;
             element.coal_froms.forEach(element_coal_froms => {
                 element_coal_from = element_coal_from +
                     `<option  value="${element_coal_froms.uuid}" >${element_coal_froms.coal_from}</option>`;
@@ -365,7 +395,7 @@
 
             $('#the-table').append(table_element);
 
-            $('#btn-export').attr('href', 'tonase/data/' + year_month)
+            $('#btn-export').attr('href', 'tonase/export/' + year_month)
             console.log('year:' + year_month)
             let _url = 'tonase/data';
             showDataTableUserTonase(_url, ['name','ritase', 'total_sell', 'total_sells',], 'table-tonases')

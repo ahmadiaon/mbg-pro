@@ -24,17 +24,7 @@ class PositionController extends Controller
             
     }
 
-    public function index()
-    {
-        // return People::all();
-        $peoples = People::query()->orderBy('created_at', 'DESC')->get();
-        // $peoples = Datatables::of(People::query())->make(true);
-
-        return view('admin.position.index', [
-            'title'         => 'People',
-            'peoples'       => $peoples
-        ]);
-    }
+  
 
     /**
      * Show the form for creating a new resource.
@@ -101,10 +91,7 @@ class PositionController extends Controller
      * @param  \App\Models\Position  $position
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdatePositionRequest $request, Position $position)
-    {
-        //
-    }
+  
 
     /**
      * Remove the specified resource from storage.

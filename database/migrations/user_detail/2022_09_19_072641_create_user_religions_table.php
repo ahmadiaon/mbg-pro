@@ -18,6 +18,10 @@ class CreateUserReligionsTable extends Migration
             $table->string('uuid')->nullable();
             $table->string('user_detail_uuid')->nullable();
             $table->string('religion_uuid')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+            
             $table->timestamps();
         });
     }

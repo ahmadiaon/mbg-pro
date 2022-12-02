@@ -40,11 +40,11 @@ class CoalFromController extends Controller
         if($validatedData['uuid']){
             $coal_from = CoalFrom::where('uuid',$request->uuid)->get()->first();
             if($validatedData['hauling_price'] != $coal_from->hauling_price){
-                $validatedData['uuid'] = strtolower(str_replace(' ','-',$validatedData['company_uuid'] )).'-'.strtolower(str_replace(' ','-',$validatedData['coal_from'] ).'-'.$validatedData['hauling_price'] );
+                $validatedData['uuid'] = strtolower(str_replace(' ','-',$validatedData['company_uuid'] )).'-'.strtolower(str_replace(' ','-',str_replace('.','-',$validatedData['coal_from'] )).'-'.$validatedData['hauling_price'] );
                 $validatedData['is_last'] = 1;
             }
         }else{
-            $validatedData['uuid'] = strtolower(str_replace(' ','-',$validatedData['company_uuid'] )).'-'.strtolower(str_replace(' ','-',$validatedData['coal_from'] ).'-'.$validatedData['hauling_price'] );
+            $validatedData['uuid'] = strtolower(str_replace(' ','-',$validatedData['company_uuid'] )).'-'.strtolower(str_replace(' ','-',str_replace('.','-',$validatedData['coal_from'] )).'-'.$validatedData['hauling_price'] );
             $validatedData['is_last'] = 1;
         }
        
@@ -56,7 +56,7 @@ class CoalFromController extends Controller
         $data = CoalFrom::join('companies','companies.uuid','coal_froms.company_uuid')
         ->orderBy('coal_froms.updated_at', 'asc')
         ->get([
-            'companies.name',
+            'companies.company',
             'coal_froms.*'
         ]);
 

@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('employee_uuid')->nullable();//head mine
             $table->string('mine_name')->nullable();
             $table->string('owner')->nullable();
-            $table->string('is_last')->nullable();
+            
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
 
             $table->timestamps();
         });

@@ -23,7 +23,10 @@ class CreateUserHealthsTable extends Migration
             $table->string('health_care_place')->nullable();
             $table->integer('long')->nullable();//mounth
             $table->string('status_health')->nullable();
-            $table->string('data_status')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+
             $table->timestamps();
         });
     }

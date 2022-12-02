@@ -21,7 +21,9 @@ class CreateCoalFromsTable extends Migration
             $table->string('hauling_price')->nullable();            
             $table->date('use_start')->nullable();
             $table->date('use_end')->nullable();
-            $table->string('is_last')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
             $table->timestamps();
         });
     }

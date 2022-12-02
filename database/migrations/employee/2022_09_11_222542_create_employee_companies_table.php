@@ -19,7 +19,8 @@ class CreateEmployeeCompaniesTable extends Migration
             $table->string('uuid')->nullable();
             $table->string('employee_uuid')->nullable();
             $table->string('company_uuid')->nullable();
-            $table->date('valid_until')->nullable();
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
 
             $table->timestamps();
         });

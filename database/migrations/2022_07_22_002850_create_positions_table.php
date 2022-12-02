@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('uuid')->nullable();
 
             $table->string('position')->nullable();
-            $table->string('data_status')->nullable();
+            
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
 
             $table->timestamps();
         });

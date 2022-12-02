@@ -17,8 +17,9 @@ class CreatePaymentGroupsTable extends Migration
             $table->id();
             $table->string('uuid')->nullable();
             $table->string('payment_group')->nullable();
-            $table->string('is_last')->nullable();
-            $table->string('status_data')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
 
             $table->timestamps();
         });

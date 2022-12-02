@@ -91,7 +91,10 @@
 							<li><a class="{{ $layout['active'] == 'privilege' ? 'active' : '' }}" href="/superadmin/privilege">Privilege</a></li>
 							<li><a class="{{ $layout['active'] == 'user-privilege' ? 'active' : '' }}" href="/user-privilege">Privilege User</a></li>
 							<li><a class="{{ $layout['active'] == 'database-status-absen' ? 'active' : '' }}" href="/database/absen">Status Absen</a></li>
+							<li><a class="{{ $layout['active'] == 'company' ? 'active' : '' }}" href="/database/company">Perusahaan</a></li>
+							<li><a class="{{ $layout['active'] == 'coal-type' ? 'active' : '' }}" href="/database/coal-type">Tipe Batu</a></li>
 							<li><a class="{{ $layout['active'] == 'coal-from' ? 'active' : '' }}" href="/database/coal-from">Asal Batu</a></li>
+							<li><a class="{{ $layout['active'] == 'premi' ? 'active' : '' }}" href="/database/premi">Premi</a></li>
 						</ul>
 					@endif
 					

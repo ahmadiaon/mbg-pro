@@ -38,15 +38,15 @@
                         </button>
                         
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" onclick="refreshTable(null, 1 )" href="#">Januari</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 2 )" href="#">Februari</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 3 )" href="#">Maret</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 4 )" href="#">April</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 5 )" href="#">Mei</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 6 )" href="#">Juni</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 7 )" href="#">Juli</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 8 )" href="#">Agustus</a>
-                            <a class="dropdown-item" onclick="refreshTable(null, 9 )" href="#">September</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 01 )" href="#">Januari</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 02 )" href="#">Februari</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 03 )" href="#">Maret</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 04 )" href="#">April</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 05 )" href="#">Mei</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 06 )" href="#">Juni</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 07 )" href="#">Juli</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 08 )" href="#">Agustus</a>
+                            <a class="dropdown-item" onclick="refreshTable(null, 09 )" href="#">September</a>
                             <a class="dropdown-item" onclick="refreshTable(null, 10 )" href="#">Oktober</a>
                             <a class="dropdown-item" onclick="refreshTable(null, 11 )" href="#">November</a>
                             <a class="dropdown-item" onclick="refreshTable(null, 12 )" href="#">Desember</a>
@@ -63,7 +63,8 @@
                         </button>
                         
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" id="btn-export" href="/user/absensi/export/">Export</a>
+                            <a class="dropdown-item" id="btn-export" href="/user/absensi/export/">Export + Data</a>
+                            <a class="dropdown-item" id="btn-export-template" href="/user/absensi/export-template/">Export Template</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal" href="">Import</a>
                         </div>
                     </div>
@@ -78,9 +79,10 @@
                         <tr>
                             <th>Nama</th>
                             <th>Dibayar</th>
-                            <th>Tidak Dibayar</th>
                             <th>Potongan</th>
-                            <th>Action</th>
+                           
+                            <th>Nama</th>
+                             <th>Action</th>
                         </tr>
                     </thead>
                 </table>
@@ -124,16 +126,19 @@
         
         let year = @json($year);
         let month = @json($months);
+        let v_year;
+        let v_month;
         $('#btn-year').html( year);
         $('#btn-month').html( months[month]);
         $('#btn-month').val( month);
         $('#btn-export').attr('href', '/user/absensi/export/'+year+'-'+month)
+        $('#btn-export-template').attr('href', '/user/absensi/export-template/'+year+'-'+month)
         // $('#form-import').attr('href', '/user/absensi/import)
         
         let year_month = @json($month);
         console.log('year:'+year_month)
         let _url = 'user/absensi/data/'+year_month;
-        showDataTableUserPrivilege(_url, [ 'pay', 'unpay', 'cut'], 'table-privilege')
+        showDataTableUserPrivilege(_url, [ 'pay', 'cut','name'], 'table-privilege')
 
         
 
@@ -169,8 +174,9 @@
 			
 			var elements = {
 					mRender: function (data, type, row) {
-						let v_year = $('#btn-year').html();
-                        let v_month = $('#btn-month').val();
+						v_year = $('#btn-year').html();
+                        v_month = $('#btn-month').val();
+                        v_month = ("0" + v_month).slice(-2);
 						return `
 									<div class="form-inline"> 
                                         <a href="/user/absensi/detail/${v_year}-${v_month}/${row.nik_employee}">
@@ -187,6 +193,9 @@
 			console.log(urls)
 				$('#'+id).DataTable({
 					processing: true,
+                    columnDefs: [
+                                        { "visible": false, "targets": 3 }
+                                    ],
 					serverSide: true,
 					responsive: true,
 						rowReorder: {
@@ -199,8 +208,8 @@
        
         function refreshTable(val_year = null, val_month = null){
             console.log(val_year);
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
+            v_year = $('#btn-year').html();
+            v_month = $('#btn-month').val();
             console.log(v_month);   
             if(val_year){
                 console.log(val_year);    
@@ -221,9 +230,10 @@
                                                     <tr>
                                                         <th>Nama</th>
                                                         <th>Dibayar</th>
-                                                        <th>Tidak Dibayar</th>
                                                         <th>Potongan</th>
-                                                        <th>Action</th>
+                                                       
+                                                        <th>Nama</th>
+                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -232,11 +242,13 @@
              $('#the-table').append(table_element);
             // let year_month = @json($month);
             // console.log('year:'+year_month)
+            v_month = ("0" + v_month).slice(-2);
             let year_month = v_year+'-'+v_month;
             $('#btn-export').attr('href', '/user/absensi/export/'+v_year+'-'+v_month)
+            $('#btn-export-template').attr('href', '/user/absensi/export-template/'+v_year+'-'+v_month)
             console.log('year:'+year_month)
             let _url = 'user/absensi/data/'+year_month;
-            showDataTableUserPrivilege(_url, [ 'pay', 'unpay', 'cut'], 'table-privilege')
+            showDataTableUserPrivilege(_url, [ 'pay', 'cut','name'], 'table-privilege')
         }
     </script>
 @endsection

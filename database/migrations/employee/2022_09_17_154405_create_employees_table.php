@@ -35,8 +35,15 @@ class CreateEmployeesTable extends Migration
             $table->integer('long_contract')->nullable(); //month
             $table->string('employee_status')->nullable();  
             $table->string('file_path')->nullable();      //profesional training
-            $table->string('is_last')->nullable(); 
-            $table->date('valid_until')->nullable();
+            $table->string('tax_status')->nullable(); 
+
+            $table->date('resign_date')->nullable(); 
+
+            
+
+            
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
 
             $table->timestamps();
         });

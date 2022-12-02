@@ -53,7 +53,7 @@
                             <label for="">Perusahaan</label>
                             <select class="selectpicker form-control " name="company_uuid" id="company_uuid">
                                 @foreach ($companies as $company)
-                                <option value="{{ $company->uuid}}">{{ $company->name}}</option>
+                                <option value="{{ $company->uuid}}">{{ $company->company}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -105,7 +105,7 @@
 
 @section('js')
     <script>
-        showDataTableAction('database/coal-from/data', ['name','coal_from','hauling_price','use_start','use_end'], 'coal-from')
+        showDataTableAction('database/coal-from/data', ['company','coal_from','hauling_price','use_start','use_end'], 'coal-from')
         function createCoalFrom(){
             $('#createCoalFrom').modal('show')
             $('#form-coal-from')[0].reset();

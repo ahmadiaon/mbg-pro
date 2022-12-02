@@ -16,6 +16,7 @@
                               <div class="col text-center">
                                 <div class="alert alert-warning" id="isEdit" role="alert">
                                     Edit Mode !
+                                    <input type="text" id="is_edit" value="is_edit" name="is_edit">
                                 </div>	
                               </div>
                               <div class="col text-right">
@@ -191,6 +192,7 @@
 @section('js')
 <script>
     $('#isEdit').hide();
+    $('#is_edit').remove();
     function showDataTableUserPrivilege(url,dataTable,id){	
         let data	=[];
         
@@ -350,6 +352,7 @@
 			let _url = "/hour-meter/edit";
 
 			$('#isEdit').show();
+            $('#isEdit').after(`<input type="text" id="is_edit" value="is_edit" name="is_edit">`);
 
 			$('#loading').show();
 
@@ -412,6 +415,7 @@
 
 	function resetData(){
         $('#isEdit').hide();
+        $('#is_edit').remove();
 		console.log('resetData')
         $('#uuid').val('')
         $('.btn-outline-primary').attr( 'class', ' btn btn-outline-primary' );

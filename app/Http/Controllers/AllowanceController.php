@@ -8,6 +8,8 @@ use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeeHourMeterDay;
 use App\Models\Employee\EmployeePayment;
 use App\Models\Employee\EmployeeTonase;
+use App\Models\HourMeterPrice;
+use App\Models\Identity;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,8 +28,62 @@ class AllowanceController extends Controller
         return view('allowance.index', [
             'title'         => 'Pendapatan Karyawan',
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
+            'hour_meter_prices'        => HourMeterPrice::all(),
             'layout'    => $layout,
         ]);
+    }
+
+    public function indexPayrol($year_month){
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+
+        $employees = Identity::join('employees', 'employees.uuid', 'identities.employee_uuid')
+        ->leftJoin('employee_absen_totals', 'employee_absen_totals.nik_employee', 'employees.nik_employee')
+        ->where('employee_absen_totals.year_month', $year.'-'.$month)
+        ->get([
+            'identities.id',
+            'identities.name',
+            // 'employees.nik_employee',
+            'employees.date_start_contract',
+            // 'employee_absen_totals.pay',
+            // 'employee_absen_totals.*',
+            // 'employees.*',
+            'employees.uuid as employee_uuid',
+            'employees.file_path as hm',
+        ]);
+
+
+        $employee_hm =  Identity::join('employees', 'employees.uuid', 'identities.employee_uuid')
+        ->leftJoin('employee_hour_meter_days', 'employee_hour_meter_days.employee_uuid', 'employees.uuid')
+        ->whereYear('employee_hour_meter_days.date', $year)
+        ->whereMonth('employee_hour_meter_days.date', $month)
+        ->groupBy(
+            'identities.id',
+            'identities.name',
+            'employee_hour_meter_days.employee_uuid',
+
+        )
+        ->select( 
+            'identities.id',
+            'identities.name',
+            'employee_hour_meter_days.employee_uuid',
+            DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
+           
+        )
+        ->get();
+
+        $hms = array();
+        foreach($employee_hm as $hm){
+            $hms[$hm->employee_uuid] = $hm;
+        }
+        
+     
+        dd($hms['MBLE-0219120106']->hour_meter_value);
+
+        return view('datatableshow', [ 'data'         => $hms]);
+
+        return $year;
     }
 
     public function anyData(Request $request){
@@ -35,71 +91,135 @@ class AllowanceController extends Controller
         $year = $date[0];
         $month = $date[1];
 
-        
+        $hour_meter_prices = HourMeterPrice::all();
 
-        $employees = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-                                                ->leftJoin('positions','positions.uuid','employees.position_uuid')
-                                                ->get([
-                                                    'employees.user_detail_uuid',
-                                                    'employees.nik_employee',
-                                                    'user_details.photo_path',
-                                                    'user_details.name',
-                                                    'positions.position',
-                                                    'employees.machine_id',                                                    
-                                                    'employees.uuid as employee_uuid'
-                                                ]);
+        $data_hm =[];
 
-        foreach ($employees as $employee) {
-            # code...
-            $employee->amount_pay = EmployeeAbsen::leftJoin('status_absens','status_absens.uuid','employee_absens.status_absen_uuid')
-                ->where('status_absens.math', 'pay')
-                ->where('employee_absens.employee_uuid', $employee->machine_id)
-                ->count();
-            $employee->amount_cut = EmployeeAbsen::leftJoin('status_absens','status_absens.uuid','employee_absens.status_absen_uuid')
-            ->where('status_absens.math', 'cut')
-            ->where('employee_absens.employee_uuid', $employee->machine_id)
-            ->count();
-            
-            // hm
-            $hm = EmployeeHourMeterDay::whereYear('employee_hour_meter_days.date', $year)
-                ->whereMonth('employee_hour_meter_days.date', $month)
-                ->where('employee_hour_meter_days.employee_uuid', $employee->employee_uuid)
-                
-                ->select( 
-                    DB::raw("SUM(employee_hour_meter_days.full_value) as hour_meter_full_value"),
-                )
-                ->get()->first();
+        foreach($hour_meter_prices as $item){
+            $employee_hm =  Identity::join('employees', 'employees.uuid', 'identities.employee_uuid')
+            ->leftJoin('employee_hour_meter_days', 'employee_hour_meter_days.employee_uuid', 'employees.uuid')
+            ->where('hour_meter_price_uuid', $item->uuid)
+            ->whereYear('employee_hour_meter_days.date', $year)
+            ->whereMonth('employee_hour_meter_days.date', $month)
+            ->groupBy(
+                'identities.id',
+                'identities.name',
+                'employee_hour_meter_days.employee_uuid',
 
-            $tonase =EmployeeTonase::whereYear('employee_tonases.date', $year)
-                ->whereMonth('employee_tonases.date', $month)
-                ->where('employee_tonases.employee_uuid', $employee->employee_uuid)    
-                ->select( 
-                    DB::raw("SUM(employee_tonases.tonase_full_value) as tonase_full_value"),
-                    DB::raw("count(employee_tonases.tonase_full_value) as count_tonase_full_value"),
-                )
-                ->get()->first();
-
-            $payment = EmployeePayment::join('payments','payments.uuid', 'employee_payments.payment_uuid')
-            ->whereYear('payments.date', $year)
-            ->whereMonth('payments.date', $month)
-            ->where('employee_payments.employee_uuid',  $employee->employee_uuid)
-            ->select( 
-                DB::raw("SUM(employee_payments.value) as amount_value_payment"),
-                DB::raw("count(employee_payments.value) as count_value_payment"),
             )
-            ->get()->first();
-
-            $employee->amount_hm = $hm->hour_meter_full_value;
-            $employee->amount_tonase = $tonase->tonase_full_value;
-            $employee->count_tonase_full_value = $tonase->count_tonase_full_value;
-
+            ->select( 
+                'identities.id',
+                'identities.name',
+                'employee_hour_meter_days.employee_uuid',
+                DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value")
+            )
+            ->get();
             
-            $employee->amount_value_payment = $payment->amount_value_payment;
-            $employee->count_value_payment = $payment->count_value_payment;
-        }    
+            $data = $employee_hm->keyBy(function ($item) {
+                return strval($item->employee_uuid);
+            });
+
+            $data_hm[$item->uuid] = $data;
+        }
+        
+        // return ResponseFormatter::getEndDay($year_month);
+
+        $employees = Identity::join('employees', 'employees.uuid', 'identities.employee_uuid')
+        ->leftJoin('employee_absen_totals', 'employee_absen_totals.nik_employee', 'employees.nik_employee')
+        ->leftJoin('employee_salaries', 'employee_salaries.employee_uuid', 'employees.uuid')
+        ->where('employee_absen_totals.year_month', $year.'-'.$month)
+        ->get([
+            'identities.*',
+            'employees.nik_employee',
+            'employees.date_start_contract',
+            'employee_absen_totals.pay',
+            'employee_absen_totals.*',
+            'employees.*',
+            'employee_salaries.salary'
+        ]);
+
+        $data = [];
+        foreach( $employees as $employee){
+            foreach($hour_meter_prices as $item){
+                $name =$item->uuid;
+                if(empty($data_hm[$item->uuid][$employee->uuid]->hour_meter_value)){
+                    $employee->$name = null;
+                }else{
+                    $employee->$name = $data_hm[$item->uuid][$employee->uuid]->hour_meter_value;
+                }
+            }
+            $data[] = $employee;
+        }
+
         return Datatables::of($employees)
         ->make(true);
-        return ResponseFormatter::toJson($employees, 'date');
-        return view('datatableshow', [ 'data'         => $employees]);
+    }
+
+    public function moreAnyData($year_month){
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+        $hour_meter_prices = HourMeterPrice::all();
+
+        $data_hm =[];
+
+        foreach($hour_meter_prices as $item){
+            $employee_hm =  Identity::join('employees', 'employees.uuid', 'identities.employee_uuid')
+            ->leftJoin('employee_hour_meter_days', 'employee_hour_meter_days.employee_uuid', 'employees.uuid')
+            ->where('hour_meter_price_uuid', $item->uuid)
+            ->whereYear('employee_hour_meter_days.date', $year)
+            ->whereMonth('employee_hour_meter_days.date', $month)
+            ->groupBy(
+                'identities.id',
+                'identities.name',
+                'employee_hour_meter_days.employee_uuid',
+
+            )
+            ->select( 
+                'identities.id',
+                'identities.name',
+                'employee_hour_meter_days.employee_uuid',
+                DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value")
+            )
+            ->get();
+            
+            $data = $employee_hm->keyBy(function ($item) {
+                return strval($item->employee_uuid);
+            });
+
+            $data_hm[$item->uuid] = $data;
+        }
+        
+        // return ResponseFormatter::getEndDay($year_month);
+
+        $employees = Identity::join('employees', 'employees.uuid', 'identities.employee_uuid')
+        ->leftJoin('employee_absen_totals', 'employee_absen_totals.nik_employee', 'employees.nik_employee')
+        ->leftJoin('employee_salaries', 'employee_salaries.employee_uuid', 'employees.uuid')
+        ->where('employee_absen_totals.year_month', $year.'-'.$month)
+        ->get([
+            'identities.*',
+            'employees.nik_employee',
+            'employees.date_start_contract',
+            'employee_absen_totals.pay',
+            'employee_absen_totals.*',
+            'employees.*',
+            'employee_salaries.salary'
+        ]);
+
+        $data = [];
+        foreach( $employees as $employee){
+            foreach($hour_meter_prices as $item){
+                $name =$item->uuid;
+                if(empty($data_hm[$item->uuid][$employee->uuid]->hour_meter_value)){
+                    $employee->$name = null;
+                }else{
+                    $employee->$name = $data_hm[$item->uuid][$employee->uuid]->hour_meter_value;
+                }
+            }
+            $data[] = $employee;
+        }
+
+        return Datatables::of($employees)
+        ->make(true);
     }
 }

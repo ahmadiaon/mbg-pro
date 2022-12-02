@@ -1,4 +1,12 @@
 @extends('template.admin.main_privilege')
+@section('css')
+<style>
+    .DTFC_LeftBodyLiner{
+      background : white !important;
+      overflow : hidden !important;
+    }
+</style>
+@endsection
 
 @section('content')
     <div class="card-box mb-30 ">
@@ -63,14 +71,20 @@
 
         <div id="the-table">
             <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-hour-meter" class="display nowrap stripe hover table" style="width:100%">
+                <table id="table-employee-hour-meter" class="stripe row-border order-column nowrap" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Nama</th>
-                            <th>Absen</th>
-                            <th>HM</th>
-                            <th>Tonase</th>
-                            <th>Pembayaran</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>8</th>
                         </tr>
                     </thead>
                 </table>
@@ -91,46 +105,52 @@
         let arr_year_month = year_month.split("-")
         let v_year = $('#btn-year').html();
         let v_month = $('#btn-month').val();
+
+        var date = new Date(), y = date.getFullYear(), m = date.getMonth();
+        var lastDay = new Date(y, m + 1, 0);
+        let day_month = lastDay.getDate();
+        console.log(day_month);
+        let moreData;
+        let hour_meter_prices = @json($hour_meter_prices);
+        
+        
+        
         $('#btn-year').html(arr_year_month[0]);
         $('#btn-month').html(months[arr_year_month[1]]);
         $('#btn-month').val(arr_year_month[1]);
         $('#btn-export').attr('href', '/hour-meter/export/' + year_month)
-
-        // $.ajax({
-        //         url: '/allowance/data',
-        //         type: "POST",
-        //         data:  {
-        //                 _token: $('meta[name="csrf-token"]').attr('content'),
-        //                 year_month: year_month,
-        //             },
-        //         success: function(response) {
-        //             $('#success-modal').modal('show')
-		// 			console.log(response)
-		// 			// $('#table-'+idForm).DataTable().ajax.reload();
-        //         },
-        //         error: function(response) {
-        //             alertModal()					
-		// 		}
-        //     });
-
-
-        let _url = 'hour-meter/data/' + year_month;
-        showDataTableEmployeeHourMeterMonth(_url, ['amount_pay','amount_hm','amount_tonase','count_tonase_full_value','amount_value_payment'],
-            'table-employee-hour-meter')
-
+        refreshTable();
         function showDataTableEmployeeHourMeterMonth(url, dataTable, id) {
+
+
+            // $.ajax({
+            //     url: '/allowance/more-data',
+            //     type: "POST",
+            //     data:  {
+            //             _token: $('meta[name="csrf-token"]').attr('content'),
+            //             year_month: year_month,
+            //         },
+            //     success: function(response) {
+            //         // $('#success-modal').modal('show')
+			// 		console.log(response)
+            //         moreData = response.data.hm;
+			// 		// $('#table-'+idForm).DataTable().ajax.reload();
+            //     },
+            //     error: function(response) {
+            //         alertModal()					
+			// 	}
+            // });
+
+
+
+
             $('#tablePrivilege').remove();
             var table_element = ` 
             <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-hour-meter" class="display nowrap stripe hover table" style="width:100%">
+                <table id="table-employee-hour-meter" class="display nowrap" cellspacing="0" style="width:100%">
                     <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Absen</th>
-                            <th>HM</th>
-                            <th>Tonase</th>
-                            <th>Pembayaran</th>
-                            <th>Pembayaran</th>
+                        <tr id="header-table">
+                           
                         </tr>
                     </thead>
                 </table>
@@ -139,59 +159,141 @@
             console.log('year_month : '+year_month);
 
             $('#the-table').append(table_element);
-            let data = [];
-            var elements = {
+            let data_column = [];
+
+            let identities = {
+                nik_employee : 'NIK',
+                name : 'Nama',
+                position : 'Jabatan',
+                date_start_contract : 'TMK',
+            };
+
+            
+
+
+            console.log(identities)
+            let header_element='';
+            let elements = '';
+
+
+            let arr_identities = [];
+            for (var key in identities) {
+                header_element = `<th>${identities[key]}</th>`;
+                $('#header-table').append(header_element);
+                arr_identities.push(key);
+            }
+
+            arr_identities.forEach(element_identity => {
+                elements = {
+                    mRender: function(data, type, row) {
+                        return row[element_identity];
+                    }
+                };
+                data_column.push(elements);
+            });
+
+            let long_work_day;
+
+
+
+            //  lama bekerja
+            header_element = `<th>Lama Bekerja</th>`;
+            $('#header-table').append(header_element);
+            elements = {
+                    mRender: function(data, type, row) {
+                        var date1 = new Date(row.date_start_contract);
+                        var date2 = new Date(year_month+'-'+lastDay);
+                        var Difference_In_Time = date2.getTime() - date1.getTime();
+                        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+                        long_work_day = Difference_In_Days;
+                        return Difference_In_Days;
+                    }
+                };
+            data_column.push(elements);
+
+
+            // Absensi
+            for(let i=1; i<= lastDay; i++){
+                header_element = `<th>${i}</th>`;
+                $('#header-table').append(header_element);
+                elements = {
+                    mRender: function(data, type, row) {
+                        return  row['day-'+i];
+                    }
+                };
+                data_column.push(elements);
+            }
+
+
+             //  
+            $('#header-table').append(`<th>Hari Dibayar</th>`);
+            elements = {
+                    mRender: function(data, type, row) {
+                       return (long_work_day < day_month)?long_work_day:row.pay;
+                    }
+                };
+            data_column.push(elements);
+            $('#header-table').append(`<th>Gapok</th>`);
+            elements = {
+                    mRender: function(data, type, row) {
+                        return `Rp. `+row.salary;
+                    }
+                };
+            data_column.push(elements);
+            $('#header-table').append(`<th>Gapok Dibayar</th>`);
+            elements = {
+                    mRender: function(data, type, row) {
+                        return (long_work_day < day_month)?'Rp. '+parseFloat(long_work_day * row.salary/day_month).toFixed(2):'Rp. '+row.salary;
+                    }
+                };
+            data_column.push(elements);
+            
+            hour_meter_prices.forEach(hour_meter_price => {
+                $('#header-table').append( `<th>${hour_meter_price.name}</th>`);
+                elements = {
+                    mRender: function(data, type, row) {
+                        return  row[hour_meter_price.uuid];
+                    }
+                };
+                data_column.push(elements);
+            });
+
+            // total hm
+
+            $('#header-table').append( `<th>Total HM</th>`);
+            elements = {
                 mRender: function(data, type, row) {
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    return `<div class="name-avatar d-flex align-items-center">
-										<div class="avatar mr-2 flex-shrink-0">
-											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
-												height="40" alt="" />
-										</div>
-										<div class="txt">
-											<div class="weight-600">${row.name}</div>
-											<small>${row.position}</small></br>
-											<small>${row.nik_employee}</small>
-										</div>
-									</div>`
+                    let total_hm= 0;
+                    hour_meter_prices.forEach(hm_price => {
+                        total_hm = total_hm + hm_price.value * row[hm_price.uuid];
+                    });
+                    return  total_hm;
                 }
             };
-            data.push(elements);
+            data_column.push(elements);
+           total_hm = 0;
 
-            dataTable.forEach(element => {
-                var dataElement = {
-                    data: element,
-                    name: element
-                }
-                data.push(dataElement)
-            });
 
 
             let urls = '{{ env('APP_URL') }}' + url
             console.log(urls)
             $('#' + id).DataTable({
-                processing: true,
+                scrollX: true,
+                scrollY:        "400px",
+                paging:         false,
+                // fixedColumns: {
+                //     leftColumns: 2
+                // },
                 serverSide: true,
-                responsive: true,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
                 ajax: {
                     url: '/allowance/data',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
                         year_month: year_month,
-                    
                     },
                     type: 'POST',
-
                 },
-                columns: data
+                columns: data_column
             });
         }
 
@@ -213,19 +315,18 @@
                 $('#btn-month').html(months[val_month]);
                 $('#btn-month').val(val_month);
             }
+            v_month =  String(v_month).padStart(2, '0')
+            lastDay = new Date(v_year, v_month , 0);
+            lastDay = lastDay.getDate();
+            console.log(lastDay);
             year_month = v_year + '-' + v_month;
             $('#btn-export').attr('href', 'hour-meter/data/' + year_month)
             let _url = 'hour-meter/data/' + year_month;
-            showDataTableEmployeeHourMeterMonth(_url, ['amount_pay','amount_hm','amount_tonase','count_tonase_full_value','amount_value_payment'],
+            showDataTableEmployeeHourMeterMonth(_url, ['nik_employee','name'],
                 'table-employee-hour-meter')
         }
+
+        
     </script>
 @endsection
 
-{{-- 
-<th>Karyawan</th>
-<th>Absensi</th>
-<th>HM</th>
-<th>Tonase</th>
-<th>Mobilisasi</th>
-<th>Loading</th> --}}

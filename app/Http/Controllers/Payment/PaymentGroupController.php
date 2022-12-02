@@ -36,12 +36,10 @@ class PaymentGroupController extends Controller
         $validatedData = $request->validate([
             'uuid' =>'',
             'payment_group' =>'',
-            'status_data' =>'',
-            'is_last' =>'',
         ]);
 
         if(empty($validatedData['uuid'])){
-            $validatedData['uuid'] = strtolower(str_replace(' ','-',$validatedData['payment_group'] ));
+            $validatedData['uuid'] = strtolower(str_replace(' ','-',str_replace('.','-',$validatedData['payment_group'] ) ));
         }
 
         $store = PaymentGroup::updateOrCreate(['uuid'=> $validatedData['uuid']], $validatedData);

@@ -71,6 +71,9 @@ class CreateUserDependentsTable extends Migration
             $table->string('child3_place_birth')->nullable();
             $table->date('child3_date_birth')->nullable();
             $table->string('child3_education')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
             $table->timestamps();
         });
     }

@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dictionary;
+use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeHourMeterDay;
+use App\Models\Identity;
 use App\Models\User;
+use App\Models\UserDetail\UserDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -80,6 +85,24 @@ class AdminController extends Controller
             'employee_payments',
             'employee_hour_meter_days'
         ];
+        $data = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid','employees.position_uuid')
+        ->get([
+            'employees.nik_employee',
+            'employees.machine_id',
+            'user_details.name',
+            'positions.position',
+        ]);
+        // dd($data);
+        foreach ($data as $key) {
+            Identity::create([
+                'nik_employee' => $key->nik_employee,
+                'name' => $key->name,
+                'machine_id' => $key->machine_id,
+                'position' => $key->position,
+            ]);
+        }
+        return 'done';
 
         /*
 
@@ -119,40 +142,100 @@ class AdminController extends Controller
 
         */
 
-        $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV'];
+        $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
        
-        foreach($arr_table_name as $tb_name){
-            $createSpreadsheet = new spreadsheet();
-            $createSheet = $createSpreadsheet->getActiveSheet();
-            $tables = DB::getSchemaBuilder()->getColumnListing($tb_name);
+        // foreach($arr_table_name as $tb_name){
+        //     $createSpreadsheet = new spreadsheet();
+        //     $createSheet = $createSpreadsheet->getActiveSheet();
+        //     $tables = DB::getSchemaBuilder()->getColumnListing($tb_name);
 
-            $row = 0;
-            foreach($tables as $table){
-                $createSheet->setCellValue($abjads[$row].'4', $table);  
-                $row++; 
+        //     $row = 0;
+        //     foreach($tables as $table){
+        //         $createSheet->setCellValue($abjads[$row].'4', $table);  
+        //         $row++; 
 
-                $data = DB::table($tb_name)->get();
+        //         $data = DB::table($tb_name)->get();
 
-                if($data->count()  > 0){
+        //         if($data->count()  > 0){
                     
-                    $column = 5;
+        //             $column = 5;
                     
-                    foreach($data as $cd){
-                        $row_c = 0;
-                        foreach($tables as $table){
-                            $createSheet->setCellValue($abjads[$row_c].$column, $cd->$table);  
-                            $row_c++;
-                        }
-                        $column++;
-                    } 
-                }
+        //             foreach($data as $cd){
+        //                 $row_c = 0;
+        //                 foreach($tables as $table){
+        //                     $createSheet->setCellValue($abjads[$row_c].$column, $cd->$table);  
+        //                     $row_c++;
+        //                 }
+        //                 $column++;
+        //             } 
+        //         }
+        //     }
+        //     $crateWriter = new Xls($createSpreadsheet);
+        //     $name = 'file/data/'.$tb_name.'-'.rand(99,9999).'-file.xlsx';
+        //     // $crateWriter->save($name);
+        //     // return response()->download($name);
+
+        // }
+        $data = UserDetail::join('employees','employees.user_detail_uuid', 'user_details.uuid')
+        ->join('positions','positions.uuid','employees.position_uuid')
+        ->leftJoin('departments','departments.uuid','employees.department_uuid')
+        ->leftJoin('employee_salaries', 'employee_salaries.employee_uuid', 'employees.uuid')
+        ->leftJoin('employee_companies', 'employee_companies.employee_uuid', 'employees.uuid')
+        ->leftJoin('employee_roasters', 'employee_roasters.employee_uuid', 'employees.uuid')
+        ->leftJoin('user_addresses', 'user_addresses.user_detail_uuid', 'user_details.uuid')
+        ->leftJoin('user_licenses', 'user_licenses.user_detail_uuid', 'user_details.uuid')
+        ->get([
+            'employees.*', 
+            'user_details.*',
+            
+            'user_addresses.*',
+            'user_licenses.*',
+            'departments.*',
+            'positions.*',
+            'employee_salaries.*',
+            'employee_roasters.*',
+            'employee_companies.*'
+        ]);
+        // $data = UserDetail::join('employees','employees.user_detail_uuid', 'user_details.uuid')
+        // ->get();
+        // dd();
+        return view('datatableshow', [ 'data'         => $data]);
+        $data_row = 1;
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        $header_excel = Dictionary::all();
+
+
+        foreach($header_excel as $he){
+            // echo $he->excel."</br>";
+            $createSheet->setCellValue($abjads[$data_row]."3", $he->excel);  
+            $data_row++;
+        }
+        $data_col = 4;
+        foreach($data as $tb_data){
+            dd($tb_data);
+            $data_row = 1;
+            foreach($header_excel as $he){
+                // echo $he->excel."</br>";
+                $namee = $he->database;
+                // dd($namee);
+                $createSheet->setCellValue($abjads[$data_row].$data_col, $tb_data->$namee);  
+                $data_row++;
             }
-            $crateWriter = new Xls($createSpreadsheet);
-            $name = 'file/data/'.$tb_name.'-'.rand(99,9999).'-file.xlsx';
-            $crateWriter->save($name);
+            $data_col++;
+        
+           
+            // $crateWriter->save($name);
             // return response()->download($name);
 
         }
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/data/exportttt-'.rand(99,9999).'-file.xlsx';
+         $crateWriter->save($name);
+
+
+            return response()->download($name);
+        return view('datatableshow', [ 'data'         => $data]);
         die;
 
        

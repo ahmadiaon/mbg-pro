@@ -20,7 +20,7 @@ class EmployeePaymentController extends Controller
 {
     public function create(){
         $employees = Employee::getAll();
-        $payment_groups = PaymentGroup::where('status_data','Aktif')->get();
+        $payment_groups = PaymentGroup::all();
       
         $layout = [
             'head_core'            => true,
@@ -74,6 +74,7 @@ class EmployeePaymentController extends Controller
         return ResponseFormatter::toJson($store, "request");
         
     }
+    
     public function delete(Request $request){
          $store = EmployeePayment::where('uuid',$request->uuid)->delete();
  

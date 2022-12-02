@@ -105,7 +105,7 @@
                                 <div class="form-group row moreThanOneDays">
                                     <label class="col-4">Lama </label>
                                     <div class="col-8">
-                                        <input onchange="setDate()" class="form-control" id="long" name="long" type="text" value="1" />
+                                        <input onkeyup="setDate()" class="form-control" id="long" name="long" type="text" value="1" />
                                     </div>
 
                                 </div>

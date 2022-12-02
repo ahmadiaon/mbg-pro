@@ -6,25 +6,40 @@
             <div class="col-auto">
                 <h4 class="text-blue h4">Karyawan</h4>
             </div>
-            <div class="col text-right">
-                @if (!empty(session('dataUser')->create_employee))
+            <div class="col text-right"
+                <div class="btn-group">
                     <div class="btn-group dropdown">
-                        <button onclick="create()" type="date" class="btn btn-secondary" data-toggle="dropdown"
+                        <button onclick="create()" type="date" class="btn btn-danger" data-toggle="dropdown"
                             aria-expanded="false">
-                            Tambah Karyawan <span class="caret"></span>
+                            Export Data <span class="caret"></span>
                         </button>
                     </div>
-                @endif
-                <div class="btn-group dropdown">
-                    <a href="/user/export">
-                        <button  type="button" class="btn btn-primary">
-                            Export <span class="caret"></span>
+                    @if (!empty(session('dataUser')->create_employee))
+                        <div class="btn-group dropdown">
+                            <button onclick="create()" type="date" class="btn btn-secondary" data-toggle="dropdown"
+                                aria-expanded="false">
+                                Tambah Karyawan <span class="caret"></span>
+                            </button>
+                        </div>
+                    @endif
+                    <div class="btn-group dropdown">
+                        <button type="date" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
+                            aria-expanded="false">
+                            Menu <span class="caret"></span>
                         </button>
-                    </a>
+
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" id="btn-export"disabled href="/user/export-simple/">Template Simpel </a>
+                            <a class="dropdown-item" id="btn-export"disabled href="/user/export-full/">Template Full </a>
+                            <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
+                                href="">Import</a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-        </div>
+        
         <div class="pb-20" id="tablePrivilege">
             <table id="table-privilege" class="display nowrap stripe hover table" style="width:100%">
                 <thead>
@@ -70,6 +85,35 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-import" action="/user/import" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import Karawan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih Karawan</label>
+                            <input name="uploaded_file" type="file"
+                                class="form-control-file form-control height-auto" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" onclick="startLoading()" class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection

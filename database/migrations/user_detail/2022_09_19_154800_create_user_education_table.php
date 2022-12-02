@@ -42,6 +42,11 @@ class CreateUserEducationTable extends Migration
             $table->string('dll_place')->nullable();
             $table->string('dll_jurusan')->nullable();
             $table->integer('dll_year')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+
+            
             $table->timestamps();
         });
     }

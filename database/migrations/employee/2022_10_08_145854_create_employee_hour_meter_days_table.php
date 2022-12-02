@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateEmployeeHourMeterDaysTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('employee_hour_meter_days', function (Blueprint $table) {
@@ -26,7 +21,7 @@ class CreateEmployeeHourMeterDaysTable extends Migration
             $table->float('value')->nullable();//di kertas
             $table->float('full_value')->nullable();//bonus
             $table->string('pay_uuid')->nullable();
-            $table->date('valid_until')->nullable();
+            $table->string('is_bonus')->nullable();
             $table->timestamps();
         });
     }

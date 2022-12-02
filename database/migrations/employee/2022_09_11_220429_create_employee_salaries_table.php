@@ -19,22 +19,26 @@ class CreateEmployeeSalariesTable extends Migration
 
             // fereign key
             $table->string('employee_uuid')->nullable();
-            $table->string('salary')->nullable();
-            $table->string('insentif')->nullable();
-            $table->string('premi_bk')->nullable();
-            $table->string('premi_nbk')->nullable();
-            $table->string('premi_kayu')->nullable();
-            $table->string('premi_mb')->nullable();
-            $table->string('premi_rj')->nullable();
-            $table->string('insentif_hm')->nullable();
-            $table->string('deposit_hm')->nullable();
-            $table->string('tonase')->nullable();
+            $table->float('salary')->nullable();
+            $table->float('insentif')->nullable();
+            $table->float('tunjangan')->nullable();
+            
+            $table->float('premi_bk')->nullable();
+            $table->float('premi_nbk')->nullable();
+            $table->float('premi_kayu')->nullable();
+            $table->float('premi_mb')->nullable();
+            $table->float('premi_nmb')->nullable();
+            $table->float('premi_rj')->nullable();
+            $table->float('premi_nrj')->nullable();
+
+            $table->float('hour_meter_price_uuid')->nullable();
+            $table->float('insentif_hm')->nullable();
+            $table->float('deposit_hm')->nullable();
+            $table->float('tonase')->nullable();
+
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
-            $table->string('data_status')->nullable();
-            $table->string('is_last')->nullable();
             
-            $table->date('valid_until')->nullable();
             $table->timestamps();
         });
     }

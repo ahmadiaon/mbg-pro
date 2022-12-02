@@ -168,7 +168,8 @@
         console.log(status_absen_uuid+date+employee_uuid);
         let _token   = $('meta[name="csrf-token"]').attr('content');
 		let _url = "/user/absensi/store";
-
+        // console.log('aaaa');
+        return false;
         $.ajax({
             url: _url,
             type: "POST",

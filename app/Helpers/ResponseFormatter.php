@@ -54,4 +54,18 @@ class ResponseFormatter
     return response()->json(['code'=>200, 'message'=>$message,'data' => $data], 200);
   }
 
+  public static function getEndDay($year_month){
+    $datetime = Carbon::createFromFormat('Y-m', $year_month);
+    $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+    return $day_month;
+  }
+  public static function toUUID($uuid){
+    return strtoupper(str_replace(' ','-',str_replace('.','-',$uuid )) );
+  }
+
+  public static function toUuidLower($uuid){
+    return strtolower(str_replace(' ','-',str_replace('.','-',$uuid )) );
+  }
+
+
 }

@@ -24,7 +24,12 @@ class CreateUserAddressesTable extends Migration
             $table->string('kecamatan')->nullable();
             $table->string('kabupaten')->nullable();
             $table->string('provinsi')->nullable();
-            $table->string('is_last')->nullable();
+            
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+
+
             $table->timestamps();
         });
     }

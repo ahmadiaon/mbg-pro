@@ -32,12 +32,15 @@ return new class extends Migration
 
             $table->string('npwp_number')->nullable();//
             $table->string('financial_number')->nullable();//
+            $table->string('financial_name')->nullable();//
             $table->string('bpjs_ketenagakerjaan')->nullable();//
             $table->string('bpjs_kesehatan')->nullable();//
 
             $table->string('phone_number')->nullable();
             $table->string('photo_path')->nullable();
-            $table->date('valid_until')->nullable();
+            
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
             
             $table->timestamps();
         });

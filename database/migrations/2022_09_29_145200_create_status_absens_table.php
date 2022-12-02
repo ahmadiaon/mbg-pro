@@ -21,7 +21,10 @@ class CreateStatusAbsensTable extends Migration
             $table->string('math')->nullable();
             $table->date('use_start')->nullable();
             $table->date('use_end')->nullable();
-            $table->string('is_last')->nullable();
+            
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
             $table->timestamps();
         });
     }

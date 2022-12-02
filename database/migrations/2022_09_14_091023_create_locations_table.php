@@ -18,6 +18,9 @@ class CreateLocationsTable extends Migration
             $table->string('uuid')->nullable();
             $table->string('location')->nullable();
 
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+
             $table->timestamps();
         });
     }

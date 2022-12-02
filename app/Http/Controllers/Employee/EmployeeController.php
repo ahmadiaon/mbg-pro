@@ -12,14 +12,23 @@ use App\Models\Department;
 use App\Models\Position;
 use App\Models\Company;
 use App\Models\Employee\EmployeeCompany;
+use App\Models\Employee\EmployeePremi;
 use App\Models\Employee\EmployeeSalary;
+use App\Models\Premi;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\Roaster;
 use App\Models\User;
+use App\Models\UserDetail\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -36,6 +45,158 @@ class EmployeeController extends Controller
             'title'         => 'Daftar Karyawan',
             'layout'    => $layout,
         ]);
+    }
+
+    public function import(Request $request){
+        // return 'aaa';
+        $the_file = $request->file('uploaded_file');
+
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+
+        try{
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet        = $spreadsheet->getActiveSheet();
+
+            $rows = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
+        
+
+
+            $no_employee = 6;
+            $employees = [];
+            /*
+            1. loop all employee
+            2.
+            EmployeeHourMeterDay::
+            */
+
+            while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
+                $date_row = 3;
+                $nik_employee = $sheet->getCell( 'B'.$no_employee)->getValue();
+
+                $excelDate=  $sheet->getCell( 'F'.$no_employee)->getValue();
+                $miliseconds = ($excelDate - (25567 + 2)) * 86400 * 1000;
+                $seconds = $miliseconds / 1000;
+                $date = date("Y-m-d", $seconds);
+
+                $premis = [];
+                $column_premi = 21;
+                while($sheet->getCell( $rows[$column_premi].'5')->getValue() != null){
+                    $premis[$sheet->getCell( $rows[$column_premi].'5')->getValue()]= $rows[$column_premi];
+                    $column_premi++;
+                }
+                $position_uuid = ResponseFormatter::toUuidLower($sheet->getCell( 'D'.$no_employee)->getValue());
+                $department_uuid = ResponseFormatter::toUuidLower($sheet->getCell( 'E'.$no_employee)->getValue());
+                $store['position'] = Position::updateOrCreate(['uuid' => $position_uuid], ['position' => $sheet->getCell( 'D'.$no_employee)->getValue()]);
+                $store['department'] = Department::updateOrCreate(['uuid' => $department_uuid], ['department' => $sheet->getCell( 'E'.$no_employee)->getValue()]);
+                
+                $employee = [
+                    'nik_employee'  => $nik_employee,
+                    'user_detail_uuid' => $nik_employee,
+                    'machine_id'    => $sheet->getCell( 'U'.$no_employee)->getValue(),
+                    'nik_employee' => $nik_employee, 
+                    'position_uuid' => $position_uuid,
+                    'department_uuid' => $department_uuid,
+                    'date_start_contract' => $date, 
+                    'date_document_contract' => $date, 
+                    'date_start' => $date, 
+                    'tax_status'    => $sheet->getCell( 'G'.$no_employee)->getValue(),  
+                    'date_start'    => $date
+                ];
+                
+                $store['employees'] = Employee::updateOrCreate(['uuid'    => $nik_employee], $employee);
+
+                $user_details = [
+                    'name'  => $sheet->getCell( 'C'.$no_employee)->getValue(),
+                    'nik_number'    => $sheet->getCell( 'M'.$no_employee)->getValue(),
+                    'financial_number' => $sheet->getCell( 'H'.$no_employee)->getValue(),
+                    'financial_name' =>  $sheet->getCell( 'I'.$no_employee)->getValue(),
+                    'bpjs_ketenagakerjaan' => $sheet->getCell( 'J'.$no_employee)->getValue(),
+                    'bpjs_kesehatan' => $sheet->getCell( 'K'.$no_employee)->getValue(),
+                    'npwp_number' => $sheet->getCell( 'L'.$no_employee)->getValue(),
+                    'date_start' => $date
+                ];
+                $store['user_details'] = UserDetail::updateOrCreate(['uuid' => $nik_employee], $user_details);
+
+                $user = [
+                    'employee_uuid' => $nik_employee,
+                    'role'  => 'employee',
+                    'nik_employee' => $nik_employee,
+                    'password' => Hash::make('password'), 
+                ];
+                $store['users'] =  User::updateOrCreate(['uuid' => $nik_employee],$user);
+
+                $employee_salaries = [
+                    'salary'    => $sheet->getCell( 'R'.$no_employee)->getValue(),
+                    'insentif' => $sheet->getCell( 'S'.$no_employee)->getValue(),
+                    'tunjangan' => $sheet->getCell( 'T'.$no_employee)->getValue(),
+                    'date_start' => $date
+                ];
+                $store['employee_salary'] =  EmployeeSalary::updateOrCreate(['uuid'  => $nik_employee], $employee_salaries);
+                
+                $employee_premis = [
+                    'employee_uuid' => $nik_employee,
+                ];
+                foreach($premis as $premi => $key){
+                    $employee_premis['premi_uuid'] =  $premi;
+                    $employee_premis['premi_value'] = $sheet->getCell( $key.$no_employee)->getValue();
+                    $employee_premis['date_start'] = $date;
+                    
+                    $store['employees_premi-'.$premi] =  EmployeePremi::updateOrCreate(['uuid' => $nik_employee.'-'.$premi],$employee_premis);
+                }
+                // dd($store);
+                $no_employee++;
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            return back()->withErrors('There was a problem uploading the data!');
+        }
+    }
+
+    public function exportSimple(){
+        $row = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
+        
+        $premis = Premi::all();
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        $createSheet->setCellValue('B1', 'Template Import Data Karyawan Simpel');
+
+
+        $createSheet->setCellValue('A5', 'No.');
+        $createSheet->setCellValue('B5', 'NIK');
+        $createSheet->setCellValue('C5', 'Nama');
+        $createSheet->setCellValue('D5', 'Jabatan');
+        $createSheet->setCellValue('E5', 'Departemen');
+        $createSheet->setCellValue('F5', 'Tanggal Awal Kontrak');
+        $createSheet->setCellValue('G5', 'Status Pajak');
+        $createSheet->setCellValue('H5', 'No Rekening');
+        $createSheet->setCellValue('I5', 'Nama Rekening');
+        $createSheet->setCellValue('J5', 'No BPJS Ketenagakerjaan');
+        $createSheet->setCellValue('K5', 'BPJS Kesehatan');
+        $createSheet->setCellValue('L5', 'No NPWP');
+        $createSheet->setCellValue('M5', 'NIK Kependudukan');
+        $createSheet->setCellValue('N5', 'Nama Ibu');
+        $createSheet->setCellValue('O5', 'BPJS TK 2%');
+        $createSheet->setCellValue('P5', 'BPJS KESEHATAN 1%');
+        $createSheet->setCellValue('Q5', 'BPJS PENSIUN 1%');
+
+        $createSheet->setCellValue('R5', 'Gaji Pokok');
+        $createSheet->setCellValue('S5', 'Insentif');
+        $createSheet->setCellValue('T5', 'Tunjangan');
+        $createSheet->setCellValue('U5', 'Nama Mesin Fingger');
+        
+        $index_column = 5;
+        $index_row = 21;
+        foreach($premis as $premi){
+            $cell = $row[$index_row].$index_column;
+            $createSheet->setCellValue($cell, $premi->uuid);
+            $index_row++;
+        }
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/Template Penambahan Karyawan -'.rand(99,9999).'file.xls';
+        $crateWriter->save($name);
+
+        return response()->download($name);
     }
 
     public function cekNikEmployee(Request $request){
@@ -242,8 +403,18 @@ class EmployeeController extends Controller
 
     public function anyData(){
 
-        $data = Employee::getAll();
-
+        $data = Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
+        ->join('positions','positions.uuid','=','employees.position_uuid')
+        ->get([
+            'user_details.name',
+            'user_details.photo_path',
+            'positions.position',
+            'employees.employee_status',
+            'employees.uuid',
+            'employees.machine_id',
+            'employees.nik_employee'
+        ]);
+        // return view('datatableshow', [ 'data'         => $data]);
         return Datatables::of($data)     
         ->make(true);
     }

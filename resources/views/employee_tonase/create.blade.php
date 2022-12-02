@@ -237,7 +237,7 @@
             <div class="col-12">
                 <div id="the-table" class="card-box">
                     <div class="pd-20">
-                        <h4 class="text-blue h4">Status Absen</h4>
+                        <h4 class="text-blue h4">Data Tonase</h4>
                     </div>
 
                 </div>
@@ -271,7 +271,7 @@
                                             <div class="custom-control custom-radio mb-5">
                                                 <input onchange="chooseCoalFrom('${i}')" type="radio"  id="${element.uuid}" name="company"
                                                     class="custom-control-input" value="${i}"  />
-                                                <label class="custom-control-label" for="${element.uuid}"  >${element.name}</label>
+                                                <label class="custom-control-label" for="${element.uuid}"  >${element.company}</label>
                                             </div>
                                         </div>`;
                 $('#element-companies').append(element_company);

@@ -162,7 +162,7 @@
                             Data tidak boleh kosong
                         </div>
                     </div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <div class="row justify-content-md-center">
                             <div class="col-12 text-center mb-5">
                                 <h4 class="mb-5">Data Status</h4>
@@ -182,7 +182,7 @@
                                 </div>
                             </div>
                           </div>
-                    </div>
+                    </div> --}}
                 </div>
                 
                 <div class="modal-footer">

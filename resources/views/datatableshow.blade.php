@@ -51,7 +51,6 @@
           z++;
           $('#t_body').append(elements);
         });
-        $('#head').val('jgjgjg');
     </script>
   </body>
 </html>

@@ -35,7 +35,10 @@ class CreateUserLicensesTable extends Migration
             $table->date('date_end_sim_a_umum')->nullable();
             $table->date('date_end_sim_b1_umum')->nullable();
             $table->date('date_end_sim_b2_umum')->nullable();
-            $table->string('data_status')->nullable();
+
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+
             $table->timestamps();
         });
     }

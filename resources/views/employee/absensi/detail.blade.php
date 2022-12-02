@@ -202,13 +202,17 @@
             console.log(status_absen_uuid + date + employee_uuid);
             let _token = $('meta[name="csrf-token"]').attr('content');
             let _url = "/user/absensi/store";
-
+            console.log('aaaaaa');
+            let nik_employee = @json($employee->nik_employee);
+            
             $.ajax({
                 url: _url,
                 type: "POST",
                 data: {
                     employee_uuid: employee_uuid,
                     date: date,
+                    year_month: year_month,
+                    nik_employee: nik_employee,
                     status_absen_uuid: status_absen_uuid,
                     _token: _token
                 },

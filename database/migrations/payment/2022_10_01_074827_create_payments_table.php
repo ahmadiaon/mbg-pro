@@ -24,7 +24,7 @@ class CreatePaymentsTable extends Migration
             $table->string('employee_know_uuid')->nullable();
             $table->string('employee_approve_uuid')->nullable();
             $table->string('description')->nullable();
-            $table->string('is_last')->nullable();
+
             $table->timestamps();
         });
     }
