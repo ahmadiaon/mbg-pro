@@ -306,8 +306,8 @@ class EmployeeTonseController extends Controller
 
             $no_employee = 6;
             $employees = [];
-            EmployeeTonase::whereYear('date', $year_hm)
-            ->whereMonth('date', $month_hm)->delete();
+            // EmployeeTonase::whereYear('date', $year_hm)
+            // ->whereMonth('date', $month_hm)->delete();
             /*
             1. loop all employee
             2.
@@ -509,7 +509,7 @@ class EmployeeTonseController extends Controller
     }
 
     public function store(Request $request){
-        
+      
         $validatedData = $request->validate([
           'uuid' => '',
           'ritase' => '',
@@ -517,6 +517,7 @@ class EmployeeTonseController extends Controller
           'employee_know_uuid' => '',
           'employee_approve_uuid' => '',
           'vehicle_uuid' => '',
+          'company' => '',
 
             
           'employee_uuid' => '',
@@ -529,7 +530,6 @@ class EmployeeTonseController extends Controller
             'time_start' => '',
             'time_come' => '',
         ]);
-        
         $tonase_each_ritase = $validatedData['tonase_value'] / $validatedData['ritase'] ;
         $tonase_each_ritase = round( $tonase_each_ritase, 2);
         //======================================== ritase ke 5 keatas dapat bonus
@@ -553,9 +553,11 @@ class EmployeeTonseController extends Controller
         //     }
            
         // }
-
+       
 
         if(empty($validatedData['uuid'])){
+            $validatedData['company_uuid'] = $validatedData['company'];
+           
             for($i = 0; $i < $validatedData['ritase']; $i++){
                 if($validatedData['ritase'] >3){
                     $validatedData['tonase_value'] = $tonase_each_ritase;
@@ -564,17 +566,16 @@ class EmployeeTonseController extends Controller
                     $validatedData['tonase_full_value'] = $tonase_each_ritase;
                     $validatedData['tonase_value'] = $tonase_each_ritase;
                 }
-                
-                
-                $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['company_uuid'].'-'.$validatedData['nik_employee'];
-            
+                        
                 if(empty($validatedData['uuid'])){
-                    $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['shift'].'-'.$validatedData['employee_uuid'];
+                    $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['coal_from_uuid'].'-'.$validatedData['employee_uuid'];
                 }
+                // return ResponseFormatter::toJson($validatedData , 'Data Stored');
+                
                 $store = EmployeeTonase::create($validatedData);
                 
             }
-           
+            return ResponseFormatter::toJson('aaaa', 'Data Stored');
         }else{
             EmployeeTonase::where('uuid', $validatedData['uuid'])->delete();
             for($i = 0; $i < $validatedData['ritase']; $i++){
@@ -584,15 +585,11 @@ class EmployeeTonseController extends Controller
                 }else{
                     $validatedData['tonase_full_value'] = $tonase_each_ritase;
                     $validatedData['tonase_value'] = $tonase_each_ritase;
-                }
-                
-                
-                
+                }                
                 if(empty($validatedData['uuid'])){
-                    $validatedData['uuid'] = "tonase-".$validatedData['date'].'-'.$validatedData['shift'].'-'.$validatedData['employee_uuid'].'-'.rand(99,999);
+                    $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['coal_from_uuid'].'-'.$validatedData['employee_uuid'];
                 }
                 $store = EmployeeTonase::create($validatedData);
-                
             }
         }
 

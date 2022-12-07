@@ -98,6 +98,7 @@ class EmployeePaymentController extends Controller
             'companies' => $companies
         ]);
     }
+    
     public function anyDataMonth($year_month){
         $date = explode("-", $year_month);
         $year = $date[0];

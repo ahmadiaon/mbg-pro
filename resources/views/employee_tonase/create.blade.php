@@ -269,8 +269,10 @@
                 let element_company = `
                                         <div class="col-md-auto">
                                             <div class="custom-control custom-radio mb-5">
-                                                <input onchange="chooseCoalFrom('${i}')" type="radio"  id="${element.uuid}" name="company"
+                                                <input type="hidden"  id="${element.uuid}-id" name="company-id"
                                                     class="custom-control-input" value="${i}"  />
+                                                <input onchange="chooseCoalFrom('${i}')" type="radio"  id="${element.uuid}" name="company"
+                                                    class="custom-control-input" value="${element.uuid}"  />
                                                 <label class="custom-control-label" for="${element.uuid}"  >${element.company}</label>
                                             </div>
                                         </div>`;
@@ -286,7 +288,7 @@
             $("#element-coal-from").empty();
             let companies = @json($companies);
             let coal_from = companies[uuid].coal_from;
-            // console.log(coal_from);
+            console.log('coal_from'); console.log(coal_from);
             coal_from.forEach(element => {
                 let element_company = `
                                         <div class="col-md-auto">
@@ -450,7 +452,7 @@
                     $('#tonase_value').val(data.total_tonase_value);
                     $('#tonase_full_value').val(data.total_tonase_full_value);
 
-                    chooseCoalFrom($('#'+data.company_uuid).val());
+                    chooseCoalFrom($('#'+data.company_uuid+'-id').val());
 
                     $('#id-'+data.coal_from_uuid).attr('checked', true);
                 },

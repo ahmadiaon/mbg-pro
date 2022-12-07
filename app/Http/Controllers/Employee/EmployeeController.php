@@ -62,7 +62,7 @@ class EmployeeController extends Controller
         
 
 
-            $no_employee = 6;
+            $no_employee = 3;
             $employees = [];
             /*
             1. loop all employee
@@ -72,19 +72,20 @@ class EmployeeController extends Controller
 
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                 $date_row = 3;
-                $nik_employee = $sheet->getCell( 'B'.$no_employee)->getValue();
+               $nik_employee = $sheet->getCell( 'B'.$no_employee)->getValue();
 
-                $excelDate=  $sheet->getCell( 'F'.$no_employee)->getValue();
-                $miliseconds = ($excelDate - (25567 + 2)) * 86400 * 1000;
-                $seconds = $miliseconds / 1000;
-                $date = date("Y-m-d", $seconds);
+                
+
+                $date = ResponseFormatter::excelToDate($sheet->getCell( 'F'.$no_employee)->getValue());
 
                 $premis = [];
                 $column_premi = 21;
-                while($sheet->getCell( $rows[$column_premi].'5')->getValue() != null){
-                    $premis[$sheet->getCell( $rows[$column_premi].'5')->getValue()]= $rows[$column_premi];
+                while($sheet->getCell( $rows[$column_premi].'2')->getValue() != null){
+                    $premis[$sheet->getCell( $rows[$column_premi].'2')->getValue()] = $rows[$column_premi];
                     $column_premi++;
                 }
+
+                // dd($premis);
                 $position_uuid = ResponseFormatter::toUuidLower($sheet->getCell( 'D'.$no_employee)->getValue());
                 $department_uuid = ResponseFormatter::toUuidLower($sheet->getCell( 'E'.$no_employee)->getValue());
                 $store['position'] = Position::updateOrCreate(['uuid' => $position_uuid], ['position' => $sheet->getCell( 'D'.$no_employee)->getValue()]);
@@ -128,12 +129,13 @@ class EmployeeController extends Controller
 
                 $employee_salaries = [
                     'salary'    => $sheet->getCell( 'R'.$no_employee)->getValue(),
-                    'insentif' => $sheet->getCell( 'S'.$no_employee)->getValue(),
-                    'tunjangan' => $sheet->getCell( 'T'.$no_employee)->getValue(),
-                    'date_start' => $date
+                    'insentif' => (empty($sheet->getCell( 'S'.$no_employee)->getValue())?null:$sheet->getCell( 'S'.$no_employee)->getValue()),
+                    'tunjangan' =>(empty($sheet->getCell( 'T'.$no_employee)->getValue())?null:$sheet->getCell( 'T'.$no_employee)->getValue()), 
+                    'date_start' => $date,
+                    'employee_uuid' => $nik_employee
                 ];
-                $store['employee_salary'] =  EmployeeSalary::updateOrCreate(['uuid'  => $nik_employee], $employee_salaries);
                 
+                $store['employee_salary'] =  EmployeeSalary::updateOrCreate(['uuid'  => $nik_employee], $employee_salaries);
                 $employee_premis = [
                     'employee_uuid' => $nik_employee,
                 ];
@@ -151,6 +153,7 @@ class EmployeeController extends Controller
             $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
+        return redirect()->back();
     }
 
     public function exportSimple(){
@@ -160,32 +163,29 @@ class EmployeeController extends Controller
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
         $createSheet->setCellValue('B1', 'Template Import Data Karyawan Simpel');
-
-
-        $createSheet->setCellValue('A5', 'No.');
-        $createSheet->setCellValue('B5', 'NIK');
-        $createSheet->setCellValue('C5', 'Nama');
-        $createSheet->setCellValue('D5', 'Jabatan');
-        $createSheet->setCellValue('E5', 'Departemen');
-        $createSheet->setCellValue('F5', 'Tanggal Awal Kontrak');
-        $createSheet->setCellValue('G5', 'Status Pajak');
-        $createSheet->setCellValue('H5', 'No Rekening');
-        $createSheet->setCellValue('I5', 'Nama Rekening');
-        $createSheet->setCellValue('J5', 'No BPJS Ketenagakerjaan');
-        $createSheet->setCellValue('K5', 'BPJS Kesehatan');
-        $createSheet->setCellValue('L5', 'No NPWP');
-        $createSheet->setCellValue('M5', 'NIK Kependudukan');
-        $createSheet->setCellValue('N5', 'Nama Ibu');
-        $createSheet->setCellValue('O5', 'BPJS TK 2%');
-        $createSheet->setCellValue('P5', 'BPJS KESEHATAN 1%');
-        $createSheet->setCellValue('Q5', 'BPJS PENSIUN 1%');
-
-        $createSheet->setCellValue('R5', 'Gaji Pokok');
-        $createSheet->setCellValue('S5', 'Insentif');
-        $createSheet->setCellValue('T5', 'Tunjangan');
-        $createSheet->setCellValue('U5', 'Nama Mesin Fingger');
+        $createSheet->setCellValue('A2', 'No.');
+        $createSheet->setCellValue('B2', 'NIK');
+        $createSheet->setCellValue('C2', 'Nama');
+        $createSheet->setCellValue('D2', 'Jabatan');
+        $createSheet->setCellValue('E2', 'Departemen');
+        $createSheet->setCellValue('F2', 'Tanggal Awal Kontrak');
+        $createSheet->setCellValue('G2', 'Status Pajak');
+        $createSheet->setCellValue('H2', 'No Rekening');
+        $createSheet->setCellValue('I2', 'Nama Rekening');
+        $createSheet->setCellValue('J2', 'No BPJS Ketenagakerjaan');
+        $createSheet->setCellValue('K2', 'BPJS Kesehatan');
+        $createSheet->setCellValue('L2', 'No NPWP');
+        $createSheet->setCellValue('M2', 'NIK Kependudukan');
+        $createSheet->setCellValue('N2', 'Nama Ibu');
+        $createSheet->setCellValue('O2', 'BPJS TK 2%');
+        $createSheet->setCellValue('P2', 'BPJS KESEHATAN 1%');
+        $createSheet->setCellValue('Q2', 'BPJS PENSIUN 1%');
+        $createSheet->setCellValue('R2', 'Gaji Pokok');
+        $createSheet->setCellValue('S2', 'Insentif');
+        $createSheet->setCellValue('T2', 'Tunjangan');
+        $createSheet->setCellValue('U2', 'Nama Mesin Fingger');
         
-        $index_column = 5;
+        $index_column = 2;
         $index_row = 21;
         foreach($premis as $premi){
             $cell = $row[$index_row].$index_column;

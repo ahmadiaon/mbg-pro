@@ -5,9 +5,11 @@ namespace App\Http\Controllers\UserDetail;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeePremi;
 use App\Models\Employee\EmployeeTotalHmMonth;
 use App\Models\HourMeterPrice;
 use App\Models\Poh;
+use App\Models\Premi;
 use App\Models\Religion;
 use App\Models\UserDetail\UserAddress;
 use App\Models\UserDetail\UserDetail;
@@ -53,6 +55,40 @@ class UserDetailController extends Controller
             'title'         => 'Employee',
             'layout'    => $layout
         ]);
+    }
+
+    public function exportData(){
+        $datas = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid','employees.position_uuid')
+        ->leftJoin('employee_salaries','employee_salaries.employee_uuid','employees.uuid')
+        ->get([
+            'employee_salaries.*',
+            'employees.uuid as employee_uuid',
+            'user_details.name'
+        ]);
+        
+        $data = $datas->keyBy(function ($item) {
+            return strval($item->employee_uuid);
+        });
+        // dd($data);
+        $premis = Premi::all();
+
+        foreach($premis as $premi){
+            $employee_premis = EmployeePremi::where('premi_uuid', $premi->uuid)
+            ->get();
+            $name_premi = $premi->uuid ;
+            foreach($employee_premis as $emp_premi){
+                $data[$emp_premi->employee_uuid]->$name_premi= $emp_premi->premi_value;
+            }
+        }
+
+        return view('datatableshow', [ 'data'         => $datas]);
+
+
+
+
+
+        return 'exportData';
     }
     
     public function indexUser(){

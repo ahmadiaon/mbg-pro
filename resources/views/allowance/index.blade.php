@@ -95,12 +95,7 @@
 
 @section('js')
     <script>
-        let nik_employee = '';
-        if (nik_employee) {
-            console.log(nik_employee);
-        } else {
-            console.log('kosong');
-        }
+
         let year_month = @json($year_month);
         let arr_year_month = year_month.split("-")
         let v_year = $('#btn-year').html();
@@ -109,10 +104,11 @@
         var date = new Date(), y = date.getFullYear(), m = date.getMonth();
         var lastDay = new Date(y, m + 1, 0);
         let day_month = lastDay.getDate();
-        console.log(day_month);
         let moreData;
         let hour_meter_prices = @json($hour_meter_prices);
-        
+        let companies = @json($companies);
+        let premis = @json($premis);
+
         
         
         $('#btn-year').html(arr_year_month[0]);
@@ -121,28 +117,6 @@
         $('#btn-export').attr('href', '/hour-meter/export/' + year_month)
         refreshTable();
         function showDataTableEmployeeHourMeterMonth(url, dataTable, id) {
-
-
-            // $.ajax({
-            //     url: '/allowance/more-data',
-            //     type: "POST",
-            //     data:  {
-            //             _token: $('meta[name="csrf-token"]').attr('content'),
-            //             year_month: year_month,
-            //         },
-            //     success: function(response) {
-            //         // $('#success-modal').modal('show')
-			// 		console.log(response)
-            //         moreData = response.data.hm;
-			// 		// $('#table-'+idForm).DataTable().ajax.reload();
-            //     },
-            //     error: function(response) {
-            //         alertModal()					
-			// 	}
-            // });
-
-
-
 
             $('#tablePrivilege').remove();
             var table_element = ` 
@@ -162,19 +136,14 @@
             let data_column = [];
 
             let identities = {
-                nik_employee : 'NIK',
+                employee_uuid : 'NIK',
                 name : 'Nama',
                 position : 'Jabatan',
                 date_start_contract : 'TMK',
             };
 
-            
-
-
-            console.log(identities)
             let header_element='';
             let elements = '';
-
 
             let arr_identities = [];
             for (var key in identities) {
@@ -192,86 +161,100 @@
                 data_column.push(elements);
             });
 
-            let long_work_day;
-
-
-
-            //  lama bekerja
-            header_element = `<th>Lama Bekerja</th>`;
-            $('#header-table').append(header_element);
+            $('#header-table').append(`<th>Gajih Pokok</th>`);
             elements = {
                     mRender: function(data, type, row) {
-                        var date1 = new Date(row.date_start_contract);
-                        var date2 = new Date(year_month+'-'+lastDay);
-                        var Difference_In_Time = date2.getTime() - date1.getTime();
-                        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-                        long_work_day = Difference_In_Days;
-                        return Difference_In_Days;
+                        return 'Rp.'+row.salary;
                     }
                 };
             data_column.push(elements);
 
-
-            // Absensi
-            for(let i=1; i<= lastDay; i++){
-                header_element = `<th>${i}</th>`;
-                $('#header-table').append(header_element);
+            premis.forEach(element => {
+                $('#header-table').append(`<th>P-${element.premi_name}</th>`);
+                
                 elements = {
-                    mRender: function(data, type, row) {
-                        return  row['day-'+i];
-                    }
-                };
-                data_column.push(elements);
-            }
+                        mRender: function(data, type, row) {
+                            let premis_ = 0;
+                            if(row[element.uuid] === undefined){
+                                premis_ =0;
+                            }else{
+                                premis_  = row[element.uuid]
+                            }
 
-
-             //  
-            $('#header-table').append(`<th>Hari Dibayar</th>`);
-            elements = {
-                    mRender: function(data, type, row) {
-                       return (long_work_day < day_month)?long_work_day:row.pay;
-                    }
-                };
-            data_column.push(elements);
-            $('#header-table').append(`<th>Gapok</th>`);
-            elements = {
-                    mRender: function(data, type, row) {
-                        return `Rp. `+row.salary;
-                    }
-                };
-            data_column.push(elements);
-            $('#header-table').append(`<th>Gapok Dibayar</th>`);
-            elements = {
-                    mRender: function(data, type, row) {
-                        return (long_work_day < day_month)?'Rp. '+parseFloat(long_work_day * row.salary/day_month).toFixed(2):'Rp. '+row.salary;
-                    }
-                };
-            data_column.push(elements);
-            
-            hour_meter_prices.forEach(hour_meter_price => {
-                $('#header-table').append( `<th>${hour_meter_price.name}</th>`);
-                elements = {
-                    mRender: function(data, type, row) {
-                        return  row[hour_meter_price.uuid];
-                    }
-                };
+                            return premis_;
+                        }
+                    };
                 data_column.push(elements);
             });
 
-            // total hm
+            
 
-            $('#header-table').append( `<th>Total HM</th>`);
+            hour_meter_prices.forEach(element => {
+                $('#header-table').append(`<th>${element.name}</th>`);
+                
+                elements = {
+                        mRender: function(data, type, row) {
+                            let hm_ = 0;
+                            if(row[element.uuid] === undefined){
+                                hm_ =0;
+                            }else{
+                                hm_  = row[element.uuid]
+                            }
+
+                            return hm_;
+                        }
+                    };
+                data_column.push(elements);
+            });
+
+
+            companies.forEach(element_tonase => {
+                $('#header-table').append(`<th>T-${element_tonase.company_uuid}</th>`);
+                
+                element_tonases = {
+                        mRender: function(data, type, row) {
+                            let tonase_ = 0;
+                            if(row['tonase_'+element_tonase.uuid] === undefined){
+                                tonase_ =0;
+                            }else{
+                                tonase_  = row['tonase_'+element_tonase.uuid]
+                            }
+                            return tonase_;
+                        }
+                    };
+                data_column.push(element_tonases);
+            });
+
+            $('#header-table').append(`<th>HM Total</th>`);
             elements = {
-                mRender: function(data, type, row) {
-                    let total_hm= 0;
-                    hour_meter_prices.forEach(hm_price => {
-                        total_hm = total_hm + hm_price.value * row[hm_price.uuid];
-                    });
-                    return  total_hm;
-                }
-            };
+                    mRender: function(data, type, row) {
+                        // console.log(row)
+                        let hm_pay_total = 0;
+                            if(row.hm_pay_total === undefined){
+                                hm_pay_total =0;
+                            }else{
+                                hm_pay_total  = row.hm_pay_total
+                            }
+                            return hm_pay_total;
+                    }
+                };
             data_column.push(elements);
-           total_hm = 0;
+
+            $('#header-table').append(`<th>Tonase Total</th>`);
+            elements = {
+                    mRender: function(data, type, row) {
+                        // console.log(row)
+                        let tonase_pay_total = 0;
+                            if(row.tonase_pay_total === undefined){
+                                tonase_pay_total =0;
+                            }else{
+                                tonase_pay_total  = row.tonase_pay_total
+                            }
+
+                            return tonase_pay_total;
+                    }
+                };
+            data_column.push(elements);
 
 
 

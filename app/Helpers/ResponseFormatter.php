@@ -60,12 +60,45 @@ class ResponseFormatter
     return $day_month;
   }
   public static function toUUID($uuid){
-    return strtoupper(str_replace(' ','-',str_replace('.','-',$uuid )) );
+    return strtoupper(str_replace(' ','-',str_replace('.','-',str_replace('/','-',$uuid ))) );
   }
 
   public static function toUuidLower($uuid){
-    return strtolower(str_replace(' ','-',str_replace('.','-',$uuid )) );
+    return strtolower(str_replace(' ','-',str_replace('.','-',str_replace('/','-',$uuid ))) );
   }
 
+  public static function countMonthLongWork($date1, $date2){
+    $ts1 = strtotime($date1);
+    $ts2 = strtotime($date2);
 
+    $year1 = date('Y', $ts1);
+    $year2 = date('Y', $ts2);
+
+    $month1 = date('m', $ts1);
+    $month2 = date('m', $ts2);
+
+    return $diff = (($year2 - $year1) * 12) + ($month2 - $month1);
+  }
+
+  public static function countDayLongWork($date1, $date2){
+    $startTimeStamp = strtotime($date1);
+    $endTimeStamp = strtotime($date2);
+    $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+    $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+    // and you might want to convert to integer
+    return $numberDays = intval($numberDays);
+  }
+
+  public static function excelToDate($date){
+
+    if(gettype($date) == 'string'){
+      return $date;
+    }else{
+      $miliseconds = ($date - (25567 + 2)) * 86400 * 1000;
+      $seconds = $miliseconds / 1000;
+      return  date("Y-m-d", $seconds);
+    }
+  }
 }

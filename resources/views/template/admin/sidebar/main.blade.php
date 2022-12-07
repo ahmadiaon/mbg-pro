@@ -31,7 +31,6 @@
 								<li><a href="/user" class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}">Daftar Karyawan</a></li>
 								<li><a href="javascript:;">Monitoring PKWT</a></li>
 								<li><a href="javascript:;">Tanpa BPJS Kesehatan</a></li>
-								
 							</ul>
 						</li>
 						@endif
@@ -48,11 +47,15 @@
 					<ul class="submenu">
 						@if (!empty(session('dataUser')->create_employee_hour_meter))
 							<li><a class="{{ $layout['active'] == 'employee-hour-meter' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
-								title="Hour Meter" href="/hour-meter">Hour Meter</a></li>
+								title="Hour Meter" href="/hour-meter">HM</a></li>
 							<li><a class="{{ $layout['active'] == 'employee-tonase' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 								title="Hour Meter" href="/tonase">Tonase</a></li>
 							<li><a class="{{ $layout['active'] == 'employee-payment' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 								title="Hour Meter" href="/payment">Payment</a></li>
+							<li><a class="{{ $layout['active'] == 'employee-other-payment' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+								title="Hour Meter" href="/other-payment">Pembayaran Lainnya</a></li>
+							<li><a class="{{ $layout['active'] == 'production' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+								title="Hour Meter" href="/production">Produksi</a></li>
 						@endif
 						@if (!empty(session('dataUser')->read_list_absensi_employee))
 							<li><a class="{{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}" href="/user/absensi">Absensi Karyawan</a></li>
@@ -95,6 +98,8 @@
 							<li><a class="{{ $layout['active'] == 'coal-type' ? 'active' : '' }}" href="/database/coal-type">Tipe Batu</a></li>
 							<li><a class="{{ $layout['active'] == 'coal-from' ? 'active' : '' }}" href="/database/coal-from">Asal Batu</a></li>
 							<li><a class="{{ $layout['active'] == 'premi' ? 'active' : '' }}" href="/database/premi">Premi</a></li>
+							<li><a class="{{ $layout['active'] == 'tax-status' ? 'active' : '' }}" href="/database/tax-status">Status Pajak</a></li>
+							<li><a class="{{ $layout['active'] == 'payment-other' ? 'active' : '' }}" href="/database/payment-other">Status Pembayaran</a></li>
 						</ul>
 					@endif
 					

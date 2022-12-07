@@ -16,6 +16,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Employee\EmployeeAbsenController;
 use App\Http\Controllers\Employee\EmployeeHourMeterDayController;
 use App\Http\Controllers\Employee\EmployeePaymentController;
+use App\Http\Controllers\Employee\EmployeePaymentOtherController;
 use App\Http\Controllers\OverBurden\OverBurdenFlitController;
 use App\Http\Controllers\OverBurden\OverBurdenListController;
 use App\Http\Controllers\Employee\EmployeeTonseController;
@@ -26,25 +27,24 @@ use App\Http\Controllers\OverBurden\OverBurdenOperatorController;
 use App\Http\Controllers\OverBurden\OverBurdenRitaseController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Payment\PaymentGroupController;
+use App\Http\Controllers\PaymentOtherController;
 use App\Http\Controllers\PremiController;
 use App\Http\Controllers\Privilege\PrivilegeController;
 use App\Http\Controllers\Privilege\UserPrivilegeController;
+use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\PurchaseOrder\GaleryController;
 use App\Http\Controllers\PurchaseOrder\PurchaseOrderController;
 use App\Http\Controllers\Safety\SafetyEmployeeController;
 use App\Http\Controllers\StatusAbsenController;
 use App\Http\Controllers\SuperadminController;
+use App\Http\Controllers\TaxStatusController;
 use App\Http\Controllers\UserDetail\UserDependentController;
 use App\Http\Controllers\UserDetail\UserDetailController;
 use App\Http\Controllers\UserDetail\UserEducationController;
 use App\Http\Controllers\UserDetail\UserLicenseController;
 use App\Http\Controllers\UserDetail\UserHealthController;
 use App\Http\Controllers\Vehicle\VehicleController as VehicleVehicleController;
-
-
-
-
-
+use App\Models\TaxStatus;
 
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
 Route::post('/login', [AuthenticationController::class, 'login']);
@@ -67,12 +67,24 @@ Route::middleware(['islogin'])->group(function () {
 
     Route::prefix('/allowance')->group(function () {
         Route::get('/', [AllowanceController::class, 'index']);
-        Route::get('/test', [AllowanceController::class, 'anyData']);
-        Route::post('/data', [AllowanceController::class, 'anyData']);
+        Route::get('/test/{year_month}', [AllowanceController::class, 'moreAnyData']);
+        Route::post('/data', [AllowanceController::class, 'moreAnyData']);
         
         Route::post('/more-data', [AllowanceController::class, 'moreAnyData']);
         
     });
+
+    Route::prefix('/production')->group(function () {
+        Route::get('/', [ProductionController::class, 'index']);
+        Route::get('/data/{year_month}', [ProductionController::class, 'anyData']);
+        Route::get('/create', [ProductionController::class, 'create']);
+        Route::post('/create', [ProductionController::class, 'store']);
+        Route::post('/show', [ProductionController::class, 'show']);
+        Route::post('/delete', [ProductionController::class, 'delete']);
+        
+        Route::post('/import', [ProductionController::class, 'import']);
+    });
+
     Route::prefix('/payrol')->group(function () {
         Route::get('/{year_month}', [AllowanceController::class, 'moreAnyData']);
         Route::get('/test', [AllowanceController::class, 'anyData']);
@@ -149,6 +161,19 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/store', [EmployeeAbsenController::class, 'store']);
     });
 
+    Route::prefix('/other-payment')->group(function () {
+        Route::get('/', [EmployeePaymentOtherController::class, 'index']);
+        Route::post('/import', [EmployeePaymentOtherController::class, 'import']);
+        Route::get('/data/{year_month}', [EmployeePaymentOtherController::class, 'anyDataMonth']);
+        Route::post('/show', [EmployeePaymentOtherController::class, 'show']);
+        Route::post('/delete', [EmployeePaymentOtherController::class, 'delete']);
+        
+        Route::post('/store', [EmployeePaymentOtherController::class, 'store']);
+        Route::get('/export/{year_month}', [EmployeePaymentOtherController::class, 'export']);
+    });
+
+
+
 
     //  =============== a l l o w a n c e
 
@@ -201,6 +226,22 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [PremiController::class, 'delete']);
             Route::post('/show', [PremiController::class, 'show']);
             Route::get('/data', [PremiController::class, 'anyData']);
+        });
+
+        Route::prefix('tax-status')->group(function () {
+            Route::get('/', [TaxStatusController::class, 'index']);
+            Route::post('/store', [TaxStatusController::class, 'store']);
+            Route::post('/delete', [TaxStatusController::class, 'delete']);
+            Route::post('/show', [TaxStatusController::class, 'show']);
+            Route::get('/data', [TaxStatusController::class, 'anyData']);
+        });
+
+        Route::prefix('payment-other')->group(function () {
+            Route::get('/', [PaymentOtherController::class, 'index']);
+            Route::post('/store', [PaymentOtherController::class, 'store']);
+            Route::post('/delete', [PaymentOtherController::class, 'delete']);
+            Route::post('/show', [PaymentOtherController::class, 'show']);
+            Route::get('/data', [PaymentOtherController::class, 'anyData']);
         });
 
     });
@@ -381,7 +422,7 @@ Route::middleware(['islogin'])->group(function () {
             
             Route::get('/create', [UserDetailController::class, 'create']);
             Route::get('/{nik_employee}/edit', [UserDetailController::class, 'show']);
-
+            Route::get('/export-data', [UserDetailController::class, 'exportData']);
             Route::get('/export', [UserDetailController::class, 'export']);
             Route::post('/export', [UserDetailController::class, 'exportAction']);
 

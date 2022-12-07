@@ -23,7 +23,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <script>
         let data = @json($data);
-        let satu = data[0];
+        if(typeof data === 'object'){
+          var satu = data[Object.keys(data)[0]];
+        }else{
+          let satu = data[0];
+        }
+        
         // satu.findIndex(function (entry, i) {
         //     console.log(entry);
         // });
@@ -41,16 +46,33 @@
 
         $('#theads').append(t_head);
         let z=1;
-        data.forEach(element => {
-          elements = ``;
-          elements = ` <tr><td>${z}</td>`;
-          for (var key in element) {
-              elements = elements +`<td>${element[key]}</td>`;
-          }
-          elements = elements + ` </tr>`;
-          z++;
-          $('#t_body').append(elements);
-        });
+     
+
+        if(typeof data === 'object'){
+          Object.keys(data).forEach(element => {
+            console.log(data[element]);
+            elements = ``;
+            elements = ` <tr><td>${z}</td>`;
+            for (var key in satu) {
+                elements = elements +`<td>${data[element][key]}</td>`;
+            }
+            elements = elements + ` </tr>`;
+            z++;
+            $('#t_body').append(elements);
+          });
+        }else{
+          data.forEach(element => {
+            elements = ``;
+            elements = ` <tr><td>${z}</td>`;
+            for (var key in element) {
+                elements = elements +`<td>${element[key]}</td>`;
+            }
+            elements = elements + ` </tr>`;
+            z++;
+            $('#t_body').append(elements);
+          });
+        }
+
     </script>
   </body>
 </html>
