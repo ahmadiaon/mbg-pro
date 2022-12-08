@@ -15,6 +15,7 @@ use App\Models\HourMeterPrice;
 use App\Models\Identity;
 use App\Models\Premi;
 use App\Models\Production;
+use App\Models\TaxStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -190,7 +191,8 @@ class AllowanceController extends Controller
         $kes_percent = 4;
         $pensiun_percent = 1;
         $position_percent = 5;
-        $bpjs_pensiun_percent = 2;
+        $percent_pph21 = 5;
+        $bpjs_pensiun_percent = 1;
         $hour_meter_prices = HourMeterPrice::all();
         $companies = Company::join('coal_froms', 'coal_froms.company_uuid', 'companies.uuid')
         ->get([
@@ -214,6 +216,10 @@ class AllowanceController extends Controller
             return strval($item->uuid);
         });
 
+        $tax_status = TaxStatus::all();
+        $tax_statuses = $tax_status->keyBy(function ($item) {
+            return strval(str_replace('-','/',$item->uuid));
+        });
 
         $last_day = ResponseFormatter::getEndDay($year_month);
 
@@ -222,6 +228,7 @@ class AllowanceController extends Controller
         ->leftJoin('employee_salaries','employee_salaries.employee_uuid','employees.uuid')
         ->get([
             'employees.is_bpjs_kesehatan',
+            'employees.tax_status',
             'employees.is_bpjs_ketenagakerjaan',
             'employees.is_bpjs_pensiun',
             'employee_salaries.*',
@@ -278,17 +285,17 @@ class AllowanceController extends Controller
             }
             // return $employee->is_bpjs_kesehatan;
             if($employee->is_bpjs_kesehatan == 'Ya'){
-                $employee->is_bpjs_kesehatan_pay = round($bpjs_kesehatan_percent * $employee->salary /100,2);
+                $employee->is_bpjs_kesehatan_pay = round($bpjs_kesehatan_percent * $employee->salary /100,0);
             }else{
                 $employee->is_bpjs_kesehatan_pay = 0;
             }
             if($employee->is_bpjs_ketenagakerjaan == 'Ya'){
-                $employee->is_bpjs_ketenagakerjaan_pay = round($bpjs_ketenagakerjaan_percent * $employee->salary /100,2);
+                $employee->is_bpjs_ketenagakerjaan_pay = round($bpjs_ketenagakerjaan_percent * $employee->salary /100,0);
             }else{
                 $employee->is_bpjs_ketenagakerjaan_pay = 0;
             }
             if($employee->is_bpjs_pensiun == 'Ya'){
-                $employee->is_bpjs_pensiun_pay = round($bpjs_pensiun_percent * $employee->salary /100,2);
+                $employee->is_bpjs_pensiun_pay = round($bpjs_pensiun_percent * $employee->salary /100,0);
             }else{
                 $employee->is_bpjs_pensiun_pay = 0;
             }
@@ -408,7 +415,7 @@ class AllowanceController extends Controller
         
 
         foreach($employees as $employee){
-            $employee->gaji_kotor = round($employee->payment_pay+$employee->tunjangan_pay+$employee->insentif_pay+$employee->salary_payed + $employee->hm_pay_total + $employee->tonase_pay_total + $employee->premi_total_pay, 2);
+            $employee->gaji_kotor = round($employee->payment_other_total+$employee->payment_pay+$employee->tunjangan_pay+$employee->insentif_pay+$employee->salary_payed + $employee->hm_pay_total + $employee->tonase_pay_total + $employee->premi_total_pay);
             $employee->extra_salary = round($employee->payment_pay+$employee->hm_pay_total + $employee->tonase_pay_total + $employee->premi_total_pay, 2);
             $employee->half_extra_salary = round($employee->extra_salary/2,2);
             $employee->main_salary =  round($employee->tunjangan_pay+$employee->insentif_pay+$employee->salary_payed , 2);
@@ -417,11 +424,27 @@ class AllowanceController extends Controller
             $employee->kes_pay =  round($employee->is_bpjs_ketenagakerjaan_pay *50 * $kes_percent /100,0);
             $employee->brutto_salary = $employee->main_salary + $employee->jkk_pay + $employee->half_extra_salary + $employee->kes_pay + $employee->jk_pay;
           
-            
+           
             $employee->position_percent = round($employee->brutto_salary * $position_percent /100, 0);
 
             $employee->jht_pay =  round($employee->is_bpjs_ketenagakerjaan_pay,2) ;
-            $employee->pensiun =  round($employee->salary_pay * $pensiun_percent /100,2) ;
+            $employee->pensiun_pay =  round($employee->salary_payed * $pensiun_percent /100,2) ;
+            $employee->netto_month =  round($employee->brutto_salary - $employee->position_percent -$employee->jht_pay-$employee->pensiun_pay,0);
+            $employee->netto_year = ($employee->netto_month * 12) - ($employee->payment_other_total *11);
+            
+            $employee->pph21_month = $employee->netto_year - $tax_statuses[strtoupper($employee->tax_status)]->tax_status_value;
+            if($employee->pph21_month > 0){
+                $employee->pph21_month = round($employee->pph21_month * $percent_pph21 /100 / 12,0);
+            }else{
+                $employee->pph21_month = 0;
+            }
+
+            $employee->salary_netto = round($employee->gaji_kotor - $employee->pph21_month - $employee->is_bpjs_ketenagakerjaan_pay -$employee->is_bpjs_kesehatan_pay- $employee->is_bpjs_pensiun_pay,0);
+            $employee->salary_netto_adjust_moded = round($employee->salary_netto / 1000,0);
+            
+            $employee->salary_netto_adjust = round($employee->salary_netto_adjust_moded * 1000,0);
+            $employee->salary_netto_adjust_mod = $employee->salary_netto -$employee->salary_netto_adjust ;
+
 
         }
         // var_dump($employees);die;

@@ -138,7 +138,7 @@
                     data = response.data
                     console.log(data)
                     $('#uuid').val(data.uuid),
-                    $('#company_uuid').val(data.company_uuid)      
+                    $('#company_uuid').val(data.company_uuid).trigger('change')
                     $('#coal_from').val(data.coal_from)  
                     $('#hauling_price').val(data.hauling_price)  
                     $('#use_start').val(data.use_start)  

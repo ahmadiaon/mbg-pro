@@ -382,6 +382,7 @@ class EmployeeHourMeterDayController extends Controller
     }
 
     public function import(Request $request){
+        
         $the_file = $request->file('uploaded_file');
 
         $createSpreadsheet = new spreadsheet();
@@ -417,7 +418,7 @@ class EmployeeHourMeterDayController extends Controller
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                 $date_row = 4;
                 (int)$sheet->getCell( 'A'.$no_employee)->getValue();
-                $nik_employee= $sheet->getCell( 'B'.$no_employee)->getValue(); //EMPLOYEE_UUID
+                $nik_employee= ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue()); //EMPLOYEE_UUID
                 $hour_meter_uuid = 'hm-'.$sheet->getCell( 'E'.$no_employee)->getValue(); //hour meter uuid
                 for($day =1; $day <= $day_month; $day++){//hm biasa
                     $date = $year_hm.'-'.$month_hm.'-'.$day;
@@ -450,6 +451,7 @@ class EmployeeHourMeterDayController extends Controller
                 }
                 $no_employee++;
             }
+            return back();
         } catch (Exception $e) {
             $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');

@@ -44,6 +44,8 @@ class PaymentController extends Controller
     }
 
     public function import(Request $request){
+
+        // return 'aaa';
         $the_file = $request->file('uploaded_file');
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
@@ -77,40 +79,38 @@ class PaymentController extends Controller
             // mobililsasi
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                 $excelDate= $sheet->getCell( 'E'.$no_employee)->getValue();
-                $date=null;
-                if('string' == gettype($excelDate)){
-                    $date = $excelDate;
-                }else{
-                    $miliseconds = ($excelDate - (25567 + 2)) * 86400 * 1000;
-                    $seconds = $miliseconds / 1000;
-                    $date = date("Y-m-d", $seconds);
-                }
+             
+
+                $date = ResponseFormatter::excelToDate($excelDate);
            
                 $date_end = date('Y-m-d', strtotime($date. ' + 1 days'));
+                $payment_group_uuid = ResponseFormatter::toUUID($sheet->getCell( 'F'.$no_employee)->getValue());
+                PaymentGroup::updateOrCreate(['uuid' => $payment_group_uuid], ['payment_group' => $payment_group_uuid, 'date_start' => '2022-01-01']);
+                $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
                 $data_payment = [
-                    'uuid' => 'mobilisasi-'.$date.'-'.$sheet->getCell( 'B'.$no_employee)->getValue().'-'.$sheet->getCell( 'A'.$no_employee)->getValue(),
-                    'payment_group_uuid' => 'mobilisasi',
+                    'uuid' => $payment_group_uuid.'-'.$date.'-'.$nik_employee.'-'.$sheet->getCell( 'A'.$no_employee)->getValue(),
+                    'payment_group_uuid' => $payment_group_uuid,
                     'date' => $date,
                     'date_end' => $date_end,
                     'long' => 1,
                     'employee_create_uuid' => '',
                     'employee_know_uuid' => '',
                     'employee_approve_uuid' => '',
-                    'description' => $sheet->getCell( 'F'.$no_employee)->getValue(),
+                    'description' => $sheet->getCell( 'H'.$no_employee)->getValue(),
                 ];
-                Payment::create($data_payment);
+                Payment::updateOrCreate(['uuid' =>$data_payment['uuid'] ],$data_payment);
                 $data_employee_payment = [
-                    'uuid' => $date.'-'.$sheet->getCell( 'B'.$no_employee)->getValue(),
-                    'employee_uuid' => $sheet->getCell( 'B'.$no_employee)->getValue(),
+                    'uuid' => $payment_group_uuid.'-'.$date.'-'.$nik_employee.'-'.$sheet->getCell( 'A'.$no_employee)->getValue(),
+                    'employee_uuid' => $nik_employee,
                     'payment_uuid' => $data_payment['uuid'],
-                    'value' => $sheet->getCell( 'I'.$no_employee)->getValue(),
+                    'value' => $sheet->getCell( 'J'.$no_employee)->getValue(),
                     'link_absen' => 'none',
                 ];
-                EmployeePayment::create($data_employee_payment);
-                $employees[]=$data_payment;
-                $employees[]=$data_employee_payment;
+                EmployeePayment::updateOrCreate(['uuid' =>$data_employee_payment['uuid'] ],$data_employee_payment);
+              
                 $no_employee++;
             }
+            return back();
             dd($employees);
         } catch (Exception $e) {
             $error_code = $e->errorInfo[1];

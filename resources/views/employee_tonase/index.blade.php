@@ -214,8 +214,31 @@
                 data.push(dataElement)
             });
 
+            var el_2 = {
+                mRender: function(data, type, row) {
+                    console.log(row)
+                    
+                    let num = parseFloat(row.total_sell);
+                    let num_ = num.toFixed(3);
+                    return num_;
+                }
+            };
+            data.push(el_2)
+
+            var el_2 = {
+                mRender: function(data, type, row) {
+                    console.log(row)
+                    
+                    let num = parseFloat(row.total_sells);
+                    let num_ = num.toFixed(3);
+                    return num_;
+                }
+            };
+            data.push(el_2)
+
             var el_1 = {
                 mRender: function(data, type, row) {
+                    console.log(row)
                     let element_action = '';
                     
                     element_action = `
@@ -364,7 +387,7 @@
 
             $('#btn-export').attr('href', 'hour-meter/data/' + year_month_day)
 
-            showDataTableUserTonase('aa', ['name','ritase', 'total_sell', 'total_sells'], 'table-tonases')
+            showDataTableUserTonase(_url, ['name','ritase'], 'table-tonases')
         }
 
         function getSelected() {
@@ -398,7 +421,7 @@
             $('#btn-export').attr('href', 'tonase/export/' + year_month)
             console.log('year:' + year_month)
             let _url = 'tonase/data';
-            showDataTableUserTonase(_url, ['name','ritase', 'total_sell', 'total_sells',], 'table-tonases')
+            showDataTableUserTonase(_url, ['name','ritase'], 'table-tonases')
         }
 
         function setNikEmployee(nik){

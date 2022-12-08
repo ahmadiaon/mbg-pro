@@ -255,21 +255,67 @@ class EmployeeTonseController extends Controller
     }
 
     public static function funcStore($validatedData){
+        $percent_bonus = 15;
+        $ritase_bonus =5;
+
+        
+
         if($validatedData['ritase'] ){
-            $tonase_each_ritase = $validatedData['tonase_value'] / $validatedData['ritase'] ;
-            $tonase_each_ritase = round( $tonase_each_ritase, 2);
+            $tonase_each_ritase = $validatedData['tonase_value'] / $validatedData['ritase'];
+            $tonase_each_ritase = round( $tonase_each_ritase,3);
+            $sisa = round($validatedData['tonase_value']  - ($tonase_each_ritase * $validatedData['ritase']),3);
+
+            if($validatedData['ritase'] >= $ritase_bonus){
+
+                // round($validatedData['tonase_full_value'] = $tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100,3)
+
+
+                $tonase_full_bonus = round( $validatedData['tonase_value'] + $validatedData['tonase_value'] * $percent_bonus / 100,3) ;
+                $sisa_bonus = round( $tonase_full_bonus - (round($tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100,3) * $validatedData['ritase'] ),3);
+            }else{
+                $tonase_full_bonus = $tonase_each_ritase;
+                $sisa_bonus  = 0;
+            }
+
+            $data = [
+                'tonase_value' => $validatedData['tonase_value'],
+                'ritase'  =>  $validatedData['ritase'],
+                'tonase_each_ritase'=> $tonase_each_ritase,
+                'sisa'  => $sisa,
+                'tonase_full_bonus' => $tonase_full_bonus,
+                'sisa_bonus' => $sisa_bonus 
+            ];
+
+            
             $validatedData['employee_uuid'] =  $validatedData['nik_employee'];
             $validatedData['coal_from_uuid'] =  $validatedData['company_uuid'];
             $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['company_uuid'].'-'.$validatedData['nik_employee'];
             $dd=[];
+           
             for($i = 0; $i < $validatedData['ritase']; $i++){
-                if($validatedData['ritase'] >3){
+                if($validatedData['ritase'] >= $ritase_bonus){
                     $validatedData['tonase_value'] = $tonase_each_ritase;
-                    $validatedData['tonase_full_value'] = $tonase_each_ritase + $tonase_each_ritase * 0.15;  
-                    $validatedData['tonase_full_value'] = round( $validatedData['tonase_full_value'], 2);
+                    $validatedData['tonase_full_value'] = $tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100;  
+                    $validatedData['tonase_full_value'] = round( $validatedData['tonase_full_value'],3);
+                    
                 }else{
                     $validatedData['tonase_full_value'] = $tonase_each_ritase;
                     $validatedData['tonase_value'] = $tonase_each_ritase;
+                }
+                
+                if($i == $validatedData['ritase'] - 1){
+                    if($validatedData['ritase'] >=$ritase_bonus){
+                      
+                        $validatedData['tonase_value'] = $tonase_each_ritase + $sisa;
+                        $validatedData['tonase_full_value_real'] = $validatedData['tonase_full_value'] = round($tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100,3);  
+                        $validatedData['tonase_full_value'] = round( $validatedData['tonase_full_value'],3) + $sisa_bonus;
+
+                        // $validatedData['data'] = $data;
+                        // dd($validatedData);
+                    }else{
+                        $validatedData['tonase_full_value'] = $tonase_each_ritase+ $sisa;
+                        $validatedData['tonase_value'] = $tonase_each_ritase+ $sisa;
+                    }
                 }
                 $store = EmployeeTonase::create($validatedData);
                 $dd[] = $store;
@@ -284,7 +330,7 @@ class EmployeeTonseController extends Controller
 
     public function import(Request $request){
         $the_file = $request->file('uploaded_file');
-
+        
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
 
@@ -314,9 +360,10 @@ class EmployeeTonseController extends Controller
             EmployeeHourMeterDay::
             */
             if($sheet->getCell( 'E'.'5')->getValue() == $sheet->getCell( 'F'.'5')->getValue()  ){
+                
                 while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                     $date_row = 3;
-                    $nik_employee = $sheet->getCell( 'B'.$no_employee)->getValue();
+                    $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
 
                     for($day =1; $day <= $day_month; $day++){//hm biasa
 
@@ -347,7 +394,8 @@ class EmployeeTonseController extends Controller
             }else{
                 while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                     $date_row = 3;
-                    $nik_employee = $sheet->getCell( 'B'.$no_employee)->getValue();
+                    $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
+
                     for($day =1; $day <= $day_month; $day++){//hm biasa
                         $cell_ritase = $abjads[$date_row+$day].$no_employee;
                         $cell_tonase = $abjads[$date_row+$day_month+$day+1].$no_employee;
@@ -360,7 +408,9 @@ class EmployeeTonseController extends Controller
                                 'price_code'  => $price_code,
                                 'company_uuid'  => $company_uuid,
                             ];
+                           
                             EmployeeTonseController::funcStore($data_each_day);
+                            
                             $employees[$day] = $data_each_day;
                         }
     
@@ -531,7 +581,7 @@ class EmployeeTonseController extends Controller
             'time_come' => '',
         ]);
         $tonase_each_ritase = $validatedData['tonase_value'] / $validatedData['ritase'] ;
-        $tonase_each_ritase = round( $tonase_each_ritase, 2);
+        $tonase_each_ritase = round( $tonase_each_ritase,3);
         //======================================== ritase ke 5 keatas dapat bonus
         // if(empty($validatedData['uuid'])){
         //     for($i = 0; $i < $validatedData['ritase']; $i++){
