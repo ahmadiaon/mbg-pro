@@ -14,12 +14,15 @@ use App\Http\Controllers\CoalFromController;
 use App\Http\Controllers\CoalTypeController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Employee\EmployeeAbsenController;
+use App\Http\Controllers\Employee\EmployeeDebtController;
 use App\Http\Controllers\Employee\EmployeeHourMeterDayController;
 use App\Http\Controllers\Employee\EmployeePaymentController;
+use App\Http\Controllers\Employee\EmployeePaymentDebtController;
 use App\Http\Controllers\Employee\EmployeePaymentOtherController;
 use App\Http\Controllers\OverBurden\OverBurdenFlitController;
 use App\Http\Controllers\OverBurden\OverBurdenListController;
 use App\Http\Controllers\Employee\EmployeeTonseController;
+use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\Hauling\HaulingSetupController;
 use App\Http\Controllers\HourMeterPriceController;
 use App\Http\Controllers\LogisticController;
@@ -43,7 +46,10 @@ use App\Http\Controllers\UserDetail\UserDetailController;
 use App\Http\Controllers\UserDetail\UserEducationController;
 use App\Http\Controllers\UserDetail\UserLicenseController;
 use App\Http\Controllers\UserDetail\UserHealthController;
+use App\Http\Controllers\VariableController;
+use App\Http\Controllers\VariableCountController;
 use App\Http\Controllers\Vehicle\VehicleController as VehicleVehicleController;
+use App\Models\Employee\EmployeePaymentDebt;
 use App\Models\TaxStatus;
 
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
@@ -51,7 +57,7 @@ Route::post('/login', [AuthenticationController::class, 'login']);
 Route::get('/', [AuthenticationController::class, 'index']);
 Route::get('/user/me-only/{table_name}', [AdminController::class, 'exportTable']);
 
-
+Route::get('/aaaaa', [AdminController::class, 'pdfs']);
 
 Route::middleware(['islogin'])->group(function () {
     Route::prefix('/me')->group(function () {
@@ -172,6 +178,18 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/export/{year_month}', [EmployeePaymentOtherController::class, 'export']);
     });
 
+    Route::prefix('/employee-debt')->group(function () {
+        Route::get('/', [EmployeeDebtController::class, 'index']);
+    });
+
+    Route::prefix('/employee-payment-debt')->group(function () {
+        Route::get('/', [EmployeePaymentDebtController::class, 'index']);
+        Route::get('/data/{year_month}', [EmployeePaymentDebtController::class, 'anyDataMonth']);
+        Route::post('/import', [EmployeePaymentDebtController::class, 'import']);
+
+        
+    });
+
 
 
 
@@ -235,6 +253,24 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/show', [TaxStatusController::class, 'show']);
             Route::get('/data', [TaxStatusController::class, 'anyData']);
         });
+
+        Route::prefix('variable')->group(function () {
+            Route::get('/', [VariableController::class, 'index']);
+            Route::post('/store', [VariableController::class, 'store']);
+            Route::post('/delete', [VariableController::class, 'delete']);
+            Route::post('/show', [VariableController::class, 'show']);
+            Route::get('/data', [VariableController::class, 'anyData']);
+        });
+
+        Route::prefix('formula')->group(function () {
+            Route::get('/', [FormulaController::class, 'index']);
+            Route::get('/create', [FormulaController::class, 'create']);
+            Route::get('/data', [FormulaController::class, 'anyData']);
+            Route::get('/show/{uuid}', [FormulaController::class, 'show']);
+            Route::post('/store', [FormulaController::class, 'store']);
+
+        });
+
 
         Route::prefix('payment-other')->group(function () {
             Route::get('/', [PaymentOtherController::class, 'index']);

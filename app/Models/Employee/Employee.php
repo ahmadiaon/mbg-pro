@@ -30,7 +30,8 @@ class Employee extends Model
             'employees.employee_status',
             'employees.uuid',
             'employees.machine_id',
-            'employees.nik_employee'
+            'employees.nik_employee',
+            'employees.uuid as employee_uuid'
         ]);
     }
     public static function where_uuid($employee_uuid){

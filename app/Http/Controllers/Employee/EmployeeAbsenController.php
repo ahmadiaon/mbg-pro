@@ -133,6 +133,7 @@ class EmployeeAbsenController extends Controller
         $createSheet->setCellValue('C4', $year);
 
         // $createSheet->setCellValue('A2', 'Absensi Bulan '.$months[$month].'-'.$year);
+        $createSheet->setCellValue('A20', 'No.');
         $createSheet->setCellValue('B20', 'Nama');
         $createSheet->setCellValue('C20', 'NIK');
         $createSheet->setCellValue('D20', 'Jabatan');
@@ -153,13 +154,10 @@ class EmployeeAbsenController extends Controller
             $date_row++;
         }
        
-        // simpulan data
         $pay=[];
         $unpay=[];
         
-        // dd($pay);
-        // loop karyawan
-        $employees = Identity::all();
+        $employees = Employee::getAll();
         $employee_row = 21;
         $status_absens_col_employee = $date_row;
         $arr_status_absens = [];
@@ -192,12 +190,12 @@ class EmployeeAbsenController extends Controller
                 'employee_absens.*'
             ]);
 
-            if($data_absens_employee->count() == 0){
-                // return $year_month;
-                return EmployeeAbsenTotal::where('nik_employee', $employee->nik_employee)
-                ->where('year_month', $year_month)
-                ->get();
-            }
+            // if($data_absens_employee->count() == 0){
+            //     // return $year_month;
+            //     return EmployeeAbsenTotal::where('nik_employee', $employee->nik_employee)
+            //     ->where('year_month', $year_month)
+            //     ->get();
+            // }
 
             foreach($data_absens_employee as $item){
                 $date_explode = explode('-',$item->date);
@@ -470,14 +468,13 @@ class EmployeeAbsenController extends Controller
 
 
             if($sheet->getCell( 'C' . '1' )->getValue() == 'Excel'){
-
-                $employees = Identity::all();
+                
+                $employees = Employee::getAll();
 
                 $employees = $employees->keyBy(function ($item) {
                     return strval($item->employee_uuid);
                 });
-                // dd($employees['MBLE-0422007']);
-                // return $employees;
+              
                 $year = $sheet->getCell( 'C' . 4 )->getValue();
                 $month = $sheet->getCell( 'C' . 3 )->getValue();
                 $month = str_pad($month, 2, '0', STR_PAD_LEFT);
@@ -496,29 +493,23 @@ class EmployeeAbsenController extends Controller
                         $isCount++;
                     }
                     $row_a++;
-                    // $isCount++;
-                    // $isCount++;
-
-                    // return $sheet->getCell( $rows[$row_a].'20')->getValue();
                 }
-
-                // return $sheet->getCell( $rows[$row_a].'20')->getValue();
 
                 $no_employee = 21;
                 // $employees = [];
                 while($sheet->getCell( 'A'.$no_employee)->getValue() != null){
                     $column_date = 4;
-                    $nik_employee = $sheet->getCell( 'C'.$no_employee)->getValue();
+                    $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'C'.$no_employee)->getValue());
                     $status_absen['year_month'] = $year_month;
                     $status_absen['nik_employee'] = $nik_employee;
                     for($day=1; $day <= $last_day; $day++){
                         $status_absen['day-'.$day] = $sheet->getCell( $rows[$column_date].$no_employee)->getValue();
-                        EmployeeAbsen::updateOrCreate([
+                        $store_employee_absen = EmployeeAbsen::updateOrCreate([
                             'uuid' => $year_month.'-'.$day.'-'.$employees[$nik_employee]->machine_id],
                             [
                                 'employee_uuid'  => $employees[$nik_employee]->machine_id,
                                 'date' => $year_month.'-'.$day,
-                                'status_absen_uuid'     => $sheet->getCell( $rows[$column_date].$no_employee)->getValue(),
+                                'status_absen_uuid'     => ResponseFormatter::toUUID($sheet->getCell( $rows[$column_date].$no_employee)->getValue()),
                                 'cek_log'       =>  null,
                             ]);
                         $column_date++;
@@ -530,11 +521,10 @@ class EmployeeAbsenController extends Controller
                     $no_employee++;
                     EmployeeAbsenTotal::updateOrCreate(['uuid' => $year_month.'-'.$nik_employee], $status_absen);
                 }
-                // dd($employees);
-                // return view('datatableshow', [ 'data'         => $employees]);
-                return 'from excel';
+                return back();
 
             }else{
+                // this is from finger machine
                 $splitTanggal =  str_split( $tanggal, 1);
 
                 $date_start =  $splitTanggal[8].$splitTanggal[9];
@@ -712,6 +702,16 @@ class EmployeeAbsenController extends Controller
         //     ]);
         // }
 
+        $empps = Employee::getAll();
+            foreach($empps as $emp){
+                Identity::updateOrCreate(['employee_uuid' => $emp->employee_uuid], [
+                    'nik_employee'  => $emp->employee_uuid,
+                    'machine_id'  => $emp->machine_id,
+                    'name'  => $emp->name,
+                    'position'  => $emp->position,
+                ] );
+            }
+
         $employees = EmployeeAbsenTotal::join('identities','identities.nik_employee','employee_absen_totals.nik_employee')
         ->where('year_month', $year_month)->get([
             'identities.*',
@@ -888,7 +888,7 @@ class EmployeeAbsenController extends Controller
          ]);
     }
 
-    public function showEmployee($year_month, $nik_employee){
+    public function  showEmployee($year_month, $nik_employee){
        $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];

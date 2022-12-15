@@ -58,6 +58,7 @@
                                           <option value="pay">pay</option>
                                           <option value="unpay">unpay</option>
                                           <option value="cut">cut</option>
+                                          <option value="A">A</option>
                                       </select>
                                   </div>
                               </div>

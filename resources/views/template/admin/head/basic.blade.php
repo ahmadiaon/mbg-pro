@@ -1,5 +1,5 @@
 <meta charset="utf-8" />
-<title>{{$title }} | MBG</title>
+<title> {{(!empty($title)?$title:'') }} | MBG</title>
 
 <!-- Site favicon -->
 <link rel="apple-touch-icon" sizes="180x180" href="{{ env('APP_URL') }}vendors/images/apple-touch-icon.png" />

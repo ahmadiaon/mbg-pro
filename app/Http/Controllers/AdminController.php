@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Dictionary;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeHourMeterDay;
@@ -20,6 +21,13 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
+    public function pdfs(){
+       
+        $pdf = Pdf::loadView('myPDF')->setPaper('a4', 'potret');
+        // ahmadi
+        // $pdf->setPaaper(array(0, 0, 396, 612));
+        return $pdf->download('invoice.pdf');
+    }
     public function exportTable($table_name){
 
 

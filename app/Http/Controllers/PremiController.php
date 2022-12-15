@@ -6,6 +6,7 @@ use App\Helpers\ResponseFormatter;
 use App\Models\Company;
 use App\Models\Premi;
 use App\Models\ProductionPremi;
+use App\Models\Variable;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
@@ -75,6 +76,18 @@ class PremiController extends Controller
                 'company_uuid'    => $value
             ]);
         }
+
+        $premis = Premi::all();
+
+        foreach($premis as $premi){
+            Variable::updateOrCreate(['uuid' => 'PREMI-'.$premi->uuid], [
+                'variable_name' => 'Premi '.$premi->premi_name,
+                'variable_code' => 'pay_premi_'.$premi->uuid,
+                'date_start'    => $premi->date_start
+            ]);
+        }
+
+        
         
         return ResponseFormatter::toJson($data, 'Data Stored');
     }

@@ -64,6 +64,22 @@
 					</ul>
 
 				</li>
+				<li class="dropdown">
+					<a href="javascript:;" class="dropdown-toggle">
+						<span class="micon bi bi-file-earmark-text"></span><span class="mtext" >Pengurang</span>
+					</a>
+					<ul class="submenu">
+						@if (!empty(session('dataUser')->create_employee_hour_meter))
+							<li>
+								<a class="{{ $layout['active'] == 'employee-debt' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+								title="Hour Meter" href="/employee-debt">Hutang HO</a>
+							</li>
+							<li>
+								<a class="{{ $layout['active'] == 'employee-payment-debt' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+								title="Hour Meter" href="/employee-payment-debt">Pembayaran Hutang</a>
+							</li>
+						@endif
+					</ul>
 				@endif
 
 				@if(!empty(session('dataUser')->read_list_safety))
@@ -77,7 +93,6 @@
 							<li><a class="{{ $layout['active'] == 'safety-index' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 								title="daftar karyawan dan apd yang didapat" href="/safety">List Karyawan</a></li>
 						@endif
-					
 					</ul>
 
 				</li>
@@ -100,6 +115,8 @@
 							<li><a class="{{ $layout['active'] == 'premi' ? 'active' : '' }}" href="/database/premi">Premi</a></li>
 							<li><a class="{{ $layout['active'] == 'tax-status' ? 'active' : '' }}" href="/database/tax-status">Status Pajak</a></li>
 							<li><a class="{{ $layout['active'] == 'payment-other' ? 'active' : '' }}" href="/database/payment-other">Status Pembayaran</a></li>
+							<li><a class="{{ $layout['active'] == 'variable' ? 'active' : '' }}" href="/database/variable">Variable</a></li>
+							<li><a class="{{ $layout['active'] == 'formula' ? 'active' : '' }}" href="/database/formula">Formula Potongan</a></li>
 						</ul>
 					@endif
 					

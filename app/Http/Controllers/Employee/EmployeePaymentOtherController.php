@@ -37,16 +37,18 @@ class EmployeePaymentOtherController extends Controller
             'year_month'        => Carbon::today()->isoFormat('Y-M')
         ]);
     }
+    
     public function show(Request $request){
         $data = EmployeePaymentOther::where('uuid', $request->uuid)->get()->first();
         return ResponseFormatter::toJson($data, 'Data Showed');
     }
-    public function delete(Request $request)
-    {
+
+    public function delete(Request $request){
          $store = EmployeePaymentOther::where('uuid',$request->uuid)->delete();
  
          return ResponseFormatter::toJson($store, 'Data deleted');
     }
+
     public function import(Request $request){
         // return 'import';
         $the_file = $request->file('uploaded_file');
