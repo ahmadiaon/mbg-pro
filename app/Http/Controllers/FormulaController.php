@@ -24,6 +24,7 @@ class FormulaController extends Controller
             'layout'    => $layout
         ]);
     }
+    
     public function create(){
         $variables = Variable::all();
         $layout = [

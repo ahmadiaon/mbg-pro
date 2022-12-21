@@ -103,7 +103,7 @@ class AllowanceController extends Controller
         }
         
      
-        dd($hms['MBLE-0219120106']->hour_meter_value);
+        // dd($hms['MBLE-0219120106']->hour_meter_value);
 
         return view('datatableshow', [ 'data'         => $hms]);
 
@@ -181,13 +181,24 @@ class AllowanceController extends Controller
         ->make(true);
     }
 
-    public function moreAnyData($year_month){
+    public static function AveragePosition($year_month){
         $date = explode("-", $year_month);
-        $day_month = ResponseFormatter::getEndDay($year_month);
+        $year = $date[0];
+        $month = $date[1];
 
-    // public function moreAnyData(Request $request){
-    //     $year_month = $request->year_month;
-    //     $date = explode("-", $request->year_month);
+
+
+    }
+
+    // public function moreAnyData($year_month){
+    //     $date = explode("-", $year_month);
+    //     $day_month = ResponseFormatter::getEndDay($year_month);
+
+    public function moreAnyData(Request $request){
+        $year_month = $request->year_month;
+        $day_month = ResponseFormatter::getEndDay($year_month);
+        $date = explode("-", $request->year_month);
+        $averagge = array();
         $year = $date[0];
         $month = $date[1];
         $bpjs_kesehatan_percent = 1;
@@ -211,7 +222,6 @@ class AllowanceController extends Controller
             ]);
 
        
-            
         
     // ==========================================  SETUP FORMULA POTONGAN
         $formulas = Formula::all();
@@ -262,13 +272,14 @@ class AllowanceController extends Controller
             return strval(str_replace('-','/',$item->uuid));
         });
     // ==========================================  END SETUP TAX STATUS
-        
+
     // ==========================================  SETUP EMPLOYEES
         $datas = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
         ->leftJoin('positions','positions.uuid','employees.position_uuid')
         ->leftJoin('employee_salaries','employee_salaries.employee_uuid','employees.uuid')
         ->get([
             'employees.is_bpjs_kesehatan',
+            'employees.position_uuid',
             'employees.tax_status',
             'employees.is_bpjs_ketenagakerjaan',
             'employees.is_bpjs_pensiun',
@@ -282,6 +293,8 @@ class AllowanceController extends Controller
         $employees = $datas->keyBy(function ($item) {
             return strval($item->employee_uuid);
         });
+
+        // dd($employees);
         /* 
         [ THE DATA
             "is_bpjs_kesehatan",
@@ -310,7 +323,6 @@ class AllowanceController extends Controller
     // ==========================================  END SETUP EMPLOYEES
 
 
-        
         
     // ==========================================  FIRST SETUP EMPLOYEES
         foreach($employees as $employee){ 
@@ -382,6 +394,8 @@ class AllowanceController extends Controller
             $employee->cut_alpa_loan = 0;//alpa
             $employee->pay_absen = 0;
             $employee->unpay_absen = 0;
+            $employee->cutted_total = 0;
+
             $employee->day_month = $day_month;
 
             $employee->count_day_unwork = 0;
@@ -409,6 +423,7 @@ class AllowanceController extends Controller
         ]
 
         */
+
         $employee_day_works =  EmployeeAbsen::join('employees','employees.machine_id', 'employee_absens.employee_uuid')
         ->join('status_absens', 'status_absens.uuid', 'employee_absens.status_absen_uuid')
         ->whereYear('employee_absens.date', $year)
@@ -523,15 +538,17 @@ class AllowanceController extends Controller
 
             $name_premi = $premi->uuid ;
             $name_premi_pay = 'pay_premi_'.$premi->uuid ;
-
+            
+            // return view('datatableshow', [ 'data'         => $employee_premis]);
+            // dd($employee_premis);
             // $production_premi = ;
-
+            
             if(empty($productions[$premi->uuid]->value_production)){
                 $production_premi = 0;
             }else{
                 $production_premi = (float)$productions[$premi->uuid]->value_production;
             }
-
+            
             foreach($employee_premis as $emp_premi){
                 $employees[$emp_premi->employee_uuid]->$name_premi = $emp_premi->premi_value;
                 $premi_pay = $emp_premi->premi_value * $production_premi;
@@ -539,7 +556,10 @@ class AllowanceController extends Controller
                 $employees[$emp_premi->employee_uuid]->premi_pay_total =  $employees[$emp_premi->employee_uuid]->premi_pay_total+ $premi_pay;
                 $employees[$emp_premi->employee_uuid]->$name_premi_pay =  $premi_pay ;
             }
+            
         }
+        
+
     // ==========================================  END PREMI EMPLOYEE
     
     // ==========================================  PAYMENT EMPLOYEE
@@ -578,7 +598,7 @@ class AllowanceController extends Controller
     // ==========================================  END PAYMENT OTHER EMPLOYEE
 
 
-        
+        // Employee::where('uuid', 'RJ-221267')->delete();
 
         foreach($employees as $employee){
             // COUNT SALARY PAY
@@ -633,9 +653,11 @@ class AllowanceController extends Controller
             }
 
             $employee->salary_netto = round($employee->gaji_kotor - $employee->pph21_month - $employee->is_bpjs_ketenagakerjaan_pay -$employee->is_bpjs_kesehatan_pay- $employee->is_bpjs_pensiun_pay,0);
+            $employee->cutted_total = $employee->pph21_month + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_pensiun_pay;
+
             $employee->salary_netto_adjust_moded = round($employee->salary_netto / 1000,0);
-            
             $employee->salary_netto_adjust = round($employee->salary_netto_adjust_moded * 1000,0);
+            
             $employee->salary_netto_before_cut_debt =  $employee->salary_netto_adjust;
             $employee->salary_netto_adjust_mod = $employee->salary_netto -$employee->salary_netto_adjust ;
             $employee->total_bpjs =    $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_pensiun_pay ;
@@ -643,11 +665,12 @@ class AllowanceController extends Controller
             $symbol = '-';
             $variabel_1 = 'salary';
 
-            
             // hitung potongan
             if($employee->count_day_unwork > 0){
                 $hasil_sebelum = 0;
                 $hasil_grup = 0;
+                
+           
                 //$dataaaa = [];
                 foreach($formulas as $fml){
                     $hasil_sebelum = 0;
@@ -655,7 +678,6 @@ class AllowanceController extends Controller
                     //$dataaaa['uuid'] = $fml->uuid;
                     $izin = ($fml->uuid =='IZIN')?true:false;
                     $alpa = ($fml->uuid =='ALPA')?true:false;
-
 
                     $day_alpa = ($employee->A_absen_count > 0)?true:false;
                     $day_izin = ($employee->cut_absen_count > 0)?true:false;
@@ -717,25 +739,19 @@ class AllowanceController extends Controller
                         }
                     }
                     
-                    
                     if($fml->uuid == 'IZIN'){
-                        $employee->cut_absen_loan =  $hasil_sebelum;
-                        // if($employee->cut_day > 0){
-                        //     // dd($fml);
-                        //     // dd(//$dataaaa);
-                        //  }
-                    }else{
                         
+                       
+                        $employee->cut_absen_loan =  $hasil_sebelum;
+                    }else{ 
                         $employee->cut_alpa_loan =  $hasil_sebelum;
-                        // if($employee->A > 0){
-                        //     // dd($fml);
-                        //     // dd(//$dataaaa);
-                        //  }
                     }
                 }
             }
+
         }
 
+        // dd('here');
         $employee_payment_debts = EmployeePaymentDebt::join('employee_debts','employee_debts.uuid', 'employee_payment_debts.debt_uuid')
         ->whereYear('employee_payment_debts.date_payment_debt', $year)
         ->whereMonth('employee_payment_debts.date_payment_debt', $month)
@@ -749,9 +765,40 @@ class AllowanceController extends Controller
             $employees[$employee_payment_debt->employee_uuid]->cut_debt =   $employee_payment_debt->value_payment_debt;
             $employees[$employee_payment_debt->employee_uuid]->salary_netto_adjust  = $employees[$employee_payment_debt->employee_uuid]->salary_netto_adjust - $employee_payment_debt->value_payment_debt;
         }
+
+        foreach($employees as $avg){
+            // $position = $avg->position;
+            if($avg->salary_netto_adjust > 0){
+                if(empty($averagge[$avg->position_uuid])){
+                    $averagge[$avg->position_uuid] = [
+                        'value' => $avg->salary_netto_adjust,
+                        'position' => $avg->position,
+                        'count' => 1
+                    ];
+                    // $averagge[$averagge[$avg->position_uuid]] = $avg->salary_netto_adjust;
+                }else{
+                    $averagge[$avg->position_uuid] = [
+                        'value' => $averagge[$avg->position_uuid]['value'] +$avg->salary_netto_adjust,
+                        'position' => $avg->position,
+                        'count' => $averagge[$avg->position_uuid]['count'] +1
+                    ];
+                }
+            }
+          
+        }
+
+        foreach($averagge as $avg=>$val){
+            $av=  $averagge[$avg]['value']/ $averagge[$avg]['count'];
+            $averagge[$avg]['avg'] =  $av;
+        }
+
+        if($request->from == 'index'){
+            return ResponseFormatter::toJson($averagge, 'Data Averagge');
+        }
+        
         // dd($employees['MBLE-130110']);
         // return view('datatableshow', [ 'data'         => $employees]);
-        return'a';
+        // return'a';
         return Datatables::of($employees)
         ->make(true);
     }
@@ -769,5 +816,5 @@ class AllowanceController extends Controller
         if($symbol_math == 'x'){ 
             return $data_1 * $data_2;
         }
-    }
+    }    
 }

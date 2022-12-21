@@ -9,6 +9,7 @@ use App\Models\Employee\EmployeeHourMeterDay;
 use App\Models\Identity;
 use App\Models\User;
 use App\Models\UserDetail\UserDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -296,34 +297,20 @@ class AdminController extends Controller
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
-            'head_datatable'        => false,
-            'javascript_datatable'  => false,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'listEmployee'
+            'active'                        => 'index'
         ];
-
-        return view('superadmin.index', [
+        
+        return view('admin.index', [
             'title'         => 'Beranda',
+            'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'layout'        => $layout
         ]);
     }
-    public function indexHR()
-    {
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => false,
-            'javascript_datatable'  => false,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'                        => 'listEmployee'
-        ];
-        return view('hr.index', [
-            'title'         => 'Beranda HR',
-            'layout'        => $layout
-        ]);
-    }
+
 
     public function listEmployee()
     {

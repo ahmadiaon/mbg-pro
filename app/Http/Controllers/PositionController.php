@@ -2,103 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\Position;
 use Yajra\Datatables\Datatables;
-use App\Models\People;
 use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
-    public function anyData()
-    {
-        return Datatables::of(Position::query())
-        ->addColumn('action', function ($model) {
-            $url = "/admin/position/";
-            $url_edit = "'".$url.$model->id."'";
-            $url_delete = "'".$url."delete/'";
-            return '<input type="hidden" value="'. $model->id .'"><button id="'.$model->id .'" onclick="runEditPosition(' . $model->id . ','.$url_edit.')"  class="btn btn-warning py-1 px-2 mr-1"><i class="icon-copy dw dw-pencil"></i></button>
-            <button onclick="isDeletePosition(' . $model->id . ','.$url_delete.')"  type="button" class="btn btn-danger  py-1 px-2"><i class="icon-copy dw dw-trash"></i></button>';
-        })
+    public function index(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'position'
+        ];
+        return view('position.index', [
+            'title'         => 'Jabatan',
+            'layout'    => $layout
+        ]);
+    }
 
+    public function delete(Request $request)
+    {
+         $store = Position::where('uuid',$request->uuid)->delete();
+ 
+         return ResponseFormatter::toJson($store, 'Data Privilege');
+    }
+
+
+    public function anyData(){
+        $data = Position::all();
+        return DataTables::of($data)    
         ->make(true);
-            
+    }
+
+
+    public function store(Request $request){
+        $position = $request->position;
+
+        if(empty($request->uuid)){
+            $request->uuid = ResponseFormatter::toUUID($request->position);
+        }
+        $strore = Position::updateOrCreate(['uuid' => $request->uuid], 
+        [
+            'position' => $request->position,
+            'date_start'    => $request->date_start,
+            'date_end'    => $request->date_end,
+        ]);
+        return ResponseFormatter::toJson($strore, 'Data Stored');
     }
 
   
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('admin.position.create', [
-            'title'         => 'Add People',
-        ]);
+    public function show(Request $request){
+        $data = Position::where('uuid', $request->uuid)->get()->first();
+        return ResponseFormatter::toJson($data, 'Data Privilege');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StorePositionRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'position'      => 'required',
-        ]);
+    
 
-        
-        $positions = Position::updateOrCreate(['id' => $request->id], [
-            'position' => $request->position
-          ]);
-
-        
-        return response()->json(['code'=>200, 'message'=>'Post Created successfully','data' => $positions], 200);
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Position  $position
-     * @return \Illuminate\Http\Response
-     */
-    public function show($position)
-    {
-        $positions = Position::find($position);
-
-        return response()->json($positions);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Position  $position
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Position $position)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdatePositionRequest  $request
-     * @param  \App\Models\Position  $position
-     * @return \Illuminate\Http\Response
-     */
+    
   
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Position  $position
-     * @return \Illuminate\Http\Response
-     */
+   
     public function destroy($position)
     {
         $data = Position::where('id', $position)->first();

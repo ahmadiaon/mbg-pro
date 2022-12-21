@@ -448,8 +448,9 @@ class EmployeeAbsenController extends Controller
 
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
-        
-
+        $year_start ='';
+        $month_start = '';
+        $dataaa = [];
 
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
@@ -524,7 +525,10 @@ class EmployeeAbsenController extends Controller
                 return back();
 
             }else{
+                // return 'ahmadi';
                 // this is from finger machine
+
+               
                 $splitTanggal =  str_split( $tanggal, 1);
 
                 $date_start =  $splitTanggal[8].$splitTanggal[9];
@@ -533,7 +537,7 @@ class EmployeeAbsenController extends Controller
                 $month_end   =$splitTanggal[18].$splitTanggal[19] ;
                 $year_start = $splitTanggal[0].$splitTanggal[1].$splitTanggal[2].$splitTanggal[3];
                 $year_end  = $splitTanggal[13].$splitTanggal[14].$splitTanggal[15].$splitTanggal[16];
-                // return $year_end."-".$month_end."-".$date_end;
+                $year_end."-".$month_end."-".$date_end;
                 $start_date = date_create($year_start."-".$month_start."-".$date_start);
                 $end_date = date_create($year_end."-".$month_end."-".$date_end);
                 $end_date = date_add($end_date,date_interval_create_from_date_string("1 days"));
@@ -549,6 +553,14 @@ class EmployeeAbsenController extends Controller
                     new DateTime($result)
                 );
                $date_data=array();
+
+
+               EmployeeAbsen::whereYear('employee_absens.date', (int)$year_start)
+               ->whereMonth('employee_absens.date', (int)$month_start)
+               ->whereNull('employee_absens.edited')
+               ->delete();
+
+
                foreach ($period as $key => $value) {
                     $date_data[] = $value->format('Y-m-d');                
                 }
@@ -574,26 +586,29 @@ class EmployeeAbsenController extends Controller
                                     'count_zone'     => $statusAbsen['count_zone'],
                                     'cek_log'       =>  $statusAbsen['cek_log'],
                                 ];
+                                $store = EmployeeAbsen::updateOrCreate(['uuid'  => $abjad.'-'.$employeeName],$absensies);
                             }
                         }else{
                             $absensies= [
                                 'employee_uuid'  => $employeeName,
                                 'date' => $abjad,
-                                'status_absen_uuid'     => 'A',
+                                'status_absen_uuid'     => '',
                                 'cek_log'       =>  null,
                             ];
                             
                             $date = explode('-', $abjad);
                         }
     
-                        $store = EmployeeAbsen::updateOrCreate(['uuid'  => $abjad.'-'.$employeeName],$absensies);
-                        $data[]= $absensies;
+                        $dataaa[]= $absensies;
                         
                         $count_day++;
                     }
                     $i = $i+2;
                 }
+                // dd($dataaa);
             }
+
+
             // update employee_absen_totals
             /*
             1. cek month data import

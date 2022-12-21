@@ -4,8 +4,13 @@
 	<div class="menu-block customscroll">
 		<div class="sidebar-menu">
 			<ul id="accordion-menu">
-				
+				<li>
+					<a href="/" class="dropdown-toggle no-arrow {{ $layout['active'] == 'index' ? 'active' : '' }}">
+						<span class="micon bi bi-person-square"></span><span class="mtext">Beranda</span>
+					</a>
+				</li>
 				@if (!empty(session('dataUser')->list_purchase_order))
+
 				<li class="dropdown">
 					<a href="javascript:;" class="dropdown-toggle">
 						<span class="micon bi bi-file-earmark-text"></span><span class="mtext">Purchase Order</span>
@@ -18,24 +23,15 @@
 				@if (!empty(session('dataUser')->read_list_employee))
 				<li class="dropdown">
 					<a href="javascript:;" class="dropdown-toggle">
-						<span class="micon bi bi-file-earmark-text"></span><span class="mtext">Karyawan</span>
+						<span class="micon bi bi-file-earmark-text"></span><span class="mtext" >Karyawan</span>
 					</a>
-					
 					<ul class="submenu">
-						@if (!empty(session('dataUser')->read_list_employee))
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle {{ $layout['active'] == 'employees-index' ? 'active' : '' }}">
-								<span class="micon bi bi-hdd-stack"></span><span class="mtext">Karyawan</span>
-							</a>
-							<ul class="submenu">
-								<li><a href="/user" class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}">Daftar Karyawan</a></li>
-								<li><a href="javascript:;">Monitoring PKWT</a></li>
-								<li><a href="javascript:;">Tanpa BPJS Kesehatan</a></li>
-							</ul>
-						</li>
-						@endif
+						<li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}"  href="/user">Daftar Karyawan</a></li>
+						<li><a href="/employee-out" class="{{ $layout['active'] == 'employee-out' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+							title="Hour Meter">Karyawan Keluar</a></li>
+						<li><a href="/employee-changge" class="{{ $layout['active'] == 'employee-changge' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+							title="Rotasi, Mutasi, Promosi. Demosi, Pemberhentian dan Pengajuan">Perubahan</a></li>
 					</ul>
-
 				</li>
 				@endif
 				@if(!empty(session('dataUser')->read_list_allowance))
@@ -104,6 +100,12 @@
 					</a>
 					@if (!empty(session('dataUser')->superadmin))
 						<ul class="submenu">
+							
+							<li><a class="{{ $layout['active'] == 'department' ? 'active' : '' }}" href="/database/department">Departemen</a></li>
+							<li><a class="{{ $layout['active'] == 'position' ? 'active' : '' }}" href="/database/position">Jabatan</a></li>
+							<li><a class="{{ $layout['active'] == 'Location' ? 'active' : '' }}" href="/database/location">Lokasi</a></li>
+							<li><a class="{{ $layout['active'] == 'religion' ? 'active' : '' }}" href="/database/religion">Agama</a></li>
+							<li><a class="{{ $layout['active'] == 'poh' ? 'active' : '' }}" href="/database/poh">POH</a></li>
 							<li><a class="{{ $layout['active'] == 'hour-meter-price' ? 'active' : '' }}" href="/database/hour-meter-price">Hour Meter</a></li>
 							<li><a class="{{ $layout['active'] == 'payment-group' ? 'active' : '' }}" href="/database/payment-group">Payment Group</a></li>
 							<li><a class="{{ $layout['active'] == 'privilege' ? 'active' : '' }}" href="/superadmin/privilege">Privilege</a></li>
@@ -115,8 +117,27 @@
 							<li><a class="{{ $layout['active'] == 'premi' ? 'active' : '' }}" href="/database/premi">Premi</a></li>
 							<li><a class="{{ $layout['active'] == 'tax-status' ? 'active' : '' }}" href="/database/tax-status">Status Pajak</a></li>
 							<li><a class="{{ $layout['active'] == 'payment-other' ? 'active' : '' }}" href="/database/payment-other">Status Pembayaran</a></li>
+							<li><a class="{{ $layout['active'] == 'atribut-size' ? 'active' : '' }}" href="/database/atribut-size">Satuan</a></li>
 							<li><a class="{{ $layout['active'] == 'variable' ? 'active' : '' }}" href="/database/variable">Variable</a></li>
 							<li><a class="{{ $layout['active'] == 'formula' ? 'active' : '' }}" href="/database/formula">Formula Potongan</a></li>
+							
+						</ul>
+					@endif
+					
+				</li>
+				@endif
+				@if (!empty(session('dataUser')->superadmin))
+				<li class="dropdown">
+					<a href="javascript:;" class="dropdown-toggle">
+						<span class="micon bi bi-bug"></span><span class="mtext">Unit</span>
+					</a>
+					@if (!empty(session('dataUser')->superadmin))
+						<ul class="submenu">
+							<li><a class="{{ $layout['active'] == 'brand' ? 'active' : '' }}" href="/logistic/brand">Daftar Brand</a></li>
+							<li><a class="{{ $layout['active'] == 'brand-type' ? 'active' : '' }}" href="/logistic/brand-type">Type Brand</a></li>
+							<li><a class="{{ $layout['active'] == 'group-vehicle' ? 'active' : '' }}" href="/logistic/group-vehicle">Daftar Group Unit</a></li>
+							<li><a class="{{ $layout['active'] == 'logistic-unit' ? 'active' : '' }}" href="/logistic/unit">Daftar Unit</a></li>
+							<li><a class="{{ $layout['active'] == 'logistic-status' ? 'active' : '' }}" href="/logistic/status">Status</a></li>
 						</ul>
 					@endif
 					

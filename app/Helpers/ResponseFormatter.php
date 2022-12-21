@@ -50,6 +50,12 @@ class ResponseFormatter
     return array_search($index, $array);
   }
 
+  public static function toFloat($data){
+    $data = str_replace(',','.', $data);
+    $data = (float)$data;
+    return $data;
+  }
+
   public static function toJson($data, $message = "success"){
     return response()->json(['code'=>200, 'message'=>$message,'data' => $data], 200);
   }
@@ -88,7 +94,7 @@ class ResponseFormatter
     $numberDays = $timeDiff/86400;  // 86400 seconds in one day
 
     // and you might want to convert to integer
-    return $numberDays = intval($numberDays);
+    return $numberDays = intval($numberDays) + 1;
   }
 
   public static function excelToDate($date){

@@ -34,6 +34,28 @@ class Employee extends Model
             'employees.uuid as employee_uuid'
         ]);
     }
+
+
+    public static function get_employee_all(){
+        return $employees = Employee::whereNull('date_end')->get();
+
+
+
+        return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
+        ->join('positions','positions.uuid','=','employees.position_uuid')
+        ->get([
+            'user_details.name',
+            'user_details.photo_path',
+            'positions.position',
+            'employees.employee_status',
+            'employees.uuid',
+            'employees.machine_id',
+            'employees.nik_employee',
+            'employees.uuid as employee_uuid'
+        ]);
+    }
+
+
     public static function where_uuid($employee_uuid){
         return Employee::where('uuid', $employee_uuid)->get('nik_employee')->first();
     }

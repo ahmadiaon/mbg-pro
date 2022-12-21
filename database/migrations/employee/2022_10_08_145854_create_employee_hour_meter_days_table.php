@@ -20,6 +20,7 @@ class CreateEmployeeHourMeterDaysTable extends Migration
             $table->string('shift')->nullable();
             $table->float('value')->nullable();//di kertas
             $table->float('full_value')->nullable();//bonus
+            
             $table->string('pay_uuid')->nullable();
             $table->string('is_bonus')->nullable();
             $table->timestamps();

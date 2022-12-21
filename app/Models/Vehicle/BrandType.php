@@ -12,10 +12,10 @@ class BrandType extends Model
 
     public static function getAll(){
         return BrandType::join('brands','brands.uuid','=','brand_types.brand_uuid')
+        // ->join('group_vehicles','group_vehicles.uuid','=','brand_types.group_vehicle_uuid')
         ->get(
             [
-                'brand_types.uuid',
-                'brand_types.type',
+                'brand_types.*',
                 'brands.brand'
             ]);
     }

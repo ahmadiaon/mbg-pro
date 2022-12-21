@@ -113,8 +113,6 @@
                                                         <button type="button" onclick="showdoc('${row.po_path}')" class="btn btn-sm btn-primary mr-1">Lihat PO</button>
                                                         <button type="button" onclick="showdoc('${row.travel_document_path}')" class="btn btn-sm btn-primary">Lihat SJ</button>
                                                     </div>`;
-                          
-						
 						return btn;
 					}
 				};

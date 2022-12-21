@@ -140,6 +140,12 @@
                 name : 'Nama',
                 position : 'Jabatan',
                 date_start_contract : 'TMK',
+                salary_netto_adjust : 'Gajih Bersih',
+                premi_pay_total : 'Premi Total',
+                pay_premi_BK : 'Pay Premi BK',
+                pay_premi_MB : 'Pay Premi MB',
+                salary_payed:'Gajih Dibayar',
+                cutted_total:'Total Potongan'
             };
 
             let header_element='';
@@ -151,10 +157,12 @@
                 $('#header-table').append(header_element);
                 arr_identities.push(key);
             }
+            // return false;
 
             arr_identities.forEach(element_identity => {
                 elements = {
                     mRender: function(data, type, row) {
+                        // console.log(row);
                         return row[element_identity];
                     }
                 };
@@ -189,72 +197,72 @@
 
             
 
-            hour_meter_prices.forEach(element => {
-                $('#header-table').append(`<th>${element.name}</th>`);
+            // hour_meter_prices.forEach(element => {
+            //     $('#header-table').append(`<th>${element.name}</th>`);
                 
-                elements = {
-                        mRender: function(data, type, row) {
-                            let hm_ = 0;
-                            if(row[element.uuid] === undefined){
-                                hm_ =0;
-                            }else{
-                                hm_  = row[element.uuid]
-                            }
+            //     elements = {
+            //             mRender: function(data, type, row) {
+            //                 let hm_ = 0;
+            //                 if(row[element.uuid] === undefined){
+            //                     hm_ =0;
+            //                 }else{
+            //                     hm_  = row[element.uuid]
+            //                 }
 
-                            return hm_;
-                        }
-                    };
-                data_column.push(elements);
-            });
+            //                 return hm_;
+            //             }
+            //         };
+            //     data_column.push(elements);
+            // });
 
 
-            companies.forEach(element_tonase => {
-                $('#header-table').append(`<th>T-${element_tonase.company_uuid}</th>`);
+            // companies.forEach(element_tonase => {
+            //     $('#header-table').append(`<th>T-${element_tonase.company_uuid}</th>`);
                 
-                element_tonases = {
-                        mRender: function(data, type, row) {
-                            let tonase_ = 0;
-                            if(row['tonase_'+element_tonase.uuid] === undefined){
-                                tonase_ =0;
-                            }else{
-                                tonase_  = row['tonase_'+element_tonase.uuid]
-                            }
-                            return tonase_;
-                        }
-                    };
-                data_column.push(element_tonases);
-            });
+            //     element_tonases = {
+            //             mRender: function(data, type, row) {
+            //                 let tonase_ = 0;
+            //                 if(row['tonase_'+element_tonase.uuid] === undefined){
+            //                     tonase_ =0;
+            //                 }else{
+            //                     tonase_  = row['tonase_'+element_tonase.uuid]
+            //                 }
+            //                 return tonase_;
+            //             }
+            //         };
+            //     data_column.push(element_tonases);
+            // });
 
-            $('#header-table').append(`<th>HM Total</th>`);
-            elements = {
-                    mRender: function(data, type, row) {
-                        // console.log(row)
-                        let hm_pay_total = 0;
-                            if(row.hm_pay_total === undefined){
-                                hm_pay_total =0;
-                            }else{
-                                hm_pay_total  = row.hm_pay_total
-                            }
-                            return hm_pay_total;
-                    }
-                };
-            data_column.push(elements);
+            // $('#header-table').append(`<th>HM Total</th>`);
+            // elements = {
+            //         mRender: function(data, type, row) {
+            //             // console.log(row)
+            //             let hm_pay_total = 0;
+            //                 if(row.hm_pay_total === undefined){
+            //                     hm_pay_total =0;
+            //                 }else{
+            //                     hm_pay_total  = row.hm_pay_total
+            //                 }
+            //                 return hm_pay_total;
+            //         }
+            //     };
+            // data_column.push(elements);
 
-            $('#header-table').append(`<th>Tonase Total</th>`);
-            elements = {
-                    mRender: function(data, type, row) {
-                        // console.log(row)
-                        let tonase_pay_total = 0;
-                            if(row.tonase_pay_total === undefined){
-                                tonase_pay_total =0;
-                            }else{
-                                tonase_pay_total  = row.tonase_pay_total
-                            }
+            // $('#header-table').append(`<th>Tonase Total</th>`);
+            // elements = {
+            //         mRender: function(data, type, row) {
+            //             // console.log(row)
+            //             let tonase_pay_total = 0;
+            //                 if(row.tonase_pay_total === undefined){
+            //                     tonase_pay_total =0;
+            //                 }else{
+            //                     tonase_pay_total  = row.tonase_pay_total
+            //                 }
 
-                            return tonase_pay_total;
-                    }
-                };
-            data_column.push(elements);
+            //                 return tonase_pay_total;
+            //         }
+            //     };
+            // data_column.push(elements);
 
 
 
@@ -267,12 +275,13 @@
                 // fixedColumns: {
                 //     leftColumns: 2
                 // },
-                serverSide: true,
+                serverSide: false,
                 ajax: {
                     url: '/allowance/data',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
                         year_month: year_month,
+                        from:'allowance'
                     },
                     type: 'POST',
                 },

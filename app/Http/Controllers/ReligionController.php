@@ -2,39 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\Religion;
+use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
 class ReligionController extends Controller
 {
-public function anyData()
-    {
-        
-        // return $data = people::latest()->get();
-        return Datatables::of(Religion::query())
-        ->addColumn('action', function ($model) {
-            $url = "/admin/religion/";
-            $url_edit = "'".$url.$model->id."'";
-            $url_delete = "'".$url."delete/'";
-            return '<input type="hidden" value="'. $model->id .'"><button disabled id="'.$model->id .'" onclick="runEdit(' . $model->id . ','.$url_edit.')"  class="btn btn-warning py-1 px-2 mr-1"><i class="icon-copy dw dw-pencil"></i></button>
-            <button onclick="isDelete(' . $model->id . ','.$url_delete.')"  type="button" disabled class="btn btn-danger  py-1 px-2"><i class="icon-copy dw dw-trash"></i></button>';
-        })
-        ->make(true);           
-    }
-    public function index()
-    {
-        return view('admin.religion.index', [
-            'title'         => 'religion'
+    public function index(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'religion'
+        ];
+        return view('religion.index', [
+            'title'         => 'Database Agama',
+            'layout'    => $layout
         ]);
     }
+    public function anyData(){
+        $data = Religion::all();
+        return Datatables::of($data)    
+        ->make(true);
+    }
+    public function show(Request $request){
+        $data = Religion::where('uuid', $request->uuid)->get()->first();
+        return ResponseFormatter::toJson($data, 'Data Privilege');
+    }
 
-   
-    public function create()
+    public function delete(Request $request)
     {
-        //
+         $store = Religion::where('uuid',$request->uuid)->delete();
+ 
+         return ResponseFormatter::toJson($store, 'Data Privilege');
     }
 
 
-
-   
+    public function store(Request $request){
+        if(empty($request->uuid)){
+            $request->uuid = ResponseFormatter::toUUID($request->religion);
+        }
+        $strore = Religion::updateOrCreate(['uuid' => $request->uuid], 
+        [
+            'religion' => $request->religion,
+        ]);
+        return ResponseFormatter::toJson($strore, 'Data Stored');
+    }
 }

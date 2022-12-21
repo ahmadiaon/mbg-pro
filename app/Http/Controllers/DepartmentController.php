@@ -2,83 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
-use App\Models\People;
-use App\Models\Unit;
-use App\Models\Position;
-use Facade\FlareClient\Http\Response;
 
 class DepartmentController extends Controller
 {
-    public function anyData()
-    {
+    public function index(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'department'
+        ];
 
-        return Datatables::of(Department::query())
-        ->addColumn('action', function ($model) {
-            $url = "/admin/department/";
-            $url_edit = "'".$url.$model->id."'";
-            $url_delete = "'".$url."delete/'";
-            return '<input type="hidden" value="'. $model->id .'"><button id="'.$model->id .'" onclick="runEdit(' . $model->id . ','.$url_edit.')"  class="btn btn-warning py-1 px-2 mr-1"><i class="icon-copy dw dw-pencil"></i></button>
-            <button onclick="isDelete(' . $model->id . ','.$url_delete.',departmentTable)"  type="button" class="btn btn-danger  py-1 px-2"><i class="icon-copy dw dw-trash"></i></button>';
-        })
-
-        ->make(true);
-            
-    }
-    public function index()
-    {
-        return view('admin.department.index', [
+        return view('department.index', [
             'title'         => 'Department',
+            'layout'    => $layout
         ]);
     }
 
-
-    public function create()
+    public function delete(Request $request)
     {
-        //
-        
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'department'      => 'required',
-        ]);
-
-        
-        $departments = Department::updateOrCreate(['id' => $request->id], [
-            'department' => $request->department
-          ]);
-
-        
-        return response()->json(['code'=>200, 'message'=>'Post Created successfully','data' => $departments], 200);
-
-
-
-    }
-
-  
-    public function show($department)
-    {
-        $departments = Department::find($department);
-
-        return response()->json($departments);
-    }
-
-  
+         $store = Department::where('uuid',$request->uuid)->delete();
  
-    public function destroy($department)
+         return ResponseFormatter::toJson($store, 'Data Privilege');
+    }
+
+
+    public function anyData(){
+        $data = Department::all();
+        return DataTables::of($data)    
+        ->make(true);
+    }
+
+
+    public function store(Request $request){
+        $Department = $request->department;
+
+        if(empty($request->uuid)){
+            $request->uuid = ResponseFormatter::toUUID($request->department);
+        }
+        $strore = Department::updateOrCreate(['uuid' => $request->uuid], 
+        [
+            'department' => $request->department,
+            'date_start'    => $request->date_start,
+            'date_end'    => $request->date_end,
+        ]);
+        return ResponseFormatter::toJson($strore, 'Data Stored');
+    }
+
+  
+    public function show(Request $request){
+        $data = Department::where('uuid', $request->uuid)->get()->first();
+        return ResponseFormatter::toJson($data, 'Data Privilege');
+    }
+
+    
+    public function destroy($Department)
     {
-        $data = Department::where('id', $department)->first();
-        $post= Department::find($department)->delete();
+        $data = Department::where('id', $Department)->first();
+        $post= Department::find($Department)->delete();
         return response()->json(['code'=>200, 'message'=>'Data deleted successfully','data' => $data], 200);
 
     }
