@@ -41,6 +41,7 @@ class CreateEmployeesTable extends Migration
             $table->string('is_bpjs_ketenagakerjaan')->nullable(); 
             $table->string('is_bpjs_pensiun')->nullable(); 
             
+            $table->string('submission_status')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->date('date_proposal')->nullable();

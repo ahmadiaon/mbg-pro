@@ -185,19 +185,18 @@ class AllowanceController extends Controller
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
-
-
-
     }
 
     // public function moreAnyData($year_month){
     //     $date = explode("-", $year_month);
     //     $day_month = ResponseFormatter::getEndDay($year_month);
 
+    // EmployeePremi::where('premi_value', null)->delete();
     public function moreAnyData(Request $request){
+        $date = explode("-", $request->year_month);
         $year_month = $request->year_month;
         $day_month = ResponseFormatter::getEndDay($year_month);
-        $date = explode("-", $request->year_month);
+        
         $averagge = array();
         $year = $date[0];
         $month = $date[1];
@@ -536,6 +535,8 @@ class AllowanceController extends Controller
             $employee_premis = EmployeePremi::where('premi_uuid', $premi->uuid)
             ->get();
 
+
+
             $name_premi = $premi->uuid ;
             $name_premi_pay = 'pay_premi_'.$premi->uuid ;
             
@@ -792,9 +793,9 @@ class AllowanceController extends Controller
             $averagge[$avg]['avg'] =  $av;
         }
 
-        if($request->from == 'index'){
-            return ResponseFormatter::toJson($averagge, 'Data Averagge');
-        }
+            if($request->from == 'index'){
+                return ResponseFormatter::toJson($averagge, 'Data Averagge');
+            }
         
         // dd($employees['MBLE-130110']);
         // return view('datatableshow', [ 'data'         => $employees]);

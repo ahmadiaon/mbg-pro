@@ -29,6 +29,8 @@
 						<li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}"  href="/user">Daftar Karyawan</a></li>
 						<li><a href="/employee-out" class="{{ $layout['active'] == 'employee-out' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 							title="Hour Meter">Karyawan Keluar</a></li>
+						<li><a href="/employee-cuti" class="{{ $layout['active'] == 'employee-cuti' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
+							title="Manajemen Cuti">Cuti</a></li>
 						<li><a href="/employee-changge" class="{{ $layout['active'] == 'employee-changge' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 							title="Rotasi, Mutasi, Promosi. Demosi, Pemberhentian dan Pengajuan">Perubahan</a></li>
 					</ul>

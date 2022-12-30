@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="title pb-20">
-        <h2 class="h3 mb-0">Hospital Overview</h2>
+        <h2 class="h3 mb-0">Sumary</h2>
     </div>
 
     <div class="row pb-10">
@@ -10,9 +10,9 @@
             <div class="card-box height-100-p widget-style3">
                 <div class="d-flex flex-wrap">
                     <div class="widget-data">
-                        <div class="weight-700 font-24 text-dark">75</div>
+                        <div class="weight-700 font-24 text-dark" id="count-department">0</div>
                         <div class="font-14 text-secondary weight-500">
-                            Appointment
+                            Department
                         </div>
                     </div>
                     <div class="widget-icon">
@@ -27,9 +27,9 @@
             <div class="card-box height-100-p widget-style3">
                 <div class="d-flex flex-wrap">
                     <div class="widget-data">
-                        <div class="weight-700 font-24 text-dark">124,551</div>
+                        <div class="weight-700 font-24 text-dark" id="count-position">124,551</div>
                         <div class="font-14 text-secondary weight-500">
-                            Total Patient
+                            Total Jabatan
                         </div>
                     </div>
                     <div class="widget-icon">
@@ -44,9 +44,9 @@
             <div class="card-box height-100-p widget-style3">
                 <div class="d-flex flex-wrap">
                     <div class="widget-data">
-                        <div class="weight-700 font-24 text-dark">400+</div>
+                        <div class="weight-700 font-24 text-dark" id="count-employee">400+</div>
                         <div class="font-14 text-secondary weight-500">
-                            Total Doctor
+                            Total Karyawan
                         </div>
                     </div>
                     <div class="widget-icon">
@@ -61,8 +61,8 @@
             <div class="card-box height-100-p widget-style3">
                 <div class="d-flex flex-wrap">
                     <div class="widget-data">
-                        <div class="weight-700 font-24 text-dark">$50,000</div>
-                        <div class="font-14 text-secondary weight-500">Earning</div>
+                        <div class="weight-700 font-24 text-dark" id="count-employee-out">$50,000</div>
+                        <div class="font-14 text-secondary weight-500">Karyawan Out</div>
                     </div>
                     <div class="widget-icon">
                         <div class="icon" data-color="#09cc06">
@@ -76,7 +76,7 @@
 
     <div class="row pb-10">
         <div class="col-md-12 mb-20">
-            <div class="card-box height-100-p pd-20">
+            <div class="card-box height-100-p pd-20 overflow-auto">
                 <div class="d-flex flex-wrap justify-content-between align-items-center pb-0 pb-md-3">
                     <div class="h5 mb-md-0">Rata-rata gajih per jabatan</div>
                     <div class="form-group mb-md-0">
@@ -88,10 +88,16 @@
                         </select>
                     </div>
                 </div>
-                <div id="activities-chart"></div>
+                <div style="width:3000px" id="activities-chart"></div>
             </div>
         </div>
     </div>
+
+    
+    <div  class="bg-white pd-20 card-box mb-30">
+        <div class=""  id="chart5"></div>
+    </div>
+
 
     <div class="row">
         <div class="col-lg-4 col-md-6 mb-20">
@@ -125,7 +131,7 @@
                                     <div class="font-12 weight-500" data-color="#b2b1b6">
                                         Pediatrician
                                     </div>
-                                </div>
+                                </div> 
                             </div>
                             <div class="cta flex-shrink-0">
                                 <a href="#" class="btn btn-sm btn-outline-primary">Schedule</a>
@@ -232,7 +238,43 @@
 
 @section('js')
     <script src="/src/plugins/apexcharts/apexcharts.min.js"></script>
+    <script src="/src/plugins/highcharts-6.0.7/code/highcharts.js"></script>
+    {{-- <script src="https://code.highcharts.com/highcharts-3d.js"></script> --}}
+    <script src="/src/plugins/highcharts-6.0.7/code/highcharts-more.js"></script>
+
     <script>
+        let department = @json($arr_department);
+        let count_department = department.length;
+        $('#count-department').text(count_department)
+        console.log(count_department)
+        let aa = [
+                ['AppleSSs', 29.9, false],
+                ['Pears', 80, false],
+                ['Oranges', 106.4, false],
+                ['Plums', 129.2, false],
+                ['Bananas', 144.0, false],
+                ['Peaches', 176.0, false],
+                ['Prunes', 135.6, true, true],
+                ['Avocados', 148.5, false]
+                ];
+
+
+        console.log(aa);
+        Highcharts.chart('chart5', {
+            title: {
+                text: 'Karyawan per DEPARTEMEN'
+            },
+            xAxis: {
+                categories: ['Jan', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            series: [{
+                type: 'pie',
+                allowPointSelect: true,
+                keys: ['name', 'y', 'selected', 'sliced'],
+                data: department,
+                showInLegend: true
+            }]
+        });
 
         let year_month = @json($year_month);
         year_month = '2022-10';

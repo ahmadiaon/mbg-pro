@@ -87,6 +87,7 @@ class EmployeeOutController extends Controller
         $employee_out = [
             'employee_uuid' => $employee_uuid,
             'date_out'  => $request->date_out,
+            'date_start'  => $request->date_out,
             'out_status'    => $request->out_status,
         ];
         $store = EmployeeOut::updateOrCreate(['uuid' => $employee_uuid], $employee_out);

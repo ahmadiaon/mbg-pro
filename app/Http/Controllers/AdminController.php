@@ -303,11 +303,37 @@ class AdminController extends Controller
             'javascript_form'       => true,
             'active'                        => 'index'
         ];
+
+        $departments = Employee::get_employee_all_latest_full_data_no_get();
+        $departments = $departments->groupBy([
+            'department_uuid',
+            'department'
+        ])
+        ->select(
+            'department',
+            DB::raw("count(department_uuid) as count"),
+        )
+        ->get();
+        // dd($departments);
+        $arr_department = [];
+        $arr_department = [];
+        $count_arr_department = count($arr_department);
+        foreach($departments as $department){
+            if($department->count > 0){
+                $arr_department[] = [
+                    $department->department, $department->count, false
+                ];
+            }
+           
+        }
+
+        // dd($arr_department);
         
         return view('admin.index', [
             'title'         => 'Beranda',
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
-            'layout'        => $layout
+            'arr_department'    => $arr_department,
+            'layout'        => $layout,
         ]);
     }
 

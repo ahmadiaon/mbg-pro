@@ -38,6 +38,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('photo_path')->nullable();
             
+            $table->string('submission_status')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->date('date_proposal')->nullable();

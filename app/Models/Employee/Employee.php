@@ -2,6 +2,8 @@
 
 namespace App\Models\Employee;
 
+use App\Helpers\ResponseFormatter;
+use App\Models\Premi;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\Safety\SafetyEmployee;
 use App\Models\UserDetail\UserAddress;
@@ -35,30 +37,203 @@ class Employee extends Model
         ]);
     }
 
-
-    public static function get_employee_all(){
-        return $employees = Employee::whereNull('date_end')->get();
-
-
-
+    public static function noGet_employeeAll(){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
-        ->join('positions','positions.uuid','=','employees.position_uuid')
+        ->join('positions','positions.uuid','=','employees.position_uuid');
+    }
+
+
+    public static function get_employee_all_latest(){
+        $employees = Employee::join('positions','positions.uuid','employees.position_uuid')
+        ->join('departments','departments.uuid','employees.department_uuid')
+        ->whereNull('employees.date_end')
         ->get([
-            'user_details.name',
-            'user_details.photo_path',
             'positions.position',
+            'departments.department',
             'employees.employee_status',
             'employees.uuid',
             'employees.machine_id',
             'employees.nik_employee',
             'employees.uuid as employee_uuid'
         ]);
+
+        $employees = $employees->keyBy(function ($item) {
+            return strval($item->uuid);
+        });
+
+        foreach($employees as $item){
+            $item->name = null;
+            $item->photo_path = null;
+        }        
+        $user_details = UserDetail::whereNull('date_end')->get();
+        foreach($user_details as $item){
+            $employees[$item->uuid]->name = $item->name;
+            $employees[$item->uuid]->photo_path = $item->photo_path ;
+        }
+        return $employees;
     }
 
+    public static function get_employee_only_latest(){
+        $employees = Employee::whereNull('employees.date_end')
+        ->get();
+
+        $employees = $employees->keyBy(function ($item) {
+            return strval($item->uuid);
+        });
+
+       
+        return $employees;
+    }
+
+    public static function get_employee_all_latest_full_data(){
+        $employees = Employee::join('positions','positions.uuid','employees.position_uuid')
+        ->join('departments','departments.uuid','employees.department_uuid')
+        ->whereNull('employees.date_end')
+        ->get([
+            'positions.position',
+            'departments.department',
+            'employees.*',
+            'employees.uuid as employee_uuid'
+        ]);
+
+        $employees = $employees->keyBy(function ($item) {
+            return strval($item->uuid);
+        });
+        $premis = Premi::all();
+
+
+        foreach($employees as $item){
+            $item->name = null;
+            $item->photo_path = null;
+            $item->salary = null;
+            $item->insentif = null;
+            $item->tunjangan = null;
+            $item->hour_meter_price_uuid = null;
+
+            foreach($premis as $premi){
+                $col_name = $premi->uuid;
+                $item->$col_name = null;
+            }
+        }       
+        
+       
+        $user_details = UserDetail::whereNull('date_end')->get();
+        foreach($user_details as $item){
+            $employees[$item->uuid]->name = $item->name;
+            $employees[$item->uuid]->photo_path = $item->photo_path ;
+        }
+
+        $employee_premis = EmployeePremi::whereNull('date_end')->get();
+
+        foreach($employee_premis as $item){
+            $col_name = $item->premi_uuid;
+            $employees[$item->employee_uuid]->$col_name = $item->premi_value;
+        }
+
+        $employee_salaries = EmployeeSalary::whereNull('date_end')->get();
+        foreach($employee_salaries as $item){
+            $employees[$item->employee_uuid]->salary = $item->salary;
+            $employees[$item->employee_uuid]->insentif = $item->insentif;
+            $employees[$item->employee_uuid]->tunjangan = $item->tunjangan;
+            $employees[$item->employee_uuid]->hour_meter_price_uuid = $item->hour_meter_price_uuid;
+        }
+
+        $employee_companies = EmployeeCompany::all();
+
+        return $employees;
+    }
+
+    public static function get_employee_all_latest_full_data_no_get(){
+        $employees = Employee::join('positions','positions.uuid','employees.position_uuid')
+        ->join('departments','departments.uuid','employees.department_uuid')
+        ->whereNull('employees.date_end');
+
+        // $employees = $employees->keyBy(function ($item) {
+        //     return strval($item->uuid);
+        // });
+
+        // $premis = Premi::all();
+
+
+        // foreach($employees as $item){
+        //     $item->name = null;
+        //     $item->photo_path = null;
+        //     $item->salary = null;
+        //     $item->insentif = null;
+        //     $item->tunjangan = null;
+        //     $item->hour_meter_price_uuid = null;
+
+        //     foreach($premis as $premi){
+        //         $col_name = $premi->uuid;
+        //         $item->$col_name = null;
+        //     }
+        // }       
+        
+       
+        // $user_details = UserDetail::whereNull('date_end')->get();
+        // foreach($user_details as $item){
+        //     $employees[$item->uuid]->name = $item->name;
+        //     $employees[$item->uuid]->photo_path = $item->photo_path ;
+        // }
+
+        // $employee_premis = EmployeePremi::whereNull('date_end')->get();
+
+        // foreach($employee_premis as $item){
+        //     $col_name = $item->premi_uuid;
+        //     $employees[$item->employee_uuid]->$col_name = $item->premi_value;
+        // }
+
+        // $employee_salaries = EmployeeSalary::whereNull('date_end')->get();
+        // foreach($employee_salaries as $item){
+        //     $employees[$item->employee_uuid]->salary = $item->salary;
+        //     $employees[$item->employee_uuid]->insentif = $item->insentif;
+        //     $employees[$item->employee_uuid]->tunjangan = $item->tunjangan;
+        //     $employees[$item->employee_uuid]->hour_meter_price_uuid = $item->hour_meter_price_uuid;
+        // }
+
+        // $employee_companies = EmployeeCompany::all();
+
+        return $employees;
+    }
+
+    public static function  get_employee_active_year_month($year_month){
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+        $day_month =ResponseFormatter::getEndDay($year_month);
+
+        $employees = Employee::whereDate('date_end', '<=', $year_month.'-'.$day_month)
+        // ->whereYear('date_start', $year)
+        ->get();
+
+        $array_employees =[];
+        foreach($employees as $item){
+            if(empty($array_employees[$item->uuid])){
+                $array_employees[$item->uuid] = $item;
+            }else{
+                if($array_employees[$item->uuid]->date_end < $item->date_end){
+                    $array_employees[$item->uuid] = $item;
+                }
+            }            
+        }
+        $employees_null_date_end = Employee::whereNull('date_end')->get();
+
+        foreach($employees_null_date_end as $item){
+            if(empty($array_employees[$item->uuid])){
+                $array_employees[$item->uuid] = $item;
+            }
+        }
+
+        $employee_outs = EmployeeOut::all();
+
+
+        return $employee_outs;
+    }
 
     public static function where_uuid($employee_uuid){
         return Employee::where('uuid', $employee_uuid)->get('nik_employee')->first();
     }
+
     public static function where_employee_uuid($employee_uuid){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
         ->join('positions','positions.uuid','=','employees.position_uuid')
@@ -73,6 +248,7 @@ class Employee extends Model
         ])
         ->first();
     }
+
     public static function where_employee_nik_employee($employee_uuid){
         $data = Employee::where('employees.nik_employee', $employee_uuid)
         ->get([
@@ -167,24 +343,6 @@ class Employee extends Model
         // dd($data);
       
         return $data;
-
-    }
-    public  static function all_nullable(){
-        $employees = Employee::all();
-
-        foreach($employees as $item){
-            $item->user_details = $dataUserDetail = UserDetail::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_addresses =$dataUserAddress = UserAddress::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_religions =$dataUserReligion = UserReligion::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_education =$dataUserEducation = UserEducation::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_licenses =$dataUserLicense = UserLicense::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_healths =$dataUserHealth = UserHealth::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_dependents =$dataUserDependent = UserDependent::where_user_detail_uuid($item->user_detail_uuid);
-            $item->user_privileges =$dataUserPrivilege = UserPrivilege::where_nik_employee($item->uuid);
-            $item->employee_salaries =$dataEmployeeSalary = EmployeeSalary::where_nik_employee($item->uuid);
-            $item->user_safety = SafetyEmployee::where('employee_uuid',$item->uuid)->get()->first();
-        }
-        return $employees;
 
     }
 }

@@ -98,13 +98,20 @@ class ResponseFormatter
   }
 
   public static function excelToDate($date){
-
-    if(gettype($date) == 'string'){
-      return $date;
+    if($date != null){
+      if($date == ''){
+        return null;
+      }
+      if(gettype($date) == 'string'){
+        return $date;
+      }else{
+        $miliseconds = ($date - (25567 + 2)) * 86400 * 1000;
+        $seconds = $miliseconds / 1000;
+        return  date("Y-m-d", $seconds);
+      }
     }else{
-      $miliseconds = ($date - (25567 + 2)) * 86400 * 1000;
-      $seconds = $miliseconds / 1000;
-      return  date("Y-m-d", $seconds);
+      return null;
     }
+    
   }
 }

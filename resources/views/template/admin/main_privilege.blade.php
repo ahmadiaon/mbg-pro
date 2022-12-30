@@ -229,7 +229,7 @@
 			let _url = $('#form-'+idForm).attr('action');
             var form = $('#form-'+idForm)[0];
             var form_data = new FormData(form);
-			
+			console.log(form_data)
 			startLoading();
             $.ajax({
                 url: _url,

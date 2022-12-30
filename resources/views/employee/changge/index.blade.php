@@ -49,11 +49,12 @@
                             </button>
 
                             <div class="dropdown-menu">
-                                <a class="dropdown-item"  href="/employee-changge/create">Tambah</a>
-                                <a class="dropdown-item" id="btn-export"disabled
-                                    href="/user/Karyawan Keluar/export/">Export</a>
+                                <a class="dropdown-item" href="/employee-changge/create">Tambah</a>
+                                <a class="dropdown-item" id="btn-export"disabled href="/employee-changge/export/">Export</a>
                                 <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                     href="">Import</a>
+                                <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#createModald"
+                                    href="">Tambah + Data</a>
                             </div>
                         </div>
 
@@ -82,18 +83,18 @@
     <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-import" action="/employee-out/import" method="post" enctype="multipart/form-data">
+            <form id="form-import" action="/employee-changge/import" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Import Karyawan Keluar</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import Perubahan Karyawan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Pilih Karyawan Keluar</label>
+                            <label>Pilih Perubahan Karyawan</label>
                             <input name="uploaded_file" type="file"
                                 class="form-control-file form-control height-auto" />
                         </div>
@@ -106,52 +107,51 @@
             </form>
         </div>
     </div>
-    {{--modal create  --}}
-    <div class="modal fade" id="createModal"  role="dialog" aria-labelledby="import-modalTitle"
-        aria-hidden="true">
+    {{-- modal create  --}}
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-employee-out" action="/employee-out/store" method="post" enctype="multipart/form-data">
+            <form id="form-employee-changge" action="/employee-changge/store" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Karyawan Keluar</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Perubahan Karyawan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                            <div class="form-group">
-                                <label for="">Pilih Karyawan</label>
-                                <select style="width: 100%;" name="employee_uuid" id="employee_uuid"
-                                    class="custom-select2 form-control">
-                                    <option value="">karyawan</option>
-                                </select>
-                                <div class="invalid-feedback" id="req-employee_uuid">
-                                    Data tidak boleh kosong
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Status Keluar</label>
-                                <select class="form-control" name="out_status" id="out_status">
-                                    <option value="Resign">Resign</option>
-                                    <option value="S-PHK">S-PHK</option>
-                                    <option value="Pensiun">Pensiun</option>
-                                    <option value="Meninggal Dunia">Meninggal Dunia</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Tanggal Keluar</label>
-                                <input class="form-control" type="date" name="date_out" id="date_out">
-                            </div>
-                            <div class="invalid-feedback" id="req-date_out">
+                        <div class="form-group">
+                            <label for="">Pilih Karyawan</label>
+                            <select style="width: 100%;" name="employee_uuid" id="employee_uuid"
+                                class="custom-select2 form-control">
+                                <option value="">karyawan</option>
+                            </select>
+                            <div class="invalid-feedback" id="req-employee_uuid">
                                 Data tidak boleh kosong
                             </div>
-                            <div class="form-group">
-                                <label for="">Dokument</label>
-                                <input type="hidden" class="form-control" name="document_out_name" id="document_out_name">
-                                <input accept=".pdf" id="document_out" name="document_out" 
-                                    class="form-control" type="file">
-                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Status Keluar</label>
+                            <select class="form-control" name="out_status" id="out_status">
+                                <option value="Resign">Resign</option>
+                                <option value="S-PHK">S-PHK</option>
+                                <option value="Pensiun">Pensiun</option>
+                                <option value="Meninggal Dunia">Meninggal Dunia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Tanggal Keluar</label>
+                            <input class="form-control" type="date" name="date_out" id="date_out">
+                        </div>
+                        <div class="invalid-feedback" id="req-date_out">
+                            Data tidak boleh kosong
+                        </div>
+                        <div class="form-group">
+                            <label for="">Dokument</label>
+                            <input type="hidden" class="form-control" name="document_out_name" id="document_out_name">
+                            <input accept=".pdf" id="document_out" name="document_out" class="form-control"
+                                type="file">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -161,7 +161,7 @@
             </form>
         </div>
     </div>
-    {{--modal create with show dokument  --}}
+    {{-- modal create with show dokument  --}}
     <div class="modal fade bs-example-modal-lg" id="createModald" role="dialog" style="width:100%"
         aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -175,34 +175,31 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-5">
-                            {{-- <div class="form-group">
-                                <label for="">Pilih Karyawan</label>
-                                <select style="width: 100%;" name="employee_uuids" id="employee_uuids"
-                                    class="custom-select2 form-control">
-                                    <option value="">karyawan</option>
-                                </select>
-                                <div class="invalid-feedback" id="req-employee_uuid">
-                                    Data tidak boleh kosong
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Tanggal Keluar</label>
-                                <input class="form-control" type="date">
-                            </div>
-                            <div class="form-group">
-                                <label for="">Dokument</label>
-                                <input accept=".pdf" id="document_out" name="document_out" onchange="showDocument()"
-                                    class="form-control" type="file">
-                            </div> --}}
-                        </div>
-                        <div class="col-md-7">
-                            <div style="text-align: center;">
-                                <iframe id="iframe-pdf" src="/file/user/123.pdf" style="width:100%; height:500px;"
-                                    frameborder="0"></iframe>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>Multiple Select</label>
+                        <select class="custom-select2 form-control" multiple="multiple" style="width: 100%">
+                            <optgroup label="Alaskan/Hawaiian Time Zone">
+                                <option value="AK">Alaska</option>
+                                <option value="HI">Hawaii</option>
+                            </optgroup>
+                            <optgroup label="Pacific Time Zone">
+                                <option value="CA">California</option>
+                                <option value="NV">Nevada</option>
+                                <option value="OR">Oregon</option>
+                                <option value="WA">Washington</option>
+                            </optgroup>
+                            <optgroup label="Mountain Time Zone">
+                                <option value="AZ">Arizona</option>
+                                <option value="CO">Colorado</option>
+                                <option value="ID">Idaho</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="UT">Utah</option>
+                                <option value="WY">Wyoming</option>
+                            </optgroup>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -217,8 +214,8 @@
         </div>
     </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    <!-- Modal -->
+    <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -257,7 +254,7 @@
         $('#btn-month').html(months[arr_year_month[1]]);
         $('#btn-month').val(arr_year_month[1]);
         $('#btn-day').html("Perbulan");
-        $('#btn-export').attr('href', '/employee-out/export/' + year_month)
+        $('#btn-export').attr('href', '/employee-changge/export/' + year_month)
 
         console.log("last day : " + year_month);
 
@@ -266,15 +263,15 @@
         $.ajax({
             url: '/employee-out/data',
             type: "POST",
-            data:  {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    year_month: year_month
-                },
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                year_month: year_month
+            },
             success: function(response) {
                 console.log(response)
             },
             error: function(response) {
-                alertModal()					
+                alertModal()
             }
         });
 
@@ -284,10 +281,10 @@
             let _url = "/employee-out/store";
             var document_out = $('#document_out')[0].files;
 
-            let muchErr =isRequired(['employee_uuid', 'date_out'])
-            console.log('req'+muchErr)
+            let muchErr = isRequired(['employee_uuid', 'date_out'])
+            console.log('req' + muchErr)
 
-            if(muchErr > 0){
+            if (muchErr > 0) {
                 return false;
             }
 
@@ -368,19 +365,19 @@
             });
 
             var elements_doc = {
-					mRender: function (data, type, row) {    
-                        let btn;
-                        if(row.document_path != null){
-                            btn =  `<div class="form-inline">
+                mRender: function(data, type, row) {
+                    let btn;
+                    if (row.document_path != null) {
+                        btn = `<div class="form-inline">
                                                         <button type="button" onclick="showdoc('${row.document_path}')" class="btn btn-sm btn-primary mr-1">Dokumen</button>
                                                     </div>`;
-                        }else{
-                            btn = 'kosong';
-                        }
-						return btn;
-					}
-				};
-			data.push(elements_doc)
+                    } else {
+                        btn = 'kosong';
+                    }
+                    return btn;
+                }
+            };
+            data.push(elements_doc)
 
             var element_action = {
                 mRender: function(data, type, row) {
@@ -417,14 +414,15 @@
                 columns: data
             });
         }
-        function deleteData(uuid){
+
+        function deleteData(uuid) {
             let _url = '/employee-out/delete'
-            
+
             $('#uuid_delete').val(uuid)
             $('#url_delete').val(_url)
             $('#confirm-modal').modal('show')
             $('#table_reload').val('employee-out')
-       }
+        }
 
         function refreshTable(val_year = null, val_month = null, val_day) {
             let v_year = $('#btn-year').html();
@@ -468,7 +466,7 @@
             </div>`;
 
             $('#the-table').append(table_element);
-            $('#btn-export').attr('href', 'employee-out/export/' + year_month)
+            $('#btn-export').attr('href', 'employee-changge/export/' + year_month)
             console.log('year:' + year_month)
             showDataTableEmployeeHourMeterMonth('url', 'table-employee-out')
         }

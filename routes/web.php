@@ -15,6 +15,8 @@ use App\Http\Controllers\CoalTypeController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Employee\EmployeeAbsenController;
 use App\Http\Controllers\Employee\EmployeeChanggeController;
+use App\Http\Controllers\Employee\EmployeeCutiController;
+use App\Http\Controllers\Employee\EmployeeCutiSetupController;
 use App\Http\Controllers\Employee\EmployeeDebtController;
 use App\Http\Controllers\Employee\EmployeeHourMeterDayController;
 use App\Http\Controllers\Employee\EmployeeOutController;
@@ -79,10 +81,29 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/export/{year_month}', [EmployeeOutController::class, 'export']);
         Route::post('/delete', [EmployeeOutController::class, 'delete']);
     });
+    Route::prefix('/employee-cuti')->group(function () {
+        Route::get('/', [EmployeeCutiController::class, 'index']);
+        Route::post('/data', [EmployeeCutiController::class, 'anyData']);
+        Route::post('/import', [EmployeeCutiController::class, 'import']);
+        Route::post('/store', [EmployeeCutiController::class, 'store']);
+    });
+
+    Route::prefix('/employee-cuti-setup')->group(function () {
+        Route::get('/', [EmployeeCutiSetupController::class, 'index']);
+        Route::post('/data', [EmployeeCutiSetupController::class, 'anyData']);
+        Route::post('/store', [EmployeeCutiSetupController::class, 'store']);
+        Route::post('/show', [EmployeeCutiSetupController::class, 'show']);
+        Route::get('/export/{year_month}', [EmployeeCutiSetupController::class, 'export']);
+        Route::post('/import', [EmployeeCutiController::class, 'import']);
+        Route::post('/delete', [EmployeeCutiSetupController::class, 'delete']);
+    });
 
     Route::prefix('/employee-changge')->group(function () {
         Route::get('/', [EmployeeChanggeController::class, 'index']);
         Route::get('/create', [EmployeeChanggeController::class, 'create']);
+        Route::get('/export/{year_month}', [EmployeeChanggeController::class, 'export']);
+        
+        Route::post('/import', [EmployeeChanggeController::class, 'import']);
     });
 
     Route::prefix('/me')->group(function () {
@@ -536,6 +557,7 @@ Route::middleware(['islogin'])->group(function () {
             Route::get('/data', [PurchaseOrderController::class, 'anyData']);
             Route::get('/detail/{po_number}', [PurchaseOrderController::class, 'showPublic']);
         });
+
         Route::prefix('/galery')->group(function () {
             Route::get('/data', [GaleryController::class, 'anyData']);
             Route::post('/store', [GaleryController::class, 'storeAdmin']);

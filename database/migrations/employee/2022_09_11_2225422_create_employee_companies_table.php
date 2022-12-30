@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmployeeRoastersTable extends Migration
+class CreateEmployeeCompaniesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,19 @@ class CreateEmployeeRoastersTable extends Migration
      */
     public function up()
     {
-        Schema::create('employee_roasters', function (Blueprint $table) {
+        Schema::create('employee_companies', function (Blueprint $table) {
             $table->id();
+            
             $table->string('uuid')->nullable();
             $table->string('employee_uuid')->nullable();
-            $table->string('roaster_uuid')->nullable();
+            $table->string('company_uuid')->nullable();
 
+            $table->string('submission_status')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->date('date_proposal')->nullable();
             $table->date('date_decline')->nullable();
+
             $table->timestamps();
         });
     }
@@ -34,6 +37,6 @@ class CreateEmployeeRoastersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('employee_roasters');
+        Schema::dropIfExists('employee_companies');
     }
 }

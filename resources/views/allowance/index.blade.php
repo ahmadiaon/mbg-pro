@@ -162,7 +162,10 @@
             arr_identities.forEach(element_identity => {
                 elements = {
                     mRender: function(data, type, row) {
-                        // console.log(row);
+                        if(row.employee_uuid == 'MBLE-0321100005'){
+
+                            console.log(row);
+                        }
                         return row[element_identity];
                     }
                 };

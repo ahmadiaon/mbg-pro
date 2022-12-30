@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmployeePremisTable extends Migration
+class CreateEmployeeOutsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,18 @@ class CreateEmployeePremisTable extends Migration
      */
     public function up()
     {
-        Schema::create('employee_premis', function (Blueprint $table) {
+        Schema::create('employee_outs', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->nullable();
             $table->string('employee_uuid')->nullable();
-            $table->string('premi_uuid')->nullable();
-            $table->float('premi_value')->nullable();
+            $table->string('out_status')->nullable();
+            $table->date('date_out')->nullable();
 
-            
+            $table->string('submission_status')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->date('date_proposal')->nullable();
             $table->date('date_decline')->nullable();
-            
             $table->timestamps();
         });
     }
@@ -37,6 +36,6 @@ class CreateEmployeePremisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('employee_premis');
+        Schema::dropIfExists('employee_outs');
     }
 }

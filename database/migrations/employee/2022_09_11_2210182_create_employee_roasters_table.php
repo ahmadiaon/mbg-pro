@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmployeeSalariesTable extends Migration
+class CreateEmployeeRoastersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,27 +13,17 @@ class CreateEmployeeSalariesTable extends Migration
      */
     public function up()
     {
-        Schema::create('employee_salaries', function (Blueprint $table) {
+        Schema::create('employee_roasters', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->nullable();
-
-            // fereign key
             $table->string('employee_uuid')->nullable();
-            $table->float('salary')->nullable();
-            $table->float('insentif')->nullable();
-            $table->float('tunjangan')->nullable();
-    
+            $table->string('roaster_uuid')->nullable();
 
-            $table->string('hour_meter_price_uuid')->nullable();
-            $table->float('insentif_hm')->nullable();
-            $table->float('deposit_hm')->nullable();
-            $table->float('tonase')->nullable();
-
+            $table->string('submission_status')->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->date('date_proposal')->nullable();
             $table->date('date_decline')->nullable();
-            
             $table->timestamps();
         });
     }
@@ -45,6 +35,6 @@ class CreateEmployeeSalariesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('employee_salaries');
+        Schema::dropIfExists('employee_roasters');
     }
 }

@@ -30,7 +30,7 @@ class UserLicenseController extends Controller
     }
     public function show($nik_employee){
         $data = Employee::where_employee_nik_employee_nullable($nik_employee);
-        // dd($data);
+        
         $data->isEdit = 1;
         $layout = [
             'head_datatable'        => true,
