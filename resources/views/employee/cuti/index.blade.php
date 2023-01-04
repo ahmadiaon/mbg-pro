@@ -665,14 +665,9 @@
 
         }
 
-        function addDays(date, days) {
-            date.setDate(date.getDate() + days);
-            return date;
-        }
+        
 
-        function padTo2Digits(num) {
-            return num.toString().padStart(2, '0');
-        }
+
 
         function changeLong() {
             let long_date = $('#long_cuti').val();
@@ -680,8 +675,8 @@
             var dateStart = new Date(date1);
             let dateEnd = addDays(dateStart, parseInt(long_date));
             let yearDate = dateEnd.getFullYear();
-            let monthDate = padTo2Digits(dateEnd.getMonth()+1);
-            let dayDate = padTo2Digits(dateEnd.getDate());
+            let monthDate =padToDigits(2, dateEnd.getMonth()+1);
+            let dayDate = padToDigits(2,dateEnd.getDate());
             $("#date_real_end_cuti").val(yearDate+'-'+monthDate+'-'+dayDate);
         }
 
@@ -867,7 +862,6 @@
             });
             var element_action = {
                 mRender: function(data, type, row) {
-                    // console.log(row)
                     return `
 									<div class="form-inline"> 
 										<button onclick="editData('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">

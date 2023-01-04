@@ -23,6 +23,7 @@ use App\Http\Controllers\Employee\EmployeeOutController;
 use App\Http\Controllers\Employee\EmployeePaymentController;
 use App\Http\Controllers\Employee\EmployeePaymentDebtController;
 use App\Http\Controllers\Employee\EmployeePaymentOtherController;
+use App\Http\Controllers\Employee\EmployeeSalaryController;
 use App\Http\Controllers\OverBurden\OverBurdenFlitController;
 use App\Http\Controllers\OverBurden\OverBurdenListController;
 use App\Http\Controllers\Employee\EmployeeTonseController;
@@ -49,6 +50,7 @@ use App\Http\Controllers\Safety\SafetyEmployeeController;
 use App\Http\Controllers\StatusAbsenController;
 use App\Http\Controllers\SuperadminController;
 use App\Http\Controllers\TaxStatusController;
+use App\Http\Controllers\UserDetail\UserAddressController;
 use App\Http\Controllers\UserDetail\UserDependentController;
 use App\Http\Controllers\UserDetail\UserDetailController;
 use App\Http\Controllers\UserDetail\UserEducationController;
@@ -60,7 +62,6 @@ use App\Http\Controllers\Vehicle\BrandTypeController;
 use App\Http\Controllers\Vehicle\GroupVehicleController;
 use App\Http\Controllers\Vehicle\StatusController;
 use App\Http\Controllers\Vehicle\VehicleController;
-use App\Models\Safety\AtributSize;
 
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
 Route::post('/login', [AuthenticationController::class, 'login']);
@@ -578,27 +579,63 @@ Route::middleware(['islogin'])->group(function () {
         // user
         Route::prefix('/user')->group(function () {
             Route::get('/', [EmployeeController::class, 'index']);
-            Route::post('/', [UserDetailController::class, 'store']);
+            Route::get('/create', [UserDetailController::class, 'create']);
+            Route::post('/store', [UserDetailController::class, 'store']);
+            Route::get('/data', [EmployeeController::class, 'anyData']);
+            Route::get('/data/{nik_employee}', [UserDetailController::class, 'anyDataOne']);
 
             Route::get('/export-simple', [EmployeeController::class, 'exportSimple']);
 
             Route::post('/import', [EmployeeController::class, 'import']);
-            
-            Route::get('/create', [UserDetailController::class, 'create']);
             Route::get('/{nik_employee}/edit', [UserDetailController::class, 'show']);
             Route::get('/export-data', [UserDetailController::class, 'exportData']);
             Route::get('/export', [UserDetailController::class, 'export']);
             Route::post('/export', [UserDetailController::class, 'exportAction']);
-
             Route::get('/monitoring', [UserDetailController::class, 'monitoring']);
         });
+        
+        Route::prefix('/user-dependent')->group(function () {          
+            Route::post('/store', [UserDependentController::class, 'store']);
+            Route::get('/data/{nik_employee}', [UserDependentController::class, 'anyDataOne']);
+        });
+
+        Route::prefix('/user-education')->group(function () {
+            Route::get('/data/{uuid}', [UserEducationController::class, 'anyDataOne']);
+            Route::post('/store', [UserEducationController::class, 'store']);     
+        });
+
+        Route::prefix('/user-address')->group(function () {          
+            Route::post('/store', [UserAddressController::class, 'store']);
+            Route::get('/data/{nik_employee}', [UserAddressController::class, 'anyDataOne']);
+        });
+
+        Route::prefix('/user-license')->group(function () {
+            Route::post('/store', [UserLicenseController::class, 'store']);
+            Route::get('/data/{uuid}', [UserLicenseController::class, 'anyDataOne']);
+        });
+
+        Route::prefix('/user-health')->group(function () {
+            Route::post('/store', [UserHealthController::class, 'store']);
+            Route::get('/data/{uuid}', [UserHealthController::class, 'anyDataOne']);
+        });
+
+        Route::prefix('/user-employee')->group(function () {
+            Route::post('/store', [EmployeeController::class, 'store']);
+            Route::get('/data/{uuid}', [EmployeeController::class, 'anyDataOne']);
+        });
+
+        Route::prefix('/employee-salary')->group(function () {
+            Route::post('/store', [EmployeeSalaryController::class, 'store']);
+            Route::get('/data/{uuid}', [EmployeeSalaryController::class, 'anyDataOne']);
+        });
+
 
         Route::prefix('/roaster')->group(function () {
             Route::get('/', [EmployeeController::class, 'index']);
         });
 
         Route::post('/user-file/store', [EmployeeController::class, 'storeFile']);
-        Route::get('/user-data', [EmployeeController::class, 'anyData']);
+        
         Route::post('/user/nik', [EmployeeController::class, 'show']);
         Route::get('/user/profile/{nik}', [EmployeeController::class, 'profile']);
         
@@ -608,26 +645,16 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/user-privilege-data', [UserPrivilegeController::class, 'anyData']);
     
         
-        Route::get('/user-health/{nik_employee}/edit', [UserHealthController::class, 'show']);
-        Route::get('/user-health/create/{user_detail_uuid}', [UserHealthController::class, 'create']);
-        Route::post('/user-health/store', [UserHealthController::class, 'store']);
+        
     
-        Route::get('/user-dependent/create/{user_detail_uuid}', [UserDependentController::class, 'create']);
-        Route::get('/user-dependent/{nik_employee}/edit', [UserDependentController::class, 'show']);
-        Route::post('/user-dependent/store', [UserDependentController::class, 'store']);
+        
+        
     
-        Route::get('/user-education/create/{user_detail_uuid}', [UserEducationController::class, 'create']);
-        Route::get('/user-education/{nik_employee}/edit', [UserEducationController::class, 'show']);
-        Route::post('/user-education/store', [UserEducationController::class, 'store']);
-    
-        Route::get('/user-license/create/{user_detail_uuid}', [UserLicenseController::class, 'create']);
-        Route::post('/user-license/store', [UserLicenseController::class, 'store']);
-        Route::get('/user-license/{nik_employee}/edit', [UserLicenseController::class, 'show']);
+        
     
         Route::get('/user-employee/create/{user_detail_uuid}', [EmployeeController::class, 'create']);
         Route::get('/user-employee/{nik_employee}/edit', [EmployeeController::class, 'show']);
         Route::post('/user-employee/store', [EmployeeController::class, 'store']);
-
         Route::post('/user-employee/cekNikEmployee', [EmployeeController::class, 'cekNikEmployee']);
 });
 

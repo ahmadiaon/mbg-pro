@@ -11,16 +11,24 @@ class UserPrivilege extends Model
     protected $guarded = ['id'];
 
     public static function where_nik_employee($nik_employee){
+        $user_privileges = [];
+
         $data = UserPrivilege::where('nik_employee', $nik_employee)->get();
-       
+        $privileges = Privilege::all();
+
+        foreach($privileges as $privilege){
+                $name_index = $privilege->uuid;
+                $user_privileges[$name_index] = null;
+        }
         
         if($data->count() > 0){   
-                    
-            return $data;
-            // $data->user_privileges = $user_privileges;
+            foreach($data as $item){
+                $user_privileges[$item->privilege_uuid] = true;
+            }    
+            return $user_privileges;
         }else{
-            return $data = null;
+            return $user_privileges;
         }
-        return $data;
+        return $user_privileges;
     }
 }

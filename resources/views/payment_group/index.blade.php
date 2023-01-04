@@ -33,7 +33,7 @@
 
 @section('js')
     <script>
-        showDataTableActions('database/payment-group/data', ['payment_group'], 'payment-group')
+        showDataTableAction('database/payment-group/data', ['payment_group'], 'payment-group')
         
 
        function deleteData(uuid){

@@ -4,13 +4,18 @@ namespace App\Http\Controllers\UserDetail;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\Department;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeePremi;
 use App\Models\Employee\EmployeeTotalHmMonth;
 use App\Models\HourMeterPrice;
 use App\Models\Poh;
+use App\Models\Position;
 use App\Models\Premi;
 use App\Models\Religion;
+use App\Models\Roaster;
+use App\Models\TaxStatus;
 use App\Models\UserDetail\UserAddress;
 use App\Models\UserDetail\UserDetail;
 use App\Models\UserDetail\UserReligion;
@@ -27,6 +32,82 @@ use Illuminate\Support\Facades\Storage;
 
 class UserDetailController extends Controller
 {
+
+    public function store(Request $request){
+        $isEdit = false;
+        $validateData = $request->all();
+
+        if($validateData['uuid'] == null){
+            $validateData['uuid'] = ResponseFormatter::toUUID($request->name).'-'.rand(99,9999);
+        }
+
+        $storeUserDetail = UserDetail::updateOrCreate(['uuid'=>$validateData['uuid']], $validateData);
+        $storeUserReligion = UserReligion::updateOrCreate(['uuid' =>$validateData['uuid']],[
+            'user_detail_uuid' => $validateData['uuid'],
+            'religion_uuid' => $request->religion_uuid,
+        ]);
+
+        return ResponseFormatter::toJson($storeUserDetail, 'from user-details');
+        //  strtolower(str_replace(' ','-',$validateDataUser['name'] ) .'-'.rand(99,9999));
+
+        // $storeUser = UserDetail::updateOrCreate(['uuid' => $validateDataUser['uuid']],$validateDataUser);
+        
+
+       
+        // $validateDataUserAddress = $request->validate([
+        //     'poh_uuid' => '',
+        //     'desa' => 'required',
+        //     'rt' => '',
+        //     'rw' => '',
+        //     'kecamatan' => '',//pkwt-pkwtt
+
+        //    'kabupaten' => 'required',
+        //    'provinsi' => '',
+        // ]);
+
+        // $validateDataUserReligion = $request->validate([
+        //     'uuid'  => '',
+        //     'religion_uuid' => '',
+        //     'user_detail_uuid' => '',
+        // ]);
+
+        // if($validateDataUser['user_detail_uuid'] == null){
+        //     $user_detail_uuid = strtolower(str_replace(' ','-',$validateDataUser['name'] ) .'-'.rand(99,9999));
+        //     $validateDataUser['uuid'] = $user_detail_uuid;
+        //     $validateDataUserAddress['uuid'] = 'address-'.$user_detail_uuid;
+        //     $validateDataUserReligion['uuid'] = 'religion-'.$user_detail_uuid;            
+        // }else{
+        //     $isEdit = true;
+        //     $validateDataUser['uuid'] =  $validateDataUser['user_detail_uuid'];
+        //     $validateDataUserAddress['uuid'] = $validateDataUser['user_address_uuid'];
+        //     $validateDataUserReligion['uuid'] = $validateDataUser['user_religion_uuid'];
+        // }
+
+        // $storeUser = UserDetail::updateOrCreate(['uuid' => $validateDataUser['uuid']],$validateDataUser);
+
+        // $validateDataUserAddress['user_detail_uuid'] = $storeUser->uuid;
+        // $validateDataUserAddress['is_last'] = '1';
+
+        // $storeUserAddress = UserAddress::updateOrCreate(['uuid' => $validateDataUserAddress['uuid']],$validateDataUserAddress);
+
+        // $validateDataUserReligion['user_detail_uuid'] = $storeUser->uuid;
+
+
+        // $storeUserReligion = UserReligion::updateOrCreate(['uuid' => $validateDataUserReligion['uuid']],$validateDataUserReligion);
+        // $das = [
+        //     'religion'  => $storeUserReligion,
+        //     'user'  => $storeUser,
+        //     'address'   => $storeUserAddress
+        // ];
+        
+        if($isEdit == true){
+            return redirect()->intended('/user/profile/'.$request->nik_employee);
+        }
+
+        return redirect()->intended('/user-dependent/create/'.$storeUserDetail->uuid);
+    }
+
+
     public function login(){
         return view('authentication.login', [
             'title'         => 'Login'
@@ -149,11 +230,27 @@ class UserDetailController extends Controller
 
         $religions = Religion::all();
         $pohs = Poh::all();
+        $companies = Company::all();
+        $departments = Department::all();
+        $positions = Position::all();
+        $roasters = Roaster::all();
+        $tax_statuses = TaxStatus::all();
+        $hour_meter_prices = HourMeterPrice::all();        
+        $premis = Premi::all();
         
-        return view('user_detail.edit', [
+        
+        return view('user_detail.main', [
             'title'         => 'Tambah Karyawan',
             'religions' => $religions,
             'pohs' => $pohs,
+            'companies' => $companies,
+            'departments' => $departments,
+            'positions' => $positions,
+            'tax_statuses' => $tax_statuses,
+            'roasters' => $roasters,
+            'hour_meter_prices' => $hour_meter_prices,
+            
+            'premis' => $premis,
             'data'  => null,
             'layout'    => $layout
         ]);
@@ -228,91 +325,7 @@ class UserDetailController extends Controller
 
     
 
-    public function store(Request $request){
-
-        //user_detail
-        //user_religion
-        //user_address
-        //
-
-        // dd($request);
-        $isEdit = false;
-        
-        $validateDataUser = $request->validate([
-            'user_detail_uuid'  => '',
-            'user_religion_uuid'    => '',
-            'user_address_uuid' =>'',
-
-            'name' => 'required',
-            'nik_number' => 'required',
-            'kk_number' => 'required',
-            'citizenship' => 'required',
-            'gender' => 'required',//pkwt-pkwtt
-
-           'place_of_birth' => 'required',
-           'date_of_birth' => 'required',
-            
-           'blood_group' => 'required',
-            'status' => 'required',  
-            'npwp_number' => '',
-            'financial_number' => '',
-            'bpjs_ketenagakerjaan' => '',  
-            'bpjs_kesehatan' => '',  
-
-            'phone_number' => '',  
-        ]);
-       
-        $validateDataUserAddress = $request->validate([
-            'poh_uuid' => '',
-            'desa' => 'required',
-            'rt' => '',
-            'rw' => '',
-            'kecamatan' => '',//pkwt-pkwtt
-
-           'kabupaten' => 'required',
-           'provinsi' => '',
-        ]);
-
-        $validateDataUserReligion = $request->validate([
-            'uuid'  => '',
-            'religion_uuid' => '',
-            'user_detail_uuid' => '',
-        ]);
-
-        if($validateDataUser['user_detail_uuid'] == null){
-            $user_detail_uuid = strtolower(str_replace(' ','-',$validateDataUser['name'] ) .'-'.rand(99,9999));
-            $validateDataUser['uuid'] = $user_detail_uuid;
-            $validateDataUserAddress['uuid'] = 'address-'.$user_detail_uuid;
-            $validateDataUserReligion['uuid'] = 'religion-'.$user_detail_uuid;            
-        }else{
-            $isEdit = true;
-            $validateDataUser['uuid'] =  $validateDataUser['user_detail_uuid'];
-            $validateDataUserAddress['uuid'] = $validateDataUser['user_address_uuid'];
-            $validateDataUserReligion['uuid'] = $validateDataUser['user_religion_uuid'];
-        }
-
-        $storeUser = UserDetail::updateOrCreate(['uuid' => $validateDataUser['uuid']],$validateDataUser);
-
-        $validateDataUserAddress['user_detail_uuid'] = $storeUser->uuid;
-        $validateDataUserAddress['is_last'] = '1';
-
-        $storeUserAddress = UserAddress::updateOrCreate(['uuid' => $validateDataUserAddress['uuid']],$validateDataUserAddress);
-
-        $validateDataUserReligion['user_detail_uuid'] = $storeUser->uuid;
-
-
-        $storeUserReligion = UserReligion::updateOrCreate(['uuid' => $validateDataUserReligion['uuid']],$validateDataUserReligion);
-        $das = [
-            'religion'  => $storeUserReligion,
-            'user'  => $storeUser,
-            'address'   => $storeUserAddress
-        ];
-        
-        if($isEdit == true){
-            return redirect()->intended('/user/profile/'.$request->nik_employee);
-        }
-        return redirect()->intended('/user-dependent/create/'.$storeUser->uuid);
-    }
+    
 
     public function anyData()
     {
@@ -329,6 +342,11 @@ class UserDetailController extends Controller
         })
         ->make(true);
             
+    }
+
+    public function anyDataOne($uuid){
+        $data = UserDetail::where('uuid', $uuid)->first();
+        return ResponseFormatter::toJson($data, 'data user_detail');
     }
 
     public function exportAction(Request $request){

@@ -20,17 +20,20 @@ use App\Models\Premi;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\Roaster;
 use App\Models\User;
+use App\Models\UserDetail\UserAddress;
+use App\Models\UserDetail\UserDependent;
 use App\Models\UserDetail\UserDetail;
+use App\Models\UserDetail\UserEducation;
+use App\Models\UserDetail\UserHealth;
+use App\Models\UserDetail\UserReligion;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
-use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -39,8 +42,14 @@ class EmployeeController extends Controller
         $data = Employee::get_employee_all();
         return view('datatableshow', [ 'data'         => $data]);
     }
+    public function anyDataOne($uuid){
+        $data = Employee::where('uuid', $uuid)->first();
+        return ResponseFormatter::toJson($data, 'data user_employee');
+    }
+
     public function index(){
         // return Employee::getAll();
+        $religions = Religion::all();
         $layout = [
             'head_datatable'        => true,
             'javascript_datatable'  => true,
@@ -51,6 +60,7 @@ class EmployeeController extends Controller
         return view('employee.index', [
             'title'         => 'Daftar Karyawan',
             'layout'    => $layout,
+            'religions' => $religions
         ]);
     }
 
@@ -708,71 +718,57 @@ class EmployeeController extends Controller
         return ResponseFormatter::toJson($validatedData, 'file store');
     }
     public function store(Request $request){
-        // dd($request);
-        $validateData = $request->validate([
-           'user_detail_uuid' => '',
-           'machine_id' => '',
-           'nik_employee' => 'unique:employees',
-           'position_uuid' => '',
-           'department_uuid' => '',
-
-           'contract_number'=>'',
-           'contract_status' => '',//pkwt-pkwtt
-           'date_start_contract'=>'',
-           'date_end_contract'=>'',
-           'date_document_contract'=>'',
-            
-           'long_contract'=>'', //month
-           'employee_status' => '',      //trainer
-        ]);
-
-        $validateDataSalaries = $request->validate([
-           'salary' => '',
-           'insentif' => '',
-           'premi_bk' => '',
-           'premi_nbk' => '',
-           'premi_kayu' => '',
-           'premi_mb' => '',
-           'premi_rj' => '',
-           'insentif_hm' => '',
-           'deposit_hm' => '',
-           'tonase' => '',
-            'date_start' => '',
-            'date_end' => '',
-         ]);
-        
-   
-
-
-        $contract_numbers = explode("/",$request->contract_number);
-        $validateData['contract_number'] =$contract_numbers[0];
-        if(empty($request->uuid)){
-            $validateData['uuid'] = $validateData['nik_employee'];           
+        $validateData = $request->all();
+        $user_detail_uuid = $validateData['user_detail_uuid'];
+        if(empty($validateData['uuid'])){
+            $validateData['uuid'] = $validateData['nik_employee'];
+            $validateData['user_detail_uuid'] = $validateData['nik_employee'];
         }
 
-        $store = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
-        $store_employee_company = EmployeeCompany::updateOrCreate(['uuid' => $validateData['uuid']], ['employee_uuid' => $store->uuid,'company_uuid'=>$request->company_uuid]);
 
-        $validateDataUser['uuid'] =$store->uuid;
+        $number_contract = explode('/', $validateData['contract_number_full']);
+        
+        $validateData['contract_number'] =$number_contract[0];
+        $validateData['date_document_contract'] =$validateData['date_start_contract'];
+
+        $storeEmployee = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
+
+        $updateUserDetail = UserDetail::updateOrCreate(['uuid' => $user_detail_uuid]);
+        $updateUserReligion = UserReligion::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
+        $updateUserHealth = UserHealth::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
+        $updateUserEducation = UserEducation::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);  
+        $updateUserDependent = UserDependent::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
+        $updateUserAddress = UserAddress::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
+       
+        $updateUserCompany = EmployeeCompany::updateOrCreate(['uuid' => $validateData['uuid']], ['date_start' => $validateData['date_start'],'employee_uuid' => $storeEmployee->uuid,'company_uuid'=>$validateData['company_uuid']]);
+        $updateUserRoaster = EmployeeRoaster::updateOrCreate(['uuid' => $validateData['uuid']], ['date_start' => $validateData['date_start'],'employee_uuid' => $storeEmployee->uuid,'roaster_uuid'=>$validateData['roaster_uuid']]);
+
+        
+
+        $validateDataUser['uuid'] =$storeEmployee->uuid;
         $validateDataUser['employee_uuid'] =   $validateData['uuid'];
         $validateDataUser['role'] = 'employee';
         $validateDataUser['nik_employee'] = $validateData['nik_employee'];;
         $validateDataUser['password'] = Hash::make('password');
-        $store = User::updateOrCreate(['uuid' => $validateDataUser['uuid']], $validateDataUser );
-        
-        $validateDataSalaries['uuid'] = $validateData['uuid'];
-        $validateDataSalaries['employee_uuid'] = $validateData['uuid'];
-        $validateDataSalaries['date_start'] = Carbon::today('Asia/Jakarta');
 
-        $store = EmployeeSalary::updateOrCreate(['uuid' => $validateDataSalaries['uuid']], $validateDataSalaries );
-
+        $updateUser = User::updateOrCreate(['uuid' => $validateDataUser['uuid']], $validateDataUser );
 
         $abc = [
             'validateDataUser' => $validateDataUser,
             'validateData' => $validateData,
-            'validateDataSalaries' => $validateDataSalaries,
+            'updateUserDetail' => $updateUserDetail,
+            'updateUserReligion' => $updateUserReligion,
+            'updateUserHealth' => $updateUserHealth,
+            'updateUserEducation' => $updateUserEducation,
+            'updateUserDependent' => $updateUserDependent,
+            'updateUserAddress' => $updateUserAddress,
+            'updateUserCompany' => $updateUserCompany,
+            
+            'updateUserRoaster' => $updateUserRoaster,
+            'updateUser' => $updateUser,
         ];
-        // dd($abc);
+
+        return ResponseFormatter::toJson($abc, 'data store employee');
         return redirect()->intended('/user')->with('success',"Karyawan Ditambahkan");
     }
 
@@ -786,18 +782,9 @@ class EmployeeController extends Controller
     }
 
     public function profile($nik_employee){
-        $data = Employee::where_employee_nik_employee_nullable($nik_employee);  
         
-        // dd($data);
-        if(!empty($data->user_privileges)){
-            foreach($data->user_privileges as $item){
-                $thiss = $item->privilege_uuid;
-                $data->$thiss = 1;
-            }
-        }
+        $data =Employee::noGet_employeeAll_detail()->where('employee_uuid', $nik_employee)->first();
          
-
-
         $layout = [
             'head_datatable'        => true,
             'javascript_datatable'  => true,
@@ -829,4 +816,6 @@ class EmployeeController extends Controller
         return Datatables::of($data)     
         ->make(true);
     }
+
+    
 }

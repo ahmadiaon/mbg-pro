@@ -465,3 +465,200 @@ if(data){
     console.log('siti');
 }
 @endsection
+
+
+<form action="/user/store" id="form-user-detail" method="POST" enctype="multipart/form-data">
+    @csrf
+        <input type="text" name="user_detail_uuid" id="user_detail_uuid">
+        <input type="text" name="isEdit" id="isEdit">
+        <input type="text" name="nik_employee" id="nik_employee">
+        <input type="text" name="user_religion_uuid" id="user_religion_uuid">
+        <input type="text" name="user_address_uuid" id="user_address_uuid">
+
+        <div class="min-height-200px">
+            <div class="pd-20 card-box mb-20">
+                <div class="clearfix">
+                    <div class="pull-left">
+                        <h4 class="text-blue h4">Identitas Karyawan</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="pd-20 card-box mb-30">
+                            <div class="form-group">
+                                <label>Nama</label>
+                                <input name="name" class="form-control" value="" id="name"
+                                    placeholder="Ahmadi Alpasyri" type="text">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>NIK</label>
+                                        <input name="nik_number" class="form-control" value="" id="nik_number"
+                                            placeholder="6210000" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="form-group">
+                                            <label>Nomor Kartu Keluarga</label>
+                                            <input name="kk_number" class="form-control" value="" id="kk_number"
+                                                placeholder="62111" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>NPWP</label>
+                                <input name="npwp_number" class="form-control" value="" id="npwp_number"
+                                    placeholder="Nomor NPWP" type="text">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Kewarganegaraan</label>
+                                        <select name="citizenship" id="citizenship" class="selectpicker form-control">
+                                            <option value="WNI">WNI</option>
+                                            <option value="WNA">WNA</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Agama</label>
+                                        <select name="religion_uuid" class="selectpicker form-control">
+                                            @foreach ($religions as $religion)
+                                                <option value="{{ $religion->uuid }}">{{ $religion->religion }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="form-group">
+                                        <label>Tempat Lahir</label>
+                                        <input name="place_of_birth" class="form-control" value="" id="place_of_birth"
+                                            placeholder="Muara Teweh" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Tanggal Lahir</label>
+                                        <input name="date_of_birth" id="date_of_birth" class="form-control" placeholder="Select Date" type="date" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Golongan Darah</label>
+                                        <select name="blood_group"
+                                            class="selectpicker form-control">
+                                            <option value="unknown">
+                                                Tak Diketahui</option>
+                                            <option value="A">A
+                                            </option>
+                                            <option value="B">B
+                                            </option>
+                                            <option value="AB">
+                                                AB
+                                            </option>
+                                            <option value="O">O
+                                            </option>
+                                            
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <select name="status" id="status"class="selectpicker form-control">
+                                            <option value="Lajang">
+                                                Lajang</option>
+                                            <option value="Menikah">
+                                                Menikah</option>
+                                            <option value="Duda">
+                                                Duda
+                                            </option>
+                                            <option value="Janda">
+                                                Janda</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Gender</label>
+                                        <select name="gender" id="gender" class="selectpicker form-control">
+                                            <option value="Laki-laki">
+                                                Laki-laki</option>
+                                            <option value="Perempuan">
+                                                Perempuan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="pd-20 card-box mb-30">
+                            {{-- norek --}}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Nomor Rekening</label>
+                                        <input name="financial_number" class="form-control " value=""
+                                            id="financial_number" placeholder="000" type="text">
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Nama Rekening</label>
+                                        <input name="phone_number" class="form-control " value=""
+                                            id="phone_number" placeholder="Ahmadi" type="text">
+
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- npwp --}}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Nomor NPWP</label>
+                                        <input name="financial_number" class="form-control" value=""
+                                            id="financial_number" placeholder="000" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- bpjs --}}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>BPJS Ketenagakerjaan</label>
+                                        <input name="bpjs_ketenagakerjaan" class="form-control" value=""
+                                            id="bpjs_ketenagakerjaan" placeholder="Muara Teweh" type="text">
+
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group ">
+                                        <label>BPJS kesehatan</label>
+                                        <input name="bpjs_kesehatan" class="form-control" value=""
+                                            id="bpjs_kesehatan" placeholder="Muara Teweh" type="text">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="store('user-detail')" class="btn btn-primary mt-30 float-right">Next
+                                Step</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>

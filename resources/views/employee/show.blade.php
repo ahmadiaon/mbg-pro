@@ -28,7 +28,7 @@
                     <div class="profile-photo">
                         <a href="modal" data-toggle="modal" data-target="#modal" class="edit-avatar"><i
                                 class="fa fa-pencil"></i></a>
-                        <img src="{{ !empty($data->user_details->photo_path) ? '/' . $data->user_details->photo_path : '/vendors/images/photo4.jpg' }}"
+                        <img src="{{ !empty($data->photo_path) ? '/' . $data->photo_path : '/vendors/images/photo4.jpg' }}"
                             alt="" class="avatar-photo" />
                         <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
                             aria-hidden="true">
@@ -37,7 +37,7 @@
                                     <div class="modal-body pd-5">
                                         <div class="img-container">
                                             <img id="image"
-                                                src="{{ !empty($data->user_details->photo_path) ? '/' . $data->user_details->photo_path : '/vendors/images/photo4.jpg' }}"
+                                                src="{{ !empty($data->photo_path) ? '/' . $data->photo_path : '/vendors/images/photo4.jpg' }}"
                                                 alt="Picture" />
                                         </div>
                                     </div>
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                     </div>
-                    <h5 class="text-center h5 mb-0">{{ $data->user_details->name }}</h5>
+                    <h5 class="text-center h5 mb-0">{{ $data->name }}</h5>
                     <p class="text-center text-muted font-14">
                         <b>{{ $data->nik_employee }}</b>
                     </p>
@@ -64,7 +64,7 @@
                             </li>
                             <li>
                                 <span>Phone Number:</span>
-                                {{ !empty($data->user_details->phone_number) ? $data->user_details->phone_number : 'belum ada' }}
+                                {{ !empty($data->phone_number) ? $data->phone_number : 'belum ada' }}
                             </li>
                             <li>
                                 <span>Country:</span>
@@ -72,8 +72,8 @@
                             </li>
                             <li>
                                 <span>Address:</span>
-                                {{ !empty($data->user_addresses->desa) ? $data->user_addresses->desa : 'belum ada' }}<br />
-                                {{ !empty($data->user_addresses->kabupaten) ? $data->user_addresses->kabupaten : 'belum ada' }}
+                                {{ !empty($data->desa) ? $data->desa : 'belum ada' }}<br />
+                                {{ !empty($data->kabupaten) ? $data->kabupaten : 'belum ada' }}
                             </li>
                         </ul>
                     </div>
@@ -155,7 +155,7 @@
                                                                 <span>Nama Lengkap:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->name }}</b>
+                                                                <b>{{ $data->name }}</b>
                                                             </div>
                                                         </div>
                                                   
@@ -165,7 +165,7 @@
                                                             </div>
                                                            
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->kk_number }}</b>/<b>{{ $data->user_details->nik_number }}</b>
+                                                                <b>{{ $data->kk_number }}</b>/<b>{{ $data->nik_number }}</b>
                                                             </div>
                                                         </div>
                                                   
@@ -174,7 +174,7 @@
                                                                 <span>Gender:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->gender }}</b>
+                                                                <b>{{ $data->gender }}</b>
                                                             </div>
                                                         </div>
                                                   
@@ -192,7 +192,7 @@
                                                                 <span>Tempat Lahir:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->place_of_birth }}</b>
+                                                                <b>{{ $data->place_of_birth }}</b>
                                                             </div>
                                                         </div>
                                                   
@@ -201,7 +201,7 @@
                                                                 <span>Tanggal Lahir:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->date_of_birth }}</b>
+                                                                <b>{{ $data->date_of_birth }}</b>
                                                             </div>
                                                         </div>
                                                     
@@ -210,7 +210,7 @@
                                                                 <span>Golongan Darah:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->blood_group }}</b>
+                                                                <b>{{ $data->blood_group }}</b>
                                                             </div>
                                                         </div>
                                                     
@@ -219,7 +219,7 @@
                                                                 <span>Status:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                <b>{{ $data->user_details->status }}</b>
+                                                                <b>{{ $data->status }}</b>
                                                             </div>
                                                         </div>
                                                     
@@ -228,7 +228,7 @@
                                                                 <span>Nomor Telepon:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_details->phone_number) ? $data->user_details->phone_number : 'belum ada' }}
+                                                                {{ !empty($data->phone_number) ? $data->phone_number : 'belum ada' }}
                                                             </div>
                                                         </div>
                                                     </li>                                                  
@@ -243,7 +243,7 @@
                                                                 <span>NPWP:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_details->npwp_number) ? $data->user_details->npwp_number : 'belum ada' }}
+                                                                {{ !empty($data->npwp_number) ? $data->npwp_number : 'belum ada' }}
                                                             </div>
                                                         </div>
                                                         <div class="row">
@@ -251,7 +251,7 @@
                                                                 <span>Rekening BNI:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_details->financial_number) ? $data->user_details->financial_number : 'belum ada' }}
+                                                                {{ !empty($data->financial_number) ? $data->financial_number : 'belum ada' }}
                                                             </div>
                                                         </div>
                                                         <div class="row">
@@ -259,7 +259,7 @@
                                                                 <span>BPJS Ketenagakerjaan:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_details->bpjs_ketenagakerjaan) ? $data->user_details->bpjs_ketenagakerjaan : 'belum ada' }}
+                                                                {{ !empty($data->bpjs_ketenagakerjaan) ? $data->bpjs_ketenagakerjaan : 'belum ada' }}
                                                             </div>
                                                         </div>
                                                         <div class="row">
@@ -267,7 +267,7 @@
                                                                 <span>BPJS Kesehatan:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_details->bpjs_kesehatan) ? $data->user_details->bpjs_kesehatan : 'belum ada' }}
+                                                                {{ !empty($data->bpjs_kesehatan) ? $data->bpjs_kesehatan : 'belum ada' }}
                                                             </div>
                                                         </div>
                                                     </li>                                          
@@ -282,7 +282,7 @@
                                                                 <span>Desa/Jalan:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_addresses->desa) ? $data->user_addresses->desa : 'belum ada' }}
+                                                                {{ !empty($data->desa) ? $data->desa : 'belum ada' }}
                                                             </div>
                                                             <div class="col-auto">
                                                             </div>
@@ -290,7 +290,7 @@
                                                                 <span>RT/RW:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_addresses->rt) ? $data->user_addresses->rt : '-' }}/{{ !empty($data->user_addresses->rw) ? $data->user_addresses->rw : '-' }}
+                                                                {{ !empty($data->rt) ? $data->rt : '-' }}/{{ !empty($data->rw) ? $data->rw : '-' }}
                                                             </div>
                                                         </div>
                                                     </li> 
@@ -300,13 +300,13 @@
                                                                 <span>Kecamatan:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_addresses->kecamatan) ? $data->user_addresses->kecamatan : 'belum ada' }}
+                                                                {{ !empty($data->kecamatan) ? $data->kecamatan : 'belum ada' }}
                                                             </div>
                                                             <div class="col-auto">
                                                                 <span>Kabupaten:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_addresses->kabupaten) ? $data->user_addresses->kabupaten : 'belum ada' }}
+                                                                {{ !empty($data->kabupaten) ? $data->kabupaten : 'belum ada' }}
                                                             </div>
                                                         </div>
 
@@ -317,7 +317,7 @@
                                                                 <span>Provinsi:</span>
                                                             </div>
                                                             <div class="col text-right">
-                                                                {{ !empty($data->user_addresses->provinsi) ? $data->user_addresses->provinsi : 'belum ada' }}
+                                                                {{ !empty($data->provinsi) ? $data->provinsi : 'belum ada' }}
                                                             </div>
                                                         </div>
                                                     </li>                                             
@@ -335,8 +335,7 @@
                                                                 class="ion-plus-round"></i> Edit</a>
                                                     </div>
                                                 </div>
-                                            @if (!empty($data->user_healths->name_health))
-                                          
+                                            @if (!empty($data->user_healths->name_health))                                          
                                                 <ul>
                                                     <li>
                                                         <div class="row">
@@ -380,8 +379,15 @@
                                                             </div>
                                                         </div>
                                                     </li>                                          
-                                                </ul>                                            
+                                                </ul>      
+                                            @else
+                                            <div class="pd-10">                    
+                                                <dl class="row">
+                                                    <dt class="col-sm-3">Tidak Ada</dt>
+                                                </dl>
+                                            </div>
                                             @endif
+                                            
                                         </div>
                                            
                                         </div>

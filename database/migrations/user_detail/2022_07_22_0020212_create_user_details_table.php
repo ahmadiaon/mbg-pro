@@ -17,26 +17,26 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->nullable();//
             //foreigen key
-            $table->string('name')->nullable();//
-            $table->string('nik_number')->nullable();//
-            $table->string('kk_number')->nullable();//
-            $table->string('citizenship')->nullable();//
-            $table->string('gender')->nullable();//
+            $table->string('name')->nullable();// 1
+            $table->string('nik_number')->nullable();// 1
+            $table->string('kk_number')->nullable();// 1
+            $table->string('citizenship')->nullable();// 1
+            $table->string('gender')->nullable();// 1
 
-            $table->string('place_of_birth')->nullable();//
-            $table->date('date_of_birth')->nullable();//
+            $table->string('place_of_birth')->nullable();// 1
+            $table->date('date_of_birth')->nullable();// 1
 
-            $table->string('blood_group')->nullable();//
-            $table->string('status')->nullable();//
+            $table->string('blood_group')->nullable();// 1
+            $table->string('status')->nullable();// 1
 
-            $table->string('npwp_number')->nullable();//
-            $table->string('financial_number')->nullable();//
-            $table->string('financial_name')->nullable();//
-            $table->string('bpjs_ketenagakerjaan')->nullable();//
-            $table->string('bpjs_kesehatan')->nullable();//
+            $table->string('npwp_number')->nullable();// 1
+            $table->string('financial_number')->nullable();// 1
+            $table->string('financial_name')->nullable();// 1
+            $table->string('bpjs_ketenagakerjaan')->nullable();// 1 
+            $table->string('bpjs_kesehatan')->nullable();// 1
 
-            $table->string('phone_number')->nullable();
-            $table->string('photo_path')->nullable();
+            $table->string('phone_number')->nullable(); // 1
+            $table->string('photo_path')->nullable(); // 1
             
             $table->string('submission_status')->nullable();
             $table->date('date_start')->nullable();
