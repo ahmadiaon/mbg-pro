@@ -19,6 +19,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
+
+    function countBonus(){
+        return 99;
+    }
     use HasFactory;
     protected $guarded = ['id'];
 
@@ -46,8 +50,18 @@ class Employee extends Model
     public static function noGet_employeeAll_detail(){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
         ->join('employee_roasters','employee_roasters.employee_uuid','employees.uuid')
-        ->leftJoin('user_addresses','user_addresses.user_detail_uuid','user_details.uuid')
-        ->join('positions','positions.uuid','=','employees.position_uuid');
+        ->leftJoin('user_addresses','user_addresses.user_detail_uuid','user_details.uuid')        
+        ->leftJoin('employee_companies','employee_companies.employee_uuid','employees.uuid')
+        ->leftJoin('user_healths','user_healths.user_detail_uuid','user_details.uuid')
+        ->leftJoin('user_dependents','user_dependents.user_detail_uuid','user_details.uuid')
+        ->leftJoin('user_religions','user_religions.user_detail_uuid','user_details.uuid')
+        ->leftJoin('religions','religions.uuid','user_religions.religion_uuid')
+        ->leftJoin('user_education','user_education.user_detail_uuid','user_details.uuid')
+        ->leftJoin('user_licenses','user_licenses.user_detail_uuid','user_details.uuid')
+        ->leftJoin('employee_salaries','employee_salaries.employee_uuid','employees.uuid')
+        ->leftJoin('positions','positions.uuid','=','employees.position_uuid')
+        ->leftJoin('departments','departments.uuid','=','employees.department_uuid')
+        ->leftJoin('hour_meter_prices','hour_meter_prices.uuid','=','employee_salaries.hour_meter_price_uuid');
     }
 
 

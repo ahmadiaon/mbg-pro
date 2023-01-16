@@ -1,9 +1,8 @@
 <script>
-   
-    function firstCreateUserDependent(get_id) {
+    function firstCreateUserDependent(pageId, user_detail_uuid) {
+        console.log('firstCreateUserAddress');
         stopLoading();
-        let user_detail_uuid = get_id;
-        $('#user_detail_uuid').val(user_detail_uuid);
+        $(`#user_detail_uuid-${pageId}`).val(user_detail_uuid);
         getData('/user/data/' + user_detail_uuid, 'user-detail').then((data) => {
             let data_user = data.data;
             setValue('/user-dependent/data/' + user_detail_uuid);
@@ -17,6 +16,12 @@
                 }
             }
         })
+        if ($(`#isEdit-${pageId}`).val() == null) {
+            $('.create-user-employee-back').hide();
+        } else {
+            $(`#uuid-${pageId}`).val(user_detail_uuid)
+            $('.create-user-employee-back').attr('onclick', `choosePage('show-employee','${user_detail_uuid}')`);
+        }
     }
 
     function storeUserDependent(idForm) {
@@ -25,10 +30,15 @@
         }
         globalStoreNoTable(idForm).then((data) => {
             let user = data.data;
-            console.log(data);
-
-            $('#btn-success-modal-id').attr('onclick',
-                `choosePage("create-user-education",  "${user.user_detail_uuid}")`);
+            console.log(data);           
+            if ($('#isEdit-create-' + idForm).val()) {
+                employees[user.employee_uuid] = user
+                $('#btn-success-modal-id').attr('onclick',
+                    `choosePage("show-employee",  "${user.employee_uuid}")`);
+            } else {
+                $('#btn-success-modal-id').attr('onclick',
+                    `choosePage("create-user-education",  "${user.user_detail_uuid}")`);
+            }
             stopLoading();
             $('#success-modal-id').modal('show')
         })

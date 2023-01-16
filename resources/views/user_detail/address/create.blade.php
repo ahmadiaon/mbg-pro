@@ -1,10 +1,9 @@
 <div id="create-user-address" class="children-content">
     <form action="/user-address/store" id="form-user-address" method="POST" enctype="multipart/form-data">
         @csrf
-
-        <input type="text" name="isEdit" id="isEdit">
-        <input type="text" name="uuid" id="uuid-user-address">
-        <input type="text" name="user_detail_uuid" id="user_detail_uuid-address">
+        <input type="text" name="isEdit" id="isEdit-create-user-address">
+        <input type="text" name="uuid" id="uuid-create-user-address">
+        <input type="text" name="user_detail_uuid" id="user_detail_uuid-create-user-address">
         <div class="min-height-200px">
             <div class="pd-20 card-box mb-20">
                 <div class="clearfix">
@@ -109,6 +108,8 @@
                     </div>
                     <div class="col-md-8">
                         <div class="form-group text-right">
+                            <button type="button"
+                                class="btn btn-secondary  mr-10 create-user-employee-back">Back</button>
                             <button type="button" onclick="storeUserAddress('user-address')"
                                 class="btn btn-primary">Simpan</button>
                         </div>

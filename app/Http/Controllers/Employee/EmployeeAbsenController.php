@@ -501,14 +501,16 @@ class EmployeeAbsenController extends Controller
                 while($sheet->getCell( 'A'.$no_employee)->getValue() != null){
                     $column_date = 4;
                     $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'C'.$no_employee)->getValue());
+
+                    $storeEmployee = Employee::updateOrCreate(['uuid'    => $nik_employee], ['machine_id'=> $nik_employee]);
                     $status_absen['year_month'] = $year_month;
                     $status_absen['nik_employee'] = $nik_employee;
                     for($day=1; $day <= $last_day; $day++){
                         $status_absen['day-'.$day] = $sheet->getCell( $rows[$column_date].$no_employee)->getValue();
                         $store_employee_absen = EmployeeAbsen::updateOrCreate([
-                            'uuid' => $year_month.'-'.$day.'-'.$employees[$nik_employee]->machine_id],
+                            'uuid' => $year_month.'-'.$day.'-'.$storeEmployee->machine_id],
                             [
-                                'employee_uuid'  => $employees[$nik_employee]->machine_id,
+                                'employee_uuid'  => $storeEmployee->machine_id,
                                 'date' => $year_month.'-'.$day,
                                 'status_absen_uuid'     => ResponseFormatter::toUUID($sheet->getCell( $rows[$column_date].$no_employee)->getValue()),
                                 'cek_log'       =>  null,
@@ -517,11 +519,18 @@ class EmployeeAbsenController extends Controller
                     }
 
                     $column_date = 4 + $last_day;
-                    $status_absen['cut'] = $sheet->getCell( $cut.$no_employee)->getOldCalculatedValue();
-                    $status_absen['pay'] = $sheet->getCell( $pay.$no_employee)->getOldCalculatedValue();
+                    // $status_absen['cut'] = $sheet->getCell( $cut.$no_employee)->getOldCalculatedValue();
+                    // $status_absen['pay'] = $sheet->getCell( $pay.$no_employee)->getOldCalculatedValue();
                     $no_employee++;
-                    EmployeeAbsenTotal::updateOrCreate(['uuid' => $year_month.'-'.$nik_employee], $status_absen);
+                    // EmployeeAbsenTotal::updateOrCreate(['uuid' => $year_month.'-'.$nik_employee], $status_absen);
                 }
+
+                $absen_month = EmployeeAbsen::join('employees','employees.machine_id', 'employee_absens.employee_uuid')
+                ->get([
+                    'employees.*',
+                    'employee_absens.*'
+                ]);
+                dd($absen_month);
                 return back();
 
             }else{
@@ -667,7 +676,7 @@ class EmployeeAbsenController extends Controller
             }
 
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
     }
@@ -677,64 +686,52 @@ class EmployeeAbsenController extends Controller
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
-        // $employees = Employee::join('user_details','user_details.uuid','employees.user_detail_uuid')
-        // ->leftJoin('positions','positions.uuid','employees.position_uuid')
-        // ->get([
-        //     'employees.nik_employee',
-        //     'user_details.photo_path',
-        //     'positions.position',
-        //     'employees.uuid',
-        //     'employees.nik_employee',
-        //     'employees.machine_id',
-        //     'user_details.name'
-        // ]);
-
- 
-        
-        // // return view('datatableshow', [ 'data'         => $employees]);
-
-        // foreach($employees as $employee){
-        //     $employee->pay = EmployeeAbsen::join('status_absens', 'status_absens.uuid','employee_absens.status_absen_uuid')
-        //     ->where('employee_absens.employee_uuid', $employee->machine_id)
-        //     ->whereYear('employee_absens.date', $year)
-        //     ->where('status_absens.math', 'pay')
-        //     ->whereMonth('employee_absens.date', $month)
-        //     ->count();
-        //     $employee->cut = EmployeeAbsen::join('status_absens', 'status_absens.uuid','employee_absens.status_absen_uuid')
-        //     ->where('employee_absens.employee_uuid', $employee->machine_id)
-        //     ->whereYear('employee_absens.date', $year)
-        //     ->where('status_absens.math', 'cut')
-        //     ->whereMonth('employee_absens.date', $month)
-        //     ->count();
-
-        //     EmployeeAbsenTotal::updateOrCreate([
-        //         'uuid'  => $year_month.'-'.$employee->nik_employee,
-        //     ],[
-        //         'nik_employee'      => $employee->nik_employee,
-        //         'pay'                     => $employee->pay,
-        //         'year_month'        => $year_month,
-        //         'cut'                       => $employee->cut,
-        //     ]);
-        // }
-
-        $empps = Employee::getAll();
-            foreach($empps as $emp){
-                Identity::updateOrCreate(['employee_uuid' => $emp->employee_uuid], [
-                    'nik_employee'  => $emp->employee_uuid,
-                    'machine_id'  => $emp->machine_id,
-                    'name'  => $emp->name,
-                    'position'  => $emp->position,
-                ] );
-            }
-
-        $employees = EmployeeAbsenTotal::join('identities','identities.nik_employee','employee_absen_totals.nik_employee')
-        ->where('year_month', $year_month)->get([
-            'identities.*',
-            'employee_absen_totals.*'
+      
+        $arr_absen = Employee::noGet_employeeAll_detail()->get([
+            'employees.nik_employee',
+            'employees.machine_id',
+            'user_details.name',
+            'user_details.photo_path',
+            
+            'user_details.photo_path as pay',
+            
+            'user_details.photo_path as unpay',
+            
+            'user_details.photo_path as A',
+            'user_details.photo_path as cut',
+            
+            'positions.position',
         ]);
-        // return view('datatableshow', [ 'data'         => $employees]);
-       
-        return Datatables::of($employees)
+        $arr_absen = ResponseFormatter::createIndexArray($arr_absen,'nik_employee');
+
+
+
+        $employee_day_works =  EmployeeAbsen::join('employees','employees.machine_id', 'employee_absens.employee_uuid')
+        ->join('status_absens', 'status_absens.uuid', 'employee_absens.status_absen_uuid')
+        ->whereYear('employee_absens.date', $year)
+        ->whereMonth('employee_absens.date', $month)
+        ->groupBy(
+            'employees.uuid',
+            'employee_absens.employee_uuid',
+            'status_absens.math',
+        )
+        ->select( 
+            'employee_absens.employee_uuid as machine_id',
+            'employees.uuid as employee_uuid',
+            'status_absens.math',
+            DB::raw("count(status_absens.math) as count_math_status_absen")
+        )
+        ->get();
+        
+
+
+        foreach($employee_day_works as $employee_day_work){
+            $name_col = $employee_day_work->math;
+            if(!empty($arr_absen[$employee_day_work->employee_uuid])){
+                $arr_absen[$employee_day_work->employee_uuid]->$name_col = $employee_day_work->count_math_status_absen;
+            }
+        }       
+        return Datatables::of($arr_absen)
         ->make(true);
     }
 

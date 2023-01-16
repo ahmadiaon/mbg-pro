@@ -14,6 +14,14 @@ class ResponseFormatter
     'data' => null
   ];
 
+  public static function createIndexArray($array, $key){
+    $data = [];
+    foreach($array as $item){
+      $data[$item->$key] = $item;
+    }
+    return $data;
+  }
+
   public static function success($data = null, $message = null)
   {
     self::$response['meta']['message'] = $message;

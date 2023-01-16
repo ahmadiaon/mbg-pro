@@ -13,31 +13,20 @@ class UserEducationController extends Controller
 {
     public function store(Request $request){
 
-        
-        // dd($request);
+        $isEdit = true;
         $validateData = $request->all();
 
-        if($validateData['uuid'] == null){
-            $validateData['uuid'] = $validateData['user_detail_uuid'];
+        if($validateData['isEdit'] == null){
+            $isEdit = false;
         }
 
-        $store = UserEducation::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        $validateData = UserEducation::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        if($isEdit){
+            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
 
-        return ResponseFormatter::toJson($store, 'Data Store User Education');
+        }  
+        return ResponseFormatter::toJson($validateData, 'Data Store User Education');
 
-        if(empty($request->user_education_uuid)){
-            $validateData['uuid'] = 'education-'.$request->user_detail_uuid;            
-        }else{
-            $validateData['uuid'] = $request->user_education_uuid;
-        }
-        // dd($validateData);
-       
-        
-        if($request->isEdit == 1){
-            return redirect()->intended('/user/profile/'.$request->nik_employee);
-        }
-
-        return redirect()->intended('/user-license/create/'.$store->user_detail_uuid);
     }
 
     public function anyDataOne($uuid){

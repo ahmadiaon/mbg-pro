@@ -16,8 +16,8 @@ class CreateHourMeterPricesTable extends Migration
         Schema::create('hour_meter_prices', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->nullable();
-            $table->string('name')->nullable();
-            $table->float('value')->nullable();
+            $table->string('hour_meter_name')->nullable();
+            $table->float('hour_meter_value')->nullable();
             $table->string('key_excel')->nullable();            
             $table->date('use_start')->nullable();
             $table->date('use_end')->nullable();

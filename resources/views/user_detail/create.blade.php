@@ -2,7 +2,6 @@
     <form action="/user/store" id="form-user-detail" method="POST" enctype="multipart/form-data">
         @csrf
 
-        <input type="text" name="isEdit" id="isEdit">
         <input type="text" name="uuid" id="uuid-user-detail">
 
         <div class="min-height-200px">
@@ -32,8 +31,8 @@
                                     <div class="form-group">
                                         <div class="form-group">
                                             <label>Nomor Kartu Keluarga</label>
-                                            <input name="kk_number" class="form-control" value=""
-                                                id="kk_number" placeholder="62111" type="text">
+                                            <input name="kk_number" class="form-control" value="" id="kk_number"
+                                                placeholder="62111" type="text">
                                         </div>
                                     </div>
                                 </div>
@@ -43,8 +42,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Kewarganegaraan</label>
-                                        <select name="citizenship" id="citizenship"
-                                            class=" form-control">
+                                        <select name="citizenship" id="citizenship" class=" form-control">
                                             <option value="WNI">WNI</option>
                                             <option value="WNA">WNA</option>
                                         </select>
@@ -54,8 +52,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Agama</label>
-                                        <select name="religion_uuid" id="religion_uuid"
-                                            class=" form-control">
+                                        <select name="religion_uuid" id="religion_uuid" class=" form-control">
 
                                         </select>
                                     </div>
@@ -155,8 +152,8 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="">Nomor Handphone</label>
-                                        <input name="Nomor HP" class="form-control" value=""
-                                            id="Nomor HP" placeholder="Nomor HP" type="text">
+                                        <input name="phone_number" class="form-control" value=""
+                                            id="phone_number" placeholder="Nomor HP" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -192,6 +189,8 @@
                             <button type="button" onclick="storeUserDetail('user-detail')"
                                 class="btn btn-primary mt-30 float-right">Next
                                 Step</button>
+                            <button type="button" class="btn btn-secondary mt-30 float-right mr-10 create-user-employee-back">Back</button>
+
                         </div>
                     </div>
                 </div>

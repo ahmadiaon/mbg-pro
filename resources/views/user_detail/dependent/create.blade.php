@@ -1,8 +1,11 @@
 <div id="create-user-dependent" class="children-content mb-30">
     <form action="/user-dependent/store" id="form-user-dependent" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="text" name="user_detail_uuid" id="user_detail_uuid">
-        <input type="text" name="isEdit" id="isEdit" value="">
+
+        <input type="text" name="isEdit" id="isEdit-create-user-dependent">
+        <input type="text" name="uuid" id="uuid-create-user-dependent">
+        <input type="text" name="user_detail_uuid" id="user_detail_uuid-create-user-dependent">
+
         <div class="min-height-200px">
             <!-- Identitas Karyawan -->
             <div class="clearfix">
@@ -21,8 +24,8 @@
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label>Nama</label>
-                            <input name="mother_name" class="form-control" id="mother_name"
-                                placeholder="Muara Teweh" type="text">
+                            <input name="mother_name" class="form-control" id="mother_name" placeholder="Muara Teweh"
+                                type="text">
 
                         </div>
                     </div>
@@ -73,8 +76,8 @@
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label>Nama</label>
-                            <input name="father_name" class="form-control" id="father_name"
-                                placeholder="Nama Ayah" type="text">
+                            <input name="father_name" class="form-control" id="father_name" placeholder="Nama Ayah"
+                                type="text">
 
                         </div>
                     </div>
@@ -248,8 +251,7 @@
                         <div class="col-md-2 col-sm-12">
                             <div class="form-group">
                                 <label>Jenis Kelamin</label>
-                                <select name="couple_gender" id="couple_gender"
-                                    class="selectpicker form-control">
+                                <select name="couple_gender" id="couple_gender" class="selectpicker form-control">
                                     <option value="Laki-laki">
                                         Laki-laki</option>
                                     <option value="Perempuan">
@@ -295,8 +297,8 @@
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label>Nama</label>
-                            <input name="child1_name" class="form-control" id="child1_name"
-                                placeholder="Nama Anak" type="text">
+                            <input name="child1_name" class="form-control" id="child1_name" placeholder="Nama Anak"
+                                type="text">
 
                         </div>
                     </div>
@@ -447,8 +449,14 @@
             </div>
             {{-- END --}}
             <div class="card-box mb-20 text-right">
-                <button type="button" onclick="storeUserDependent('user-dependent')"
-                    class="btn btn-primary mt-30 text-right mr-20 mb-20">Next Step</button>
+                <div class="form-group text-right">
+                    <button type="button"
+                        class="btn btn-secondary  mr-10 create-user-employee-back">Back</button>
+                    <button type="button" onclick="storeUserDependent('user-dependent')"
+                        class="btn btn-primary">Simpan</button>
+                </div>
+
+          
             </div>
         </div>
     </form>

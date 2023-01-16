@@ -70,8 +70,11 @@
             elements = elements + ` </tr>`;
             z++;
             $('#t_body').append(elements);
+            
           });
+          
         }
+        $('#head').val(z)
 
     </script>
   </body>

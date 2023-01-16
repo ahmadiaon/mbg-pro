@@ -196,7 +196,7 @@
                     columnDefs: [
                                         { "visible": false, "targets": 3 }
                                     ],
-					serverSide: true,
+					serverSide: false,
 					responsive: true,
 						rowReorder: {
 							selector: 'td:nth-child(2)'

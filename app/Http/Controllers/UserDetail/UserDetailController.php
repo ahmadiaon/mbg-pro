@@ -34,10 +34,11 @@ class UserDetailController extends Controller
 {
 
     public function store(Request $request){
-        $isEdit = false;
+        $isEdit = true;
         $validateData = $request->all();
 
         if($validateData['uuid'] == null){
+            $isEdit = false;
             $validateData['uuid'] = ResponseFormatter::toUUID($request->name).'-'.rand(99,9999);
         }
 
@@ -46,65 +47,11 @@ class UserDetailController extends Controller
             'user_detail_uuid' => $validateData['uuid'],
             'religion_uuid' => $request->religion_uuid,
         ]);
+        if($isEdit){
+            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
 
-        return ResponseFormatter::toJson($storeUserDetail, 'from user-details');
-        //  strtolower(str_replace(' ','-',$validateDataUser['name'] ) .'-'.rand(99,9999));
-
-        // $storeUser = UserDetail::updateOrCreate(['uuid' => $validateDataUser['uuid']],$validateDataUser);
-        
-
-       
-        // $validateDataUserAddress = $request->validate([
-        //     'poh_uuid' => '',
-        //     'desa' => 'required',
-        //     'rt' => '',
-        //     'rw' => '',
-        //     'kecamatan' => '',//pkwt-pkwtt
-
-        //    'kabupaten' => 'required',
-        //    'provinsi' => '',
-        // ]);
-
-        // $validateDataUserReligion = $request->validate([
-        //     'uuid'  => '',
-        //     'religion_uuid' => '',
-        //     'user_detail_uuid' => '',
-        // ]);
-
-        // if($validateDataUser['user_detail_uuid'] == null){
-        //     $user_detail_uuid = strtolower(str_replace(' ','-',$validateDataUser['name'] ) .'-'.rand(99,9999));
-        //     $validateDataUser['uuid'] = $user_detail_uuid;
-        //     $validateDataUserAddress['uuid'] = 'address-'.$user_detail_uuid;
-        //     $validateDataUserReligion['uuid'] = 'religion-'.$user_detail_uuid;            
-        // }else{
-        //     $isEdit = true;
-        //     $validateDataUser['uuid'] =  $validateDataUser['user_detail_uuid'];
-        //     $validateDataUserAddress['uuid'] = $validateDataUser['user_address_uuid'];
-        //     $validateDataUserReligion['uuid'] = $validateDataUser['user_religion_uuid'];
-        // }
-
-        // $storeUser = UserDetail::updateOrCreate(['uuid' => $validateDataUser['uuid']],$validateDataUser);
-
-        // $validateDataUserAddress['user_detail_uuid'] = $storeUser->uuid;
-        // $validateDataUserAddress['is_last'] = '1';
-
-        // $storeUserAddress = UserAddress::updateOrCreate(['uuid' => $validateDataUserAddress['uuid']],$validateDataUserAddress);
-
-        // $validateDataUserReligion['user_detail_uuid'] = $storeUser->uuid;
-
-
-        // $storeUserReligion = UserReligion::updateOrCreate(['uuid' => $validateDataUserReligion['uuid']],$validateDataUserReligion);
-        // $das = [
-        //     'religion'  => $storeUserReligion,
-        //     'user'  => $storeUser,
-        //     'address'   => $storeUserAddress
-        // ];
-        
-        if($isEdit == true){
-            return redirect()->intended('/user/profile/'.$request->nik_employee);
-        }
-
-        return redirect()->intended('/user-dependent/create/'.$storeUserDetail->uuid);
+        }       
+        return ResponseFormatter::toJson($validateData, 'from user-details');
     }
 
 
@@ -113,30 +60,8 @@ class UserDetailController extends Controller
             'title'         => 'Login'
         ]);
     }
-    public function storePayrol(){
-        $data = [
-            'udin'=>'udin'
-        ];
-        return response()->json(['code'=>200, 'message'=>'Data deleted successfully','data' => $data], 200);
-    }
-    public function index(){
-        
-        // dd(UserDetail::getAll());    
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => true,
-            'javascript_datatable'  => true,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'                        => 'admin-hr',
-            'active-sub'                        => 'employee'
-        ];
-        return view('hr.user.index', [
-            'title'         => 'Employee',
-            'layout'    => $layout
-        ]);
-    }
+
+
 
     public function exportData(){
         $datas = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
@@ -172,53 +97,7 @@ class UserDetailController extends Controller
         return 'exportData';
     }
     
-    public function indexUser(){
-        $user = DB::table('users')
-        ->join('employees','employees.uuid','users.employee_uuid')
-        ->join('user_details','user_details.uuid','employees.user_detail_uuid')
-        ->join('positions','positions.uuid','employees.position_uuid')
-        ->join('departments','departments.uuid','employees.department_uuid')
-        ->where('employees.uuid', session('dataUser')->employee_uuid)
-        ->get([
-            'employees.*',
-            'employees.uuid as employee_uuid',
-            'positions.position',
-            'departments.department',
-            'user_details.*',
-        ])
-        ->first();
-
-        // dd(session('dataUser'));
-        $hour_meter_pricees = HourMeterPrice::all();
-
-        $hm = DB::table('employee_total_hm_months')
-        ->join('hour_meter_prices','hour_meter_prices.uuid', 'employee_total_hm_months.hour_meter_price_uuid')
-        ->where('employee_total_hm_months.employee_uuid',$user->employee_uuid)
-        ->get([
-        'hour_meter_prices.uuid as hour_meter_price_uuid',
-        'hour_meter_prices.name',
-        
-        'employee_total_hm_months.value'
-        ]);
-        // return $hm;
-        // dd($hm);
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => true,
-            'javascript_datatable'  => true,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'                        => 'employee',
-        ];
-        return view('employee.index', [
-            'title'         => 'Employee',
-            'user'      => $user,
-            'hour_meter_prices' => $hour_meter_pricees,
-            'employee_total_hm_months'  => $hm,
-            'layout'    => $layout
-        ]);
-    }
+  
     public function create(){
         $layout = [
             'head_datatable'        => true,
@@ -323,29 +202,14 @@ class UserDetailController extends Controller
         return $nik_employee;
     }
 
-    
-
-    
-
-    public function anyData()
-    {
-        $dataAny =  UserDetail::getAll();
-        
-
-        return Datatables::of($dataAny)
-        ->addColumn('action', function ($model) {
-            $url = "/admin/vehicle/";
-            $url_edit = "'".$url.$model->uuid."'";
-            $url_delete = "'".$url."delete/'";
-            return '<a class="text-decoration-none" href="/admin-hr/employees/contract/show/' . $model->nik_employee . '"><button class="btn btn-secondary py-1 px-2 mr-1"><i class="icon-copy bi bi-eye-fill"></i></button></a><input type="hidden" value="'. $model->nik_employee .'"><button id="'.$model->nik_employee .'" onclick="runEditVehicle(' . $model->nik_employee . ','.$url_edit.')"  class="btn btn-warning py-1 px-2 mr-1"><i class="icon-copy dw dw-pencil"></i></button>
-            <button onclick="isDeletevehicle(' . $model->nik_employee . ','.$url_delete.')"  type="button" class="btn btn-danger  py-1 px-2"><i class="icon-copy dw dw-trash"></i></button>';
-        })
-        ->make(true);
-            
-    }
-
     public function anyDataOne($uuid){
         $data = UserDetail::where('uuid', $uuid)->first();
+        return ResponseFormatter::toJson($data, 'data user_detail');
+    }
+
+    public function anyDataDetailOne($uuid){
+        $data = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $uuid)->get()->first();
+
         return ResponseFormatter::toJson($data, 'data user_detail');
     }
 

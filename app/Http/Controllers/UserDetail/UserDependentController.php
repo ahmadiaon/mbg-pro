@@ -55,11 +55,20 @@ class UserDependentController extends Controller
         return $nik_employee;
     }
 
-    public function store(Request $request){       
+    public function store(Request $request){      
+        $isEdit = true;
+        $validateData = $request->all();
 
-        $dependent = UserDependent::updateOrCreate(['uuid' => $request->user_detail_uuid], $request->all());
+        if($validateData['isEdit'] == null){
+            $isEdit = false;
+        } 
 
-        return ResponseFormatter::toJson($dependent, 'store-user-dependent');
+        $validateData = UserDependent::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        if($isEdit){
+            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
+
+        }  
+        return ResponseFormatter::toJson($validateData, 'store-user-dependent');
         
         if($request->isEdit == 1){
             return redirect()->intended('/user/profile/'.$request->nik_employee);

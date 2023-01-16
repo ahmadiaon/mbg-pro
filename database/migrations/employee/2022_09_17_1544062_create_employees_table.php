@@ -35,7 +35,7 @@ class CreateEmployeesTable extends Migration
             $table->integer('long_contract')->nullable(); //month
             $table->string('employee_status')->nullable();  
             $table->string('file_path')->nullable();      //profesional training
-            $table->string('tax_status')->nullable(); 
+            $table->string('tax_status_uuid')->nullable(); 
 
             $table->string('is_bpjs_kesehatan')->nullable(); 
             $table->string('is_bpjs_ketenagakerjaan')->nullable(); 

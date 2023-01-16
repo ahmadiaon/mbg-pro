@@ -5,8 +5,11 @@
         <div class="row pd-20">
             <div class="col-auto">
                 <h4 class="text-blue h4">HM karywan</h4>
+                @if (session()->has('messageErr'))
+                    <p>Error</p>
+                @endif
             </div>
-            @if (empty($nik_employee))
+            
                 <div class="col text-right">
                     <div class="btn-group">
                         <div class="btn-group dropdown">
@@ -42,6 +45,7 @@
                                 <a class="dropdown-item" onclick="refreshTable(null, 12, null )" href="#">Desember</a>
                             </div>
                         </div>
+                        
                         <div class="btn-group dropdown">
                             <button type="button" class="btn btn-secondary dropdown-toggle waves-effect"
                                 data-toggle="dropdown" aria-expanded="false" id="btn-day" value="Perbulan">
@@ -72,6 +76,7 @@
                                 <label for=""></label>
                             </div>
                         </div>
+                        @if (empty($nik_employee))
                         <div class="btn-group dropdown">
                             <button type="date" class="btn btn-primary dropdown-toggle waves-effect"
                                 data-toggle="dropdown" aria-expanded="false">
@@ -85,19 +90,19 @@
                                     href="">Import</a>
                             </div>
                         </div>
+                        @endif
 
                     </div>
                 </div>
-            @endif
+            
         </div>
         <div id="the-table">
-            <div class="pb-20" id="tablePrivilege">
+            <div class="pb-20" id="employee-hour-meter-day">
                 <table id="table-employee-hour-meter" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
                             <th>Nama</th>
                             <th>Value Full</th>
-                            <th>Harga</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -138,77 +143,65 @@
 
 @section('js')
     <script>
+        let arr_date_today = getDateTodayArr();
+        console.log('employee_hour_meter_day index');
         let nik_employee = @json($nik_employee);
-        if (nik_employee) {
-            console.log(nik_employee);
-        } else {
-            console.log('kosong');
+        console.log(nik_employee)
+
+        function setViewEmployeeHourMeter(){
+            // arr_date_today.year = '2022';
+            // arr_date_today.month = '10';
+            // cg('month',monthName(arr_date_today.month));
+            $('#btn-year').html(arr_date_today.year);
+            $('#btn-month').val(arr_date_today.month);
+            $('#btn-month').html(monthName(arr_date_today.month));
+            setDatesMonth();
+            arr_date_today.day = null
+            showDataTableEmployeeHourMeteDay()
+           
         }
-        let year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
-        $('#btn-month').val(arr_year_month[1]);
-        $('#btn-day').html("Perbulan");
-        $('#btn-export').attr('href', '/hour-meter/export/' + year_month)
-
-        var date = new Date(),
-            y = arr_year_month[0],
-            m = arr_year_month[1];
-        var firstDay = new Date(y, m, 1);
-        var lastDay = new Date(y, m + 1, 0);
-        console.log("last day : " + lastDay.getDate());
-
-        reloadTable(year_month)
 
 
-        // function showDataTableEmployeeHourMeterMonth(url, dataTable, id) {
-        function showDataTableEmployeeHourMeterMonth(url, id) {
+        function firstEmployeeHourMeter() {
+            arr_date_today = getDateTodayArr();
+            setViewEmployeeHourMeter();
+            $('#btn-day').html("Perbulan");
+            $('#btn-export').attr('href', '/hour-meter/export/' +arr_date_today.year+'-'+ arr_date_today.month)
+            // showDataTableEmployeeHourMeteDay()
+        }
+        firstEmployeeHourMeter()
+
+        function showDataTableEmployeeHourMeteDay() {
+            $('#employee-hour-meter-day').empty()
+            let for_nik_employee = `<th>Action</th>`;
+            if(nik_employee){
+                for_nik_employee ='';
+            }
+            $('#employee-hour-meter-day').append(`
+            <table id="table-employee-hour-meter" class="display nowrap stripe hover table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Value Full</th>
+                            ${for_nik_employee}
+                        </tr>
+                    </thead>
+                </table>
+            `)
             let data = [];
-            var elements = {
-                mRender: function(data, type, row) {
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    // console.log('aaa');
-                    return `<div class="name-avatar d-flex align-items-center">
-										<div class="avatar mr-2 flex-shrink-0">
-											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
-												height="40" alt="" />
-										</div>
-										<div class="txt">
-											<div class="weight-600">${row.name}</div>
-											<small>${row.position}</small></br>
-											<small>${row.nik_employee}</small>
-										</div>
-									</div>`
-                }
-            };
-            data.push(elements);
+            // from global
+            data.push(element_profile_employee);
             var elem = {
                 mRender: function(data, type, row) {
-
+                    let cc = Number(row.hour_meter_full_value);
+                    cc = cc.toFixed(2);
                     return `<button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-placement="right"
 								title="jumlah slip :${row.count_hour_meter}, hm tanpa bonus : ${row.hour_meter_value}">
-								${row.hour_meter_full_value}
+								${cc}
 							</button>`
                 }
             };
             data.push(elem)
-            // dataTable.forEach(element => {
-            //     var dataElement = {
-            //         data: element,
-            //         name: element
-            //     }
-            //     data.push(dataElement)
-            // });
-            // description
-
-
-
 
             var elements = {
                 mRender: function(data, type, row) {
@@ -225,7 +218,7 @@
                     } else {
                         element_action = `
 									<div class="form-inline"> 
-										<a href="/hour-meter/show/${row.uuid}/${year_month}">
+										<a href="/hour-meter/show/${row.uuid}/${arr_date_today.year+'-'+arr_date_today.month}">
 											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
 												<small>detail</small>
 											</button>
@@ -235,59 +228,38 @@
                     return element_action;
                 }
             };
-            data.push(elements)
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
-            $('#' + id).DataTable({
+            if(!nik_employee){
+                data.push(elements)
+            }
+            
+            console.log('arr_date_today')
+            console.log(arr_date_today)
+            $('#' + 'table-employee-hour-meter').DataTable({
                 processing: true,
-                serverSide: true,
+                serverSide: false,
                 responsive: true,
                 rowReorder: {
                     selector: 'td:nth-child(2)'
                 },
-                ajax: urls,
+                ajax: {
+                    url: '/hour-meter/data',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        year:arr_date_today.year,
+                        month:arr_date_today.month,
+                        day:arr_date_today.day,
+                        employee_uuid: nik_employee
+                    },
+                    type: 'POST',
+                },
                 columns: data
             });
         }
 
-        function refreshTable(val_year = null, val_month = null, val_day) {
-            console.log('val_year :' + val_year + 'val_month :' + val_month + 'val_day :' + val_day);
-
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
-            console.log(v_month);
-            if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
-            }
-            if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
-            }
-            year_month = v_year + '-' + v_month;
-
-
-            if (val_day) {
-                $('#btn-day').html(val_day);
-                let val_all = year_month + '-' + val_day;
-                console.log(val_all)
-                eachDay(val_all);
-                return false;
-            }
-
-            $('#btn-day').html("Perbulan");
-            setDates(v_year, v_month);
-
-            reloadTable(year_month)
-        }
-
-        function setDates(val_year, val_month) {
+        function setDatesMonth() {
             var date = new Date(),
-                y = val_year,
-                m = val_month - 1;
+                y = arr_date_today.year,
+                m = arr_date_today.month - 1;
             var firstDay = new Date(y, m, 1);
             var lastDay = new Date(y, m + 1, 0);
             $('#ten-one').empty();
@@ -295,77 +267,48 @@
             $('#ten-three').empty();
             for (let a = 1; a <= 10; a++) {
                 $('#ten-one').append(
-                    `<button onclick="refreshTable(null, null, ${a})"  type="button" class="btn btn-light">${a}</button>`
-                    );
+                    `<button onclick="refreshTable(null, null, ${a})"  type="button" class="btn btn-sm btn-primary">${a}</button>`
+                );
             }
             for (let b = 11; b <= 20; b++) {
                 $('#ten-two').append(
-                    `<button onclick="refreshTable(null, null, ${b})" type="button" class="btn btn-light">${b}</button>`
-                    );
+                    `<button onclick="refreshTable(null, null, ${b})" type="button" class="btn btn-sm btn-primary">${b}</button>`
+                );
             }
             for (let c = 21; c <= lastDay.getDate(); c++) {
                 $('#ten-three').append(
-                    `<button onclick="refreshTable(null, null, ${c})" type="button" class="btn btn-light">${c}</button>`
-                    );
+                    `<button onclick="refreshTable(null, null, ${c})" type="button" class="btn btn-sm btn-primary">${c}</button>`
+                );
+            }
+        }
+
+        function refreshTable(val_year = null, val_month = null, val_day) {
+            console.log('refreshTable');
+
+            if (val_year) {
+                console.log(val_year);
+                arr_date_today.year = val_year;
+                $('#btn-year').html(val_year);
+            }
+            if (val_month) {
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(val_month);
             }
 
-            console.log("last day : " + lastDay.getDate());
+            if (val_day) {
+                $('#btn-day').html(val_day);
+                arr_date_today.day = val_day;
+                showDataTableEmployeeHourMeteDay();
+                return false;
+            }
+            $('#btn-export').attr('href', '/hour-meter/export/' +arr_date_today.year+'-'+ arr_date_today.month)
+            arr_date_today.day = null;
+            $('#btn-day').html("Perbulan");
+            setDatesMonth()
+            showDataTableEmployeeHourMeteDay();
+            // reloadTable(year_month)
         }
-
-        function eachDay(year_month_day) {
-            console.log('year_month_day :' + year_month_day);
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-hour-meter" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Value Full</th>
-                            <th>Harga</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>`;
-
-            $('#the-table').append(table_element);
-
-            $('#btn-export').attr('href', 'hour-meter/export/' + year_month_day)
-
-            let _url = 'hour-meter/data-day/' + year_month_day;
-            console.log('url:' + _url)
-            showDataTableEmployeeHourMeterMonth(_url,
-                // showDataTableEmployeeHourMeterMonth(_url, ['hour_meter_price'],
-                'table-employee-hour-meter')
-        }
-
-        function reloadTable(year_month) {
-
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-hour-meter" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Value Full</th>
-                            <th>Harga</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>`;
-
-            $('#the-table').append(table_element);
-
-            $('#btn-export').attr('href', 'hour-meter/export/' + year_month)
-            console.log('year:' + year_month)
-            let _url = 'hour-meter/data/' + year_month;
-            console.log(_url);
-            showDataTableEmployeeHourMeterMonth(_url,
-                // showDataTableEmployeeHourMeterMonth(_url, ['hour_meter_price'],
-                'table-employee-hour-meter')
-        }
+  
     </script>
 @endsection

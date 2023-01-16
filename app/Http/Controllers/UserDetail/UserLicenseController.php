@@ -18,13 +18,18 @@ class UserLicenseController extends Controller
     }
 
     public function store(Request $request){
+        $isEdit = true;
         $validateData = $request->all();
-        if($validateData['uuid'] == null){
-            $validateData['uuid'] = $validateData['user_detail_uuid'];
+
+        if($validateData['isEdit'] == null){
+            $isEdit = false;
         }
 
-        $store = UserLicense::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        $validateData = UserLicense::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        if($isEdit){
+            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
 
-        return ResponseFormatter::toJson($store, 'Data Store User License');
+        }  
+        return ResponseFormatter::toJson($validateData, 'Data Store User License');
     }
 }

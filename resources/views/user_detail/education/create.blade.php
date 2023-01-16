@@ -1,9 +1,11 @@
 <div id="create-user-education" class="children-content">
     <form action="/user-education/store" id="form-user-education" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="text" name="isEdit" id="isEdit" value="">
-        <input type="text" name="uuid" id="uuid-user-education" value="">
-        <input type="text" name="user_detail_uuid" id="user_detail_uuid-user-education">
+  
+        <input type="text" name="isEdit" id="isEdit-create-user-education">
+        <input type="text" name="uuid" id="uuid-create-user-education">
+        <input type="text" name="user_detail_uuid" id="user_detail_uuid-create-user-education">
+
         <div class="min-height-200px">
 
             <!-- Identitas Karyawan -->

@@ -3,24 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
+use App\Models\CoalFrom;
 use App\Models\Company;
+use App\Models\Department;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeeAbsenTotal;
+use App\Models\Employee\EmployeeCompany;
 use App\Models\Employee\EmployeeHourMeterDay;
 use App\Models\Employee\EmployeePayment;
 use App\Models\Employee\EmployeePaymentDebt;
 use App\Models\Employee\EmployeePaymentOther;
 use App\Models\Employee\EmployeePremi;
+use App\Models\Employee\EmployeeSalary;
 use App\Models\Employee\EmployeeTonase;
 use App\Models\Formula;
 use App\Models\GroupFormula;
 use App\Models\HourMeterPrice;
 use App\Models\Identity;
+use App\Models\Position;
 use App\Models\Premi;
 use App\Models\Production;
 use App\Models\StatusAbsen;
 use App\Models\TaxStatus;
+use App\Models\UserDetail\UserDetail;
 use App\Models\VariableCount;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -187,15 +193,112 @@ class AllowanceController extends Controller
         $month = $date[1];
     }
 
-    // public function moreAnyData($year_month){
-    //     $date = explode("-", $year_month);
-    //     $day_month = ResponseFormatter::getEndDay($year_month);
+    public function moreAnyData($year_month){
+        $date = explode("-", $year_month);
+        $day_month = ResponseFormatter::getEndDay($year_month);
+        $date_day_month_end = $year_month.'-'.$day_month;
+        $arr_setup_employee = [];
+
+        $arr_position = Position::all();        
+        $arr_position = ResponseFormatter::createIndexArray($arr_position,'uuid');
+
+        $arr_department = Department::all();
+        $arr_department = ResponseFormatter::createIndexArray($arr_department,'uuid');
+
+        $arr_company = Company::all();
+        $arr_company = ResponseFormatter::createIndexArray($arr_company,'uuid');
+        $arr_coal_from = CoalFrom::all();
+        $arr_coal_from = ResponseFormatter::createIndexArray($arr_coal_from,'uuid');
+
+        $arr_user_detail = UserDetail::where('date_start', '<=', $date_day_month_end)->orderBy('date_end', 'desc')
+        ->get();
+        $arr_setup_user_detail = [];
+
+        foreach($arr_user_detail as $user_detail){
+            if(empty($arr_setup_user_detail[$user_detail->uuid])){
+                $arr_setup_user_detail[$user_detail->uuid] = $user_detail;                
+            }           
+        }
+        // return view('datatableshow', [ 'data'         => $arr_setup_user_detail]);
+
+        $arr_employee = Employee::where('date_start', '<=', $date_day_month_end)->orderBy('date_end', 'desc')
+        ->get();
+
+        $arr_employee_for_absen = ResponseFormatter::createIndexArray($arr_employee,'machine_id');
+        // dd($arr_employee_for_absen);
+       
+        //setup employee
+        foreach($arr_employee as $employee){
+            $employee->company = null;
+            $employee->name = null;
+            $employee->employee_uuid = $employee->uuid;
+            
+            $employee->date_start_join = $employee->date_document_contract;
+
+            if(empty($arr_setup_employee[$employee->nik_employee])){
+                if(!empty($employee->position_uuid)){
+                    $employee->position = $arr_position[$employee->position_uuid]->position;
+                }
+                if(!empty($employee->department_uuid)){
+                    $employee->department = $arr_department[$employee->department_uuid]->department;
+                }
+                if(!empty($arr_setup_user_detail[$employee->user_detail_uuid])){
+                    $employee->name = $arr_setup_user_detail[$employee->user_detail_uuid]->name;
+                    $employee->bpjs_ketenagakerjaan = $arr_setup_user_detail[$employee->user_detail_uuid]->bpjs_ketenagakerjaan;
+                    $employee->bpjs_kesehatan = $arr_setup_user_detail[$employee->user_detail_uuid]->bpjs_kesehatan;
+                    $employee->name = $arr_setup_user_detail[$employee->user_detail_uuid]->name;
+                }
+                $arr_setup_employee[$employee->nik_employee] = $employee;
+            }
+        }
+
+        $arr_employee_premi = EmployeePremi::where('date_start', '<=', $date_day_month_end)->orderBy('date_end', 'desc')
+        ->get();
+        // return view('datatableshow', [ 'data'         => $arr_employee_premi]);
+        foreach($arr_employee_premi as $employee_premi){
+            $col_name = 'premi_value_'.$employee_premi->premi_uuid;
+            if(!empty($arr_setup_employee[$employee_premi->employee_uuid])){
+                $arr_setup_employee[$employee_premi->employee_uuid]->$col_name = $employee_premi->premi_value;
+            }            
+        }
+       
+        // salary
+        $arr_employee_salary = EmployeeSalary::where('date_start', '<=', $date_day_month_end)->orderBy('employee_uuid', 'desc')
+        ->get();
+        foreach($arr_employee_salary as $employee_salary){
+            if(!empty($arr_setup_employee[$employee_salary->employee_uuid])){
+                if(empty($arr_setup_employee[$employee_salary->employee_uuid]->salary)){
+                    $arr_setup_employee[$employee_salary->employee_uuid]->salary = $employee_salary->salary;
+                    $arr_setup_employee[$employee_salary->employee_uuid]->insentif = $employee_salary->insentif;
+                    $arr_setup_employee[$employee_salary->employee_uuid]->tunjangan = $employee_salary->tunjangan;
+                }
+            }           
+        }
+
+        //company
+        $arr_employee_company = EmployeeCompany::join('companies','companies.uuid', 'employee_companies.company_uuid')
+        ->where('date_start', '<=', $date_day_month_end)
+        ->orderBy('employee_uuid', 'desc')
+        ->get([
+            'employee_companies.*',
+            'companies.*'
+        ]);
+
+        foreach($arr_employee_company as $employee_company){
+            if(!empty($arr_setup_employee[$employee_company->employee_uuid])){                
+                if(empty($arr_setup_employee[$employee_company->employee_uuid]->company)){
+                    $arr_setup_employee[$employee_company->employee_uuid]->company = $employee_company->company;
+                }
+            }           
+        }
 
     // EmployeePremi::where('premi_value', null)->delete();
-    public function moreAnyData(Request $request){
-        $date = explode("-", $request->year_month);
-        $year_month = $request->year_month;
-        $day_month = ResponseFormatter::getEndDay($year_month);
+    // public function moreAnyData(Request $request){
+    //     $date = explode("-", $request->year_month);
+    //     $year_month = $request->year_month;
+        // $day_month = ResponseFormatter::getEndDay($year_month);
+
+
         
         $averagge = array();
         $year = $date[0];
@@ -241,12 +344,14 @@ class AllowanceController extends Controller
             $f->group_formula =  $group_formulas;
         }
     // ==========================================  END SETUP FORMULA POTONGAN
+      
        
-
-        
-
         
     // ==========================================  SETUP PRODUCTION
+        $premi_production = Premi::all();
+        $premi_production = ResponseFormatter::createIndexArray($premi_production,'uuid');
+
+
         $productions = Premi::leftJoin('productions', 'productions.premi_uuid', 'premis.uuid')
         ->whereYear('productions.date_production', $year)
         ->whereMonth('productions.date_production', $month)
@@ -259,66 +364,38 @@ class AllowanceController extends Controller
             DB::raw("SUM(productions.value_production) as value_production")
         )
         ->get();
+        
 
         $productions = $productions->keyBy(function ($item) {
             return strval($item->uuid);
         });
+
+        foreach($premi_production as $production){
+            if(!empty($productions[$production->uuid])){
+                $production->value_production = $productions[$production->uuid]->value_production;
+            }else{
+                $production->value_production = 0;
+            }            
+        }
+
+        $productions = $premi_production;
+
     // ==========================================  END SETUP PRODUCTION
 
     // ==========================================  SETUP TAX STATUS
-        $tax_status = TaxStatus::all();
-        $tax_statuses = $tax_status->keyBy(function ($item) {
-            return strval(str_replace('-','/',$item->uuid));
+        $tax_status_uuid = TaxStatus::all();
+        $tax_status_uuides = $tax_status_uuid->keyBy(function ($item) {
+            return $item->uuid;
         });
+
+        // dd($tax_status_uuides);
     // ==========================================  END SETUP TAX STATUS
 
+
     // ==========================================  SETUP EMPLOYEES
-        $datas = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-        ->leftJoin('positions','positions.uuid','employees.position_uuid')
-        ->leftJoin('employee_salaries','employee_salaries.employee_uuid','employees.uuid')
-        ->get([
-            'employees.is_bpjs_kesehatan',
-            'employees.position_uuid',
-            'employees.tax_status',
-            'employees.is_bpjs_ketenagakerjaan',
-            'employees.is_bpjs_pensiun',
-            'employee_salaries.*',
-            'employees.uuid as employee_uuid',
-            'user_details.name',
-            'positions.position',
-            'employees.date_start_contract'
-        ]);
-
-        $employees = $datas->keyBy(function ($item) {
-            return strval($item->employee_uuid);
-        });
-
-        // dd($employees);
-        /* 
-        [ THE DATA
-            "is_bpjs_kesehatan",
-            "tax_status",
-            "is_bpjs_ketenagakerjaan",
-            "is_bpjs_pensiun",
-            "id",
-            "uuid",
-            "employee_uuid",
-            "salary",
-            "insentif",
-            "tunjangan",
-            "hour_meter_price_uuid",
-            "insentif_hm",
-            "deposit_hm",
-            "tonase",
-            "date_start",
-            "date_end",
-            "created_at",
-            "updated_at",
-            "name",
-            "position",
-            "date_start_contract"
-        ]
-        */
+               
+        $employees = $arr_setup_employee;
+        
     // ==========================================  END SETUP EMPLOYEES
 
 
@@ -347,10 +424,13 @@ class AllowanceController extends Controller
             }
 
             foreach($premis as $premi){
-                $name_premi = $premi->uuid ;
                 $name_premi_pay = 'pay_premi_'.$premi->uuid ;
-                $employee->$name_premi = 0;
                 $employee->$name_premi_pay = 0;
+            }
+
+            for($status_absen_day = 1; $status_absen_day <= $day_month;$status_absen_day++){
+                $name_day = 'status_absen_day_'.$status_absen_day;
+                $employee->$name_day = null;
             }
 
 
@@ -387,6 +467,8 @@ class AllowanceController extends Controller
             $employee->payment_pay_total= 0;
 
             $employee->payment_other_pay_total = 0;
+            $employee->value_payment_debt =0;
+
             
             $employee->cut_absen = 0;
             $employee->cut_absen_loan = 0;//izin
@@ -409,6 +491,7 @@ class AllowanceController extends Controller
                 $employee->$col_name = 0;
             }
         }
+    
     // ==========================================  END FIRST SETUP EMPLOYEES
 
     // ==========================================  DAY WORK EMPLOYEE
@@ -439,11 +522,17 @@ class AllowanceController extends Controller
             DB::raw("count(status_absens.math) as count_math_status_absen")
         )
         ->get();
+      
+
 
         foreach($employee_day_works as $employee_day_work){
             $name_col = $employee_day_work->math.'_absen_count';
-            $employees[$employee_day_work->employee_uuid]->$name_col = $employee_day_work->count_math_status_absen;
+            if(!empty($employees[$employee_day_work->employee_uuid])){
+                $employees[$employee_day_work->employee_uuid]->$name_col = $employee_day_work->count_math_status_absen;
+            }
         }
+        // return view('datatableshow', [ 'data'         => $employees]);
+        // dd($employee_day_works->first());
     // ==========================================  END DAY WORK EMPLOYEE
 
     // ==========================================  DAY WORK EMPLOYEE status absen
@@ -462,13 +551,16 @@ class AllowanceController extends Controller
                 DB::raw("count(employee_absens.status_absen_uuid) as count_status_absen_uuid")
             )
             ->get();
-
+            // return view('datatableshow', [ 'data'         => $employee_absen_status_absen]);
         foreach($employee_absen_status_absen as $employees_absen){
             $name_col = $employees_absen->status_absen_uuid;
-            $employees[$employees_absen->employee_uuid]->$name_col = $employees_absen->count_status_absen_uuid;
+            if(!empty($employees[$employees_absen->employee_uuid])){
+                $employees[$employees_absen->employee_uuid]->$name_col = $employees_absen->count_status_absen_uuid;
+            }
         }
     // ==========================================  END DAY WORK EMPLOYEE status absen
     
+ 
     // ==========================================  HOUR METER EMPLOYEE
         // TO GET count hm each price each employee
         /* the data
@@ -493,75 +585,124 @@ class AllowanceController extends Controller
             $hm_uui_pay = 'pay_'.$item->uuid;
 
             foreach($employee_hms as $employee_hm){
-                $pay = $item->value * $employee_hm->hour_meter_value;
+                $pay = $item->hour_meter_value * $employee_hm->hour_meter_value;
                 $employees[$employee_hm->employee_uuid]->$hm_uuid = $employee_hm->hour_meter_value;
                 $employees[$employee_hm->employee_uuid]->hm_pay_total = $employees[$employee_hm->employee_uuid]->hm_pay_total + $pay;
                 $employees[$employee_hm->employee_uuid]->$hm_uui_pay =  $pay ;
             }
         }
+
+        // return view('datatableshow', [ 'data'         => $employees]);
+        // dd($employee_day_works->first());
+
     // ==========================================  END HOUR METER EMPLOYEE
 
     // ==========================================  HAULING EMPLOYEE
-        foreach($companies as $company){
             $employee_tonases = EmployeeTonase::whereYear('date', $year)
             ->whereMonth('date', $month)
-            ->where('company_uuid', $company->uuid)
             ->groupBy(
                 'employee_uuid',
+                'coal_from_uuid'
             )
             ->select( 
-                'employee_uuid',
+                'employee_uuid',                
+                'coal_from_uuid',
                 DB::raw("SUM(employee_tonases.tonase_full_value) as tonase_full_value")
             )
             ->get();
 
-            $tonase_uuid = 'tonase_'.$company->uuid;
-            $tonase_uui_pay = 'pay_tonase_'.$company->uuid;
+
+            
 
             foreach($employee_tonases as $employee_tonase){
+                if(!empty($employees[$employee_tonase->employee_uuid])){
+                    $tonase_uuid = 'tonase_'.$employee_tonase->coal_from_uuid;
+                    $tonase_uui_pay = 'pay_tonase_'.$employee_tonase->coal_from_uuid;
+                    $employees[$employee_tonase->employee_uuid]->$tonase_uuid = round($employee_tonase->tonase_full_value, 3);
+                    
+                    $pay_ton = round($arr_coal_from[$employee_tonase->coal_from_uuid]->hauling_price * $employee_tonase->tonase_full_value, 3);
+                    $employees[$employee_tonase->employee_uuid]->tonase_pay_total = $employees[$employee_tonase->employee_uuid]->tonase_pay_total + $pay_ton;
+                    $employees[$employee_tonase->employee_uuid]->$tonase_uui_pay =  $pay_ton;
+                }
                 // if(empty($employees[$employee_tonase->employee_uuid]->tonase_pay_total)){
                 //     $employees[$employee_tonase->employee_uuid]->tonase_pay_total = 0;
                 // }
-                $employees[$employee_tonase->employee_uuid]->$tonase_uuid = round($employee_tonase->tonase_full_value, 3);
-                $pay_ton = round($company->hauling_price * $employee_tonase->tonase_full_value, 3);
-                $employees[$employee_tonase->employee_uuid]->tonase_pay_total = $employees[$employee_tonase->employee_uuid]->tonase_pay_total + $pay_ton;
-                $employees[$employee_tonase->employee_uuid]->$tonase_uui_pay =  $pay_ton;
+               
             }
-        }
+        
+        // dd($employees['MB-PL-120054']);
+        // return view('datatableshow', [ 'data'         => $employees]);
+        // dd($employee_day_works->first());
+
+
     // ==========================================  END HAULING EMPLOYEE
 
-    // ==========================================  PREMI EMPLOYEE
-        foreach($premis as $premi){
-            $employee_premis = EmployeePremi::where('premi_uuid', $premi->uuid)
+    // ==========================================  STATUS ABSEN EACH DAY
+            $arr_employee_absen = EmployeeAbsen::whereYear('date', $year)
+            ->whereMonth('date', $month)
             ->get();
 
+            foreach($arr_employee_absen as $employee_absen){
+              
+                if(!empty($arr_employee_for_absen[$employee_absen->employee_uuid])){
+                    $arr_date_absen = explode('-', $employee_absen->date);
+                    $the_date = (int)$arr_date_absen[2];
+                    $col_name_date = 'status_absen_day_'.$the_date;
+                    $employees[$arr_employee_for_absen[$employee_absen->employee_uuid]->nik_employee]->$col_name_date = $employee_absen->status_absen_uuid;
+                }
 
-
-            $name_premi = $premi->uuid ;
-            $name_premi_pay = 'pay_premi_'.$premi->uuid ;
-            
-            // return view('datatableshow', [ 'data'         => $employee_premis]);
-            // dd($employee_premis);
-            // $production_premi = ;
-            
-            if(empty($productions[$premi->uuid]->value_production)){
-                $production_premi = 0;
-            }else{
-                $production_premi = (float)$productions[$premi->uuid]->value_production;
             }
+            // return view('datatableshow', [ 'data'         => $arr_employee_absen]);
+
+
             
-            foreach($employee_premis as $emp_premi){
-                $employees[$emp_premi->employee_uuid]->$name_premi = $emp_premi->premi_value;
-                $premi_pay = $emp_premi->premi_value * $production_premi;
+
+            foreach($employee_tonases as $employee_tonase){
+                if(!empty($employees[$employee_tonase->employee_uuid])){
+                    $tonase_uuid = 'tonase_'.$employee_tonase->coal_from_uuid;
+                    $tonase_uui_pay = 'pay_tonase_'.$employee_tonase->coal_from_uuid;
+                    $employees[$employee_tonase->employee_uuid]->$tonase_uuid = round($employee_tonase->tonase_full_value, 3);
+                    
+                    $pay_ton = round($arr_coal_from[$employee_tonase->coal_from_uuid]->hauling_price * $employee_tonase->tonase_full_value, 3);
+                    $employees[$employee_tonase->employee_uuid]->tonase_pay_total = $employees[$employee_tonase->employee_uuid]->tonase_pay_total + $pay_ton;
+                    $employees[$employee_tonase->employee_uuid]->$tonase_uui_pay =  $pay_ton;
+                }
+                // if(empty($employees[$employee_tonase->employee_uuid]->tonase_pay_total)){
+                //     $employees[$employee_tonase->employee_uuid]->tonase_pay_total = 0;
+                // }
                 
-                $employees[$emp_premi->employee_uuid]->premi_pay_total =  $employees[$emp_premi->employee_uuid]->premi_pay_total+ $premi_pay;
-                $employees[$emp_premi->employee_uuid]->$name_premi_pay =  $premi_pay ;
             }
-            
-        }
         
+        // dd($employees['MB-PL-120054']);
+        // return view('datatableshow', [ 'data'         => $employees]);
+        // dd($employee_day_works->first());
+
+
+    // ==========================================  END STATUS ABSEN EACH DAY
+
+
+    // ==========================================  PREMI EMPLOYEE
+        foreach($arr_employee_premi as $employee_premi){
+            $premi_uuid = $employee_premi->premi_uuid;
+            $col_name = 'premi_value_'.$employee_premi->premi_uuid;
+            if(!empty($employees[$employee_premi->employee_uuid])){
+                $employees[$employee_premi->employee_uuid]->$col_name = $employee_premi->premi_value;
+                $name_premi_pay = 'pay_premi_'.$employee_premi->premi_uuid ;
+             
+                $production_premi = (float)$productions[$premi_uuid]->value_production;
+                $premi_pay = $employee_premi->premi_value * $production_premi;
+                $employees[$employee_premi->employee_uuid]->$name_premi_pay =$premi_pay;
+                $employees[$employee_premi->employee_uuid]->$name_premi_pay =$premi_pay;
+                $employees[$employee_premi->employee_uuid]->premi_pay_total =  $employees[$employee_premi->employee_uuid]->premi_pay_total+ $premi_pay;
+
+            }            
+        }
+
+         
 
     // ==========================================  END PREMI EMPLOYEE
+
+
     
     // ==========================================  PAYMENT EMPLOYEE
         $payments = EmployeePayment::join('payments', 'payments.uuid', 'employee_payments.payment_uuid')
@@ -577,10 +718,11 @@ class AllowanceController extends Controller
         ->get();
 
         foreach($payments as $payment){
-            $employees[$payment->employee_uuid]->payment_pay_total = $payment->payment_pay_total;
+            // dd($payment->payment_pay_total);
+            $employees[$payment->employee_uuid]->payment_pay_total = $payment->payment_pay;
         }
     // ==========================================  END PAYMENT EMPLOYEE
-
+       
     // ==========================================  PAYMENT OTHER EMPLOYEE
         $EmployeePaymentOther = EmployeePaymentOther::whereYear('employee_payment_others.payment_other_date', $year)
         ->whereMonth('employee_payment_others.payment_other_date', $month)
@@ -594,13 +736,33 @@ class AllowanceController extends Controller
         ->get();
 
         foreach($EmployeePaymentOther as $payment_other_pay_total){
-            $employees[$payment_other_pay_total->employee_uuid]->payment_other_pay_total= $payment_other_pay_total->payment_other_pay_total;
+            $employees[$payment_other_pay_total->employee_uuid]->payment_other_pay_total= $payment_other_pay_total->payment_other_total;
         }
+
+        
+        // dd($employees['MBLE-220666']);
     // ==========================================  END PAYMENT OTHER EMPLOYEE
 
+    // ==========================================  DEBT Payment
+        $employee_payment_debts = EmployeePaymentDebt::join('employee_debts','employee_debts.uuid', 'employee_payment_debts.debt_uuid')
+        ->whereYear('employee_payment_debts.date_payment_debt', $year)
+        ->whereMonth('employee_payment_debts.date_payment_debt', $month)
+        ->get([
+            'employee_debts.employee_uuid',
+            'employee_payment_debts.value_payment_debt',
+            ]
+        );
+        // dd($employee_payment_debts);
 
-        // Employee::where('uuid', 'RJ-221267')->delete();
+        foreach($employee_payment_debts as $employee_pay_debt){
+            if(!empty($employees[$employee_pay_debt->employee_uuid])){
+                $employees[$employee_pay_debt->employee_uuid]->value_payment_debt = $employee_pay_debt->value_payment_debt;
+            }
+        }
+    // ==========================================  END DEBT Payment
+        
 
+        $data_count = [];
         foreach($employees as $employee){
             // COUNT SALARY PAY
             $date_start_contract = $employee->date_start_contract;
@@ -623,54 +785,86 @@ class AllowanceController extends Controller
                 $employee->insentif_pay = round(($employee->pay_absen_count + $employee->cut_absen_count + $employee->A_count )  * $employee->insentif/$day_month, 3);
                 $employee->tunjangan_pay = round(($employee->pay_absen_count + $employee->cut_absen_count + $employee->A_count )  * $employee->tunjangan/$day_month, 3);
             }
-
             $employee->count_day_unwork = $employee->A_absen_count + $employee->cut_absen_count;
 
-            $employee->gaji_kotor = round($employee->payment_other_pay_total+$employee->payment_pay_total+$employee->tunjangan_pay+$employee->insentif_pay+$employee->salary_payed + $employee->hm_pay_total + $employee->tonase_pay_total + $employee->premi_pay_total);
-            $employee->extra_salary = round($employee->payment_pay_total+$employee->hm_pay_total + $employee->tonase_pay_total + $employee->premi_pay_total, 3);
+           
+
+            $employee->gaji_kotor = round(
+                $employee->payment_other_pay_total+
+                $employee->payment_pay_total+
+                $employee->tunjangan_pay+
+                $employee->insentif_pay+
+                $employee->salary_payed + 
+                $employee->hm_pay_total + 
+                $employee->tonase_pay_total + 
+                $employee->premi_pay_total,3
+            );
+
+            $employee->extra_salary = round(
+                $employee->payment_pay_total+
+                $employee->hm_pay_total + 
+                $employee->tonase_pay_total + 
+                $employee->premi_pay_total, 
+            3);
+
+
             $employee->half_extra_salary = round($employee->extra_salary/2, 3);
-            $employee->main_salary =  round($employee->tunjangan_pay+$employee->insentif_pay+$employee->salary_payed , 3);
+
+            $employee->main_salary =  round(
+                $employee->tunjangan_pay+
+                $employee->insentif_pay+
+                $employee->salary_payed , 
+            3);
+            
             $employee->jkk_pay =  round($employee->is_bpjs_ketenagakerjaan_pay *50 * $jkk_percent / 100,0);
             $employee->jk_pay =  round($employee->is_bpjs_ketenagakerjaan_pay *50 * $jk_percent / 100,0);
             $employee->kes_pay =  round($employee->is_bpjs_ketenagakerjaan_pay *50 * $kes_percent /100,0);
-            $employee->brutto_salary = $employee->main_salary + $employee->jkk_pay + $employee->half_extra_salary + $employee->kes_pay + $employee->jk_pay + $employee->payment_other_pay_total;
+            //untuk pph 21
+            $employee->brutto_salary = round(
+                $employee->main_salary + 
+                $employee->jkk_pay + 
+                $employee->half_extra_salary + 
+                $employee->kes_pay + 
+                $employee->jk_pay + 
+                $employee->payment_other_pay_total
+            ,3);
           
-           
+            $employee->jht_pay =  round($employee->is_bpjs_ketenagakerjaan_pay,2) ;
+            $employee->pensiun_pay =  round($employee->salary_payed * $pensiun_percent /100,2) ;
+
+            $employee->total_bpjs = $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_pensiun_pay ;
+            
+            
             $employee->position_percent = round($employee->brutto_salary * $position_percent /100, 0);
+           
             if($employee->position_percent > 500000){
                 $employee->position_percent = 500000;
             }
 
             $employee->jht_pay =  round($employee->is_bpjs_ketenagakerjaan_pay,2) ;
             $employee->pensiun_pay =  round($employee->salary_payed * $pensiun_percent /100,2) ;
-            $employee->netto_month =  round($employee->brutto_salary - $employee->position_percent -$employee->jht_pay-$employee->pensiun_pay,0);
-            $employee->netto_year = ($employee->netto_month * 12) - ($employee->payment_other_pay_total *11);
             
-            $employee->pph21_month = $employee->netto_year - $tax_statuses[strtoupper($employee->tax_status)]->tax_status_value;
-            if($employee->pph21_month > 0){
-                $employee->pph21_month = round($employee->pph21_month * $percent_pph21 /100 / 12,0);
-            }else{
-                $employee->pph21_month = 0;
+            $employee->netto_month =  round(
+                $employee->brutto_salary - 
+                $employee->position_percent -
+                $employee->jht_pay-
+                $employee->pensiun_pay,
+            0);
+           
+            $employee->netto_year = ($employee->netto_month * 12) - ($employee->payment_other_pay_total *11);
+            $tax_status_uuid = ResponseFormatter::toUUID($employee->tax_status_uuid);
+            $employee->pph21_month = $employee->netto_year - $tax_status_uuides[$tax_status_uuid]->tax_status_value;
+
+            $employee->pph21 = round($employee->pph21_month * $percent_pph21/100/12,0);
+            
+            if($employee->pph21 < 0){
+                $employee->pph21 = 0;
             }
 
-            $employee->salary_netto = round($employee->gaji_kotor - $employee->pph21_month - $employee->is_bpjs_ketenagakerjaan_pay -$employee->is_bpjs_kesehatan_pay- $employee->is_bpjs_pensiun_pay,0);
-            $employee->cutted_total = $employee->pph21_month + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_pensiun_pay;
-
-            $employee->salary_netto_adjust_moded = round($employee->salary_netto / 1000,0);
-            $employee->salary_netto_adjust = round($employee->salary_netto_adjust_moded * 1000,0);
-            
-            $employee->salary_netto_before_cut_debt =  $employee->salary_netto_adjust;
-            $employee->salary_netto_adjust_mod = $employee->salary_netto -$employee->salary_netto_adjust ;
-            $employee->total_bpjs =    $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_pensiun_pay ;
-            $employee->brutto_slip =  $employee->total_bpjs + $employee->salary_netto_adjust +  $employee->pph21_month + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_pensiun_pay + $employee->jkk_pay + $employee->jk_pay + $employee->kes_pay;
-            $symbol = '-';
-            $variabel_1 = 'salary';
-
-            // hitung potongan
+            // potongan alpa dan izin
             if($employee->count_day_unwork > 0){
                 $hasil_sebelum = 0;
-                $hasil_grup = 0;
-                
+                $hasil_grup = 0;            
            
                 //$dataaaa = [];
                 foreach($formulas as $fml){
@@ -697,18 +891,12 @@ class AllowanceController extends Controller
                                     $nama_col =  $variable_count_formula->variable_code;
                                     $symbol = $variable_count_formula->symbol_count;
                                     if($variable_count_formula->order_number == 1){
-                                        $hasil_sebelum = $employee->$nama_col;
-                                        //$dataaaa[$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number] = $hasil_sebelum;
-                                        
+                                        $hasil_sebelum = $employee->$nama_col;                                        
                                     }else{
                                         if($variable_count_formula->variable_uuid == 'NILAI'){
                                             $hasil_sebelum = AllowanceController::Maths($hasil_sebelum,  $variable_count_formula->value_value_variable, $symbol);
-                                            //$dataaaa[$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  = $variable_count_formula->value_value_variable;
-                                            //$dataaaa['symbol-'.$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  = $symbol;
                                         }else{
                                             $hasil_sebelum = AllowanceController::Maths($hasil_sebelum,  $employee->$nama_col, $symbol);
-                                            //$dataaaa[$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  =  $employee->$nama_col;
-                                            //$dataaaa['symbol-'.$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  = $symbol;
                                         }
                                     }
                                 }
@@ -719,53 +907,93 @@ class AllowanceController extends Controller
                                     $symbol = $variable_count_formula->symbol_count;
                                     if($variable_count_formula->order_number == 1){
                                         $hasil_sebelum = $employee->$nama_col;
-                                        //$dataaaa[$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  = $hasil_sebelum;
                                     }else{
                                         if($variable_count_formula->variable_uuid == 'NILAI'){
                                             $hasil_sebelum = AllowanceController::Maths($hasil_sebelum,  $variable_count_formula->value_value_variable, $symbol);
-                                            //$dataaaa[$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number] = $variable_count_formula->value_value_variable;
-                                            //$dataaaa['symbol-'.$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  = $symbol;
                                         }else{
                                             $hasil_sebelum = AllowanceController::Maths($hasil_sebelum,  $employee->$nama_col, $symbol);
-                                            //$dataaaa['symbol-'.$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number]  = $symbol;
-                                            //$dataaaa[$nama_col.$g_fml->group_formula_order.'-'.$variable_count_formula->order_number] = $employee->$nama_col;
                                         }
                                     }
                                 }
                                 $symbol = $g_fml->group_formula_symbol;
                                 $hasil_sebelum = AllowanceController::Maths($hasil_grup,  $hasil_sebelum, $symbol);
-                               
                             }
-                            //$dataaaa['hasil-group'.$g_fml->group_formula_order] = $hasil_sebelum;
                         }
                     }
                     
                     if($fml->uuid == 'IZIN'){
-                        
-                       
                         $employee->cut_absen_loan =  $hasil_sebelum;
                     }else{ 
                         $employee->cut_alpa_loan =  $hasil_sebelum;
                     }
                 }
             }
+            // end potongan alpa dan izin
 
+            $employee->cutted_total = $employee->pph21 + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_pensiun_pay +$employee->cut_alpa_loan+$employee->cut_absen_loan;
+
+            $employee->salary_netto = $employee->salary_netto_before_cut_debt = round($employee->gaji_kotor - $employee->cutted_total,0);           
+
+            if($employee->value_payment_debt > 0){
+                $employee->salary_netto = round($employee->salary_netto_before_cut_debt - $employee->value_payment_debt,0);
+            }
+
+            $employee->salary_netto_adjust_moded = round($employee->salary_netto / 1000,0);
+            $employee->salary_netto_adjust = round($employee->salary_netto_adjust_moded * 1000,0);
+            
+            $employee->salary_netto_before_cut_debt =  $employee->salary_netto_adjust;
+            $employee->salary_netto_adjust_mod = $employee->salary_netto -$employee->salary_netto_adjust ;
+            
+            
+            $data_count[$employee->nik_employee] = [
+                'name'  => $employee->name,
+                'nik_employee'  => $employee->nik_employee,
+                'count_pay_day'  => $employee->pay_day,                
+                'no_bpjs_ketenagakerjaan'  => $employee->bpjs_ketenagakerjaan,                
+                'no_bpjs_kesehatana'  => $employee->bpjs_kesehatana,
+                
+                // 'no_kpj'    => $employee->
+                'date_start_contract'  => $employee->date_start_contract,
+                'position'  => $employee->position,
+                'tax_status'  => $employee->tax_status_uuid,
+                'long_work' => $employee->long_work,
+                'total_hari_tidak_bekerja' => $employee->count_day_unwork,
+                'salary'    => $employee->salary,
+                'salary_payed'  =>    $employee->salary_payed,
+                'insentif'  =>    $employee->insentif,
+                'insentif_pay'  =>    $employee->insentif_pay,
+                'tunjangan'  =>    $employee->tunjangan,
+                'tunjangan_pay'  =>    $employee->tunjangan_pay,
+                'total_hasil_hm'  => $employee->hm_pay_total,
+                'total_hasil_hauling'  => $employee->tonase_pay_total,
+                'total_hasil_premi'  => $employee->premi_pay_total,
+                'total_hasil_pembayaran'  => $employee->payment_pay_total,
+                'total_pendapatan_tambahan'  => $employee->extra_salary,
+                'total_gajih_kotor'  => $employee->gaji_kotor,
+                'bpjs_kesehatan'  => $employee->is_bpjs_kesehatan_pay,
+                'bpjs_pensiun'  => $employee->is_bpjs_pensiun_pay,
+                'bpjs_ketenagakerjaan'  => $employee->is_bpjs_ketenagakerjaan_pay,
+                'total_bpjs'    => $employee->total_bpjs,
+                'pph21' => $employee->pph21,
+                'total_potongan_izin' => $employee->cut_absen_loan,
+                'total_potongan_alpa' => $employee->cut_alpa_loan,
+                'total_pembayaran_hutang' => $employee->value_payment_debt,
+                
+                'A_absen_count' => $employee->A_absen_count,
+                'cut_absen_count' => $employee->cut_absen_count,
+                'pay_absen_count' => $employee->pay_absen_count,
+                'unpay_absen_count' => $employee->unpay_day,
+
+                'total_gajih_bersih_sebelum_potong_hutang'  => $employee->salary_netto_before_cut_debt,
+                'total_gajih_bersih_sebelum_dibulatkan'  => $employee->salary_netto,                
+                'total_pembulat'  => $employee->salary_netto_adjust_mod *(-1),
+                'total_gajih_bersih_bulat'  => $employee->salary_netto_adjust,
+            ];
         }
 
-        // dd('here');
-        $employee_payment_debts = EmployeePaymentDebt::join('employee_debts','employee_debts.uuid', 'employee_payment_debts.debt_uuid')
-        ->whereYear('employee_payment_debts.date_payment_debt', $year)
-        ->whereMonth('employee_payment_debts.date_payment_debt', $month)
-        ->get([
-            'employee_debts.employee_uuid',
-            'employee_payment_debts.value_payment_debt',
-            ]
-        );
-
-        foreach($employee_payment_debts as $employee_payment_debt){
-            $employees[$employee_payment_debt->employee_uuid]->cut_debt =   $employee_payment_debt->value_payment_debt;
-            $employees[$employee_payment_debt->employee_uuid]->salary_netto_adjust  = $employees[$employee_payment_debt->employee_uuid]->salary_netto_adjust - $employee_payment_debt->value_payment_debt;
-        }
+        dd($employees['MBLE-120044']);
+        return view('datatableshow', [ 'data'         => $data_count]);
+ 
 
         foreach($employees as $avg){
             // $position = $avg->position;
@@ -792,14 +1020,13 @@ class AllowanceController extends Controller
             $av=  $averagge[$avg]['value']/ $averagge[$avg]['count'];
             $averagge[$avg]['avg'] =  $av;
         }
+        return view('datatableshow', [ 'data'         => $employees]);
 
-            if($request->from == 'index'){
-                return ResponseFormatter::toJson($averagge, 'Data Averagge');
-            }
+            // if($request->from == 'index'){
+            //     return ResponseFormatter::toJson($averagge, 'Data Averagge');
+            // }
         
-        // dd($employees['MBLE-130110']);
-        // return view('datatableshow', [ 'data'         => $employees]);
-        // return'a';
+
         return Datatables::of($employees)
         ->make(true);
     }

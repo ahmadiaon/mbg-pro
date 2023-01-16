@@ -42,10 +42,76 @@ class EmployeeTonseController extends Controller
             'title'         => 'Tonase',
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'layout'    => $layout,
-            'companies' => $companies
+            'companies' => $companies,
+            'nik_employee' => ''
         ]);
     }
 
+    public function template($year_month){
+        $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+
+        $day_month = ResponseFormatter::getEndDay($year_month);
+
+        $arr_coal_from = CoalFrom::join('companies','companies.uuid', 'coal_froms.company_uuid')->get([
+            'companies.*',
+            'coal_froms.*',
+            'coal_froms.uuid as coal_from_uuid'
+        ]);
+
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        $createSheet->setCellValue('B1', 'Template Tonase');
+        
+        $createSheet->setCellValue('C1', 'Excel');
+        $createSheet->setCellValue('B2', 'Perusahaan');
+        $createSheet->setCellValue('D2', 'Harga');
+        
+        $createSheet->setCellValue('B3', 'Bulan');
+        $createSheet->setCellValue('B4', 'Tahun');
+
+        $createSheet->setCellValue('C3', $month);
+        $createSheet->setCellValue('C4', $year);
+        $createSheet->setCellValue('A5', 'No');
+        $createSheet->setCellValue('B5', 'NIK');
+        $createSheet->setCellValue('C5', 'Nama');
+        $createSheet->setCellValue('D5', 'Jabatan');
+
+        for($i = 1; $i <= $day_month; $i++){  
+            $first = $i + 3;
+            $second = $first+1 + $day_month;
+            $third = $second +1 + $day_month;
+            $createSheet->setCellValue($abjads[$first].'5', $i);
+            $createSheet->setCellValue($abjads[$second].'5', $i);
+            $createSheet->setCellValue($abjads[$third].'5', $i);
+        }
+
+        $zip = new ZipArchive;
+        $fileName = 'file/absensi/Tonase '.$year_month.'-'.rand(99,9999).'file.zip';
+        if($zip->open($fileName, ZipArchive::CREATE) === TRUE){
+            
+
+            foreach($arr_coal_from as $coal_from){
+                 $createSheet->setCellValue('D3', $coal_from->hauling_price);
+                 $createSheet->setCellValue('C2', $coal_from->company_uuid);
+                 $createSheet->setCellValue('E2', 'Asal Batu');
+                 $createSheet->setCellValue('E3', $coal_from->coal_from);
+                 $createSheet->setCellValue('F2', 'Kode Asal Batu');
+                 $createSheet->setCellValue('F3', $coal_from->coal_from_uuid);
+
+                $crateWriter = new Xls($createSpreadsheet);
+                $name = 'file/absensi/Tonase -'.$coal_from->company_uuid.'-'.$coal_from->coal_from.'-'.$year_month.'-'.rand(99,9999).'file.xls';
+                $crateWriter->save($name);
+                $zip->addFile($name, $coal_from->company_uuid.'-'.$coal_from->coal_from.'-'.$year_month.'-'.rand(99,9999).'.xls.');
+            }
+        }
+        $zip->close();
+        return response()->download(public_path($fileName));
+    }
+
+    // butuh export untuk data
     public function export($year_month){
         $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         $date = explode("-", $year_month);
@@ -60,6 +126,14 @@ class EmployeeTonseController extends Controller
         ->get([
             'coal_froms.*'
         ]);
+
+        $arr_coal_from = CoalFrom::join('companies','companies.uuid', 'coal_froms.company_uuid')->get([
+            'companies.*',
+            'coal_froms.*',
+            'coal_froms.uuid as coal_from_uuid'
+        ]);
+
+        // dd($arr_coal_from);
   
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
@@ -79,186 +153,184 @@ class EmployeeTonseController extends Controller
         $createSheet->setCellValue('C5', 'Nama');
         $createSheet->setCellValue('D5', 'Jabatan');
 
-        $employees = Identity::all();
+        $employees = Employee::noGet_employeeAll_detail()
+        ->get();
+
+        $arr_employee = Employee::noGet_employeeAll_detail()
+        ->get();
+
+        
         for($i = 1; $i <= $day_month; $i++){  
             $first = $i * 3 - 2;
             $second = $first+1;
             $third = $second + 1;
-            $createSheet->setCellValue($abjads[$first+3].'5', $i);
-            $createSheet->setCellValue($abjads[$second+3].'5', $i);
+            $createSheet->setCellValue($abjads[$first+3].'5', $i); 
+            $createSheet->setCellValue($abjads[$first+3].'4', 'rit');
+            $createSheet->setCellValue($abjads[$second+3].'5', $i);            
+            $createSheet->setCellValue($abjads[$second+3].'4', 'ton');
             $createSheet->setCellValue($abjads[$third+3].'5', $i);
+            $createSheet->setCellValue($abjads[$third+3].'4', 'full');
         }
+
         $employee_row = 6;
         $no = 1;
             
 
-        // foreach($employees as $item){
-        //     $createSheet->setCellValue( $abjads[0].$employee_row, $no);
-        //     $createSheet->setCellValue( $abjads[1].$employee_row, $item->nik_employee);
-        //     $createSheet->setCellValue( $abjads[2].$employee_row, $item->name);
-        //     $createSheet->setCellValue( $abjads[3].$employee_row, $item->position);
-
-        //     $data_tonase_employee = Employee::leftJoin('employee_tonases','employee_tonases.employee_uuid', 'employees.uuid')
-        //     ->where('employee_tonases.employee_uuid', $item->employee_uuid)
-            
-        //     ->where('employee_tonases.coal_from_uuid', $item->uuid)
-        //     ->whereYear('employee_tonases.date', $year)->whereMonth('employee_tonases.date', $month)
-        //     ->orderBy('employee_tonases.date', 'asc')
-        //     ->groupBy(
-        //         'employee_tonases.employee_uuid',
-        //         'employee_tonases.date',
-        //     )
-        //     ->select( 
-        //         'employee_tonases.date', 
-        //         'employee_tonases.employee_uuid',
-        //         DB::raw("count(employee_tonases.tonase_value) as tonase_count"),
-        //         DB::raw("sum(employee_tonases.tonase_value) as tonase_value"),
-        //     )
-        //     ->get();
-            
-        //     $item->data_tonase_employee = $data_tonase_employee;
-
-        //     $employee_row++;
-        //     $no++;    
-
-           
-
-        //     for($i = 1; $i <= $day_month; $i++){  
-        //         $first = $i * 3 - 2;
-        //         $second = $first+1;
-        //         $third = $second + 1;
-        //         $cel_for = $abjads[$second+3].$employee_row;
-        //         $formula = '=IF('.$abjads[$first+3].$employee_row.'>4,'.$cel_for.'*0.15+'.$cel_for.','.$cel_for.')';
-        //         $createSheet->setCellValue($abjads[$first+3].$employee_row, '0');
-        //         $createSheet->setCellValue($abjads[$second+3].$employee_row, '0');
-        //         $createSheet->setCellValue($abjads[$third+3].$employee_row, $formula);
-        //     }
-
-        //     foreach($data_tonase_employee as $tonase){
-        //         $date = $tonase->date;
-        //         $date = explode('-', $date);
-        //         $date_day = (int)$date[2];
-        //         $first = $date_day * 3 - 2;
-        //         $second = $first+1;
-        //         $third = $second + 1;
-                
-        //         if(!empty($tonase->tonase_count)){
-        //             $count = $tonase->tonase_count;
-        //             $value = $tonase->tonase_value;
-        //         }else{
-        //             $count = 0;
-        //             $value = 0;
-        //         }
-        //         $createSheet->setCellValue($abjads[$first+3].$employee_row, $count);
-        //         $createSheet->setCellValue($abjads[$second+3].$employee_row, $value);
-        //     }
-        // }
-        // dd($employees);
-        // var_dump($employees);die;
-                         
+               
 
         $zip = new ZipArchive;
         $fileName = 'file/absensi/Tonase '.$year_month.'-'.rand(99,9999).'file.zip';
-        if ($zip->open($fileName, ZipArchive::CREATE) === TRUE){
-            foreach($companies as $company){
-                
-                $employees = Identity::all();
-                for($i = 1; $i <= $day_month; $i++){  
-                    $first = $i * 3 - 2;
-                    $second = $first+1;
-                    $third = $second + 1;
-                    $createSheet->setCellValue($abjads[$first+3].'5', $i);
-                    $createSheet->setCellValue($abjads[$second+3].'5', $i);
-                    $createSheet->setCellValue($abjads[$third+3].'5', $i);
-                }
-                $employee_row = 6;
-                $no = 1;
-                    
+        $arr_tonase_employee = Employee::noGet_employeeAll_detail()->join('employee_tonases','employee_tonases.employee_uuid', 'employees.uuid')
+            ->whereYear('employee_tonases.date', $year)
+            ->whereMonth('employee_tonases.date', $month)
+            ->groupBy(
+                'employee_tonases.employee_uuid',
+                'employee_tonases.coal_from_uuid',
+                'employee_tonases.date',
+            )
+            ->select( 
+                'employee_tonases.coal_from_uuid',
+                'employee_tonases.date', 
+                'employee_tonases.employee_uuid',
+                DB::raw("count(employee_tonases.tonase_value) as tonase_count"),
+                DB::raw("sum(employee_tonases.tonase_value) as tonase_value"),                    
+                DB::raw("sum(employee_tonases.tonase_full_value) as tonase_full_value"),
+            )
+            ->get();
 
-                foreach($employees as $item){
-                    $createSheet->setCellValue( $abjads[0].$employee_row, $no);
-                    $createSheet->setCellValue( $abjads[1].$employee_row, $item->nik_employee);
-                    $createSheet->setCellValue( $abjads[2].$employee_row, $item->name);
-                    $createSheet->setCellValue( $abjads[3].$employee_row, $item->position);
+        $arr_data = [];
+        
+        foreach($arr_tonase_employee as $tonase_employee){
+            $arr_data[$tonase_employee->coal_from_uuid][$tonase_employee->employee_uuid][$tonase_employee->date] = [
+                'ritase'    => $tonase_employee->tonase_count,
+                'tonase_value'  => round($tonase_employee->tonase_value,2),
+                'tonase_full_value' => round($tonase_employee->tonase_full_value, 2)
+            ] ;
+        }
 
-                    $data_tonase_employee = Employee::leftJoin('employee_tonases','employee_tonases.employee_uuid', 'employees.uuid')
-                    ->where('employee_tonases.employee_uuid', $item->employee_uuid)
-                    
-                    ->where('employee_tonases.coal_from_uuid', $company->uuid)
-                    ->whereYear('employee_tonases.date', $year)->whereMonth('employee_tonases.date', $month)
-                    ->orderBy('employee_tonases.date', 'asc')
-                    ->groupBy(
-                        'employee_tonases.employee_uuid',
-                        'employee_tonases.date',
-                    )
-                    ->select( 
-                        'employee_tonases.date', 
-                        'employee_tonases.employee_uuid',
-                        DB::raw("count(employee_tonases.tonase_value) as tonase_count"),
-                        DB::raw("sum(employee_tonases.tonase_value) as tonase_value"),
-                    )
-                    ->get();
-                    
-                    $item->data_tonase_employee = $data_tonase_employee;
+        
+        if($zip->open($fileName, ZipArchive::CREATE) === TRUE){
+            for($i = 1; $i <= $day_month; $i++){  
+                $first = $i * 3 - 2;
+                $second = $first+1;
+                $third = $second + 1;
+                $createSheet->setCellValue($abjads[$first+3].'5', $i);
+                $createSheet->setCellValue($abjads[$second+3].'5', $i);
+                $createSheet->setCellValue($abjads[$third+3].'5', $i);
+            }
 
-                   
-                
-
-                    for($i = 1; $i <= $day_month; $i++){  
-                        $first = $i * 3 - 2;
-                        $second = $first+1;
-                        $third = $second + 1;
-                        $cel_for = $abjads[$second+3].$employee_row;
-                        $formula = '=IF('.$abjads[$first+3].$employee_row.'>4,'.$cel_for.'*0.15+'.$cel_for.','.$cel_for.')';
-                        $createSheet->setCellValue($abjads[$first+3].$employee_row, '0');
-                        $createSheet->setCellValue($abjads[$second+3].$employee_row, '0');
-                        $createSheet->setCellValue($abjads[$third+3].$employee_row, $formula);
-                    }
-
-                    foreach($data_tonase_employee as $tonase){
-                        $date = $tonase->date;
-                        $date = explode('-', $date);
-                        $date_day = (int)$date[2];
-                        $first = $date_day * 3 - 2;
-                        $second = $first+1;
-                        $third = $second + 1;
-                        
-                        if(!empty($tonase->tonase_count)){
-                            $count = $tonase->tonase_count;
-                            $value = $tonase->tonase_value;
-                        }else{
-                            $count = 0;
-                            $value = 0;
-                        }
-                        $createSheet->setCellValue($abjads[$first+3].$employee_row, $count);
-                        $createSheet->setCellValue($abjads[$second+3].$employee_row, $value);
-                    }
-                    $employee_row++;
-                    $no++;    
-
-                }
-                // dd($company);
-                $createSheet->setCellValue('D3', $company->hauling_price);
-                $createSheet->setCellValue('C2', $company->uuid);
-
+            foreach($arr_coal_from as $coal_from){
+                 $createSheet->setCellValue('D3', $coal_from->hauling_price);
+                 $createSheet->setCellValue('C2', $coal_from->company_uuid);
+                 $createSheet->setCellValue('E2', 'Asal Batu');
+                 $createSheet->setCellValue('E3', $coal_from->coal_from);
+                 $createSheet->setCellValue('F2', 'Kode Asal Batu');
+                 $createSheet->setCellValue('F3', $coal_from->coal_from_uuid);
 
                 $crateWriter = new Xls($createSpreadsheet);
-                $name = 'file/absensi/Tonase Perusahaan '.$company->uuid.'-'.$year_month.'-'.rand(99,9999).'file.xls';
+                $name = 'file/absensi/Tonase -'.$coal_from->company_uuid.'-'.$coal_from->coal_from.'-'.$year_month.'-'.rand(99,9999).'file.xls';
                 // ob_end_clean();
 
                 $crateWriter->save($name);
-                $zip->addFile($name, $company->uuid.'.xls.');
+                $zip->addFile($name, $coal_from->company_uuid.'-'.$coal_from->coal_from.'-'.$year_month.'-'.rand(99,9999).'.xls.');
+
             }
+
+
+            // foreach($companies as $company){ 
+            //     for($i = 1; $i <= $day_month; $i++){  
+            //         $first = $i * 3 - 2;
+            //         $second = $first+1;
+            //         $third = $second + 1;
+            //         $createSheet->setCellValue($abjads[$first+3].'5', $i);
+            //         $createSheet->setCellValue($abjads[$second+3].'5', $i);
+            //         $createSheet->setCellValue($abjads[$third+3].'5', $i);
+            //     }
+            //     $employee_row = 6;
+            //     $no = 1;
+
+                
+
+            //     foreach($employees as $item){
+            //         $createSheet->setCellValue( $abjads[0].$employee_row, $no);
+            //         $createSheet->setCellValue( $abjads[1].$employee_row, $item->nik_employee);
+            //         $createSheet->setCellValue( $abjads[2].$employee_row, $item->name);
+            //         $createSheet->setCellValue( $abjads[3].$employee_row, $item->position);
+
+            //         $data_tonase_employee = Employee::leftJoin('employee_tonases','employee_tonases.employee_uuid', 'employees.uuid')
+            //         ->where('employee_tonases.employee_uuid', $item->employee_uuid)
+                    
+            //         ->where('employee_tonases.coal_from_uuid', $company->uuid)
+            //         ->whereYear('employee_tonases.date', $year)->whereMonth('employee_tonases.date', $month)
+            //         ->orderBy('employee_tonases.date', 'asc')
+            //         ->groupBy(
+            //             'employee_tonases.employee_uuid',
+            //             'employee_tonases.date',
+            //         )
+            //         ->select( 
+            //             'employee_tonases.date', 
+            //             'employee_tonases.employee_uuid',
+            //             DB::raw("count(employee_tonases.tonase_value) as tonase_count"),
+            //             DB::raw("sum(employee_tonases.tonase_value) as tonase_value"),
+            //         )
+            //         ->get();
+                    
+            //         $item->data_tonase_employee = $data_tonase_employee;                
+                
+
+            //         for($i = 1; $i <= $day_month; $i++){  
+            //             $first = $i * 3 - 2;
+            //             $second = $first+1;
+            //             $third = $second + 1;
+            //             $cel_for = $abjads[$second+3].$employee_row;
+            //             $formula = '=IF('.$abjads[$first+3].$employee_row.'>4,'.$cel_for.'*0.15+'.$cel_for.','.$cel_for.')';
+            //             $createSheet->setCellValue($abjads[$first+3].$employee_row, '0');
+            //             $createSheet->setCellValue($abjads[$second+3].$employee_row, '0');
+            //             $createSheet->setCellValue($abjads[$third+3].$employee_row, $formula);
+            //         }
+
+            //         foreach($data_tonase_employee as $tonase){
+            //             $date = $tonase->date;
+            //             $date = explode('-', $date);
+            //             $date_day = (int)$date[2];
+            //             $first = $date_day * 3 - 2;
+            //             $second = $first+1;
+            //             $third = $second + 1;
+                        
+            //             if(!empty($tonase->tonase_count)){
+            //                 $count = $tonase->tonase_count;
+            //                 $value = $tonase->tonase_value;
+            //             }else{
+            //                 $count = 0;
+            //                 $value = 0;
+            //             }
+            //             $createSheet->setCellValue($abjads[$first+3].$employee_row, $count);
+            //             $createSheet->setCellValue($abjads[$second+3].$employee_row, $value);
+            //         }
+            //         $employee_row++;
+            //         $no++;    
+
+            //     }
+            //     // dd($company);
+            //     $createSheet->setCellValue('D3', $company->hauling_price);
+            //     $createSheet->setCellValue('C2', $company->uuid);
+
+            //     $crateWriter = new Xls($createSpreadsheet);
+            //     $name = 'file/absensi/Tonase Perusahaan '.$company->uuid.'-'.$year_month.'-'.rand(99,9999).'file.xls';
+            //     // ob_end_clean();
+
+            //     $crateWriter->save($name);
+            //     $zip->addFile($name, $company->uuid.'.xls.');
+            // }
         }
         $zip->close();
         return response()->download(public_path($fileName));
     }
 
+    //used good
     public static function funcStore($validatedData){
         $percent_bonus = 15;
-        $ritase_bonus =5;
-
-        
+        $ritase_bonus =5;        
 
         if($validatedData['ritase'] ){
             $tonase_each_ritase = $validatedData['tonase_value'] / $validatedData['ritase'];
@@ -266,29 +338,17 @@ class EmployeeTonseController extends Controller
             $sisa = round($validatedData['tonase_value']  - ($tonase_each_ritase * $validatedData['ritase']),3);
 
             if($validatedData['ritase'] >= $ritase_bonus){
-
-                // round($validatedData['tonase_full_value'] = $tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100,3)
-
-
-                $tonase_full_bonus = round( $validatedData['tonase_value'] + $validatedData['tonase_value'] * $percent_bonus / 100,3) ;
-                $sisa_bonus = round( $tonase_full_bonus - (round($tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100,3) * $validatedData['ritase'] ),3);
+                $tonase_full_bonus = $validatedData['tonase_full_value'] ;
+                $each_tonase_full_bonus = round( $validatedData['tonase_full_value']/ $validatedData['ritase'],3);
+                $sisa_bonus = round( $tonase_full_bonus - (round($each_tonase_full_bonus * $validatedData['ritase'] ,3) ));
             }else{
                 $tonase_full_bonus = $tonase_each_ritase;
                 $sisa_bonus  = 0;
             }
 
-            $data = [
-                'tonase_value' => $validatedData['tonase_value'],
-                'ritase'  =>  $validatedData['ritase'],
-                'tonase_each_ritase'=> $tonase_each_ritase,
-                'sisa'  => $sisa,
-                'tonase_full_bonus' => $tonase_full_bonus,
-                'sisa_bonus' => $sisa_bonus 
-            ];
-
             
             $validatedData['employee_uuid'] =  $validatedData['nik_employee'];
-            $validatedData['coal_from_uuid'] =  $validatedData['company_uuid'];
+            $validatedData['coal_from_uuid'] =  $validatedData['coal_from_uuid'];
             $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['company_uuid'].'-'.$validatedData['nik_employee'];
             $dd=[];
            
@@ -309,25 +369,19 @@ class EmployeeTonseController extends Controller
                         $validatedData['tonase_value'] = $tonase_each_ritase + $sisa;
                         $validatedData['tonase_full_value_real'] = $validatedData['tonase_full_value'] = round($tonase_each_ritase + $tonase_each_ritase * $percent_bonus /100,3);  
                         $validatedData['tonase_full_value'] = round( $validatedData['tonase_full_value'],3) + $sisa_bonus;
-
-                        // $validatedData['data'] = $data;
-                        // dd($validatedData);
                     }else{
                         $validatedData['tonase_full_value'] = $tonase_each_ritase+ $sisa;
                         $validatedData['tonase_value'] = $tonase_each_ritase+ $sisa;
                     }
                 }
+                
                 $store = EmployeeTonase::create($validatedData);
-                $dd[] = $store;
-            }
-            // dd($dd);
-            // $store = EmployeeTonase::create($validatedData);
-    
+                $dd[] = $validatedData;
+            }    
         }
-          
-      
     }
 
+    // used good
     public function import(Request $request){
         $the_file = $request->file('uploaded_file');
         
@@ -337,7 +391,6 @@ class EmployeeTonseController extends Controller
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
-
             $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         
             // DESCRIPTION
@@ -348,17 +401,10 @@ class EmployeeTonseController extends Controller
 
             $price_code = $sheet->getCell( 'D3')->getValue();
             $company_uuid = $sheet->getCell( 'C2')->getValue();
-
+            $coal_from_uuid = $sheet->getCell( 'f3')->getValue();
 
             $no_employee = 6;
             $employees = [];
-            // EmployeeTonase::whereYear('date', $year_hm)
-            // ->whereMonth('date', $month_hm)->delete();
-            /*
-            1. loop all employee
-            2.
-            EmployeeHourMeterDay::
-            */
             if($sheet->getCell( 'E'.'5')->getValue() == $sheet->getCell( 'F'.'5')->getValue()  ){
                 
                 while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
@@ -373,12 +419,14 @@ class EmployeeTonseController extends Controller
                         
                         $cell_ritase = $abjads[$first+3].$no_employee;
                         $cell_tonase = $abjads[$second+3].$no_employee;
+                        
                         if($sheet->getCell($cell_ritase)->getValue() != null){
                             $data_each_day = [
                                 'nik_employee'  => $nik_employee,
                                 'date'  => $year_hm.'-'.$month_hm.'-'.$day,
                                 'ritase'       => $sheet->getCell($cell_ritase)->getValue(),
-                                'tonase_value' => $sheet->getCell($cell_tonase)->getValue(),
+                                'tonase_value' => $sheet->getCell($cell_tonase)->getValue(),                    
+                                'coal_from_uuid'  => $coal_from_uuid,                                
                                 'price_code'  => $price_code,
                                 'company_uuid'  => $company_uuid,
                             ];
@@ -388,7 +436,7 @@ class EmployeeTonseController extends Controller
                             $employees[$day] = $data_each_day;    
                         }
                     } 
-                    // dd( $employees);
+                    dd( $employees);
                     $no_employee++;
                 }
             }else{
@@ -398,17 +446,24 @@ class EmployeeTonseController extends Controller
 
                     for($day =1; $day <= $day_month; $day++){//hm biasa
                         $cell_ritase = $abjads[$date_row+$day].$no_employee;
-                        $cell_tonase = $abjads[$date_row+$day_month+$day+1].$no_employee;
+                        $cell_tonase = $abjads[$date_row+$day_month+$day+1].$no_employee;                        
+                        $cell_full_tonase = $abjads[$date_row+$day_month+$day+1+$day_month+1].$no_employee;
+                         
                         if($sheet->getCell($cell_ritase)->getValue() != null){
+                            
                             $data_each_day = [
                                 'nik_employee'  => $nik_employee,
                                 'date'  => $year_hm.'-'.$month_hm.'-'.$day,
                                 'ritase'       => $sheet->getCell($cell_ritase)->getValue(),
                                 'tonase_value' => $sheet->getCell($cell_tonase)->getValue(),
+                                'tonase_full_value' =>   $sheet->getCell($cell_full_tonase)->getValue(),
+                                'coal_from_uuid'  => $coal_from_uuid,          
                                 'price_code'  => $price_code,
                                 'company_uuid'  => $company_uuid,
                             ];
-                           
+                            // dd($data_each_day);
+                            EmployeeTonase::where('employee_uuid', $nik_employee)->where('date', $data_each_day['date'])->where('coal_from_uuid',$coal_from_uuid)->delete();
+                            EmployeeTonase::where('employee_uuid', $nik_employee)->where('date', $data_each_day['date'])->where('company_uuid',$company_uuid)->delete();
                             EmployeeTonseController::funcStore($data_each_day);
                             
                             $employees[$day] = $data_each_day;
@@ -421,7 +476,7 @@ class EmployeeTonseController extends Controller
             
             return back();
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
     }
@@ -646,6 +701,7 @@ class EmployeeTonseController extends Controller
         return ResponseFormatter::toJson($validatedData, 'Data Stored');
     }
 
+    
     public function anyData(Request $request){
         $date = explode("-", $request->year_month);
         $year = $date[0];
@@ -806,168 +862,91 @@ class EmployeeTonseController extends Controller
         ->make(true);
     }
 
-    public function anyDataMonthFilter(Request $request){
-        $date = explode("-", $request->year_month);
-        $year = $date[0];
-        $month = $date[1];
+    //used on index
+    public function anyDataMonthFilter(Request $request){        
+        $arr_data = [];
+        $arr_data_send = [];
+        $filter_arr_coal_from = [];
+        $validateData = $request->all();
 
-        $filters = [];
-        $data =[];
-        $collecection = collect($data);
-        
-        $coal_froms = $request->filter;
-        
-        if(!empty($request->year_month_day)){
-            if(empty($coal_froms)){
-                $coal_froms = CoalFrom::all();
-                foreach($coal_froms as $value){
-                    $filters[] = $value->uuid;
-                }
-            }else{
-                $filters = $request->filter;
+
+        $arr_coal_from = CoalFrom::all();
+
+        if(empty($request->filter['arr_coal_from'])){
+            foreach($arr_coal_from as $coal_from){
+                $filter_arr_coal_from[]= $coal_from->uuid;
             }
-            foreach($filters as $value){
-                $base =  EmployeeTonase::leftJoin('employees','employees.uuid','employee_tonases.employee_uuid')
-                    ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-                    ->leftJoin('positions','positions.uuid','employees.position_uuid')
-                    ->join('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
-                    ->where('coal_from_uuid', $value)
-                    ->groupBy(                     
-                        'user_details.photo_path',
-                        'employees.nik_employee',
-                        'positions.position',
-                        'user_details.name',
-                        'employees.user_detail_uuid',
-                        'employee_tonases.employee_uuid',
-                        'coal_froms.uuid',
-                        'coal_froms.coal_from',
-                        )
-                    ->select( 
-                        'employee_tonases.employee_uuid',
-                        'employees.user_detail_uuid',
-                        'employees.nik_employee',
-                        'user_details.photo_path',
-                        'user_details.name',
-                        'positions.position',
-                        'coal_froms.uuid',
-                        'coal_froms.coal_from',
-                        DB::raw("count(tonase_value) as ritase"),
-                        DB::raw("SUM(tonase_value) as total_sell"),
-                        DB::raw("SUM(tonase_full_value) as total_sells"),
-                    );
-                if(!empty($request->year_month_day)){
-                    $da = $base->where('date', $request->year_month_day);  
-                }else{
-                    $da = $base->whereYear('date', $year)
-                    ->whereMonth('date', $month);                  
+        }else{
+            $filter_arr_coal_from = $request->filter['arr_coal_from'];
+        }
+        $validateData['filter']['arr_coal_from'] = $filter_arr_coal_from;
+        
+       
+        if(!empty($validateData['filter']['arr_coal_from'])){
+            foreach($validateData['filter']['arr_coal_from'] as $coal_from){
+                $data = Employee::noGet_employeeAll_detail()->join('employee_tonases','employee_tonases.employee_uuid', 'employees.nik_employee' )
+                ->leftJoin('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
+                ->whereYear('employee_tonases.date', $request->year)
+                ->whereMonth('employee_tonases.date', $request->month);
+
+                if(!empty($request->day)){
+                    $data = $data->whereDay('employee_tonases.date', $request->day);
                 }
-    
-                if(!empty($request->nik_employee)){
-                    $da = $da->where('nik_employee', $request->nik_employee);
-                }
-    
-                $da = $da->get();
-    
-    
-                if($da->count() > 0){
-                    $collecection = $collecection->merge($da);
-                }        
-            }
-        }elseif((empty($coal_froms)) && (empty($request->nik_employee))){
-            $collecection =  EmployeeTonase::leftJoin('employees','employees.uuid','employee_tonases.employee_uuid')
-                ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-                ->leftJoin('positions','positions.uuid','employees.position_uuid')
-                // ->join('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
-                // ->where('coal_from_uuid', $value)
-                ->whereYear('employee_tonases.date', $year)
-                ->whereMonth('employee_tonases.date', $month)
-                ->groupBy(                     
+                $data = $data->where('employee_tonases.coal_from_uuid',$coal_from)->groupBy(     
+                    'employee_tonases.coal_from_uuid',                
                     'user_details.photo_path',
                     'employees.nik_employee',
                     'positions.position',
                     'user_details.name',
                     'employees.user_detail_uuid',
                     'employee_tonases.employee_uuid',
-                    // 'coal_froms.uuid',
-                    // 'coal_froms.coal_from',
                     )
                 ->select( 
+                    'employee_tonases.coal_from_uuid',      
                     'employee_tonases.employee_uuid',
                     'employees.user_detail_uuid',
                     'employees.nik_employee',
                     'user_details.photo_path',
                     'user_details.name',
                     'positions.position',
-                    // 'coal_froms.uuid',
-                    // 'coal_froms.coal_from',
                     DB::raw("count(tonase_value) as ritase"),
-                    DB::raw("SUM(tonase_value) as total_sell"),
-                    DB::raw("SUM(tonase_full_value) as total_sells"),
+                    DB::raw("SUM(tonase_value) as sum_tonase_value"),
+                    DB::raw("SUM(tonase_full_value) as sum_tonase_full_value"),
                 )
                 ->get();
-                
-        }else{
-            if(empty($coal_froms)){
-                $coal_froms = CoalFrom::all();
-                foreach($coal_froms as $value){
-                    $filters[] = $value->uuid;
+               
+                if(!empty($data)){
+                    foreach($data as $item){
+                        $arr_data[$coal_from][$item->employee_uuid] = $item;
+                    }   
+                }                                            
+            }
+            
+            if($request->filter['is_combined'] == "false"){
+                foreach($validateData['filter']['arr_coal_from'] as $coal_from_uuid){
+                    if(!empty($arr_data[$coal_from_uuid])){
+                        foreach($arr_data[$coal_from_uuid] as $item_data){
+                            $arr_data_send[] = $item_data;
+                        }  
+                    }                                 
                 }
             }else{
-                $filters = $request->filter;
-            }
-            // return ResponseFormatter::toJson( $filters, 'aa');
-            foreach($filters as $value){
-                
-                $base =  EmployeeTonase::leftJoin('employees','employees.uuid','employee_tonases.employee_uuid')
-                    ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-                    ->leftJoin('positions','positions.uuid','employees.position_uuid')
-                    ->join('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
-                    ->where('coal_from_uuid', $value)
-                    ->groupBy(                     
-                        'user_details.photo_path',
-                        'employees.nik_employee',
-                        'positions.position',
-                        'user_details.name',
-                        'employees.user_detail_uuid',
-                        'employee_tonases.employee_uuid',
-                        'coal_froms.uuid',
-                        'coal_froms.coal_from',
-                        )
-                    ->select( 
-                        'employee_tonases.employee_uuid',
-                        'employees.user_detail_uuid',
-                        'employees.nik_employee',
-                        'user_details.photo_path',
-                        'user_details.name',
-                        'positions.position',
-                        'coal_froms.uuid',
-                        'coal_froms.coal_from',
-                        DB::raw("count(tonase_value) as ritase"),
-                        DB::raw("SUM(tonase_value) as total_sell"),
-                        DB::raw("SUM(tonase_full_value) as total_sells"),
-                    );
-                
-                if(!empty($request->year_month_day)){
-                    $da = $base->where('date', $request->year_month_day);  
-                }else{
-                    $da = $base->whereYear('date', $year)
-                    ->whereMonth('date', $month);                  
+                foreach($validateData['filter']['arr_coal_from'] as $coal_from_uuid){
+                    if(!empty($arr_data[$coal_from_uuid])){
+                        foreach($arr_data[$coal_from_uuid] as $item_data){
+                            if(!empty($arr_data_send[$item_data->employee_uuid])){
+                                $arr_data_send[$item_data->employee_uuid]->ritase = $arr_data_send[$item_data->employee_uuid]->ritase + $item_data->ritase;
+                                $arr_data_send[$item_data->employee_uuid]->sum_tonase_value = $arr_data_send[$item_data->employee_uuid]->sum_tonase_value + $item_data->sum_tonase_value;
+                                $arr_data_send[$item_data->employee_uuid]->sum_tonase_full_value = $arr_data_send[$item_data->employee_uuid]->sum_tonase_full_value + $item_data->sum_tonase_full_value;
+                            }else{
+                                $arr_data_send[$item_data->employee_uuid] = $item_data;
+                            }                        
+                        }  
+                    }                                
                 }
-                
-                if(!empty($request->nik_employee)){
-                    $da = $da->where('nik_employee', $request->nik_employee);
-                }
-    
-                $da = $da->get();
-    
-    
-                if($da->count() > 0){
-                    $collecection = $collecection->merge($da);
-                }        
             }
         }
-
-        return Datatables::of($collecection)
+        return Datatables::of($arr_data_send)
         ->make(true);
     }
 }

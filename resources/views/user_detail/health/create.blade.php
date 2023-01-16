@@ -1,9 +1,9 @@
 <div id="create-user-health" class="children-content">
     <form action="/user-health/store" id="form-user-health" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="text" name="isEdit" id="isEdit" value="">
-        <input type="text" name="uuid" id="uuid-user-health" value="">
-        <input type="text" name="user_detail_uuid" id="user_detail_uuid-user-health">
+        <input type="text" name="isEdit" id="isEdit-create-user-health">
+        <input type="text" name="uuid" id="uuid-create-user-health" value="">
+        <input type="text" name="user_detail_uuid" id="user_detail_uuid-create-user-health">
         <div class="min-height-200px">
             <div class="pd-20 card-box mb-20">
                 <div class="clearfix">
@@ -52,10 +52,17 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="col">
-                        <button type="button" onclick="storeUserHealth('user-health')"
-                            class="btn btn-primary mt-10 float-right">Next Step</button>
+                        <div class="form-group text-right">
+                            <button type="button"
+                                class="btn btn-secondary  mr-10 create-user-employee-back">Back</button>
+                            <button type="button" onclick="storeUserHealth('user-health')"
+                                class="btn btn-primary">Simpan</button>
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>

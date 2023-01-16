@@ -40,7 +40,7 @@ class EmployeeHourMeterDayController extends Controller
         ->groupBy(
             'employees.nik_employee',
             'user_details.photo_path',
-            // 'hour_meter_prices.value',
+            // 'hour_meter_prices.hour_meter_value',
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
@@ -52,7 +52,7 @@ class EmployeeHourMeterDayController extends Controller
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
-            // 'hour_meter_prices.value as hour_meter_price',
+            // 'hour_meter_prices.hour_meter_value as hour_meter_price',
             DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
             DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
             DB::raw("SUM(employee_hour_meter_days.full_value) as hour_meter_full_value"),
@@ -62,6 +62,99 @@ class EmployeeHourMeterDayController extends Controller
         return Datatables::of($data)
         ->make(true);
     }
+
+    // used index
+    public function moreAnyData(Request $request){        
+        $data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
+        ->whereYear('employee_hour_meter_days.date', $request->year)
+        ->whereMonth('employee_hour_meter_days.date', $request->month);
+        if(!empty($request->day)){
+            $data = $data->whereDay('employee_hour_meter_days.date', $request->day);
+        }
+        if(!empty($request->employee_uuid)){
+            $data = $data->where('employee_hour_meter_days.employee_uuid', $request->employee_uuid);
+        }
+        $data =$data
+        ->groupBy(
+            'employees.nik_employee',
+            'user_details.photo_path',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee',
+           )
+           ->groupBy(
+            'user_details.name',
+           )
+        ->select( 
+            'user_details.name',
+            'user_details.photo_path',
+            'positions.position',
+            'employees.uuid',
+            'employees.nik_employee',
+            DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
+            DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
+            DB::raw("SUM(employee_hour_meter_days.full_value) as hour_meter_full_value"),
+        )
+        ->get();
+        return Datatables::of($data)
+        ->make(true);
+        return ResponseFormatter::toJson($data,'bbb');
+    }
+
+    //used on create 
+    public function AnyDataCreate(Request $request){
+       
+        // return ResponseFormatter::toJson($request->all(),'bbb');
+        $data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' );
+
+        if(!empty($request->year)){
+            $data = $data->whereYear('employee_hour_meter_days.date', $request->year)
+            ->whereMonth('employee_hour_meter_days.date', $request->month)
+            ->where('employee_hour_meter_days.employee_uuid', $request->employee_uuid)
+            ->orderBy('employee_hour_meter_days.updated_at', 'desc');
+        }else{
+            $data = $data->orderBy('employee_hour_meter_days.updated_at','desc')->limit(18);
+        }
+        $data = $data->get();
+        return ResponseFormatter::toJson($data,'bbb');
+    }
+    // used to store 
+    public function store(Request $request){
+        $validatedData = $request->all();
+        if(empty($validatedData['uuid'])){
+            $validatedData['uuid']  = $validatedData['date'].'-'.$validatedData['employee_uuid'].'-'.rand(99,9999);
+        }
+
+        if(empty($validatedData['isBonusAktive'])){
+            $validatedData['is_bonus'] = 'bonus';
+        }
+        $store = EmployeeHourMeterDay::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
+        $the_data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
+        ->where('employee_hour_meter_days.uuid', $store->uuid)->get()->first();
+
+        return ResponseFormatter::toJson($the_data,'store employee-hour-meter-day');
+
+
+
+  
+        
+        return ResponseFormatter::toJson($store, 'Data Stored');
+    }
+    
+    public function show(Request $request){        
+        $validatedData = $request->validate([
+            'uuid' => 'required',
+        ]);
+        
+        $data = EmployeeHourMeterDay::where('uuid', $request->uuid)->first();
+        return ResponseFormatter::toJson($data, 'Data Stored');
+    }
+
+
+
+
+
+
 
     public function anyDataUuid($hour_meter_uuid){
 
@@ -76,7 +169,7 @@ class EmployeeHourMeterDayController extends Controller
             'employee_hour_meter_days.updated_at',
             'employees.nik_employee',
             'user_details.photo_path',
-            'hour_meter_prices.value',
+            'hour_meter_prices.hour_meter_value',
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
@@ -92,7 +185,7 @@ class EmployeeHourMeterDayController extends Controller
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
-            'hour_meter_prices.value as hour_meter_price',
+            'hour_meter_prices.hour_meter_value as hour_meter_price',
             'employee_hour_meter_days.value as hour_meter_value',
             'employee_hour_meter_days.full_value as hour_meter_full_value',
         )
@@ -121,7 +214,7 @@ class EmployeeHourMeterDayController extends Controller
             'employee_hour_meter_days.updated_at',
             'employees.nik_employee',
             'user_details.photo_path',
-            'hour_meter_prices.value',
+            'hour_meter_prices.hour_meter_value',
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
@@ -139,7 +232,7 @@ class EmployeeHourMeterDayController extends Controller
             'employee_hour_meter_days.shift',
             'employees.uuid',
             'employees.nik_employee',
-            'hour_meter_prices.value as hour_meter_price',
+            'hour_meter_prices.hour_meter_value as hour_meter_price',
             'employee_hour_meter_days.value as hour_meter_value',
             'employee_hour_meter_days.full_value as hour_meter_full_value',
         )
@@ -160,7 +253,7 @@ class EmployeeHourMeterDayController extends Controller
             'employee_hour_meter_days.uuid',
             'employees.nik_employee',
             'user_details.photo_path',
-            'hour_meter_prices.value',
+            'hour_meter_prices.hour_meter_value',
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
@@ -173,7 +266,7 @@ class EmployeeHourMeterDayController extends Controller
             'employees.uuid',
             'employees.nik_employee',
             'employee_hour_meter_days.uuid as hour_meter_uuid',
-            'hour_meter_prices.value as hour_meter_price',
+            'hour_meter_prices.hour_meter_value as hour_meter_price',
             DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
             DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
             DB::raw("SUM(employee_hour_meter_days.full_value) as hour_meter_full_value"),
@@ -200,7 +293,7 @@ class EmployeeHourMeterDayController extends Controller
                     'employee_hour_meter_days.date',
                     'employee_hour_meter_days.value',
                     'employee_hour_meter_days.full_value',
-                    'hour_meter_prices.value as hour_meter_price'
+                    'hour_meter_prices.hour_meter_value as hour_meter_price'
         ]);
 
         // $data = EmployeeHourMeterDay::join('payments', 'payments.uuid' , 'employee_payments.payment_uuid')
@@ -231,7 +324,7 @@ class EmployeeHourMeterDayController extends Controller
     }
 
     public function create(){
-        $employees = Employee::getAll();
+        $employees = Employee::noGet_employeeAll_detail()->get();
         $hour_meter_prices =HourMeterPrice::all();
         // Carbon::today()->isoFormat('Y-M-D');
         $layout = [
@@ -255,41 +348,58 @@ class EmployeeHourMeterDayController extends Controller
             'layout'    => $layout
         ]);
     }
-
+    // done
     public function export($year_month){
+        $arr_bonus = [
+            [
+                'min_hm'    => 16,
+                'percent'   => 50,
+            ],
+            [
+                'min_hm'    => 14,
+                'percent'   => 30,
+            ],
+            [
+                'min_hm'    => 10,
+                'percent'   => 15,
+            ],
+        ];
+        
+        
+
+        $arr_hour_meter_price = HourMeterPrice::all();
+
         $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
 
-        $datetime = Carbon::createFromFormat('Y-m', $year.'-'.$month);
-        $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+        $day_month = ResponseFormatter::getEndDay($year_month);
 
-        $employees = Employee::leftJoin('user_details', 'user_details.uuid', 'employees.user_detail_uuid')
-        ->leftJoin('employee_salaries', 'employee_salaries.employee_uuid', 'employees.uuid')
-        ->leftJoin('positions','positions.uuid', 'employees.position_uuid')
-        ->get([
-            'user_details.name',
-            'employees.nik_employee',
-            'employees.uuid',
-            'employees.uuid as employee_uuid',
-            'employee_salaries.hour_meter_price_uuid',
-            'positions.position'
-        ]);
-        // return view('datatableshow', [ 'data'         => $employees]);
+        $arr_employee = Employee::noGet_employeeAll_detail()->orderBy('employee_salaries.hour_meter_price_uuid')->get();
+        // return view('datatableshow', [ 'data'         => $arr_employee]);
+
+        $employee['nik_employee']['date']['hm-20000'] = [
+            'value' => 10,
+            'value_bonus'   => 11.5,
+        ];
+
+        foreach($arr_hour_meter_price as $item_hour_meter_price){
+            // $data = EmployeeHourMeterDay::where('hour_meter_price_uuid', $item_hour_meter_price->uuid)->get();
+            // return view('datatableshow', [ 'data'         => $data]);
+        }
+
+        $arr_hour_meter_data = EmployeeHourMeterDay::whereYear('date', $year)->whereMonth('date', $month)
+        // ->where('employee_hour_meter_days.employee_uuid', 'MBLE-0422003')
+        ->get();
         
-
-        $data_hm_employees = EmployeeHourMeterDay::join('identities','identities.nik_employee', 'employee_hour_meter_days.employee_uuid')
-        ->whereYear('date', $year)->whereMonth('date', $month)
-        ->whereNull('is_bonus')
-        ->get([
-            'identities.*',
-            'employee_hour_meter_days.*'
-        ]);
-        // return view('datatableshow', [ 'data'         => $data_hm_employees]);
-        // dd($data_hm_employees);
-
-                
+        foreach($arr_hour_meter_data as $item_hour_meter_data){
+            $arr_employee_hour_meter[$item_hour_meter_data->employee_uuid][$item_hour_meter_data->hour_meter_price_uuid][$item_hour_meter_data->date][]=[
+                'value' => $item_hour_meter_data->value,
+                'full_value' => $item_hour_meter_data->full_value
+            ];
+        }
+      
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
         $createSheet->setCellValue('B1', 'Template HM');
@@ -306,83 +416,181 @@ class EmployeeHourMeterDayController extends Controller
         $createSheet->setCellValue('C5', 'Nama');
         $createSheet->setCellValue('D5', 'Jabatan');
         
+        $createSheet->setCellValue('F4', 'HM dislip tanpa Bonus');
+        
         $createSheet->setCellValue('E5', 'Harga HM');
 
         for($i = 1; $i <= $day_month; $i++){  
             $createSheet->setCellValue($abjads[$i+4].'5', $i);
-            $createSheet->setCellValue($abjads[$i+4+$day_month+4].'5', $i);
-            $createSheet->setCellValue($abjads[$i+4+$day_month+4+$day_month+4].'5', $i);
+            $createSheet->setCellValue($abjads[$i+4+$day_month+2].'5', $i);
+            $createSheet->setCellValue($abjads[$i+4+$day_month+2+$day_month+2].'5', $i);
+
         }
+        $createSheet->setCellValue($abjads[5+$day_month].'5', "Total");
+        $createSheet->setCellValue($abjads[5+$day_month+$day_month+2].'5', "Total");
+        $createSheet->setCellValue($abjads[5+$day_month+$day_month+$day_month+4].'5', "Total");
+
+
 
         $employee_row = 6;
         $no = 1;
+        // each employee
+        foreach($arr_employee as $item){
+        //    if employee have hm
 
-        foreach($employees as $item){
-            $createSheet->setCellValue( $abjads[0].$employee_row, $no);
-            $createSheet->setCellValue( $abjads[1].$employee_row, $item->nik_employee);
-            $createSheet->setCellValue( $abjads[2].$employee_row, $item->name);
-            $createSheet->setCellValue( $abjads[3].$employee_row, $item->position);
-            $createSheet->setCellValue( $abjads[4].$employee_row, $item->hour_meter_price_uuid);
-            // $createSheet->setCellValue( $abjads[4].$employee_row, 'Rp. '.$item->hour_meter_price_uuid);
-
-            $data_hm_employee = EmployeeHourMeterDay::where('employee_uuid', $item->employee_uuid)
-            ->whereYear('date', $year)->whereMonth('date', $month)
-            ->whereNull('is_bonus')
-            ->orderBy('employee_hour_meter_days.date', 'asc')
-            ->get();
-
-            $data_hm_employee_bonus = EmployeeHourMeterDay::where('employee_uuid', $item->employee_uuid)
-            ->whereYear('date', $year)->whereMonth('date', $month)
-            ->where('is_bonus', 'bonus')
-            ->orderBy('employee_hour_meter_days.date', 'asc')
-            ->groupBy(
-                'employee_hour_meter_days.employee_uuid',
-                'employee_hour_meter_days.date',
-               )
-               ->select( 
-                'employee_hour_meter_days.date',
-                'employee_hour_meter_days.employee_uuid',
-                DB::raw("sum(employee_hour_meter_days.full_value) as sum_hour_meter"),
-            )
-            ->get();
-            // dd($data_hm_employee_bonus);
-            $column_identity = 4;
-
-            foreach($data_hm_employee_bonus as $item_1){
-                $date_explode = explode('-',$item_1->date);
-                $item_date = $date_explode[2] + $column_identity;
-                $row_bonus = $item_date + $day_month + $column_identity + $day_month + $column_identity;
-                $cell_data  = $abjads[$row_bonus].$employee_row;
-                $createSheet->setCellValue($cell_data,  $item_1->sum_hour_meter); 
-            }
-
-            foreach($data_hm_employee as $item_2){
-                $date_explode = explode('-',$item_2->date);
-                $item_date = $date_explode[2] + $column_identity;
-                $row_bonus = $item_date + $day_month + $column_identity;
-                $cell_data  = $abjads[$item_date].$employee_row;
-                $createSheet->setCellValue($abjads[$item_date].$employee_row,  $item_2->value); 
-            }
-            for($i = 1; $i <= $day_month; $i++){  
+            $employee_row_old = $employee_row;
+            $much_column_data_employee = [];
+            if(!empty($arr_employee_hour_meter[$item->employee_uuid])){
+                // dd($arr_employee_hour_meter[$item->employee_uuid]);
+                $arr_column_employee = [];
+                // each hm uuid 
+                foreach($arr_employee_hour_meter[$item->employee_uuid] as $index=>$employee_hour_meter){                    
+                    $max_arr_each_day = 1;                    
+                    //eac day
+                    foreach($employee_hour_meter as $day=>$arr_each_day){
+                        $the_date = explode('-',$day);
+                        $much_arr_each_day = 0;
+                        $old ='';
+                        foreach($arr_each_day as $each_day){
+                            $thecoll = $employee_row+$much_arr_each_day;
+                            if($each_day['value'] >= $arr_bonus[2]['min_hm']){                               
+                                if($each_day['value'] == $each_day['full_value']){
+                                    if($old == 'bonus'){                                        
+                                        $much_arr_each_day++;
+                                        $thecoll = $employee_row+$much_arr_each_day;
+                                    }    
+                                    $createSheet->setCellValue( $abjads[4+(int)$the_date[2]+$day_month+$day_month+4].$thecoll, $each_day['value']);                             
+                                    $old = 'bonus';
+                                }else{
+                                    if($old == 'reguler'){                                        
+                                        $much_arr_each_day++;
+                                        $thecoll = $employee_row+$much_arr_each_day;
+                                    }
+                                    $old = 'reguler';
+                                    $createSheet->setCellValue( $abjads[4+(int)$the_date[2]].$thecoll, $each_day['value']);
+                                }
+                            }else{
+                                if($old == 'reguler'){                                    
+                                    $much_arr_each_day++;
+                                    $thecoll = $employee_row+$much_arr_each_day;
+                                }
+                                $old = 'reguler';
+                                $createSheet->setCellValue( $abjads[4+(int)$the_date[2]].$thecoll, $each_day['value']);
+                            }
+                            if($much_arr_each_day+1 > $max_arr_each_day){
+                                $max_arr_each_day = $much_arr_each_day+1;
+                            }                            
+                        }
+                    }
+                    $employee_row++;
+                    $arr_column_employee[] = [
+                        'hour_meter_price_uuid' => $index,
+                        'much'  => $max_arr_each_day
+                    ];
+                }
+                // dd($arr_column_employee);
+                $employee_row = $employee_row_old;
                 
-                $cell_data  =$abjads[$i+$column_identity].$employee_row;
-                $formula_hm = '=IF('.$cell_data.'>15,'.$cell_data.'*0.5+'.$cell_data.',IF('.$cell_data.'>13,'.$cell_data.'*0.3+'.$cell_data.',IF('.$cell_data.'>9,'.$cell_data.'*0.15+'.$cell_data.','.$cell_data.')))';
-                $createSheet->setCellValue($abjads[$i+$column_identity+$day_month+$column_identity].$employee_row, $formula_hm);
+                foreach($arr_column_employee as $item_column_employee){
+                    // dd( $item->nik_employee);
+                    for($i=0; $i< $item_column_employee['much']; $i++){
+                        $createSheet->setCellValue( $abjads[0].$employee_row, $no);
+                        $createSheet->setCellValue( $abjads[1].$employee_row, $item->nik_employee);
+                        $createSheet->setCellValue( $abjads[2].$employee_row, $item->name);
+                        $createSheet->setCellValue( $abjads[3].$employee_row, $item->position);
+                        $createSheet->setCellValue( $abjads[4].$employee_row, $item_column_employee['hour_meter_price_uuid']);
+                        for($j = 1; $j <= $day_month; $j++){  
+                            $name_row = $abjads[$j+4].$employee_row;
+                            $string_end = '';
+                            $the_closer = ')';
+                            $formula_add ='';
+                            
+                            foreach($arr_bonus as $item_bonus){
+                                $formula_add = $formula_add.",IF(".$name_row.">=".$item_bonus['min_hm'].",".$name_row. "*".$item_bonus['percent']."%+".$name_row;
+                                $string_end = $string_end.$the_closer;
+                            }
+                            $str = ltrim($formula_add, ',');
+                            $the_formula = "=".$str.",".$name_row.$string_end;
+                            $createSheet->setCellValue($abjads[$j+4+$day_month+2].$employee_row, $the_formula); 
+                        }
+                        $employee_row++;
+                    }
+                }
+            }else{
+                $createSheet->setCellValue( $abjads[0].$employee_row, $no);
+                $createSheet->setCellValue( $abjads[1].$employee_row, $item->nik_employee);
+                $createSheet->setCellValue( $abjads[2].$employee_row, $item->name);
+                $createSheet->setCellValue( $abjads[3].$employee_row, $item->position);
+                $createSheet->setCellValue( $abjads[4].$employee_row, $item->hour_meter_price_uuid);
+                for($k = 1; $k <= $day_month; $k++){  
+                    $name_row = $abjads[$k+4].$employee_row;
+                    $string_end = '';
+                    $the_closer = ')';
+                    $formula_add ='';                    
+                    foreach($arr_bonus as $item_bonus){
+                        $formula_add = $formula_add.",IF(".$name_row.">=".$item_bonus['min_hm'].",".$name_row. "*".$item_bonus['percent']."%+".$name_row;
+                        $string_end = $string_end.$the_closer;
+                    }
+                    $str = ltrim($formula_add, ',');
+                    $the_formula = "=".$str.",".$name_row.$string_end;
+                    // dd($formula_add);
+                    $createSheet->setCellValue($abjads[$k+4+$day_month+2].$employee_row, $the_formula); 
+                }
+                $employee_row++;
             }
-           
-            $employee_row++;$no++;
+            
         }
-       
+
         $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/absensi/'.$year_month.'-'.rand(99,9999).'file.xls';
+        $name = 'file/absensi/file-hm-bulan-'.$year_month.'-'.rand(99,9999).'file.xls';
         $crateWriter->save($name);
 
         // return 'aaa';
         return response()->download($name);
     }
 
+    static function  countBonus($hm_value){
+        $arr_bonus = [
+            [
+                'min_hm'    => 16,
+                'percent'   => 50,
+            ],
+            [
+                'min_hm'    => 14,
+                'percent'   => 30,
+            ],
+            [
+                'min_hm'    => 10,
+                'percent'   => 15,
+            ],
+
+
+        ];
+        foreach($arr_bonus as $item_bonus){
+            if($hm_value >= $item_bonus['min_hm']){
+                return $hm_value_full = $hm_value * $item_bonus['percent']/100 + $hm_value;
+            }
+        }
+    }
+
     public function import(Request $request){
-        
+        $arr_bonus = [
+            [
+                'min_hm'    => 16,
+                'percent'   => 50,
+            ],
+            [
+                'min_hm'    => 14,
+                'percent'   => 30,
+            ],
+            [
+                'min_hm'    => 10,
+                'percent'   => 15,
+            ],
+
+
+        ];
+        // return 'ahmadi';
         $the_file = $request->file('uploaded_file');
 
         $createSpreadsheet = new spreadsheet();
@@ -391,20 +599,25 @@ class EmployeeHourMeterDayController extends Controller
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
-            $row_limit    = $sheet->getHighestDataRow();
-            $column_limit = $sheet->getHighestDataColumn();
-            $row_range    = range( 2, $row_limit );
-            $column_range = range( 'C', $column_limit );
-            $startcount = 2;
-            $data = array();
+
+           
 
             $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         
             // DESCRIPTION
             $month_hm =  $sheet->getCell( 'C3')->getValue();
             $year_hm = $sheet->getCell( 'C4')->getValue();
-            $datetime = Carbon::createFromFormat('Y-m', $year_hm.'-'.$month_hm);
-            $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+
+            $year_month = $year_hm.'-'.$month_hm;
+            $day_month = ResponseFormatter::getEndDay($year_month);
+            $arr_data_employee_hour_meter_day = EmployeeHourMeterDay::whereYear('date', $year_hm)
+            ->whereMonth('date', $month_hm)
+            // ->where('employee_hour_meter_days.employee_uuid', 'MBLE-0422003')
+            ->get();
+
+            $arr_data_employee_hour_meter_day = $arr_data_employee_hour_meter_day->keyBy(function ($item) {
+                return strval($item->employee_uuid);
+            });
 
 
             $no_employee = 6;
@@ -414,50 +627,76 @@ class EmployeeHourMeterDayController extends Controller
             2.
             EmployeeHourMeterDay::
             */
-
+            $arr_data = [];
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
-                $date_row = 4;
-                (int)$sheet->getCell( 'A'.$no_employee)->getValue();
                 $nik_employee= ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue()); //EMPLOYEE_UUID
-                $hour_meter_uuid = 'hm-'.$sheet->getCell( 'E'.$no_employee)->getValue(); //hour meter uuid
-                for($day =1; $day <= $day_month; $day++){//hm biasa
-                    $date = $year_hm.'-'.$month_hm.'-'.$day;
-                    if($sheet->getCell( $abjads[$date_row+$day].$no_employee)->getValue() > 0){
-                        $employees[$day] = $sheet->getCell( $abjads[$date_row+$day].$no_employee)->getValue(); //hm value,
-                        $employees[$day.'bonus'] = $sheet->getCell( $abjads[$date_row+$day+$day_month+4].$no_employee)->getOldCalculatedValue(); //hm value,
-                        $employees = [
-                            'uuid'  => $year_hm.'-'.$month_hm.'-'.$day.'-'.$nik_employee,
-                            'employee_uuid' => $nik_employee,
-                            'date' => $date,
-                            'value' =>  $sheet->getCell( $abjads[$date_row+$day].$no_employee)->getValue(),
-                            'hour_meter_price_uuid' => $hour_meter_uuid,
-                            'full_value' => $sheet->getCell( $abjads[$date_row+$day+$day_month+4].$no_employee)->getOldCalculatedValue(),
+                $hm_uuid= ResponseFormatter::toUuidLower($sheet->getCell( 'E'.$no_employee)->getValue());
+                $date_row = 4;
+                for($day =1; $day <= $day_month; $day++){
+                    //reguler
+                    $hm_value = $sheet->getCell( $abjads[$date_row+$day].$no_employee)->getValue();
+                    if(!empty($hm_value)){
+                        if($hm_value >= $arr_bonus[2]['min_hm']){
+                           $hm_value_full =  EmployeeHourMeterDayController::countBonus($hm_value);                            
+                        }else{
+                            $hm_value_full = $hm_value;
+                        }                        
+                        $arr_data[$nik_employee][$hm_uuid][$day][]= [
+                            'value' => $hm_value,
+                            'full_value'    => round($hm_value_full, 2)
                         ];
-                        $store = EmployeeHourMeterDay::create($employees);
                     }
-                    if($sheet->getCell( $abjads[$date_row+$day+$day_month+4+$day_month+4].$no_employee)->getValue() > 0){//hm bonus
-                        // $employees[$day.'bonus11'] =$sheet->getCell( $abjads[$date_row+$day+$day_month+4+$day_month+4].$no_employee)->getValue(); //hm value,
-                        $employees = [
-                            'uuid'  => $year_hm.'-'.$month_hm.'-'.$day.'-'.$nik_employee.rand(99,9999),
-                            'employee_uuid' => $nik_employee,
-                            'date' => $date,
-                            'hour_meter_price_uuid' => $hour_meter_uuid,
-                            'value' =>  $sheet->getCell( $abjads[$date_row+$day+$day_month+4+$day_month+4].$no_employee)->getValue(),
-                            'full_value' => $sheet->getCell( $abjads[$date_row+$day+$day_month+4+$day_month+4].$no_employee)->getValue(),
-                            'is_bonus' => 'bonus',
+                    //bonus
+                    $hm_value_bonus = $sheet->getCell( $abjads[$date_row+$day+$day_month+2+$day_month+2].$no_employee)->getValue();
+                    if(!empty($hm_value_bonus)){          
+                        $hm_value_full = $hm_value_bonus;                                               
+                        $arr_data[$nik_employee][$hm_uuid][$day][]= [
+                            'value' => $hm_value_bonus,
+                            'full_value'    => round($hm_value_full, 2),
+                            'is_bonus'  => 'bonus',
+                            'row'   => $abjads[$date_row+$day+$day_month+2+$day_month+2].$no_employee
                         ];
-                        $store = EmployeeHourMeterDay::create($employees);
                     }
                 }
                 $no_employee++;
             }
+            foreach($arr_data as $employee_uuid=>$arr_hm_uuid ){     
+
+                foreach($arr_hm_uuid as $hm_uuid=>$arr_day){
+
+                    foreach($arr_day as $day=>$arr_each_data){
+                        $date_each_data = $year_month.'-'.$day;
+                        if(!empty($arr_data_employee_hour_meter_day[$employee_uuid])){
+                            $delete = EmployeeHourMeterDay::whereYear('date', $year_hm)
+                            ->whereMonth('date', $month_hm)
+                            ->whereDay('date', $day)
+                            ->where('employee_uuid', $employee_uuid)->delete();
+                        }
+                        foreach($arr_each_data as $index=>$each_data){
+                            $each_data['uuid']  = $date_each_data.'-'.$employee_uuid.'-'.$index;
+                            $each_data['employee_uuid']  = $employee_uuid;
+                            $each_data['date']  = $date_each_data;
+                            $each_data['hour_meter_price_uuid']  = $hm_uuid;
+                            $store = EmployeeHourMeterDay::create($each_data);
+                            // dd($store);
+                        }
+                    }
+                    
+                }
+            }
+
+            // var_dump($arr_data);die;
+            
+
+            
             return back();
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
-            return back()->withErrors('There was a problem uploading the data!');
+            // dd($e);
+            $error_code = $e;
+            return back()->with('messageErr', 'file eror!');
         }
     }
-
+    //used
     public function index(){
         $layout = [
             'head_core'            => true,
@@ -475,8 +714,8 @@ class EmployeeHourMeterDayController extends Controller
             'nik_employee' => ''
         ]);
     }
+
     public function indexForEmployee($nik_employee){
-        $employee = Employee::where('nik_employee',$nik_employee)->get()->first();
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -484,13 +723,13 @@ class EmployeeHourMeterDayController extends Controller
             'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'hour-meter-price-me'
+            'active'                        => 'employee-hour-meter'
         ];
-        return view('employee_hour_meter_day.employee.index', [
-            'title'         => 'Tonase',
+        return view('employee_hour_meter_day.index', [
+            'title'         => 'Hour Meter',
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'layout'    => $layout,
-            'nik_employee' => $employee->uuid
+            'nik_employee' => $nik_employee
         ]);
     }
 
@@ -531,10 +770,12 @@ class EmployeeHourMeterDayController extends Controller
 
 
     }
+
     public function showUuid($hour_meter_uuid){
         
         // dd($data);
-        $employees = Employee::getAll();
+        $employees = Employee::noGet_employeeAll_detail()->get();
+
         $hour_meter_prices =HourMeterPrice::all();
         // Carbon::today()->isoFormat('Y-M-D');
         $layout = [
@@ -571,7 +812,7 @@ class EmployeeHourMeterDayController extends Controller
             'employee_hour_meter_days.*',
             'ud_employee.name',
             'positions.position',
-            'hour_meter_prices.value as hour_meter_value'
+            'hour_meter_prices.hour_meter_value as hour_meter_value'
         ]);
 
         $data = EmployeeHourMeterDay::leftJoin('employees','employees.uuid','employee_hour_meter_days.employee_uuid')
@@ -585,7 +826,7 @@ class EmployeeHourMeterDayController extends Controller
             'employee_hour_meter_days.updated_at',
             'employees.nik_employee',
             'user_details.photo_path',
-            'hour_meter_prices.value',
+            'hour_meter_prices.hour_meter_value',
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
@@ -601,7 +842,7 @@ class EmployeeHourMeterDayController extends Controller
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
-            'hour_meter_prices.value as hour_meter_price',
+            'hour_meter_prices.hour_meter_value as hour_meter_price',
             'employee_hour_meter_days.value as hour_meter_value',
             'employee_hour_meter_days.full_value as hour_meter_full_value',
         )
@@ -627,7 +868,7 @@ class EmployeeHourMeterDayController extends Controller
         ->groupBy(
             'employees.nik_employee',
             'user_details.photo_path',
-            'hour_meter_prices.value',
+            'hour_meter_prices.hour_meter_value',
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
@@ -641,7 +882,7 @@ class EmployeeHourMeterDayController extends Controller
             'positions.position',
             'employees.uuid',
             'employees.nik_employee',
-            'hour_meter_prices.value as hour_meter_price',
+            'hour_meter_prices.hour_meter_value as hour_meter_price',
             // DB::raw("(DATE_FORMAT(employee_hour_meter_days.date, '%Y-%m')) as month_year"),
             DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
             DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
@@ -682,52 +923,7 @@ class EmployeeHourMeterDayController extends Controller
         ]);
     }
 
-    public function store(Request $request){
-        
-        $validatedData = $request->validate([
-            'uuid' => '',
-            'hour_meter_price_uuid' => '',
-            'employee_uuid' => '',
-            'employee_checker_uuid' => '',
-            'employee_foreman_uuid' => '',
-            'employee_supervisor_uuid' => '',
-            'date' => '',
-            'shift' => '',
-            'full_value' => '',            
-            'value' => '',
-            'is_edit'    => '',
 
-        ]);
-        
-
-        if(empty($validatedData['uuid'])){//data baru
-            $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['employee_uuid'];
-
-            $cek_before = EmployeeHourMeterDay::where('date', $validatedData['date'])
-            ->where('employee_uuid', $validatedData['employee_uuid'])
-            ->count();
-
-            if($cek_before > 0){ //sudah ada ditanggal yg sama
-                $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['employee_uuid'].'-'.rand(99,9999);
-                $validatedData['is_bonus'] = 'bonus';
-            }
-        }
-
-
-        $employees = Employee::where_employee_uuid($validatedData['employee_uuid']);
-        $store = EmployeeHourMeterDay::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
-
-        return ResponseFormatter::toJson($store, 'Data Stored');
-    }
-    public function show(Request $request){
-        
-        $validatedData = $request->validate([
-            'uuid' => 'required',
-        ]);
-        
-        $data = EmployeeHourMeterDay::where('uuid', $request->uuid)->first();
-        return ResponseFormatter::toJson($data, 'Data Stored');
-    }
 
 
 

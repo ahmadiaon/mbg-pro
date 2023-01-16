@@ -1,9 +1,9 @@
 <div id="create-user-license" class="children-content">
     <form action="/user-license/store" id="form-user-license" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="text" name="isEdit" id="isEdit" value="">
-        <input type="text" name="uuid" id="uuid-user-license" value="">
-        <input type="text" name="user_detail_uuid" id="user_detail_uuid-user-license">
+        <input type="text" name="isEdit" id="isEdit-create-user-license">
+        <input type="text" name="uuid" id="uuid-create-user-license">
+        <input type="text" name="user_detail_uuid" id="user_detail_uuid-create-user-license">
         <div class="min-height-200px">
             <div class="pd-20 card-box mb-20">
                 <div class="clearfix">
@@ -192,9 +192,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-mb-12  text-right">
-                            <button type="button" onclick="storeUserLicense('user-license')" class="btn btn-primary mt-30 ">Next Step</button>
-
+                        <div class="col-mb-12">
+                            <div class="form-group text-right">
+                                <button type="button"
+                                    class="btn btn-secondary  mr-10 create-user-employee-back">Back</button>
+                                <button type="button"  onclick="storeUserLicense('user-license')" 
+                                    class="btn btn-primary">Simpan</button>
+                            </div>
                         </div>
                     </div>
                 </div>

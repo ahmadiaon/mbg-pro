@@ -11,6 +11,7 @@ use App\Models\Religion;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Company;
+use App\Models\Dictionary;
 use App\Models\Employee\EmployeeCompany;
 use App\Models\Employee\EmployeeOut;
 use App\Models\Employee\EmployeePremi;
@@ -25,7 +26,9 @@ use App\Models\UserDetail\UserDependent;
 use App\Models\UserDetail\UserDetail;
 use App\Models\UserDetail\UserEducation;
 use App\Models\UserDetail\UserHealth;
+use App\Models\UserDetail\UserLicense;
 use App\Models\UserDetail\UserReligion;
+use App\Models\Variable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Yajra\Datatables\Datatables;
@@ -98,8 +101,26 @@ class EmployeeController extends Controller
             $sheet        = $spreadsheet->getActiveSheet();
 
             $rows = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
-        
+            $no_row=0;
 
+            $dictionaries = Dictionary::all();
+            $dictionaries = $dictionaries->keyBy(function ($item) {
+                return strval($item->excel);
+            });
+
+            $arr_index = [];
+
+            
+            while($sheet->getCell($rows[$no_row].'2')->getValue() != null){
+                $arr_index[$dictionaries[$sheet->getCell($rows[$no_row].'2')->getValue()]->database] = [
+                    'index' => $rows[$no_row],
+                    'database' => $dictionaries[$sheet->getCell($rows[$no_row].'2')->getValue()]->database,                    
+                    'excel' => $dictionaries[$sheet->getCell($rows[$no_row].'2')->getValue()]->excel,
+                    'data_type' => $dictionaries[$sheet->getCell($rows[$no_row].'2')->getValue()]->data_type,
+                ];
+                $no_row++;
+            }
+            // dd($arr_index);
 
             $no_employee = 3;
             $employees = [];
@@ -108,6 +129,7 @@ class EmployeeController extends Controller
             $employee_data = $employee_data->keyBy(function ($item) {
                 return strval($item->uuid);
             });
+            $premis = Premi::all();
 
             $get_all_employee_premis = EmployeePremi::whereNull('date_end')->get();
             $get_all_employee_premis = $get_all_employee_premis->keyBy(function ($item) {
@@ -129,12 +151,10 @@ class EmployeeController extends Controller
                 return strval($item->uuid);
             });
 
-            $get_all_employee_roasters = EmployeeCompany::whereNull('date_end')->get();
+            $get_all_employee_roasters = EmployeeRoaster::whereNull('date_end')->get();
             $get_all_employee_roasters = $get_all_employee_roasters->keyBy(function ($item) {
                 return strval($item->employee_uuid);
-            });           
-
-            
+            });                       
 
             $month = $sheet->getCell( 'D1')->getValue();
             $year = $sheet->getCell( 'F1')->getValue();
@@ -145,416 +165,232 @@ class EmployeeController extends Controller
             $this_date_end_prev = $date_prev->subDays(1);
 
 
-            $employee_only = Employee::get_employee_only_latest();
-
-
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                 $date_row = 3;
                 $nik_employee = $sheet->getCell( 'B'.$no_employee)->getValue();
-                $nik_employee = ResponseFormatter::toUUID($nik_employee);
-                $company_uuid = ResponseFormatter::toUUID($sheet->getCell( 'W'.$no_employee)->getValue());
-                
-                $position_uuid = ResponseFormatter::toUuidLower($sheet->getCell( 'D'.$no_employee)->getValue());
-                $department_uuid = ResponseFormatter::toUuidLower($sheet->getCell( 'E'.$no_employee)->getValue());
-                $store['position'] = Position::updateOrCreate(['uuid' => $position_uuid], ['position' => $sheet->getCell( 'D'.$no_employee)->getValue()]);
-                $store['department'] = Department::updateOrCreate(['uuid' => $department_uuid], ['department' => $sheet->getCell( 'E'.$no_employee)->getValue()]);
-                
-                $date_contract = ResponseFormatter::excelToDate($sheet->getCell( 'F'.$no_employee)->getValue());
-                $date_end_contract = ResponseFormatter::excelToDate($sheet->getCell( 'Y'.$no_employee)->getValue());
-               
-
-                $premis = [];
-                $column_premi = 27;
-                while($sheet->getCell( $rows[$column_premi].'2')->getValue() != null){
-                    $premis[$sheet->getCell( $rows[$column_premi].'2')->getValue()] = $rows[$column_premi];
-                    $column_premi++;
+                $nik_employee = ResponseFormatter::toUUID($nik_employee);                
+                  
+                if(!empty($employee_data[$nik_employee])){                    
+                    $data_old = $employee_data_one = $employee_data[$nik_employee]->toArray();                                
                 }
 
-               
-                
-                
-                
-                // dd($employee_data[$nik_employee]);
-            // ================================================================  employee
-                $employee = [
-                    'uuid'    => $nik_employee,
-                    'nik_employee'  => $nik_employee,
-                    'user_detail_uuid' => $nik_employee,
-                    'machine_id'    => $sheet->getCell( 'U'.$no_employee)->getValue(),
-                    'position_uuid' => $position_uuid,
-                    'department_uuid' => $department_uuid,
-                    'date_start_contract' => $date_contract, 
-                    
-                    'company_uuid' => $company_uuid,
-                    'date_document_contract' => $date_contract, 
-                    'tax_status'    => $sheet->getCell( 'G'.$no_employee)->getValue(),  
-                    'contract_status'    => $sheet->getCell( 'N'.$no_employee)->getValue(),  
-                    'date_start'    => $date,
-                    'date_end_contract' => $date_end_contract, 
-                    'contract_number'   => null,
-                    'contract_number_full' => null,
-                    'long_contract' => null,
-                    'employee_status'   => null,
-                    'file_path' => null,
-                    'is_bpjs_kesehatan'    => $sheet->getCell( 'P'.$no_employee)->getValue(),  
-                    'is_bpjs_ketenagakerjaan'    => $sheet->getCell( 'O'.$no_employee)->getValue(),  
-                    'is_bpjs_pensiun'    => $sheet->getCell( 'Q'.$no_employee)->getValue(),  
-
-                    'date_start'    => $this_date,
-
-                    'submission_status' =>  null,
-                    'date_end' => null,
-                    'date_proposal' => null,
-                    'date_decline' => null,
-                    
-                ];
-                $preeeev = $employee;
-                if(!empty($employee_only[$nik_employee])){
-                    $employee = [
-                        'uuid' => $nik_employee,     
-                         'user_detail_uuid' =>  ($employee['user_detail_uuid']) != null?$employee['user_detail_uuid']:$employee_only[$nik_employee]->user_detail_uuid, //
-                         'machine_id' => ($employee['machine_id']) != null?$employee['machine_id']:$employee_only[$nik_employee]->machine_id,  //
-                         'nik_employee' => ($employee['nik_employee']) != null?$employee['nik_employee']:$employee_only[$nik_employee]->nik_employee,  //
-                         'position_uuid' => ($employee['position_uuid']) != null?$employee['position_uuid']:$employee_only[$nik_employee]->position_uuid,  //
-                         'department_uuid' => ($employee['department_uuid']) != null?$employee['department_uuid']:$employee_only[$nik_employee]->department_uuid,  //
-                         'company_uuid' => ($employee['company_uuid']) != null?$employee['company_uuid']:$employee_only[$nik_employee]->company_uuid,  //
-             
-                         'contract_number' => ($employee['contract_number']) != null?$employee['contract_number']:$employee_only[$nik_employee]->contract_number,  //
-                         'contract_number_full' => ($employee['contract_number_full']) != null?$employee['contract_number_full']:$employee_only[$nik_employee]->contract_number_full,  //
-                         'contract_status' => ($employee['contract_status']) != null?$employee['contract_status']:$employee_only[$nik_employee]->contract_status,  //pkwt-pkwtt
-                         'date_start_contract' => ($employee['date_start_contract']) != null?$employee['date_start_contract']:$employee_only[$nik_employee]->date_start_contract,  //
-                         'date_end_contract' => ($employee['date_end_contract']) != null?$employee['date_end_contract']:$employee_only[$nik_employee]->date_end_contract,  //
-                         'date_document_contract' => ($employee['date_document_contract']) != null?$employee['date_document_contract']:$employee_only[$nik_employee]->date_document_contract,  //
-                         
-                         'long_contract' => ($employee['long_contract']) != null?$employee['long_contract']:$employee_only[$nik_employee]->long_contract,  // //month
-                         'employee_status' => ($employee['employee_status']) != null?$employee['employee_status']:$employee_only[$nik_employee]->employee_status,  //  
-                         'file_path' => ($employee['file_path']) != null?$employee['file_path']:$employee_only[$nik_employee]->file_path,  //      //profesional training
-                         'tax_status' => ($employee['tax_status']) != null?$employee['tax_status']:$employee_only[$nik_employee]->tax_status,  // 
-             
-                         'is_bpjs_kesehatan' => ($employee['is_bpjs_kesehatan']) != null?$employee['is_bpjs_kesehatan']:$employee_only[$nik_employee]->is_bpjs_kesehatan,  // 
-                         'is_bpjs_ketenagakerjaan' => ($employee['is_bpjs_ketenagakerjaan']) != null?$employee['is_bpjs_ketenagakerjaan']:$employee_only[$nik_employee]->is_bpjs_ketenagakerjaan,  // 
-                         'is_bpjs_pensiun' => ($employee['is_bpjs_pensiun']) != null?$employee['is_bpjs_pensiun']:$employee_only[$nik_employee]->is_bpjs_pensiun,  // 
-                         
-                         'submission_status' => ($employee['submission_status']) != null?$employee['submission_status']:$employee_only[$nik_employee]->submission_status,  //
-                         'date_start' => ($employee['date_start']) != null?$employee['date_start']:$employee_only[$nik_employee]->date_start,  //
-                         'date_end' => ($employee['date_end']) != null?$employee['date_end']:$employee_only[$nik_employee]->date_end,  //
-                         'date_proposal' => ($employee['date_proposal']) != null?$employee['date_proposal']:$employee_only[$nik_employee]->date_proposal,  //
-                         'date_decline' => ($employee['date_decline']) != null?$employee['date_decline']:$employee_only[$nik_employee]->date_decline,  //
-                     ];
-                }
-
-                $daslfk = [
-                    'old' => $employee_only[$nik_employee],
-                    'new' => $preeeev,
-                    'marge' => $employee
-                ];
-                // dd($daslfk);
-
-                
-               
-                
-                $isNew = false;
-                $isHaveEmployee = false;
-                if(!empty($employee_data[$nik_employee])){
-                    $isHaveEmployee = true;
-                    if($this_date > $employee_data[$nik_employee]->date_start){
-                        $isNew = true;
-                    }else{
-                        $isNew = false;
-                    }
-                    
-                    $ddd = [
-                        'this_date' => $this_date,
-                        'date_start' => $employee_data[$nik_employee]->date_start
-                    ];
-
-                    if($this_date == $employee_data[$nik_employee]->date_start){
-                        $isHaveEmployee = false;
-                    }
-                }
-               
-                if(!$isHaveEmployee){
-                    $store['employees'] = Employee::updateOrCreate(['uuid'    => $nik_employee], $employee);
-                }else{
-                    if($isNew){
-                        $store['employees'] =  Employee::updateOrCreate(['uuid'  => $nik_employee, 'date_end' => null], ['date_end' => $this_date_end_prev ]);
-                        $store['employees'] = Employee::create($employee);
-                    }
-                }
-            // ================================================================  end employee
-            
-            // ================================================================ user_detail
-                $user_details = [
-                    'uuid'    => $nik_employee,
-                    'name'  => $sheet->getCell( 'C'.$no_employee)->getValue(),
-                    'nik_number'    => $sheet->getCell( 'M'.$no_employee)->getValue(),
-                    'financial_number' => $sheet->getCell( 'H'.$no_employee)->getValue(),
-                    'financial_name' =>  $sheet->getCell( 'I'.$no_employee)->getValue(),
-                    'bpjs_ketenagakerjaan' => $sheet->getCell( 'J'.$no_employee)->getValue(),
-                    'bpjs_kesehatan' => $sheet->getCell( 'K'.$no_employee)->getValue(),
-                    'npwp_number' => $sheet->getCell( 'L'.$no_employee)->getValue(),
-                    'date_start' => $this_date
-                ];
                 if(!empty($get_all_user_details[$nik_employee])){
-                    $user_details = [
-                        'uuid' => $nik_employee,
-                        'name' =>  ($user_details['name']) != null?$user_details['name']:$get_all_user_details[$nik_employee]->name,
-                        'nik_number' => ($user_details['nik_number']) != null?$user_details['nik_number']:$get_all_user_details[$nik_employee]->nik_number,
-                        'kk_number' => $get_all_user_details[$nik_employee]->kk_number,
-                        'citizenship' => $get_all_user_details[$nik_employee]->citizenship,
-                        'gender' => $get_all_user_details[$nik_employee]->gender,
-
-                        'place_of_birth' => $get_all_user_details[$nik_employee]->place_of_birth,
-                        'date_of_birth' => $get_all_user_details[$nik_employee]->date_of_birth,
-
-                        'blood_group' => $get_all_user_details[$nik_employee]->blood_group,
-                        'status' => $get_all_user_details[$nik_employee]->status,
-
-                        'npwp_number' => ($user_details['npwp_number']) != null?$user_details['npwp_number']:$get_all_user_details[$nik_employee]->npwp_number,
-                        'financial_number' => ($user_details['financial_number']) != null?$user_details['financial_number']:$get_all_user_details[$nik_employee]->financial_number,
-                        'financial_name' => ($user_details['financial_name']) != null?$user_details['financial_name']:$get_all_user_details[$nik_employee]->financial_name,
-                        'bpjs_ketenagakerjaan' => ($user_details['bpjs_ketenagakerjaan']) != null?$user_details['bpjs_ketenagakerjaan']:$get_all_user_details[$nik_employee]->bpjs_ketenagakerjaan,
-                        'bpjs_kesehatan' => ($user_details['bpjs_kesehatan']) != null?$user_details['bpjs_kesehatan']:$get_all_user_details[$nik_employee]->bpjs_kesehatan,
-
-                        'phone_number' => $get_all_user_details[$nik_employee]->phone_number,
-                        'photo_path' => $get_all_user_details[$nik_employee]->photo_path,
-                        
-                        'submission_status' => $get_all_user_details[$nik_employee]->submission_status,
-                        'date_start' => ($user_details['date_start']) != null?$user_details['date_start']:$get_all_user_details[$nik_employee]->date_start,
-                        'date_end' => $get_all_user_details[$nik_employee]->date_end,
-                        'date_proposal' => $get_all_user_details[$nik_employee]->date_proposal,
-                        'date_decline' => $get_all_user_details[$nik_employee]->date_decline,
-                    ];
-                }               
-
-                $isNew = false;
-                $isHaveEmployee = false;
-                if(!empty($get_all_user_details[$nik_employee])){
-                    $isHaveEmployee = true;
-                    if($this_date > $get_all_user_details[$nik_employee]->date_start){
-                        $isNew = true;
-                    }else{
-                        $isNew = false;
-                    }
+                    $data_old_user_detail = $get_all_user_details[$nik_employee]->toArray(); 
+                    $data_old = array_merge($data_old, $data_old_user_detail );  
                 }
-
-                if(!$isHaveEmployee){
-                    $store['user_details'] = UserDetail::updateOrCreate(['uuid'    => $nik_employee], $user_details);
-                }else{
-                    if($isNew){
-                        $store['user_details'] =  UserDetail::updateOrCreate(['uuid'  => $nik_employee, 'date_end' => null], ['date_end' => $this_date_end_prev ]);
-                        $store['user_details'] = UserDetail::create($user_details);
-                    }
-                    if($this_date == $get_all_user_details[$nik_employee]->date_start){
-                        $isHaveEmployee = false;
-                    }
-                }
-            // ================================================================ end user_detail
-                
-            //  =============================================================== user
-                $user = [
-                    'employee_uuid' => $nik_employee,
-                    'role'  => 'employee',
-                    'nik_employee' => $nik_employee,
-                    'password' => Hash::make('password'), 
-                ];
-                $store['users'] =  User::updateOrCreate(['uuid' => $nik_employee],$user);
-            //  =============================================================== end user
-
-
-            // ===================================================================== employee_salaries
-                $employee_salaries = [
-                    'uuid'  => $nik_employee,
-                    'salary'    => $sheet->getCell( 'R'.$no_employee)->getValue(),
-                    'insentif' => (empty($sheet->getCell( 'S'.$no_employee)->getValue())?null:$sheet->getCell( 'S'.$no_employee)->getValue()),
-                    'tunjangan' =>(empty($sheet->getCell( 'T'.$no_employee)->getValue())?null:$sheet->getCell( 'T'.$no_employee)->getValue()), 
-                    'date_start' => $this_date,
-                    'hour_meter_price_uuid' => ($sheet->getCell( 'V'.$no_employee)->getValue() != null)? 'hm-'.$sheet->getCell( 'V'.$no_employee)->getValue():null,
-                    'employee_uuid' => $nik_employee
-                ];
 
                 if(!empty($get_all_employee_salaries[$nik_employee])){
-                    $employee_salaries = [
-                        'uuid'  => $nik_employee,
-                        'employee_uuid' => $nik_employee,
-                        'salary' => ($employee_salaries['salary']) != null?$employee_salaries['salary']:$get_all_employee_salaries[$nik_employee]->salary,
-                        'insentif' => ($employee_salaries['insentif']) != null?$employee_salaries['insentif']:$get_all_employee_salaries[$nik_employee]->insentif,
-                        'tunjangan' => ($employee_salaries['tunjangan']) != null?$employee_salaries['tunjangan']:$get_all_employee_salaries[$nik_employee]->tunjangan,
-                
-
-                        'hour_meter_price_uuid' => ($employee_salaries['hour_meter_price_uuid']) != null?$employee_salaries['hour_meter_price_uuid']:$get_all_employee_salaries[$nik_employee]->hour_meter_price_uuid,
-                        'insentif_hm' => $get_all_employee_salaries[$nik_employee]->insentif_hm,
-                        'deposit_hm' => $get_all_employee_salaries[$nik_employee]->deposit_hm,
-                        'tonase' => $get_all_employee_salaries[$nik_employee]->tonase,
-
-                        'submission_status' => $get_all_employee_salaries[$nik_employee]->submission_status,
-                        'date_start' => ($employee_salaries['date_start']) != null?$employee_salaries['date_start']:$get_all_employee_salaries[$nik_employee]->date_start,
-                        'date_end' => $get_all_employee_salaries[$nik_employee]->date_end,
-                        'date_proposal' => $get_all_employee_salaries[$nik_employee]->date_proposal,
-                        'date_decline' => $get_all_employee_salaries[$nik_employee]->date_decline,
-
-                    ];
+                    $data_old_employee_salary = $get_all_employee_salaries[$nik_employee]->toArray(); 
+                    $data_old = array_merge($data_old, $data_old_employee_salary );  
                 }
 
-                $isNew = false;
-                $isHaveEmployee = false;
-                if(!empty($get_all_employee_salaries[$nik_employee])){
-                    $isHaveEmployee = true;
-                    if($this_date > $get_all_employee_salaries[$nik_employee]->date_start){
-                        $isNew = true;
-                    }else{
-                        $isNew = false;
-                    } 
-                    if($this_date == $get_all_employee_salaries[$nik_employee]->date_start){
-                        $isHaveEmployee = false;
-                    }
-                }
-
-
-                if(!$isHaveEmployee){
-                    $store['employee_salaries'] = EmployeeSalary::updateOrCreate(['uuid'    => $nik_employee], $employee_salaries);
-                }else{
-                    if($isNew){
-                        $store['employee_salaries'] =  EmployeeSalary::updateOrCreate(['uuid'  => $nik_employee, 'date_end' => null], ['date_end' => $this_date_end_prev ]);
-                        $store['employee_salaries'] = EmployeeSalary::create($employee_salaries);
-                    }
-                }
-             // ===================================================================== employee_salaries
-                
-            // ===================================================================== employee_out
-                $date_out =  (empty($sheet->getCell( 'Z'.$no_employee)->getValue())?null:ResponseFormatter::excelToDate($sheet->getCell( 'Z'.$no_employee)));
-
-                if(!empty($date_out)){
-                    $employee_out = [
-                        'out_status' => (empty($sheet->getCell( 'AA'.$no_employee)->getValue())?null:$sheet->getCell( 'AA'.$no_employee)->getValue()),
-                        'date_out' => $date_out, 
-                        'date_start' => $date_out,
-                        'employee_uuid' => $nik_employee
-                    ];
-                    $store['employee_out'] =  EmployeeOut::updateOrCreate(['uuid' => $nik_employee], $employee_out);
-                }
-            // ===================================================================== employee_out
-
-            // ===================================================================== employee companies
-                $employee_companies = [
-                    'uuid'  => $nik_employee,
-                    'employee_uuid' => $nik_employee,
-                    'company_uuid' => $company_uuid,
-                    'date_start' => $this_date,
-                ];
-
-                if(!empty($get_all_employee_companies[$nik_employee])){
-                    $employee_companies = [
-                        'uuid'  => $nik_employee,
-                        'employee_uuid' => $nik_employee,
-                        'company_uuid' => ($employee_companies['company_uuid']) != null?$employee_companies['company_uuid']:$get_all_employee_companies[$nik_employee]->company_uuid,
-
-                        'submission_status' => $get_all_employee_companies[$nik_employee]->submission_status,
-                        'date_start' => ($employee_companies['date_start']) != null?$employee_companies['date_start']:$get_all_employee_companies[$nik_employee]->date_start,
-                        'date_end' => $get_all_employee_companies[$nik_employee]->date_end,
-                        'date_proposal' => $get_all_employee_companies[$nik_employee]->date_proposal,
-                        'date_decline' => $get_all_employee_companies[$nik_employee]->date_decline,
-                    ];
-                }
-
-                $isNew = false;
-                $isHaveEmployee = false;
-                if(!empty($get_all_employee_companies[$nik_employee])){
-                    $isHaveEmployee = true;
-                    if($this_date > $get_all_employee_companies[$nik_employee]->date_start){
-                        $isNew = true;
-                    }else{
-                        $isNew = false;
-                    }
-                    if($this_date == $get_all_employee_salaries[$nik_employee]->date_start){
-                        $isHaveEmployee = false;
-                    }
-                }
-
-
-                if(!$isHaveEmployee){
-                    $store['employee_companies'] = EmployeeCompany::updateOrCreate(['uuid'    => $nik_employee], $employee_companies);
-                }else{
-                    if($isNew){
-                        $store['employee_companies'] =  EmployeeCompany::updateOrCreate(['uuid'  => $nik_employee, 'date_end' => null], ['date_end' => $this_date_end_prev ]);
-                        $store['employee_companies'] = EmployeeCompany::create($employee_companies);
-                    }
-                    
-                }
-            // ===================================================================== employee companies
-
-
-                $employee_roaster = [
-                    'uuid'  => $nik_employee,
-                    'employee_uuid' => $nik_employee,
-                    'roaster_uuid' => $sheet->getCell( 'X'.$no_employee)->getValue(),
-                    'date_start' => $this_date,
-                ];
-
-                $isNew = false;
-                $isHaveEmployee = false;
                 if(!empty($get_all_employee_roasters[$nik_employee])){
-                    $isHaveEmployee = true;
-                    if($this_date > $get_all_employee_roasters[$nik_employee]->date_start){
-                        $isNew = true;
-                    }else{
-                        $isNew = false;
-                    }
+                    $data_old_employee_roaster = $get_all_employee_roasters[$nik_employee]->toArray(); 
+                    $data_old = array_merge($data_old, $data_old_employee_roaster );  
                 }
 
+                if(!empty($get_all_employee_companies[$nik_employee])){
+                    $data_old_employee_company = $get_all_employee_companies[$nik_employee]->toArray(); 
+                    $data_old = array_merge($data_old, $data_old_employee_company );  
+                }
 
-                if(!$isHaveEmployee){
-                    $store['employee_roaster'] = EmployeeRoaster::updateOrCreate(['uuid'    => $nik_employee], $employee_roaster);
+                
+
+                foreach($arr_index as $item_index){
+                    if(!empty($sheet->getCell( $item_index['index'].$no_employee)->getValue())){
+                        switch($item_index['data_type']){
+                            case 'uuid':
+                                $employee_data_one[$item_index['database'].'_uuid'] = ResponseFormatter::toUUID($sheet->getCell( $item_index['index'].$no_employee)->getValue());
+                                $employee_data_one[$item_index['database']] = $sheet->getCell( $item_index['index'].$no_employee)->getValue();
+                                break;
+                            case 'date':
+                                $employee_data_one[$item_index['database']] = ResponseFormatter::excelToDate($sheet->getCell( $item_index['index'].$no_employee)->getValue());
+                                break;
+                            default:
+                            $employee_data_one[$item_index['database']] = $sheet->getCell( $item_index['index'].$no_employee)->getValue();
+                        }
+                    }
+                    
+                }  
+                   
+
+                Position::updateOrCreate(['uuid' => $employee_data_one['position_uuid']], ['position' => $employee_data_one['position']] );
+                Department::updateOrCreate(['uuid' => $employee_data_one['department_uuid']], ['position' => $employee_data_one['department']] );
+                // Company::updateOrCreate(['uuid' => $employee_data_one['company_uuid']], $employee_data_one );                
+
+                if(!empty($employee_data_one['bpjs_ketenagakerjaan'])){
+                    $employee_data_one['is_bpjs_kesehatan'] = 'Ya';
+                    $employee_data_one['is_bpjs_pensiun'] = 'Ya';
                 }else{
-                    if($isNew){
-                        $store['employee_roaster'] =  EmployeeRoaster::updateOrCreate(['uuid'  => $nik_employee, 'date_end' => null], ['date_end' => $this_date_end_prev ]);
-                        $store['employee_roaster'] = EmployeeRoaster::create($employee_roaster);
-                    }
+                    $employee_data_one['is_bpjs_kesehatan'] = 'Tidak';
+                    $employee_data_one['is_bpjs_pensiun'] = 'Tidak';
                 }
+                if(!empty($employee_data_one['bpjs_kesehatan'])){
+                    $employee_data_one['is_bpjs_ketenagakerjaan'] = 'Ya';
+                }else{
+                    $employee_data_one['is_bpjs_ketenagakerjaan'] = 'Tidak';
+                }
+                $employee_data_one['uuid'] = $employee_data_one['nik_employee'];
+                $employee_data_one['employee_uuid'] = $employee_data_one['uuid'];
+               
+
+                if(!empty($employee_data_one['contract_number_full'])){
+                    $contract_number= explode('/',$employee_data_one['contract_number_full']);
+                    $employee_data_one['contract_number'] = (int)$contract_number[0];
+                }
+
+                if(!empty($employee_data_one['hour_meter_prices'])){
+                    $employee_data_one['hour_meter_price_uuid'] ='hm-'.$employee_data_one['hour_meter_prices'];
+                }
+                
+                $employee_data_one['date_start'] = $employee_data_one['date_start_effective'];
+                $employee_data_one['user_detail_uuid'] = $employee_data_one['nik_employee'];
+                    
+                if(!empty($data_old)){
+                    if($data_old['date_start'] > $employee_data_one['date_start']){
+                        if(empty($employee_data_one['date_end_effective'])){
+                            $employee_data_one['date_end'] = $data_old['date_start'];
+                        }else{
+                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                        }
+                        $storeEmployee = Employee::create($employee_data_one); 
+                    }elseif($data_old['date_start'] == $employee_data_one['date_start']){
+                        $storeEmployee = Employee::updateOrCreate(['id'   => $data_old['id']], $employee_data_one); 
+                    }else{
+                        $storeEmployee = Employee::updateOrCreate(['id'   => $data_old['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                        $storeEmployee = Employee::create($employee_data_one); 
+                    }
+                }else{
+                    $storeEmployee = Employee::create($employee_data_one); 
+                }
+
+                
+                // user
+                $employee_data_one['role'] = 'employee';               
+                $employee_data_one['password'] = Hash::make('password');
+                $storeUser = User::updateOrCreate(['uuid'    =>  $employee_data_one['uuid']], $employee_data_one);
+                // end user
+
+                //user detail
+
+                if(!empty($data_old_user_detail)){
+                    if($data_old_user_detail['date_start'] > $employee_data_one['date_start']){
+                        if(empty($employee_data_one['date_end_effective'])){
+                            $employee_data_one['date_end'] = $data_old_user_detail['date_start'];
+                        }else{
+                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                        }
+                        $storeEmployee = UserDetail::create($employee_data_one); 
+                        return 'a';
+                    }elseif($data_old_user_detail['date_start'] == $employee_data_one['date_start']){
+                        $storeEmployee = UserDetail::updateOrCreate(['id'   => $data_old_user_detail['id']], $employee_data_one); 
+                      
+                    }else{
+                        $storeEmployee = UserDetail::updateOrCreate(['id'   => $data_old_user_detail['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                        $storeEmployee = UserDetail::create($employee_data_one); 
+                        return 'c';
+                    }
+                }else{
+                    return 'd';
+                    $storeEmployee = UserDetail::create($employee_data_one); 
+                }
+                // return 'z';
+                if(!empty($data_old_employee_salary)){
+                    if($data_old_employee_salary['date_start'] > $employee_data_one['date_start']){
+                        if(empty($employee_data_one['date_end_effective'])){
+                            $employee_data_one['date_end'] = $data_old_employee_salary['date_start'];
+                        }else{
+                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                        }
+                        $storeEmployee = EmployeeSalary::create($employee_data_one); 
+                    }elseif($data_old_employee_salary['date_start'] == $employee_data_one['date_start']){
+                        $storeEmployee = EmployeeSalary::updateOrCreate(['id'   => $data_old_employee_salary['id']], $employee_data_one); 
+                    }else{
+                        $storeEmployee = EmployeeSalary::updateOrCreate(['id'   => $data_old_employee_salary['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                        $storeEmployee = EmployeeSalary::create($employee_data_one); 
+                    }
+                }else{
+                    $storeEmployee = EmployeeSalary::create($employee_data_one); 
+                }
+
+                if(!empty($data_old_employee_roaster)){
+                    if($data_old_employee_roaster['date_start'] > $employee_data_one['date_start']){
+                        if(empty($employee_data_one['date_end_effective'])){
+                            $employee_data_one['date_end'] = $data_old_employee_roaster['date_start'];
+                        }else{
+                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                        }
+                        $storeEmployee = EmployeeRoaster::create($employee_data_one); 
+                    }elseif($data_old_employee_roaster['date_start'] == $employee_data_one['date_start']){
+                        $storeEmployee = EmployeeRoaster::updateOrCreate(['id'   => $data_old_employee_roaster['id']], $employee_data_one); 
+                    }else{
+                        $storeEmployee = EmployeeRoaster::updateOrCreate(['id'   => $data_old_employee_roaster['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                        $storeEmployee = EmployeeRoaster::create($employee_data_one); 
+                    }
+                }else{
+                    $storeEmployee = EmployeeRoaster::create($employee_data_one); 
+                }
+
+                if(!empty($data_old_employee_company)){
+                    if($data_old_employee_company['date_start'] > $employee_data_one['date_start']){
+                        if(empty($employee_data_one['date_end_effective'])){
+                            $employee_data_one['date_end'] = $data_old_employee_company['date_start'];
+                        }else{
+                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                        }
+                        $storeEmployee = EmployeeCompany::create($employee_data_one); 
+                    }elseif($data_old_employee_company['date_start'] == $employee_data_one['date_start']){
+                        $storeEmployee = EmployeeCompany::updateOrCreate(['id'   => $data_old_employee_company['id']], $employee_data_one); 
+                    }else{
+                        $storeEmployee = EmployeeCompany::updateOrCreate(['id'   => $data_old_employee_company['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                        $storeEmployee = EmployeeCompany::create($employee_data_one); 
+                    }
+                }else{
+                    $storeEmployee = EmployeeCompany::create($employee_data_one); 
+                }
+
+                // dd($premis); 
+
 
 
                 
-                foreach($premis as $premi => $key){
-                    $employee_premis['uuid'] =  $nik_employee.'-'.$premi;
-                    $employee_premis['premi_uuid'] =  $premi;
-                    $employee_premis['employee_uuid'] =  $nik_employee;
-                    $employee_premis['premi_value'] = $sheet->getCell( $key.$no_employee)->getValue();
-                    $employee_premis['date_start'] = $this_date;
+                foreach($premis as $premi){
+                    // dd($nik_employee.'-'.$premi->uuid);
+                   
 
-                    $isNew = false;
-                    $isHaveEmployee = false;
-                    if(!empty($nik_employee)){
-                        
-                        // $store['employees_premi-'.$premi] = EmployeePremi::updateOrCreate(['uuid'    => $nik_employee.'-'.$premi], $employee_premis);
-                        if(($employee_premis['premi_value'] != null) ||($employee_premis['premi_value'] != 0) ){
-                            // dd($employee_premis['premi_value']);
+                    if(!empty($employee_data_one[$premi->uuid])){
+                        $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
+                        $employee_data_one['premi_uuid'] = $premi->uuid;
+                        $employee_data_one['uuid'] = $nik_employee.'-'.$premi->uuid;
+                        $premi_value = $employee_data_one[$premi->uuid];
 
-                            if(!empty($get_all_employee_premis[$nik_employee.'-'.$premi])){
-                                $isHaveEmployee = true;
-                                if($this_date > $get_all_employee_premis[$nik_employee.'-'.$premi]->date_start){
-                                    $isNew = true;
+                        if(!empty($get_all_employee_premis[$nik_employee.'-'.$premi->uuid])){
+                            $data_old_premi[$premi->uuid] = $get_all_employee_premis[$nik_employee.'-'.$premi->uuid]->toArray(); 
+                            $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
+
+                            if($data_old_premi[$premi->uuid]['date_start'] >  $employee_data_one['date_start']){
+                                if(empty($employee_data_one['date_end_effective'])){
+                                    $employee_data_one['date_end'] = $data_old_premi[$premi->uuid]['date_start'];
                                 }else{
-                                    $isNew = false;
+                                    $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
                                 }
-                            }
-        
-                            if(!$isHaveEmployee){
-                                $store['employees_premi-'.$premi] = EmployeePremi::updateOrCreate(['uuid'    => $nik_employee.'-'.$premi], $employee_premis);
+                                $storeEmployee = EmployeePremi::create($employee_data_one); 
+                            }elseif($data_old_premi[$premi->uuid]['date_start']  == $employee_data_one['date_start']){
+                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_employee_roaster['id']], $employee_data_one); 
                             }else{
-                                if($isNew){
-                                    $store['employees_premi-'.$premi] =  EmployeePremi::updateOrCreate(['uuid'  => $nik_employee.'-'.$premi, 'date_end' => null], ['date_end' => $this_date_end_prev ]);
-                                    $store['employees_premi-'.$premi] = EmployeePremi::create($employee_premis);
-                                }
+                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_employee_roaster['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                                $storeEmployee = EmployeePremi::create($employee_data_one); 
                             }
+                        }else{
+                            $storeEmployee = EmployeePremi::create($employee_data_one); 
                         }
-
+                        // dd($storeEmployee);
                     }
-                    
                 }
                 $no_employee++;
             }
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
         return redirect()->back();
@@ -568,7 +404,54 @@ class EmployeeController extends Controller
         $year = $date[0];
         $month = $date[1];
 
+        $variables = Dictionary::all();
+
+        $variables = $variables->keyBy(function ($item) {
+            return strval($item->database);
+        });
+
+        // foreach($variables as $variable){
+        //     Dictionary::updateOrCreate(['database'   => $variable->variable_code], ['excel'=> $variable->variable_name]);
+        // }
+
+        
+        $arr_exports = [
+            'no',
+            'nik_employee',
+            'name' ,            
+            'machine_id',     
+            'position',
+            'department',
+            'contract_status',
+            'date_document_contract',   
+            'date_start_contract',   
+            'long_contract',          
+            'date_end_contract',
+            'tax_status',
+            'financial_number',
+            'financial_name',
+            'bpjs_ketenagakerjaan',
+            'bpjs_kesehatan',
+            'nik_number',
+            'npwp_number',
+            'salary',
+            'insentif',
+            'tunjangan',
+            'hour_meter_prices',
+            'company',
+            'roaster',
+            'contract_number_full',     
+        ];
+        
+
+        // return $arr_exports;
+
         $premis = Premi::all();
+        foreach($premis as $premi){
+            $arr_exports[] = $premi->uuid;           
+        }
+        $arr_exports[] ='date_start_effective';
+        $arr_exports[] = 'date_end_effective';
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
         $createSheet->setCellValue('B1', 'Template Import Data Karyawan Simpel');
@@ -576,42 +459,10 @@ class EmployeeController extends Controller
         $createSheet->setCellValue('D1', $month);
         $createSheet->setCellValue('E1', 'Tahun');
         $createSheet->setCellValue('F1', $year);
-        $createSheet->setCellValue('A2', 'No.');
-        $createSheet->setCellValue('D2', '12');
-        $createSheet->setCellValue('A2', 'No.');
-        $createSheet->setCellValue('B2', 'NIK');
-        $createSheet->setCellValue('C2', 'Nama');
-        $createSheet->setCellValue('D2', 'Jabatan');
-        $createSheet->setCellValue('E2', 'Departemen');
-        $createSheet->setCellValue('F2', 'Tanggal Awal Kontrak');
-        $createSheet->setCellValue('G2', 'Status Pajak');
-        $createSheet->setCellValue('H2', 'No Rekening');
-        $createSheet->setCellValue('I2', 'Nama Rekening');
-        $createSheet->setCellValue('J2', 'No BPJS Ketenagakerjaan');
-        $createSheet->setCellValue('K2', 'BPJS Kesehatan');
-        $createSheet->setCellValue('L2', 'No NPWP');
-        $createSheet->setCellValue('M2', 'NIK Kependudukan');
-        $createSheet->setCellValue('N2', 'Jenis Kontrak');
-        $createSheet->setCellValue('O2', 'BPJS TK 2%');
-        $createSheet->setCellValue('P2', 'BPJS KESEHATAN 1%');
-        $createSheet->setCellValue('Q2', 'BPJS PENSIUN 1%');
-        $createSheet->setCellValue('R2', 'Gaji Pokok');
-        $createSheet->setCellValue('S2', 'Insentif');
-        $createSheet->setCellValue('T2', 'Tunjangan');
-        $createSheet->setCellValue('U2', 'Nama Mesin Fingger');
-        $createSheet->setCellValue('V2', 'Harga HM');
-        $createSheet->setCellValue('W2', 'Site');
-        $createSheet->setCellValue('X2', 'Roster');
-        $createSheet->setCellValue('Y2', 'Tanggal Berakhir Kontrak');
-        $createSheet->setCellValue('Z2', 'Tanggal Resign');
-        $createSheet->setCellValue('AA2', 'Status Resign');
-        
-        $index_column = 2;
-        $index_row = 27;
-        foreach($premis as $premi){
-            $cell = $row[$index_row].$index_column;
-            $createSheet->setCellValue($cell, $premi->uuid);
-            $index_row++;
+        $no_col = 0;
+        foreach($arr_exports as $item_export){
+            $createSheet->setCellValue($row[$no_col].'2', $variables[$item_export]->excel);
+            $no_col++;
         }
         $crateWriter = new Xls($createSpreadsheet);
         $name = 'file/absensi/Template Penambahan Karyawan -'.rand(99,9999).'file.xls';
@@ -626,73 +477,8 @@ class EmployeeController extends Controller
         return ResponseFormatter::toJson($data, 'data nik');
     }
 
-    public function create($user_detail_uuid){
-        $d = Carbon::today('Asia/Jakarta')->isoFormat('D');
-        $m = Carbon::today('Asia/Jakarta')->isoFormat('M');
-        $y = Carbon::today('Asia/Jakarta')->isoFormat('Y');
+    
 
-
-        $contract_number = '001';
-        $nik_employee = "001";
-        $machine_id = 1;
-        $religions = Religion::all();
-        $pohs = Poh::all();
-        $departments = Department::all();
-        $positions = Position::all();
-        $companies = Company::all();
-        $roasters = Roaster::all();
-
-       $employee = Employee::where('nik_employee', '!=',null)->where('created_at', '!=',null)->latest()->first();
-        if($employee->count() > 0){
-            // return $employee;
-            $nik_employees = $employee->nik_employee;
-            $nik_suggest = explode('-', $nik_employees);
-            $nik = $nik_suggest[1][4].$nik_suggest[1][5].$nik_suggest[1][6] + 1;
-            $machine_id = $employee->machine_id + 1;
-            $contract_number = $employee->contract_number + 1;
-        }
-
-        // dd($employee);
-
-        
-
-         $date_now = $d.' '.ResponseFormatter::getMonthName($m).' '.$y;
-         $date_now =  $y.'-'.$m.'-'.$d;
-
-        $d = Carbon::today()->addDays(90)->isoFormat('D');
-        $m = Carbon::today()->addDays(90)->isoFormat('M');
-        $y = Carbon::today()->addDays(90)->isoFormat('Y');
-        $date_add = $d.' '.ResponseFormatter::getMonthName($m).' '.$y;
-        $date_adds = $y.'-'.$m.'-'.$d;
-        // dd($positions);
-        $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => false,
-            'javascript_datatable'  => false,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'                        => 'admin-hr-employees'
-        ];
-        // return Carbon::today('Asia/Jakarta')->isoFormat('YYYY-MM-DD');
-        return view('employee.hr.create', [
-            'title'         => 'Add People',
-            'user_detail_uuid' => $user_detail_uuid,
-            'layout'    => $layout,
-            'pohs' => $pohs,
-            'positions' => $positions,
-            'religions' => $religions,
-            'companies' => $companies,
-            'roasters' => $roasters,
-            'departments' => $departments,
-            'date_now'  => Carbon::today('Asia/Jakarta')->isoFormat('YYYY-MM-DD'),
-            'long'      => 3,
-            'date_add'  => $date_adds,
-            'contract_number'   => $contract_number,
-            'nik_employee'      => $nik,
-            'machine_id'    =>$machine_id
-        ]);
-    }
     public function storeFile(Request $request){
         $validatedData = $request->validate([
             'nik_employee_file' => '',
@@ -729,16 +515,16 @@ class EmployeeController extends Controller
         $number_contract = explode('/', $validateData['contract_number_full']);
         
         $validateData['contract_number'] =$number_contract[0];
-        $validateData['date_document_contract'] =$validateData['date_start_contract'];
 
         $storeEmployee = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
 
-        $updateUserDetail = UserDetail::updateOrCreate(['uuid' => $user_detail_uuid]);
+        $updateUserDetail = UserDetail::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid']]);
         $updateUserReligion = UserReligion::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
         $updateUserHealth = UserHealth::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
         $updateUserEducation = UserEducation::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);  
         $updateUserDependent = UserDependent::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
         $updateUserAddress = UserAddress::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
+        $updateUserAddress = UserLicense::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
        
         $updateUserCompany = EmployeeCompany::updateOrCreate(['uuid' => $validateData['uuid']], ['date_start' => $validateData['date_start'],'employee_uuid' => $storeEmployee->uuid,'company_uuid'=>$validateData['company_uuid']]);
         $updateUserRoaster = EmployeeRoaster::updateOrCreate(['uuid' => $validateData['uuid']], ['date_start' => $validateData['date_start'],'employee_uuid' => $storeEmployee->uuid,'roaster_uuid'=>$validateData['roaster_uuid']]);
@@ -768,7 +554,7 @@ class EmployeeController extends Controller
             'updateUser' => $updateUser,
         ];
 
-        return ResponseFormatter::toJson($abc, 'data store employee');
+        return ResponseFormatter::toJson($storeEmployee, 'data store employee');
         return redirect()->intended('/user')->with('success',"Karyawan Ditambahkan");
     }
 
@@ -783,7 +569,7 @@ class EmployeeController extends Controller
 
     public function profile($nik_employee){
         
-        $data =Employee::noGet_employeeAll_detail()->where('employee_uuid', $nik_employee)->first();
+        $data =Employee::noGet_employeeAll_detail()->where('employees.uuid', $nik_employee)->first();
          
         $layout = [
             'head_datatable'        => true,
@@ -798,7 +584,6 @@ class EmployeeController extends Controller
             'layout'    => $layout,
         ]);
     }
-
     public function anyData(){
 
         $data = Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
@@ -817,5 +602,28 @@ class EmployeeController extends Controller
         ->make(true);
     }
 
-    
+
+
+    public function anyMoreData(Request $request){
+        $data = Employee::noGet_employeeAll_detail()->get();
+        // return $data;
+        $datas = $data->keyBy(function ($item) {
+            return strval($item->employee_uuid);
+        });
+
+
+        $employee_premis= EmployeePremi::all();
+
+        foreach($employee_premis as $employee_premi){
+            if(!empty($datas[$employee_premi->employee_uuid])){
+                $name_col = $employee_premi->premi_uuid;
+                $employee_uuid = $employee_premi->employee_uuid;
+                $datas[$employee_uuid]->$name_col = $employee_premi->premi_value; 
+            }
+           
+        }
+        return ResponseFormatter::toJson($data, $datas);
+        return Datatables::of($data)     
+        ->make(true);
+    }    
 }

@@ -13,24 +13,20 @@ use App\Models\UserDetail\UserDetail;
 class UserHealthController extends Controller
 {
     public function store(Request $request){
-
-        
-        // dd($request);
+        $isEdit = true;
         $validateData = $request->all();
 
         if($validateData['uuid'] == null){
+            $isEdit = false;
             $validateData['uuid'] = $validateData['user_detail_uuid'];
         }
 
-        $store = UserHealth::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        $validateData = UserHealth::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        if($isEdit){
+            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
 
-        return ResponseFormatter::toJson($store, 'Data Store User Health');
-
-        if($request->isEdit == 1){
-            return redirect()->intended('/user/profile/'.$request->nik_employee);
-        }
-
-        return redirect()->intended('/user-license/create/'.$store->user_detail_uuid);
+        }        
+        return ResponseFormatter::toJson($validateData, 'Data Store User Education');
     }
 
     public function anyDataOne($uuid){

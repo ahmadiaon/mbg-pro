@@ -6,6 +6,7 @@ use App\Helpers\ResponseFormatter;
 use App\Models\UserDetail\UserAddress;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 
 class UserAddressController extends Controller
 {
@@ -15,12 +16,18 @@ class UserAddressController extends Controller
     }
 
     public function store(Request $request){  
-        $dependent = UserAddress::updateOrCreate(['uuid' => $request->user_detail_uuid], $request->except(['uuid']));
-        return ResponseFormatter::toJson($dependent, 'store-user-dependent');
-        
-        if($request->isEdit == 1){
-            return redirect()->intended('/user/profile/'.$request->nik_employee);
+        $isEdit = true;
+        $validateData = $request->all();
+
+        if($validateData['isEdit'] == null){
+            $isEdit = false;
         }
-        return redirect()->intended('/user-education/create/'.$request->user_detail_uuid);
+        $validateData = UserAddress::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
+
+        if($isEdit){
+            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
+
+        }   
+        return ResponseFormatter::toJson($validateData, 'store-user-dependent');
     }
 }
