@@ -17,8 +17,9 @@ class CreateEmployeePaymentDebtsTable extends Migration
             $table->id();
             
             $table->string('uuid')->nullable();
-            $table->string('debt_uuid')->nullable();
-            $table->date('date_payment_debt')->nullable();
+            $table->string('debt_uuid')->nullable();            
+            $table->string('employee_uuid')->nullable();
+            $table->date('date_payment_debt')->nullable(); 
             $table->float('remaining_old_debt')->nullable();
             $table->float('value_payment_debt')->nullable();
             $table->float('remaining_new_debt')->nullable();

@@ -49,7 +49,7 @@ class AuthenticationController extends Controller
                     $request->session()->put('dataUser', $dataUser);
                 }else{
                     $request->session()->put('dataUser', $dataUser);
-                    return redirect()->intended('/me/'.$dataUser->nik_employee);
+                    return redirect()->intended('/user');
                 }
             }else{
                 return back()->with('loginError', 'Login Failed!');

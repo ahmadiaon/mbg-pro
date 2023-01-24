@@ -171,7 +171,7 @@
                                     </div>
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <select name="tax_status" id="tax_status" class="form-control">
+                                            <select name="tax_status_uuid" id="tax_status_uuid" class="form-control">
 
                                             </select>
                                         </div>

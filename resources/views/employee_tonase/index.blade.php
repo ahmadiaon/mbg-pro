@@ -141,8 +141,7 @@
 
                             </div>
                         </div>
-                    </div>
-                    
+                    </div>                    
 
                     <div id="the-table">
                         <div class="pb-20" id="employee-tonase">
@@ -152,7 +151,6 @@
                 </div>
                 <!-- Simple Datatable End -->
             </div>
-
         </div>
     </div>
 
@@ -292,6 +290,7 @@
 
             $('#is_combined').prop('checked', true);
             filter.is_combined = true;
+
             showDataTableUserTonase()
         }
 
@@ -414,7 +413,7 @@
                     let element_action = '';
                     element_action = `
                                 <div class="form-inline"> 
-                                    <a onclick="setNikEmployee('${row.nik_employee}')">
+                                    <a href="/tonase/show/${row.nik_employee}/${arr_date_today.year}-${arr_date_today.month}">
                                         <button  type="button" class="btn btn-primary mr-1  py-1 px-2">
                                             <small>detail</small>
                                         </button>

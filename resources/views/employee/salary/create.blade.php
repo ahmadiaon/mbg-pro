@@ -1,6 +1,7 @@
 <div id="create-employee-salary" class="children-content">
     <form action="/employee-salary/store" id="form-employee-salary" method="POST" enctype="multipart/form-data">
         @csrf
+        <input type="text" name="isEdit" id="isEdit-employee-salary">
         <input type="text" name="employee_uuid" id="employee_uuid-employee-salary">
         <input type="text" name="uuid" id="uuid-employee-salary">
         <div class="min-height-200px">

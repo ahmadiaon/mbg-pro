@@ -123,7 +123,7 @@
                     firstCreateUserEmployee(pageId, data);
                     break;
                 case 'create-employee-salary':
-                    firstCreateEmployeeSalary(data);
+                    firstCreateEmployeeSalary(pageId,data);
                     break;
 				case 'index-employee':
                     firstIndexEmployee(data);

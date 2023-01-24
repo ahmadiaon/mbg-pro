@@ -16,6 +16,7 @@ class EmployeeSalaryController extends Controller
         
         // dd($request);
         $premis = Premi::all();
+      
         $validateData = $request->all();
 
         if($validateData['uuid'] == null){
@@ -23,7 +24,7 @@ class EmployeeSalaryController extends Controller
         }
 
         foreach($premis as $premi){
-            if($validateData[$premi->uuid]!=null){
+            if(!empty($validateData[$premi->uuid])){
                 EmployeePremi::updateOrCreate(['uuid'   => $validateData['employee_uuid'].'-'.$premi->uuid], [
                     'employee_uuid' => $validateData['employee_uuid'],
                     'premi_uuid'    => $premi->uuid,
@@ -35,9 +36,9 @@ class EmployeeSalaryController extends Controller
         }
 
         $storeEmployeeSalary = EmployeeSalary::updateOrCreate(['uuid'   => $validateData['uuid']], $validateData);
-        return ResponseFormatter::toJson($validateData, 'Data Store User Education');
+       
         $store = EmployeeSalary::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
-
+        return ResponseFormatter::toJson($validateData, 'Data Store User Education');
         return ResponseFormatter::toJson($store, 'Data Store User Education');
     }
 

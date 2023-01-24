@@ -146,15 +146,15 @@ class EmployeeController extends Controller
                 return strval($item->uuid);
             });
 
-            $get_all_employee_companies = EmployeeCompany::whereNull('date_end')->get();
-            $get_all_employee_companies = $get_all_employee_companies->keyBy(function ($item) {
-                return strval($item->uuid);
-            });
+            // $get_all_employee_companies = EmployeeCompany::whereNull('date_end')->get();
+            // $get_all_employee_companies = $get_all_employee_companies->keyBy(function ($item) {
+            //     return strval($item->uuid);
+            // });
 
-            $get_all_employee_roasters = EmployeeRoaster::whereNull('date_end')->get();
-            $get_all_employee_roasters = $get_all_employee_roasters->keyBy(function ($item) {
-                return strval($item->employee_uuid);
-            });                       
+            // $get_all_employee_roasters = EmployeeRoaster::whereNull('date_end')->get();
+            // $get_all_employee_roasters = $get_all_employee_roasters->keyBy(function ($item) {
+            //     return strval($item->employee_uuid);
+            // });                       
 
             $month = $sheet->getCell( 'D1')->getValue();
             $year = $sheet->getCell( 'F1')->getValue();
@@ -184,15 +184,15 @@ class EmployeeController extends Controller
                     $data_old = array_merge($data_old, $data_old_employee_salary );  
                 }
 
-                if(!empty($get_all_employee_roasters[$nik_employee])){
-                    $data_old_employee_roaster = $get_all_employee_roasters[$nik_employee]->toArray(); 
-                    $data_old = array_merge($data_old, $data_old_employee_roaster );  
-                }
+                // if(!empty($get_all_employee_roasters[$nik_employee])){
+                //     $data_old_employee_roaster = $get_all_employee_roasters[$nik_employee]->toArray(); 
+                //     $data_old = array_merge($data_old, $data_old_employee_roaster );  
+                // }
 
-                if(!empty($get_all_employee_companies[$nik_employee])){
-                    $data_old_employee_company = $get_all_employee_companies[$nik_employee]->toArray(); 
-                    $data_old = array_merge($data_old, $data_old_employee_company );  
-                }
+                // if(!empty($get_all_employee_companies[$nik_employee])){
+                //     $data_old_employee_company = $get_all_employee_companies[$nik_employee]->toArray(); 
+                //     $data_old = array_merge($data_old, $data_old_employee_company );  
+                // }
 
                 
 
@@ -212,6 +212,7 @@ class EmployeeController extends Controller
                     }
                     
                 }  
+                dd($employee_data_one);
                    
 
                 Position::updateOrCreate(['uuid' => $employee_data_one['position_uuid']], ['position' => $employee_data_one['position']] );
@@ -263,6 +264,7 @@ class EmployeeController extends Controller
                 }else{
                     $storeEmployee = Employee::create($employee_data_one); 
                 }
+              
 
                 
                 // user
@@ -272,7 +274,7 @@ class EmployeeController extends Controller
                 // end user
 
                 //user detail
-
+                dd($storeEmployee);
                 if(!empty($data_old_user_detail)){
                     if($data_old_user_detail['date_start'] > $employee_data_one['date_start']){
                         if(empty($employee_data_one['date_end_effective'])){
@@ -288,10 +290,10 @@ class EmployeeController extends Controller
                     }else{
                         $storeEmployee = UserDetail::updateOrCreate(['id'   => $data_old_user_detail['id']], ['date_end'=>$employee_data_one['date_start']]); 
                         $storeEmployee = UserDetail::create($employee_data_one); 
-                        return 'c';
+                        // return 'c';
                     }
                 }else{
-                    return 'd';
+                    // return 'd';
                     $storeEmployee = UserDetail::create($employee_data_one); 
                 }
                 // return 'z';
@@ -313,50 +315,48 @@ class EmployeeController extends Controller
                     $storeEmployee = EmployeeSalary::create($employee_data_one); 
                 }
 
-                if(!empty($data_old_employee_roaster)){
-                    if($data_old_employee_roaster['date_start'] > $employee_data_one['date_start']){
-                        if(empty($employee_data_one['date_end_effective'])){
-                            $employee_data_one['date_end'] = $data_old_employee_roaster['date_start'];
-                        }else{
-                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
-                        }
-                        $storeEmployee = EmployeeRoaster::create($employee_data_one); 
-                    }elseif($data_old_employee_roaster['date_start'] == $employee_data_one['date_start']){
-                        $storeEmployee = EmployeeRoaster::updateOrCreate(['id'   => $data_old_employee_roaster['id']], $employee_data_one); 
-                    }else{
-                        $storeEmployee = EmployeeRoaster::updateOrCreate(['id'   => $data_old_employee_roaster['id']], ['date_end'=>$employee_data_one['date_start']]); 
-                        $storeEmployee = EmployeeRoaster::create($employee_data_one); 
-                    }
-                }else{
-                    $storeEmployee = EmployeeRoaster::create($employee_data_one); 
-                }
+                // if(!empty($data_old_employee_roaster)){
+                //     if($data_old_employee_roaster['date_start'] > $employee_data_one['date_start']){
+                //         if(empty($employee_data_one['date_end_effective'])){
+                //             $employee_data_one['date_end'] = $data_old_employee_roaster['date_start'];
+                //         }else{
+                //             $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                //         }
+                //         $storeEmployee = EmployeeRoaster::create($employee_data_one); 
+                //     }elseif($data_old_employee_roaster['date_start'] == $employee_data_one['date_start']){
+                //         $storeEmployee = EmployeeRoaster::updateOrCreate(['id'   => $data_old_employee_roaster['id']], $employee_data_one); 
+                //     }else{
+                //         $storeEmployee = EmployeeRoaster::updateOrCreate(['id'   => $data_old_employee_roaster['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                //         $storeEmployee = EmployeeRoaster::create($employee_data_one); 
+                //     }
+                // }else{
+                //     $storeEmployee = EmployeeRoaster::create($employee_data_one); 
+                // }
 
-                if(!empty($data_old_employee_company)){
-                    if($data_old_employee_company['date_start'] > $employee_data_one['date_start']){
-                        if(empty($employee_data_one['date_end_effective'])){
-                            $employee_data_one['date_end'] = $data_old_employee_company['date_start'];
-                        }else{
-                            $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
-                        }
-                        $storeEmployee = EmployeeCompany::create($employee_data_one); 
-                    }elseif($data_old_employee_company['date_start'] == $employee_data_one['date_start']){
-                        $storeEmployee = EmployeeCompany::updateOrCreate(['id'   => $data_old_employee_company['id']], $employee_data_one); 
-                    }else{
-                        $storeEmployee = EmployeeCompany::updateOrCreate(['id'   => $data_old_employee_company['id']], ['date_end'=>$employee_data_one['date_start']]); 
-                        $storeEmployee = EmployeeCompany::create($employee_data_one); 
-                    }
-                }else{
-                    $storeEmployee = EmployeeCompany::create($employee_data_one); 
-                }
+                // if(!empty($data_old_employee_company)){
+                //     if($data_old_employee_company['date_start'] > $employee_data_one['date_start']){
+                //         if(empty($employee_data_one['date_end_effective'])){
+                //             $employee_data_one['date_end'] = $data_old_employee_company['date_start'];
+                //         }else{
+                //             $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                //         }
+                //         $storeEmployee = EmployeeCompany::create($employee_data_one); 
+                //     }elseif($data_old_employee_company['date_start'] == $employee_data_one['date_start']){
+                //         $storeEmployee = EmployeeCompany::updateOrCreate(['id'   => $data_old_employee_company['id']], $employee_data_one); 
+                //     }else{
+                //         $storeEmployee = EmployeeCompany::updateOrCreate(['id'   => $data_old_employee_company['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                //         $storeEmployee = EmployeeCompany::create($employee_data_one); 
+                //     }
+                // }else{
+                //     $storeEmployee = EmployeeCompany::create($employee_data_one); 
+                // }
 
                 // dd($premis); 
 
 
 
                 
-                foreach($premis as $premi){
-                    // dd($nik_employee.'-'.$premi->uuid);
-                   
+                foreach($premis as $premi){                  
 
                     if(!empty($employee_data_one[$premi->uuid])){
                         $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
@@ -376,9 +376,9 @@ class EmployeeController extends Controller
                                 }
                                 $storeEmployee = EmployeePremi::create($employee_data_one); 
                             }elseif($data_old_premi[$premi->uuid]['date_start']  == $employee_data_one['date_start']){
-                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_employee_roaster['id']], $employee_data_one); 
+                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_premi[$premi->uuid]['id']], $employee_data_one); 
                             }else{
-                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_employee_roaster['id']], ['date_end'=>$employee_data_one['date_start']]); 
+                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_premi[$premi->uuid]['id']], ['date_end'=>$employee_data_one['date_start']]); 
                                 $storeEmployee = EmployeePremi::create($employee_data_one); 
                             }
                         }else{
@@ -505,19 +505,22 @@ class EmployeeController extends Controller
     }
     public function store(Request $request){
         $validateData = $request->all();
+        // return ResponseFormatter::toJson($validateData, 'data store employee');
         $user_detail_uuid = $validateData['user_detail_uuid'];
         if(empty($validateData['uuid'])){
             $validateData['uuid'] = $validateData['nik_employee'];
             $validateData['user_detail_uuid'] = $validateData['nik_employee'];
         }
 
+        $validateData['uuid'] = $validateData['nik_employee'];
+        $validateData['user_detail_uuid'] = $validateData['nik_employee'];
 
         $number_contract = explode('/', $validateData['contract_number_full']);
         
         $validateData['contract_number'] =$number_contract[0];
 
         $storeEmployee = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
-
+        // return ResponseFormatter::toJson($user_detail_uuid, 'data store employee');
         $updateUserDetail = UserDetail::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid']]);
         $updateUserReligion = UserReligion::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);
         $updateUserHealth = UserHealth::updateOrCreate(['uuid' => $user_detail_uuid],['date_start' => $validateData['date_start'],'uuid' => $validateData['uuid'], 'user_detail_uuid' => $validateData['uuid']]);

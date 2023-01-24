@@ -35,15 +35,16 @@
             return false;
         }
         globalStoreNoTable(idForm).then((data) => {
+            console.log('data store employees')
             let user = data.data;
             console.log(data);
-            if ($('#uuid-create-' + idForm).val()) {
+            if ($('#isEdit-create-' + idForm).val()) {
                 employees[user.employee_uuid] = user
                 $('#btn-success-modal-id').attr('onclick',
-                    `choosePage("show-employee",  "${user.employee_uuid}")`);
+                    `choosePage("show-employee",  "${user.nik_employee}")`);
             } else {
                 $('#btn-success-modal-id').attr('onclick',
-                    `choosePage("create-employee-salary",  "${user.uuid}")`);
+                    `choosePage("create-employee-salary",  "${user.nik_employee}")`);
             }
             stopLoading();
             $('#success-modal-id').modal('show')

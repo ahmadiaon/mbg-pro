@@ -18,7 +18,7 @@
         globalStoreNoTable(idForm).then((data) => {
             let user = data.data;
             console.log(data);
-            if ($('#uuid-create-' + idForm).val()) {
+            if ($('#isEdit-create-' + idForm).val()) {
                 employees[user.employee_uuid] = user
                 $('#btn-success-modal-id').attr('onclick',
                     `choosePage("show-employee",  "${user.employee_uuid}")`);

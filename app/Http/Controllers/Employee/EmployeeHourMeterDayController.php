@@ -65,7 +65,10 @@ class EmployeeHourMeterDayController extends Controller
 
     // used index
     public function moreAnyData(Request $request){        
-        $data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
+        $data = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid' )
+        ->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
+        ->join('positions','positions.uuid', 'employees.position_uuid' )->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end')
         ->whereYear('employee_hour_meter_days.date', $request->year)
         ->whereMonth('employee_hour_meter_days.date', $request->month);
         if(!empty($request->day)){
@@ -105,22 +108,29 @@ class EmployeeHourMeterDayController extends Controller
     public function AnyDataCreate(Request $request){
        
         // return ResponseFormatter::toJson($request->all(),'bbb');
-        $data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' );
+        $data = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid' )        
+        ->join('positions','positions.uuid', 'employees.position_uuid' )
+        ->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
+        ->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end');
 
-        if(!empty($request->year)){
+        // return ResponseFormatter::toJson($data,'bbb');
+        if(!empty($request->employee_uuid)){
             $data = $data->whereYear('employee_hour_meter_days.date', $request->year)
-            ->whereMonth('employee_hour_meter_days.date', $request->month)
+            ->whereMonth('employee_hour_meter_days.date', (int)$request->month)
             ->where('employee_hour_meter_days.employee_uuid', $request->employee_uuid)
             ->orderBy('employee_hour_meter_days.updated_at', 'desc');
         }else{
             $data = $data->orderBy('employee_hour_meter_days.updated_at','desc')->limit(18);
         }
+        
         $data = $data->get();
         return ResponseFormatter::toJson($data,'bbb');
     }
     // used to store 
     public function store(Request $request){
         $validatedData = $request->all();
+        // return ResponseFormatter::toJson($validatedData,'store employee-hour-meter-day');
         if(empty($validatedData['uuid'])){
             $validatedData['uuid']  = $validatedData['date'].'-'.$validatedData['employee_uuid'].'-'.rand(99,9999);
         }
@@ -129,6 +139,7 @@ class EmployeeHourMeterDayController extends Controller
             $validatedData['is_bonus'] = 'bonus';
         }
         $store = EmployeeHourMeterDay::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
+
         $the_data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
         ->where('employee_hour_meter_days.uuid', $store->uuid)->get()->first();
 
@@ -142,11 +153,10 @@ class EmployeeHourMeterDayController extends Controller
     }
     
     public function show(Request $request){        
-        $validatedData = $request->validate([
-            'uuid' => 'required',
-        ]);
         
-        $data = EmployeeHourMeterDay::where('uuid', $request->uuid)->first();
+        // return ResponseFormatter::toJson($request->all(), 'Data Stored');
+        
+        $data = EmployeeHourMeterDay::where('uuid', $request->uuid)->get()->first();
         return ResponseFormatter::toJson($data, 'Data Stored');
     }
 
@@ -324,7 +334,7 @@ class EmployeeHourMeterDayController extends Controller
     }
 
     public function create(){
-        $employees = Employee::noGet_employeeAll_detail()->get();
+        $employees = Employee::get_employee_all_latest();
         $hour_meter_prices =HourMeterPrice::all();
         // Carbon::today()->isoFormat('Y-M-D');
         $layout = [
@@ -743,7 +753,7 @@ class EmployeeHourMeterDayController extends Controller
     public function showMonth($nik_employee, $year_month){
         
         // dd($data);
-        $employees = Employee::getAll();
+        $employees = Employee::get_employee_all_latest();
         $hour_meter_prices =HourMeterPrice::all();
         // Carbon::today()->isoFormat('Y-M-D');
         $layout = [

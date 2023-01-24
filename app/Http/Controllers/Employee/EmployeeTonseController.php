@@ -505,17 +505,46 @@ class EmployeeTonseController extends Controller
         ]);
     }
 
-    public function create(){
-        $year_month_day = null;
-        $year_month = null;
-        $nik_employee = null;
-        $employees = Employee::getAll();
-        $companies = Company::where('uuid', '!=','MBLE')->get();
-        foreach($companies as $item){
-            $item->coal_from = CoalFrom::where('company_uuid', $item->uuid)->get();
-        }
-        //  dd($companies);
-        // return Carbon::today()->isoFormat('Y-M-D');
+    public function showEmployeeMonth($nik_employee, $year_month){
+        $arr_date = explode('-', $year_month);
+        $month = $arr_date[1];
+        $year = $arr_date[0];
+        $employees = Employee::get_employee_all_latest();
+
+        //coal from
+            $companies = Company::where('uuid', '!=','MBLE')->get();
+            $arr_coal_from = Company::join('coal_froms','coal_froms.company_uuid','companies.uuid')->get();
+
+        
+                foreach($companies as $item){
+                    $item->coal_from = CoalFrom::where('company_uuid', $item->uuid)->get();
+                }
+                $arr_company = [];
+                foreach($companies as $company){
+                    $arr_company[$company->uuid]['detail'] =  $company;
+                }
+                foreach($arr_coal_from as $coal_from){
+                    $arr_company[$coal_from->company_uuid]['coal_from'][$coal_from->uuid] =  $coal_from;
+                }
+        //coal from
+
+        // count employee rit
+            $count_rit_employee = EmployeeTonase::groupBy('employee_uuid','date')
+            ->select( 
+                'employee_uuid',
+                'date',
+                DB::raw("count(employee_uuid) as count_ritase")
+            )
+            ->get();
+
+            $arr_count_rit_employee = [];
+            foreach($count_rit_employee as $rit_employee){
+                $arr_date= explode('-',$rit_employee->date);
+                $arr_count_rit_employee[$rit_employee->employee_uuid][$arr_date[0]][(int)$arr_date[1]][(int)$arr_date[2]] =$rit_employee->count_ritase;
+            }
+        //end count employee rit
+
+  
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -527,12 +556,72 @@ class EmployeeTonseController extends Controller
         ];
         return view('employee_tonase.create', [
             'title'         => 'Tonase',
+            'arr_company'   => $arr_company,
             'employees' => $employees,
-            'companies' => $companies,
-            'year_month_day' => $year_month_day,
-            'year_month' => $year_month,
+            'arr_count_rit_employee' => $arr_count_rit_employee,
+            'month' => $month,
+            'year' => $year,
             'nik_employee'  =>$nik_employee,
-            'today'        => Carbon::today()->isoFormat('Y-M-D'),
+            'layout'    => $layout
+        ]);
+    }
+    public function create(){
+        $month = null;
+        $year = null;
+        $nik_employee = null;
+        $employees = Employee::get_employee_all_latest();
+
+        //coal from
+            $companies = Company::where('uuid', '!=','MBLE')->get();
+            $arr_coal_from = Company::join('coal_froms','coal_froms.company_uuid','companies.uuid')->get();
+
+        
+                foreach($companies as $item){
+                    $item->coal_from = CoalFrom::where('company_uuid', $item->uuid)->get();
+                }
+                $arr_company = [];
+                foreach($companies as $company){
+                    $arr_company[$company->uuid]['detail'] =  $company;
+                }
+                foreach($arr_coal_from as $coal_from){
+                    $arr_company[$coal_from->company_uuid]['coal_from'][$coal_from->uuid] =  $coal_from;
+                }
+        //coal from
+
+        // count employee rit
+            $count_rit_employee = EmployeeTonase::groupBy('employee_uuid','date')
+            ->select( 
+                'employee_uuid',
+                'date',
+                DB::raw("count(employee_uuid) as count_ritase")
+            )
+            ->get();
+
+            $arr_count_rit_employee = [];
+            foreach($count_rit_employee as $rit_employee){
+                $arr_date= explode('-',$rit_employee->date);
+                $arr_count_rit_employee[$rit_employee->employee_uuid][$arr_date[0]][(int)$arr_date[1]][(int)$arr_date[2]] =$rit_employee->count_ritase;
+            }
+        //end count employee rit
+
+  
+        $layout = [
+            'head_core'            => true,
+            'javascript_core'       => true,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employee-tonase'
+        ];
+        return view('employee_tonase.create', [
+            'title'         => 'Tonase',
+            'arr_company'   => $arr_company,
+            'employees' => $employees,
+            'arr_count_rit_employee' => $arr_count_rit_employee,
+            'month' => $month,
+            'year' => $year,
+            'nik_employee'  =>$nik_employee,
             'layout'    => $layout
         ]);
     }
@@ -581,12 +670,13 @@ class EmployeeTonseController extends Controller
     }
 
     public function show(Request $request){
-
+        // return ResponseFormatter::toJson($request->all(), 'edit');
         // $data = EmployeeTonase::where('uuid', $request->uuid)->get();
         $base =  EmployeeTonase::leftJoin('employees','employees.uuid','employee_tonases.employee_uuid')
                 ->join('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
                 ->leftJoin('companies','companies.uuid','coal_froms.company_uuid')
-                ->where('employee_tonases.uuid', $request->uuid)
+                ->where('employee_tonases.uuid', $request->uuid)                
+                ->whereNull('employees.date_end')
                 ->groupBy( 
                     'companies.uuid',
                     'employee_tonases.uuid',
@@ -614,27 +704,40 @@ class EmployeeTonseController extends Controller
     }
 
     public function store(Request $request){
-      
-        $validatedData = $request->validate([
-          'uuid' => '',
-          'ritase' => '',
-          'employee_create_uuid' => '',
-          'employee_know_uuid' => '',
-          'employee_approve_uuid' => '',
-          'vehicle_uuid' => '',
-          'company' => '',
+        
+        $validatedData = $request->all();
+        // return ResponseFormatter::toJson('Ada data lama',$validatedData);
+        $arr_employee_tonase = EmployeeTonase::where('employee_uuid', $validatedData['employee_uuid'])
+        ->where('date', $validatedData['date'])
+        ->get();
+        
+        $arr_count = $arr_employee_tonase->count();
 
-            
-          'employee_uuid' => '',
-          'coal_from_uuid' => '',
-          'tonase_value' => '',//di kertas
-          'tonase_full_value' => '',//bonus
-            'date' => '',
-          'shift' => '', 
-            
-            'time_start' => '',
-            'time_come' => '',
-        ]);
+        if(empty($validatedData['uuid'])){
+            if($validatedData['ritase'] == 1){
+                $inddex = 0;
+                $validatedData['uuid'] = $validatedData['employee_uuid'].'-'.$validatedData['date'].'-'.$inddex;
+                if($arr_employee_tonase->count() > 0 ){
+                    $arr_employee_tonase = ResponseFormatter::createIndexArray($arr_employee_tonase, 'uuid');                   
+                    while(!empty($arr_employee_tonase[$validatedData['uuid']])){
+                        // return ResponseFormatter::toJson('Data lama',$arr_employee_tonase[$validatedData['uuid']]);
+                        $inddex++;
+                        $validatedData['uuid'] = $validatedData['employee_uuid'].'-'.$validatedData['date'].'-'.$inddex;
+                    }                    
+                    $store = EmployeeTonase::create($validatedData);
+                    return ResponseFormatter::toJson('Ada data lama',$store);
+                }
+                $store = EmployeeTonase::create($validatedData);
+                return ResponseFormatter::toJson('Tidak ada data lama', $store);
+            }
+        }else{
+            // return ResponseFormatter::toJson('Ada data lama',$validatedData);
+            $store = EmployeeTonase::updateOrCreate(['uuid' => $validatedData['uuid']] , $validatedData);
+            return ResponseFormatter::toJson('Tidak ada data lama', $store);
+        }
+
+
+        return ResponseFormatter::toJson('faild', $validatedData);
         $tonase_each_ritase = $validatedData['tonase_value'] / $validatedData['ritase'] ;
         $tonase_each_ritase = round( $tonase_each_ritase,3);
         //======================================== ritase ke 5 keatas dapat bonus
@@ -702,163 +805,62 @@ class EmployeeTonseController extends Controller
     }
 
     
-    public function anyData(Request $request){
-        $date = explode("-", $request->year_month);
-        $year = $date[0];
-        $month = $date[1];
-        
-      
-        $coal_froms = CoalFrom::all();
-        $data =[];
-        $collecection = collect($data);
-        
-        foreach($coal_froms as $value)
-        {
-            $da =  EmployeeTonase::leftJoin('employees','employees.uuid','employee_tonases.employee_uuid')
-                ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-                ->leftJoin('positions','positions.uuid','employees.position_uuid')
-                ->join('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
-                ->where('coal_from_uuid', $value->uuid)
-                ->groupBy( 
-                    
-                    'user_details.photo_path',
-                    'employees.nik_employee',
-                    'positions.position',
-                    'user_details.name',
-                    'employees.user_detail_uuid',
-                    'employee_tonases.employee_uuid',
-                    'coal_froms.uuid',
-                    'coal_froms.coal_from',
-                    )
-                ->whereYear('employee_tonases.date', $year)
-                ->whereMonth('employee_tonases.date', $month)
-                ->select( 
-                    'employee_tonases.employee_uuid',
-                    'employees.user_detail_uuid',
-                    'employees.nik_employee',
-                    'user_details.photo_path',
-                    'user_details.name',
-                    'positions.position',
-                    'coal_froms.uuid',
-                    'coal_froms.coal_from',
-                    DB::raw("count(tonase_value) as ritase"),
-                    DB::raw("SUM(tonase_value) as total_sell"),
-                    DB::raw("SUM(tonase_full_value) as total_sells"),
-                )
-                ->get(); 
-                if($da->count() > 0){
-                    $collecection = $collecection->merge($da);
-                }
-        }
-        return Datatables::of($collecection)
-        ->make(true);
-    }
+  
 
     public function anyDataCreate(Request $request){
-        // year_month: year_month,
-        // year_month_day: year_month_day,
-        // filter: vall,
-        // nik_employee: nik_employee,
 
-        $filters = [];
-        // create
-        if(!empty($request->today)){
-            // create
-            $year_month_day = $request->today;
-        }else{
-            $nik_employee = $request->nik_employee;
-            $nik_employee = $request->nik_employee;
-            if(!empty($request->year_month_day)){
-                // perhari
-                $year_month_day = $request->year_month_day; 
-            }else{
-                $year_month = $request->year_month;
-                $date = explode("-", $year_month);
-                $year = $date[0];
-                $month = $date[1];
-            }
+        $arr_data_employee_tonase = EmployeeTonase::join('employees','employees.uuid', 'employee_tonases.employee_uuid')
+        ->join('user_details','user_details.uuid', 'employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid', 'employees.position_uuid')
+        ->join('coal_froms', 'coal_froms.uuid', 'employee_tonases.coal_from_uuid');
+        if(!empty($request->year)){
+            $arr_data_employee_tonase = $arr_data_employee_tonase->whereYear('employee_tonases.date', $request->year);
+            $arr_data_employee_tonase = $arr_data_employee_tonase->whereMonth('employee_tonases.date', $request->month);
+           
         }
-        // filters
-            
-        
-        $coal_froms = $request->filter;
-    
-        if(empty($coal_froms)){
-            $coal_froms = CoalFrom::all();
-            foreach($coal_froms as $value){
-                $filters[] = $value->uuid;
-            }
+        if(!empty($request->nik_employee)){
+            $arr_data_employee_tonase = $arr_data_employee_tonase->where('employee_tonases.employee_uuid', $request->nik_employee);
         }
+
+        $arr_data_employee_tonase = $arr_data_employee_tonase->groupBy( 
+            'employee_tonases.id',
+            'employee_tonases.uuid',
+            'user_details.photo_path',
+            'employees.nik_employee',
+            'positions.position',
+            'user_details.name',
+            'employees.user_detail_uuid',
+            'employee_tonases.employee_uuid',
+            'coal_froms.uuid',
+            'coal_froms.coal_from',
+            'employee_tonases.updated_at',
+            'employee_tonases.date',
+            'employee_tonases.uuid'
+            )
+        ->orderBy('employee_tonases.created_at' , 'desc')
+        ->limit(40)
+        ->get([
+            'employee_tonases.id',
+            'employee_tonases.uuid',
+            'user_details.photo_path',
+            'employees.nik_employee',
+            'positions.position',
+            'user_details.name',
+            'employees.user_detail_uuid',
+            'employee_tonases.employee_uuid',
+            'coal_froms.uuid',
+            'coal_froms.coal_from',
+            'employee_tonases.updated_at',
+            'employee_tonases.date',
+            'employee_tonases.uuid',
+            'employee_tonases.tonase_value',
+            'employee_tonases.tonase_full_value'
+        ]);
+
+        // return ResponseFormatter::toJson($arr_data_employee_tonase,'bbb');
+
         
-        $data =[];
-        $collecection = collect($data);
-        
-        foreach($filters as $value){
-            $da =  EmployeeTonase::leftJoin('employees','employees.uuid','employee_tonases.employee_uuid')
-                ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-                ->leftJoin('positions','positions.uuid','employees.position_uuid')
-                ->join('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
-                ->where('coal_from_uuid', $value)
-                ->groupBy( 
-                    'employee_tonases.id',
-                    'employee_tonases.uuid',
-                    'user_details.photo_path',
-                    'employees.nik_employee',
-                    'positions.position',
-                    'user_details.name',
-                    'employees.user_detail_uuid',
-                    'employee_tonases.employee_uuid',
-                    'coal_froms.uuid',
-                    'coal_froms.coal_from',
-                    'employee_tonases.updated_at',
-                    'employee_tonases.date',
-                    'employee_tonases.uuid'
-                    )
-                ->select( 
-                    'employee_tonases.updated_at',
-                    'employee_tonases.id',
-                    'employee_tonases.uuid',
-                    'employee_tonases.employee_uuid',
-                    'employee_tonases.date',
-                    'employees.user_detail_uuid',
-                    'employees.nik_employee',
-                    'user_details.photo_path',
-                    'user_details.name',
-                    'positions.position',
-                    'coal_froms.uuid',
-                    'employee_tonases.uuid as employee_tonase_uuid',
-                    'coal_froms.coal_from',
-                    DB::raw("count(tonase_value) as ritase"),
-                    DB::raw("SUM(tonase_value) as total_sell"),
-                    DB::raw("SUM(tonase_full_value) as total_sells"),
-                ); 
-
-                if(!empty($nik_employee)){
-                    // lihat per karyawan
-                    $ff = $da->where('nik_employee', $nik_employee);  
-                    if(!empty($year_month_day)){
-                        $ff = $ff->where('date', $year_month_day);
-                    }else{
-                        $ff = $ff->whereYear('date', $year)
-                        ->whereMonth('date', $month);
-                    }
-                }else{
-                    // get updated today || create
-                    // return ResponseFormatter::toJson('today','bbb');
-                    $ff = $da->whereDate('employee_tonases.updated_at', $year_month_day)->orderBy('employee_tonases.updated_at','desc');
-                }
-
-                $da = $ff->get();
-                if($da->count() > 0){
-                    $collecection = $collecection->merge($da);
-                }
-        }
-        // return ResponseFormatter::toJson($collecection,'bbb');
-
-        // return view('datatableshow', [ 'data'         => $collecection]);
- 
-
-        return Datatables::of($collecection)
+        return Datatables::of($arr_data_employee_tonase)
         ->make(true);
     }
 
@@ -880,19 +882,23 @@ class EmployeeTonseController extends Controller
             $filter_arr_coal_from = $request->filter['arr_coal_from'];
         }
         $validateData['filter']['arr_coal_from'] = $filter_arr_coal_from;
-        
        
         if(!empty($validateData['filter']['arr_coal_from'])){
             foreach($validateData['filter']['arr_coal_from'] as $coal_from){
-                $data = Employee::noGet_employeeAll_detail()->join('employee_tonases','employee_tonases.employee_uuid', 'employees.nik_employee' )
-                ->leftJoin('coal_froms', 'coal_froms.uuid','employee_tonases.coal_from_uuid')
+                $data =EmployeeTonase::join('employees','employees.uuid', 'employee_tonases.employee_uuid')
+                ->join('user_details','user_details.uuid', 'employees.user_detail_uuid')
+                ->leftJoin('positions','positions.uuid', 'employees.position_uuid')
+                ->join('coal_froms', 'coal_froms.uuid', 'employee_tonases.coal_from_uuid')
+                ->whereNull('employees.date_end')
+                ->whereNull('user_details.date_end')
                 ->whereYear('employee_tonases.date', $request->year)
                 ->whereMonth('employee_tonases.date', $request->month);
 
                 if(!empty($request->day)){
                     $data = $data->whereDay('employee_tonases.date', $request->day);
                 }
-                $data = $data->where('employee_tonases.coal_from_uuid',$coal_from)->groupBy(     
+                $data = $data->where('employee_tonases.coal_from_uuid',$coal_from)
+                ->groupBy(     
                     'employee_tonases.coal_from_uuid',                
                     'user_details.photo_path',
                     'employees.nik_employee',

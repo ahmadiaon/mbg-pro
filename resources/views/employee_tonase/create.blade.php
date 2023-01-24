@@ -1,13 +1,14 @@
 @extends('template.admin.main_privilege')
 @section('content')
     <div class="mb-30">
+        {{-- form --}}
         <div class="row">
             <div class="col-12">
                 <!-- Simple Datatable start -->
                 <div class="card-box  mb-30">
                     <form action="/tonase/store" id="form-tonase" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="uuid" id="uuid">
+                        <input type="text" name="uuid" id="uuid">
                         <div class="pd-20">
                             <div class="row">
                                 <div class="col-md-4">
@@ -18,8 +19,8 @@
                                         <div class="col text-center">
                                             <div class="alert alert-warning" id="isEdit" role="alert">
                                                 Edit Mode !
-                                            </div>	
-                                          </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -30,36 +31,27 @@
                                     <div class="form-group">
                                         <label for="employee_create_uuid">Pilih Checker</label>
                                         <select name="employee_create_uuid" id="employee_create_uuid"
-                                            class="custom-select2 form-control">
+                                            class="custom-select2 form-control employees">
                                             <option value="">karyawan</option>
                                         </select>
-                                        <div class="invalid-feedback" id="req-employee_create_uuid">
-                                            Data tidak boleh kosong
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="employee_know_uuid">Pilih Foreman</label>
                                         <select name="employee_know_uuid" id="employee_know_uuid"
-                                            class="custom-select2 form-control">
+                                            class="custom-select2 form-control employees">
                                             <option value="">karyawan</option>
                                         </select>
-                                        <div class="invalid-feedback" id="req-employee_know_uuid">
-                                            Data tidak boleh kosong
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="employee_approve_uuid">Pilih Supervisor</label>
                                         <select name="employee_approve_uuid" id="employee_approve_uuid"
-                                            class="custom-select2 form-control">
+                                            class="custom-select2 form-control employees">
                                             <option value="">karyawan</option>
                                         </select>
-                                        <div class="invalid-feedback" id="req-employee_approve_uuid">
-                                            Data tidak boleh kosong
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -67,39 +59,37 @@
                                 <div class="col-md-3 timbangan">
                                     <div class="form-group">
                                         <label for="vehicle_uuid">Pilih Unit</label>
-                                        <select name="vehicle_uuid" id="vehicle_uuid" class="custom-select2 form-control">
-                                            <option value="">karyawan</option>
+                                        <select name="vehicle_uuid" id="vehicle_uuid"
+                                            class="unit custom-select2 form-control">
+                                            <option value="">Unit</option>
                                         </select>
-                                        <div class="invalid-feedback" id="req-vehicle_uuid">
-                                            Data tidak boleh kosong
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label for="employee_uuid">Pilih Karyawan</label>
-                                        <select onchange="cekBonus()" name="employee_uuid" id="employee_uuid" class="custom-select2 form-control">
+                                        <select onchange="ritBefore()" name="employee_uuid" id="employee_uuid"
+                                            class="employees custom-select2 form-control">
                                             <option value="">karyawan</option>
                                         </select>
-                                        <div class="invalid-feedback" id="req-employee_uuid">
-                                            Data tidak boleh kosong
-                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="date">Tanggal</label>
-                                        <input onchange="cekBonus()" type="date" name="date" id="date" value="{{ $today }}"
-                                            class="form-control">
+                                        <input onchange="ritBefore()" type="date" name="date" id="date"
+                                           class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-md-2 timbangan">
+                                <div class="col-md-5">
                                     <div class="form-group">
-                                        <label for="date">Rit Hari ini</label>
-                                        <input onchange="cekBonus()" type="text" name="prev-ritase" id="prev-ritase" value=""
-                                            class="form-control">
+                                        <label for="employee_uuid">Total Rit Sebelum</label>
+                                        <input id="rit-before" name="rit-before" type="text" class="form-control "
+                                            disabled value="0">
                                     </div>
                                 </div>
+
+
                             </div>
                             <div class="row justify-content-md-center timbangan">
 
@@ -137,7 +127,8 @@
                                 <div class="col-md-3 ">
                                     <div class="form-group ">
                                         <label for="">Total Rit</label>
-                                        <input onchange="fullValue()" type="text" class="form-control" id="ritase" name="ritase">
+                                        <input onchange="fullValue()" type="text"  class="form-control" id="ritase"
+                                            name="ritase" value="1">
 
                                     </div>
                                 </div>
@@ -163,7 +154,7 @@
                                 <div class="col-md-4 text-center">
                                     <div class="form-group">
                                         <label for="tonase_value">Nilai Tonase</label>
-                                        <input onkeyup="fullValue()" type="text" name="tonase_value"
+                                        <input onkeyup="fullValue()" type="number" name="tonase_value"
                                             id="tonase_value" value="" class="form-control">
                                     </div>
                                 </div>
@@ -183,6 +174,7 @@
                                 <div class="col-3 text-center">
                                     <div class="form-group">
                                         <label class="center">Perusahaan</label>
+                                        <input type="text" name="company_uuid" id="company_uuid">
                                     </div>
                                 </div>
                             </div>
@@ -190,7 +182,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <div class="row justify-content-md-center" id="element-companies">
-                                            <input type="hidden" id="hour_meter_price_uuid">
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -205,7 +197,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <input type="hidden" id="coal_from_uuid" name="coal_from_uuid">
+                                        <input type="text" id="coal_from_uuid" name="coal_from_uuid">
                                         <div class="row justify-content-md-center" id="element-coal-from">
 
 
@@ -233,6 +225,8 @@
                 <!-- Simple Datatable End -->
             </div>
         </div>
+        {{-- end form --}}
+        {{-- table tonase --}}
         <div class="row">
             <div class="col-12">
                 <div id="the-table" class="card-box">
@@ -249,73 +243,95 @@
     <script>
         $('#isEdit').hide();
         $('.timbangan').hide();
-        let year_month = @json($year_month);
-        let year_month_day = @json($year_month_day);
+        let rit_before = 0;
+        let minBonus = [{
+                min_ritase: 5,
+                percent: 15
+            },
+            {
+                min_ritase: 6,
+                percent: 20
+            }
+        ];
+        let arr_date_today = getDateTodayArr();
+
+        let year = @json($year);
+        let month = @json($month);
         let nik_employee = @json($nik_employee);
-        // create 
-        let today = @json($today);
 
-        console.log('year_month : '+ year_month);
-        console.log('year_month_day : '+ year_month_day);
-        console.log('nik_employee : '+ nik_employee);
+        let arr_count_rit_employee = @json($arr_count_rit_employee);
+        let employees = @json($employees);
+        let arr_company = @json($arr_company);
 
-        function companies() {
+        
+        
+
+
+        function firstEmployeeTonaseCreate() {
+            employees.forEach(element => {
+                $('.employees').append(`
+                <option value="${element.nik_employee}">${element.name} - ${element.position}</option>
+            `)
+            });
             $('#element-companies').empty();
-            let companies = @json($companies);
-            console.log('companies');
-            console.log(companies);
-            var i = 0;
-            companies.forEach(element => {
+            jQuery.each( arr_company, function( i, val ) {
+                cg('element', val.detail)
                 let element_company = `
                                         <div class="col-md-auto">
                                             <div class="custom-control custom-radio mb-5">
-                                                <input type="hidden"  id="${element.uuid}-id" name="company-id"
-                                                    class="custom-control-input" value="${i}"  />
-                                                <input onchange="chooseCoalFrom('${i}')" type="radio"  id="${element.uuid}" name="company"
-                                                    class="custom-control-input" value="${element.uuid}"  />
-                                                <label class="custom-control-label" for="${element.uuid}"  >${element.company}</label>
+                                                <input onchange="chooseCompany('${val.detail.uuid}')" type="radio"  id="${val.detail.uuid}" name="company"
+                                                    class="custom-control-input" value="${val.detail.uuid}"  />
+                                                <label class="custom-control-label" for="${val.detail.uuid}"  >${val.detail.company}</label>
                                             </div>
                                         </div>`;
                 $('#element-companies').append(element_company);
-                i++;
-            });
+            }); 
+            if(year){
+                arr_date_today.year = year
+                // cg(year)
+            }   
+            if(month){
+                arr_date_today.month = month
+            }
+            
+            showDataTableUserTonase('aa', ['updated_at', 'name', 'date', 'tonase_value', 'tonase_full_value', 'coal_from'],
+            'table-tonase');
 
         }
-        companies();
 
-        function chooseCoalFrom(uuid) {
-            console.log(uuid);
+        function chooseCompany(company_uuid){
+            $('#coal_from_uuid').val('')
+            let arr_coal_from = arr_company[company_uuid]['coal_from'];
+            $('#company_uuid').val(company_uuid);
+            cg('coal arr_coal_from ', arr_coal_from)
             $("#element-coal-from").empty();
-            let companies = @json($companies);
-            let coal_from = companies[uuid].coal_from;
-            console.log('coal_from'); console.log(coal_from);
-            coal_from.forEach(element => {
+            jQuery.each( arr_coal_from, function( i, coal_from ) {
+                // cg('coal from', coal_from)
                 let element_company = `
                                         <div class="col-md-auto">
                                             <div class="custom-control custom-radio mb-5">
-                                                <input onblur="chooseCoalFroms('${element.uuid}')" type="radio"  id="id-${element.uuid}" name="coal_from_uuid"
-                                                    class="custom-control-input" value="${element.uuid}"  />
-                                                <label class="custom-control-label" for="id-${element.uuid}"  >${element.coal_from}</label>
+                                                <input onchange="chooseCoalFrom('${coal_from.uuid}')" type="radio"  id="id-coal-${coal_from.uuid}" name="coal_from_uuid"
+                                                    class="custom-control-input" value="${coal_from.uuid}"  />
+                                                <label class="custom-control-label" for="id-coal-${coal_from.uuid}"  >${coal_from.coal_from}</label>
                                             </div>
                                         </div>`;
                 $('#element-coal-from').append(element_company);
+                $('#coal_from_uuid').val(coal_from.uuid);
             });
-            
-            // $('#id-6').attr('checked', true);
+            $(`#id-coal-${company_uuid}`).attr('checked', true);
         }
 
-
-        function chooseCoalFroms(uuid) {
+        function chooseCoalFrom(uuid) {
             $('#coal_from_uuid').val(uuid);
-            // console.log(uuid);
         }
 
         $('#loading').hide();
+
         function showDataTableUserTonase(url, dataTable, id) {
             $('#tablePrivilege').remove();
             var table_element = ` 
                                         <div class="pb-20" id="tablePrivilege">
-                                            <table id="table-tonases" class="display nowrap stripe hover table" style="width:100%">
+                                            <table id="table-tonase" class="display nowrap stripe hover table" style="width:100%">
                                                 <thead>
                                                     <tr>
                                                         <th>Updated</th>
@@ -329,7 +345,6 @@
                                                 </thead>
                                             </table>
                                         </div>`;
-
             $('#the-table').append(table_element);
             let data = [];
 
@@ -347,9 +362,9 @@
                     // console.log(row);
                     element_action = `
                                 <div class="form-inline"> 
-                                    <a onclick="editEmployeeTonase('${row.employee_tonase_uuid}')">
+                                    <a onclick="editEmployeeTonase('${row.uuid}')">
                                         <button  type="button" class="btn btn-primary mr-1  py-1 px-2">
-                                            <small>detail</small>
+                                            <small>${row.uuid}</small>
                                         </button>
                                     </a>
                                 </div>`;
@@ -357,19 +372,20 @@
                 }
             };
             data.push(el_1)
-            console.log('table year_month : '+ year_month);
-            console.log('table year_month_day : '+ year_month_day);
-            console.log('table nik_employee : '+ nik_employee);
-            
 
+            cg('nik_employee',nik_employee)
             $('#' + id).DataTable({
-                order: [['0', 'desc']],
-                columnDefs: [
-                                        { "visible": false, "targets": 0 }
-                                    ],
+                order: [
+                    ['0', 'desc']
+                ],
+                columnDefs: [{
+                    "visible": false,
+                    "targets": 0
+                }],
                 processing: true,
-                serverSide: true,
-                responsive: true,
+                serverSide: false,
+                responsive: true,                
+                paging: false,
                 rowReorder: {
                     selector: 'td:nth-child(2)'
                 },
@@ -377,49 +393,31 @@
                     url: '/tonase/data-create',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
-                        year_month: year_month,
-                        year_month_day: year_month_day,
+                        month: arr_date_today.month,
+                        year: arr_date_today.year,
                         nik_employee: nik_employee,
-                        today: today
                     },
                     type: 'POST',
 
                 },
-                success: function(response) {
-                    // $('#success-modal').modal('show')
-					// console.log(response)
-					// $('#table-'+idForm).DataTable().ajax.reload();
-                },
                 error: function(response) {
-                    alertModal()					
-				},
+                    alertModal()
+                },
                 columns: data
             });
-        }
-
-        showDataTableUserTonase('aa', ['updated_at','name','date', 'total_sell', 'total_sells', 'coal_from'], 'table-tonases');
-
+        }        
+       
+        
         function store(idForm) {
-            console.log(idForm)
-            // if(isRequired(['employee_uuid','employee_create_uuid','employee_know_uuid'])    > 0){ return false; }
-            var isStored = globalStore(idForm)
-            resetData();
-            showDataTableUserTonase('aa', ['updated_at','name','date', 'total_sell', 'total_sells', 'coal_from'], 'table-tonases');
+            if (isRequiredCreate(['company_uuid']) > 0) {
+                return false;
+            }
+            globalStore(idForm);
+ 
             $('#sa-custom-position').click();
         }
 
-        function getFirst() {
-            var employees = @json($employees);
-            employees.forEach(element => {
-                var elements = `<option value="${element.uuid}">${element.name} - ${element.position}</option>`;
-                // console.log(element);
-                $('#employee_uuid').append(elements);
-                $('#employee_create_uuid').append(elements);
-                $('#employee_know_uuid').append(elements);
-                $('#employee_approve_uuid').append(elements);
-            });
-            // console.log(employees)
-        }
+
 
 
         function editEmployeeTonase(uuid) {
@@ -438,23 +436,18 @@
                 },
                 success: function(response) {
                     data = response.data
-                    console.log('data')
-                    console.log(data)
-                    companies();
+                    chooseCompany(data.company_uuid)
                     // return false;
                     $('#employee_uuid').val(data.employee_uuid).trigger('change');
                     $('#uuid').val(data.uuid).trigger('change');
-                    // $('#employee_create_uuid').val(data.employee_create_uuid).trigger('change');
-                    // $('#employee_know_uuid').val(data.employee_know_uuid).trigger('change');
                     $('#ritase').val(data.amount_ritase).trigger('change');
                     $('#date').val(data.date).trigger('change');
-                    $('#'+data.company_uuid).attr('checked', true);
+                    $('#' + data.company_uuid).attr('checked', true);
                     $('#tonase_value').val(data.total_tonase_value);
                     $('#tonase_full_value').val(data.total_tonase_full_value);
-
-                    chooseCoalFrom($('#'+data.company_uuid+'-id').val());
-
-                    $('#id-'+data.coal_from_uuid).attr('checked', true);
+                    
+                    $('#coal_from_uuid').val(data.coal_from_uuid);
+                    $(`#id-coal-${data.coal_from_uuid}`).attr('checked', true);
                 },
 
                 error: function(response) {
@@ -463,34 +456,55 @@
             });
         }
 
-        function fullValue() {
-            let isBonusAktive = $('#isBonusAktive')[0].checked
-            let tonase_full_value;
-            let amount_ritase = $('#ritase').val();
-            if (isBonusAktive == true) {
-                let value_hm = parseInt($('#tonase_value').val())
-                if (amount_ritase > 4) {
-                    tonase_full_value = value_hm * 0.15
-                    tonase_full_value = tonase_full_value + value_hm
-                }else{
-                    tonase_full_value = value_hm
-                }
-                
-                $('#tonase_full_value').val(tonase_full_value)
-                console.log(value_hm)
-            } else {
-                $('#tonase_full_value').val(parseInt($('#tonase_value').val()))
-            }
-        }
 
-        function cekBonus(){
+
+        function ritBefore() {
             let employee_uuid = $('#employee_uuid').val();
             let date = $('#date').val();
+            if (date && employee_uuid) {
+                let arr_date = date.split("-");
+                rit_before = 0;
+                $('#rit-before').val(rit_before)
+                // cg('arr_count_rit_employee', 'none')
 
-            if(date && employee_uuid){
-                console.log('date : '+date+' employee_uuid : '+employee_uuid);
+                if (typeof(arr_count_rit_employee[employee_uuid]) !== 'undefined') {
+                    if (typeof(arr_count_rit_employee[employee_uuid][parseInt(arr_date[0])]) !== 'undefined') {
+                        if (typeof(arr_count_rit_employee[employee_uuid][parseInt(arr_date[0])][parseInt(arr_date[1])]) !==
+                            'undefined') {
+                            if (typeof(arr_count_rit_employee[employee_uuid][parseInt(arr_date[0])][parseInt(arr_date[1])][
+                                    parseInt(arr_date[2])
+                                ]) !== 'undefined') {
+                                cg('define ', arr_count_rit_employee[employee_uuid][parseInt(arr_date[0])][parseInt(
+                                    arr_date[1])][parseInt(arr_date[2])])
+                                rit_before = arr_count_rit_employee[employee_uuid][parseInt(arr_date[0])][parseInt(arr_date[
+                                    1])][parseInt(arr_date[2])]
+                                $('#rit-before').val(rit_before)
+                            }
+                        }
+                    }
+                }
+            }
+            fullValue()
+        }
+
+        function fullValue() {
+            rit_before = $('#rit-before').val();
+            rit_now = $('#ritase').val();
+            let isBonusAktive = $('#isBonusAktive')[0].checked
+            let total_rit = parseFloat(rit_before) + parseFloat(rit_now)
+            let value_tonase = $('#tonase_value').val()
+            $('#tonase_full_value').val(value_tonase)
+            // cg('total rit', total_rit);
+            if (isBonusAktive == true) {
+                minBonus.forEach(role_bonus => {
+                    if ((total_rit > role_bonus.min_ritase) && (value_tonase !== '')) {
+                        let full_value = parseFloat(value_tonase) + (value_tonase * role_bonus.percent / 100);
+                        $('#tonase_full_value').val(full_value)
+                    }
+                });
             }
         }
+
 
         function resetData() {
             console.log('resetData')
@@ -501,14 +515,14 @@
             $('#employee_uuid').val('').trigger('change');
         }
 
-       
+
 
         $(document).ready(function() {
             // console.log( "ready!" );
-            getFirst();
+            firstEmployeeTonaseCreate();
             $('.btn-outline-primary').attr('class', ' btn btn-outline-primary');
             $('#lbl-Siang').attr('class', ' btn btn-outline-primary active');
-
         });
+
     </script>
 @endsection

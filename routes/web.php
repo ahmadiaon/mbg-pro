@@ -170,6 +170,8 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/import', [EmployeeHourMeterDayController::class, 'import']);        
     });
 
+
+
     Route::prefix('/tonase')->group(function () {
         Route::get('/', [EmployeeTonseController::class, 'index']);
         Route::get('/create', [EmployeeTonseController::class, 'create']);
@@ -178,6 +180,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/data-create', [EmployeeTonseController::class, 'anyDataCreate']);
         Route::post('/store', [EmployeeTonseController::class, 'store']);
 
+        Route::get('/show/{nik_employee}/{year_month}', [EmployeeTonseController::class, 'showEmployeeMonth']);
         Route::post('/import', [EmployeeTonseController::class, 'import']);
         Route::get('/export/{year_month}', [EmployeeTonseController::class, 'export']);
         Route::get('/template/{year_month}', [EmployeeTonseController::class, 'template']);
@@ -230,14 +233,18 @@ Route::middleware(['islogin'])->group(function () {
 
     Route::prefix('/employee-debt')->group(function () {
         Route::get('/', [EmployeeDebtController::class, 'index']);
+        Route::get('/export/{year_month}', [EmployeeDebtController::class, 'export']);
+        Route::post('/import', [EmployeeDebtController::class, 'import']);  
+        Route::get('data', [EmployeeDebtController::class, 'anyData']);
     });
 
     Route::prefix('/employee-payment-debt')->group(function () {
         Route::get('/', [EmployeePaymentDebtController::class, 'index']);
         Route::get('/data/{year_month}', [EmployeePaymentDebtController::class, 'anyDataMonth']);
+        Route::get('/export/{year_month}', [EmployeePaymentDebtController::class, 'export']);
         Route::post('/import', [EmployeePaymentDebtController::class, 'import']);        
     });
-    
+
 
 
 
@@ -527,7 +534,9 @@ Route::middleware(['islogin'])->group(function () {
 
 
 
-
+Route::prefix('/recruitment')->group(function () {
+        Route::get('/', [EmployeeTonseController::class, 'index']);
+});
 
 
 

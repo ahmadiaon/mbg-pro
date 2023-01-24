@@ -16,22 +16,26 @@ class UserHealthController extends Controller
         $isEdit = true;
         $validateData = $request->all();
 
-        if($validateData['uuid'] == null){
-            $isEdit = false;
-            $validateData['uuid'] = $validateData['user_detail_uuid'];
+        if(!empty($request->name_health)){
+            if($validateData['uuid'] == null){
+                $isEdit = false;
+                $validateData['uuid'] = $validateData['user_detail_uuid'];
+            }
+            $validateData = UserHealth::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+        }else{
+            if(empty($request->isEdit)){
+                $isEdit = false;
+            }
         }
-
-        $validateData = UserHealth::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
         if($isEdit){
             $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
 
         }        
-        return ResponseFormatter::toJson($validateData, 'Data Store User Education');
+        return ResponseFormatter::toJson( $validateData, 'Data Store User Helath');
     }
 
     public function anyDataOne($uuid){
         $data = UserHealth::where('uuid', $uuid)->first();
         return ResponseFormatter::toJson($data, 'data user_education');
-    }
-    
+    }    
 }

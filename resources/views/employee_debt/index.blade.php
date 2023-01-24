@@ -62,7 +62,7 @@
         </div>
         <div id="the-table">
             <div class="pb-20" id="tablePrivilege">
-                <table id="table-other-payment" class="display nowrap stripe hover table" style="width:100%">
+                <table id="table-employee-debt" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
                             <th>Nama</th>
@@ -82,7 +82,7 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form action="other-payment/store" id="form-other-payment" method="POST" enctype="multipart/form-data">
+                <form action="employee-debt/store" id="form-employee-debt" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="text" name="uuid" id="uuid" class="form-control">
                     <div class="modal-header">
@@ -163,7 +163,7 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             Close
                         </button>
-                        <button type="button" onclick="store('other-payment')" class="btn btn-primary">
+                        <button type="button" onclick="store('employee-debt')" class="btn btn-primary">
                             Save changes
                         </button>
                     </div>
@@ -176,7 +176,7 @@
     <div class="modal fade" id="import-modal" role="dialog" aria-labelledby="import-modalTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-import" action="/other-payment/import" method="post" enctype="multipart/form-data">
+            <form id="form-import" action="/employee-debt/import" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
@@ -210,7 +210,7 @@
         $('#btn-year').html(arr_year_month[0]);
         $('#btn-month').html(months[arr_year_month[1]]);
         $('#btn-month').val(arr_year_month[1]);
-        $('#btn-export').attr('href', '/other-payment/export/' + year_month)
+        $('#btn-export').attr('href', '/employee-debt/export/' + year_month)
 
         var employees = @json($employees);
 		employees.forEach(element => {
@@ -223,15 +223,15 @@
         reloadTable(year_month)
         function createCoalFrom(){
             $('#createCoalFrom').modal('show');
-            $('#form-other-payment')[0].reset();
+            $('#form-employee-debt')[0].reset();
         }
         function deleteData(uuid){
-            let _url = 'other-payment/delete'
+            let _url = 'employee-debt/delete'
             
             $('#uuid_delete').val(uuid)
             $('#url_delete').val(_url)
             $('#confirm-modal').modal('show')
-            $('#table_reload').val('other-payment')
+            $('#table_reload').val('employee-debt')
        }
 
         function store(idForm){
@@ -240,7 +240,7 @@
        }
        function editData(uuid){
             let _token = $('meta[name="csrf-token"]').attr('content');
-            let _url = "/other-payment/show";
+            let _url = "/employee-debt/show";
             // startLoading();
             $.ajax({
                 url: _url,
@@ -270,29 +270,28 @@
        }
 
         function showDataTableUserPrivilege(url, dataTable, id) {
+            $('#tablePrivilege').remove();
+            var table_element = ` 
+            <div class="pb-20" id="tablePrivilege">
+                <table id="table-employee-debt" class="display nowrap stripe hover table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Total Hutang</th>
+                            <th>Sisa Hutang</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>`;
+
+            $('#the-table').append(table_element);
+
+
             let data = [];
-            var elements = {
-                mRender: function(data, type, row) {
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    return `<div class="name-avatar d-flex align-items-center">
-										<div class="avatar mr-2 flex-shrink-0">
-											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
-												height="40" alt="" />
-										</div>
-										<div class="txt">
-											<div class="weight-600">${row.name}</div>
-											<small>${row.position}</small></br>
-											<small>${row.nik_employee}</small>
-										</div>
-									</div>`
-                }
-            };
-            data.push(elements)
+            
+            data.push(element_profile_employee)
+
             dataTable.forEach(element => {
                 var dataElement = {
                     data: element,
@@ -325,7 +324,7 @@
                 rowReorder: {
                     selector: 'td:nth-child(2)'
                 },
-                ajax: urls,
+                ajax: '/employee-debt/data',
                 columns: data
             });
         }
@@ -355,7 +354,7 @@
             $('#tablePrivilege').remove();
             var table_element = ` 
             <div class="pb-20" id="tablePrivilege">
-                <table id="table-other-payment" class="display nowrap stripe hover table" style="width:100%">
+                <table id="table-employee-debt" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
                             <th>Nama</th>
@@ -370,11 +369,11 @@
 
             $('#the-table').append(table_element);
 
-            $('#btn-export').attr('href', 'other-payment/export/' + year_month)
+            $('#btn-export').attr('href', 'employee-debt/export/' + year_month)
             console.log('year:' + year_month)
-            let _url = 'other-payment/data/' + year_month;
-            showDataTableUserPrivilege(_url, ['payment_other_date', 'payment_other_value','payment_other_total'],
-                'table-other-payment')
+            let _url = 'employee-debt/data/' + year_month;
+            showDataTableUserPrivilege(_url, ['value_debt', 'remaining_new_debt'],
+                'table-employee-debt')
         }
     </script>
 @endsection

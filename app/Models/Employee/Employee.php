@@ -49,9 +49,9 @@ class Employee extends Model
 
     public static function noGet_employeeAll_detail(){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
-        ->join('employee_roasters','employee_roasters.employee_uuid','employees.uuid')
+        // ->leftJoin('roasters','roasters.uuid','employees.roaster_uuid')
         ->leftJoin('user_addresses','user_addresses.user_detail_uuid','user_details.uuid')        
-        ->leftJoin('employee_companies','employee_companies.employee_uuid','employees.uuid')
+        ->leftJoin('companies','companies.uuid','employees.company_uuid')
         ->leftJoin('user_healths','user_healths.user_detail_uuid','user_details.uuid')
         ->leftJoin('user_dependents','user_dependents.user_detail_uuid','user_details.uuid')
         ->leftJoin('user_religions','user_religions.user_detail_uuid','user_details.uuid')
@@ -66,32 +66,23 @@ class Employee extends Model
 
 
     public static function get_employee_all_latest(){
-        $employees = Employee::join('positions','positions.uuid','employees.position_uuid')
-        ->join('departments','departments.uuid','employees.department_uuid')
+
+        $employees = Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
+        ->leftJoin('positions','positions.uuid','=','employees.position_uuid')
         ->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end')
         ->get([
             'positions.position',
-            'departments.department',
             'employees.employee_status',
             'employees.uuid',
             'employees.machine_id',
             'employees.nik_employee',
-            'employees.uuid as employee_uuid'
+            'employees.uuid as employee_uuid',
+            'user_details.name'
         ]);
 
-        $employees = $employees->keyBy(function ($item) {
-            return strval($item->uuid);
-        });
+       
 
-        foreach($employees as $item){
-            $item->name = null;
-            $item->photo_path = null;
-        }        
-        $user_details = UserDetail::whereNull('date_end')->get();
-        foreach($user_details as $item){
-            $employees[$item->uuid]->name = $item->name;
-            $employees[$item->uuid]->photo_path = $item->photo_path ;
-        }
         return $employees;
     }
 

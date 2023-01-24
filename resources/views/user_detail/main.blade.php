@@ -71,7 +71,7 @@
 
         let tax_statuses = @json($tax_statuses);
         tax_statuses.forEach(tax_status_element => {
-            $('#tax_status').append(
+            $('#tax_status_uuid').append(
                 `<option value="${tax_status_element.uuid}">${tax_status_element.tax_status_name}</option>`);
         });
 

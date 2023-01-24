@@ -203,6 +203,7 @@
         let month = arr_year_month[1];
 
         function getLastHm() {
+            
             $.ajax({
                 url: '/hour-meter/create/data',
                 type: "POST",
@@ -214,7 +215,8 @@
                 },
                 success: function(response) {
                     let data = response.data;
-                    // console.log(data)
+                    console.log('data')
+                    console.log(data)
                     $('.last-hm').empty();
                     data.forEach(element => {
                         let date_each = element.date

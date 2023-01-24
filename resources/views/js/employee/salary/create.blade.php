@@ -1,11 +1,15 @@
 <script>
-    function firstCreateEmployeeSalary(uuid) {
+    function firstCreateEmployeeSalary(pageId,uuid) {
         $('#employee_uuid-employee-salary').val(uuid);
-
+        console.log('udin petot')
         stopLoading();
-
         setValue('/employee-salary/data/' + uuid, 'employee-salary');
-
+        if ($(`#isEdit-${pageId}`).val() == null) {
+            $('.create-user-employee-back').hide();
+        } else {
+            $(`#uuid-${pageId}`).val(uuid)
+            $('.create-user-employee-back').attr('onclick', `choosePage('show-employee','${uuid}')`);
+        }
     }
 
     function storeEmployeeSalary(idForm) {
@@ -20,7 +24,6 @@
                 $('#btn-success-modal-id').attr('onclick',
                     `choosePage("show-employee",  "${user.employee_uuid}")`);
             } else {
-
                 $('#btn-success-modal-id').attr('onclick',
                     `choosePage("index-employee",  "${user.employee_uuid}")`);
             }
