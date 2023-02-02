@@ -253,7 +253,6 @@
                 percent: 20
             }
         ];
-        let arr_date_today = getDateTodayArr();
 
         let year = @json($year);
         let month = @json($month);

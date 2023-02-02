@@ -31,22 +31,3 @@ class CreateAtributSizesTable extends Migration
         Schema::dropIfExists('atribut_sizes');
     }
 }
-
-/*
-INSERT INTO atribut_sizes (uuid,size) values
-('S','huruf'),
-('M','huruf'),
-('L','huruf'),
-('XL','huruf'),
-('XXL','huruf'),
-('3XL','huruf'),
-('5','angka'),
-('6','angka'),
-('8','angka'),
-('9','angka'),
-('10','angka'),
-('11','angka'),
-('12','angka'),
-('13','angka')
-;
-*/

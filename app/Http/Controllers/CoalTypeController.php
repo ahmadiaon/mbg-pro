@@ -48,12 +48,12 @@ class CoalTypeController extends Controller
     }
 
     public function store(Request $request){
-        $validatedData = $request->validate([
-            'uuid' =>'',
-            'type_name' =>'',
-        ]);
-        if(empty($request->uuid)){
-            $validatedData['uuid']  = strtolower(str_replace(' ','-',$validatedData['type_name'] ));
+
+        $validatedData = $request->all();
+
+        
+        if(empty($validatedData['uuid'])){
+            $validatedData['uuid'] = ResponseFormatter::toUUID($validatedData['type_name']);
         }
 
         $store = CoalType::updateOrCreate(['uuid'=> $validatedData['uuid']], $validatedData);

@@ -7,12 +7,19 @@ use App\Models\Privilege\UserPrivilege;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class AuthenticationController extends Controller
 {
     //
     public function index()
     {
+        return view('authentication.login', [
+            'title'         => 'Login'
+        ]);
+    }
+    public function logout(){
+        session()->forget('dataUser');
         return view('authentication.login', [
             'title'         => 'Login'
         ]);
@@ -29,29 +36,32 @@ class AuthenticationController extends Controller
         // dd($dataUser);
         //  dd($aa = Hash::check($request->password, $dataUser->password));
         if($dataUser){
-            // dd($request->password);
-            if(Hash::check($request->password, $dataUser->password)){
-                $dataUserOld = $dataUser;
+            try{
+                if(Hash::check($request->password, $dataUser->password)){
+                    $dataUserOld = $dataUser;
 
-               $col_dataUser = Employee::noGet_employeeAll();
-             
-               $dataUser = $col_dataUser->where('nik_employee', $dataUser->nik_employee)->get()->first();
-               $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($dataUser->nik_employee);
-               foreach($user_privileges as $user_privilege=>$value){
-                    $name_index = $user_privilege;
-                    $dataUser->$name_index = $value;
-               }
-
-            
-                if(!$dataUser){
-                    $dataUser =$dataUserOld;
-                    //  dd('/me/');
-                    $request->session()->put('dataUser', $dataUser);
+                $col_dataUser = Employee::noGet_employeeAll_detail();
+                
+                $dataUser = $col_dataUser->where('nik_employee', $dataUser->nik_employee)->get()->first();
+              
+                $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($dataUser->nik_employee);
+                $dataUser->is_login  = true;
+                foreach($user_privileges as $user_privilege=>$value){
+                        $name_index = $user_privilege;
+                        $dataUser->$name_index = $value;
+                }                
+                    if(!$dataUser){
+                        $dataUser =$dataUserOld;
+                        //  dd('/me/');
+                        $request->session()->put('dataUser', $dataUser);
+                    }else{
+                        $request->session()->put('dataUser', $dataUser);
+                        return redirect()->intended('/user');
+                    }
                 }else{
-                    $request->session()->put('dataUser', $dataUser);
-                    return redirect()->intended('/user');
+                    return back()->with('loginError', 'Login Failed!');
                 }
-            }else{
+            } catch (Exception $e) {
                 return back()->with('loginError', 'Login Failed!');
             }
         }else{

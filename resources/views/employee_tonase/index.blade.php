@@ -246,7 +246,7 @@
 @endsection
 @section('js')
     <script>
-        let arr_date_today = getDateTodayArr();
+       
         let nik_employee = @json($nik_employee);
 
 

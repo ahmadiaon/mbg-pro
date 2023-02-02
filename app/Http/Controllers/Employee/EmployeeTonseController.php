@@ -825,10 +825,10 @@ class EmployeeTonseController extends Controller
         $arr_data_employee_tonase = $arr_data_employee_tonase->groupBy( 
             'employee_tonases.id',
             'employee_tonases.uuid',
-            'user_details.photo_path',
             'employees.nik_employee',
             'positions.position',
             'user_details.name',
+            'user_details.photo_path',
             'employees.user_detail_uuid',
             'employee_tonases.employee_uuid',
             'coal_froms.uuid',

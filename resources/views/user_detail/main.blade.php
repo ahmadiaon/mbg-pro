@@ -109,8 +109,5 @@
         let religions = @json($religions);
         let employees;
         choosePage('index-employee', null);
-        // choosePage('create-user-detail', null);
-        // choosePage('show-employee', 'MBLE-2301004');
-        // choosePage('create-user-employee', 'MBLE-2301004');
     </script>
 @endsection

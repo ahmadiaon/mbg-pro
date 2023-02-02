@@ -4,6 +4,7 @@
 	<div class="menu-block customscroll">
 		<div class="sidebar-menu">
 			<ul id="accordion-menu">
+				@if (!empty(session('dataUser')->is_login))
 				<li>
 					<a href="/" class="dropdown-toggle no-arrow {{ $layout['active'] == 'index' ? 'active' : '' }}">
 						<span class="micon bi bi-person-square"></span><span class="mtext">Beranda</span>
@@ -27,6 +28,7 @@
 					</a>
 					<ul class="submenu">
 						<li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}"  href="/user">Daftar Karyawan</a></li>
+						<li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}"  href="/employee">Karyawan</a></li>
 						<li><a href="/employee-out" class="{{ $layout['active'] == 'employee-out' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
 							title="Hour Meter">Karyawan Keluar</a></li>
 						<li><a href="/employee-cuti" class="{{ $layout['active'] == 'employee-cuti' ? 'active' : '' }}" data-toggle="tooltip" data-placement="right"
@@ -169,7 +171,14 @@
 						</li>
 					</ul>
 				</li>
-				{{-- @endif --}}
+				@else
+				<li>
+					<a href="/" class="dropdown-toggle no-arrow {{ $layout['active'] == 'recruitment-create' ? 'active' : '' }}">
+						<span class="micon bi bi-person-square"></span><span class="mtext">Recruitment</span>
+					</a>
+				</li>
+				@endif
+				
 			</ul>
 		</div>
 	</div>

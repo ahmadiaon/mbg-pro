@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Dictionary;
 use App\Models\Employee\Employee;
@@ -28,6 +29,16 @@ class AdminController extends Controller
         // ahmadi
         // $pdf->setPaaper(array(0, 0, 396, 612));
         return $pdf->download('invoice.pdf');
+    }
+
+    public function setDate(Request $request){
+        $data = [
+            'year'  => $request->year,
+            'month' => (int)$request->month,
+            'day'   => null
+        ];
+        session()->put('year_month', $data);
+        return ResponseFormatter::toJson($data, 'set date');
     }
     public function exportTable($table_name){
 

@@ -63,7 +63,27 @@ use App\Http\Controllers\Vehicle\GroupVehicleController;
 use App\Http\Controllers\Vehicle\StatusController;
 use App\Http\Controllers\Vehicle\VehicleController;
 
+
+
+Route::prefix('/support')->group(function () {
+    Route::post('/set-date', [AdminController::class, 'setDate']);
+});
+
+Route::prefix('/recruitment')->group(function () {
+    Route::get('/create', [UserDetailController::class, 'createRecruitment']);
+    Route::prefix('/user-detail')->group(function () {
+        Route::post('/store', [UserDetailController::class, 'store']);
+    });
+
+    Route::prefix('/user-address')->group(function () {
+        Route::post('/create', [UserAddressController::class, 'createRecruitment']);
+        Route::post('/store', [UserDetailController::class, 'store']);
+    });
+});
+
+
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
+Route::get('/logout', [AuthenticationController::class, 'logout']);
 Route::post('/login', [AuthenticationController::class, 'login']);
 
 Route::get('/user/me-only/{table_name}', [AdminController::class, 'exportTable']);
@@ -215,7 +235,9 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/export/{year_month}', [EmployeeAbsenController::class, 'exportWithData']);
         Route::get('/export-template/{year_month}', [EmployeeAbsenController::class, 'exportTemplate']);
         Route::post('/import', [EmployeeAbsenController::class, 'import']);
+
         Route::get('/data/{year_month}', [EmployeeAbsenController::class, 'anyData']);
+
         Route::get('/data-employee/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'anyDataEmployee']);
         Route::post('/store', [EmployeeAbsenController::class, 'store']);
     });
@@ -254,17 +276,27 @@ Route::middleware(['islogin'])->group(function () {
 
 // ===================== d a t a b a s e 
     Route::prefix('/database')->group(function () {
+
         Route::get('/absen', [StatusAbsenController::class, 'indexPayrol']);
         Route::post('/status-absen', [StatusAbsenController::class, 'storePayrol']);///payrol/database/status-absen
         Route::get('/absen/{uuid}/edit', [StatusAbsenController::class, 'showPayrol']);
         Route::post('/absen/delete', [StatusAbsenController::class, 'delete']);
         Route::get('/absen-data', [StatusAbsenController::class, 'anyData']);
+        
+
+        Route::prefix('/status-absen')->group(function () {
+            Route::get('/export', [StatusAbsenController::class, 'export']);
+            Route::post('/import', [StatusAbsenController::class, 'import']);
+        });
+
         Route::prefix('/hour-meter-price')->group(function () {
             Route::get('/', [HourMeterPriceController::class, 'index']);
             Route::post('/store', [HourMeterPriceController::class, 'store']);
             Route::post('/delete', [HourMeterPriceController::class, 'delete']);
             Route::post('/show', [HourMeterPriceController::class, 'show']);
             Route::get('/data', [HourMeterPriceController::class, 'anyData']);
+            Route::get('/export', [HourMeterPriceController::class, 'export']);
+            Route::post('/import', [HourMeterPriceController::class, 'import']);
         });
 
         Route::prefix('/company')->group(function () {
@@ -273,6 +305,9 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [CompanyController::class, 'delete']);
             Route::post('/show', [CompanyController::class, 'show']);
             Route::get('/data', [CompanyController::class, 'anyData']);
+            
+            Route::get('/export', [CompanyController::class, 'export']);
+            Route::post('/import', [CompanyController::class, 'import']);
         });
 
         Route::prefix('/religion')->group(function () {
@@ -281,6 +316,9 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [ReligionController::class, 'delete']);
             Route::post('/show', [ReligionController::class, 'show']);
             Route::get('/data', [ReligionController::class, 'anyData']);
+            Route::get('/export', [ReligionController::class, 'export']);
+            Route::post('/import', [ReligionController::class, 'import']);
+            
         });
 
         Route::prefix('/poh')->group(function () {
@@ -289,6 +327,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [PohController::class, 'delete']);
             Route::post('/show', [PohController::class, 'show']);
             Route::get('/data', [PohController::class, 'anyData']);
+            Route::get('/export', [PohController::class, 'export']);
+            Route::post('/import', [PohController::class, 'import']);
         });
 
         Route::prefix('/coal-type')->group(function () {
@@ -305,6 +345,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [PaymentGroupController::class, 'delete']);
             Route::post('/show', [PaymentGroupController::class, 'show']);
             Route::get('/data', [PaymentGroupController::class, 'anyData']);
+            Route::get('/export', [PaymentGroupController::class, 'export']);
+            Route::post('/import', [PaymentGroupController::class, 'import']);
         });
 
         Route::prefix('/coal-from')->group(function () {
@@ -313,6 +355,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [CoalFromController::class, 'delete']);
             Route::post('/show', [CoalFromController::class, 'show']);
             Route::get('/data', [CoalFromController::class, 'anyData']);
+            Route::get('/export', [CoalFromController::class, 'export']);
+            Route::post('/import', [CoalFromController::class, 'import']);
         });
 
         Route::prefix('/premi')->group(function () {
@@ -329,6 +373,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [TaxStatusController::class, 'delete']);
             Route::post('/show', [TaxStatusController::class, 'show']);
             Route::get('/data', [TaxStatusController::class, 'anyData']);
+            Route::get('/export', [TaxStatusController::class, 'export']);
+            Route::post('/import', [TaxStatusController::class, 'import']);
         });
 
         Route::prefix('variable')->group(function () {
@@ -337,6 +383,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [VariableController::class, 'delete']);
             Route::post('/show', [VariableController::class, 'show']);
             Route::get('/data', [VariableController::class, 'anyData']);
+            Route::get('/export', [VariableController::class, 'export']);
+            Route::post('/import', [VariableController::class, 'import']);
         });
 
         Route::prefix('position')->group(function () {
@@ -345,6 +393,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [PositionController::class, 'delete']);
             Route::post('/show', [PositionController::class, 'show']);
             Route::get('/data', [PositionController::class, 'anyData']);
+            Route::get('/export', [PositionController::class, 'export']);
+            Route::post('/import', [PositionController::class, 'import']);
         });
 
         Route::prefix('department')->group(function () {
@@ -353,6 +403,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [DepartmentController::class, 'delete']);
             Route::post('/show', [DepartmentController::class, 'show']);
             Route::get('/data', [DepartmentController::class, 'anyData']);
+            Route::get('/export', [DepartmentController::class, 'export']);
+            Route::post('/import', [DepartmentController::class, 'import']);
         });
 
         Route::prefix('location')->group(function () {
@@ -361,6 +413,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [LocationController::class, 'delete']);
             Route::post('/show', [LocationController::class, 'show']);
             Route::get('/data', [LocationController::class, 'anyData']);
+            Route::get('/export', [LocationController::class, 'export']);
+            Route::post('/import', [LocationController::class, 'import']);
         });
         Route::prefix('atribut-size')->group(function () {
             Route::get('/', [AtributSizeController::class, 'index']);
@@ -368,6 +422,8 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [AtributSizeController::class, 'delete']);
             Route::post('/show', [AtributSizeController::class, 'show']);
             Route::get('/data', [AtributSizeController::class, 'anyData']);
+            Route::get('/export', [AtributSizeController::class, 'export']);
+            Route::post('/import', [AtributSizeController::class, 'import']);
         });
         
 
@@ -386,6 +442,13 @@ Route::middleware(['islogin'])->group(function () {
             Route::post('/delete', [PaymentOtherController::class, 'delete']);
             Route::post('/show', [PaymentOtherController::class, 'show']);
             Route::get('/data', [PaymentOtherController::class, 'anyData']);
+            Route::get('/export', [PaymentOtherController::class, 'export']);
+            Route::post('/import', [PaymentOtherController::class, 'import']);
+        });
+
+        Route::prefix('privilege')->group(function () {
+            Route::get('/export', [PrivilegeController::class, 'export']);
+            Route::post('/import', [PrivilegeController::class, 'import']);
         });
 
     });
@@ -534,9 +597,6 @@ Route::middleware(['islogin'])->group(function () {
 
 
 
-Route::prefix('/recruitment')->group(function () {
-        Route::get('/', [EmployeeTonseController::class, 'index']);
-});
 
 
 
@@ -582,7 +642,7 @@ Route::prefix('/recruitment')->group(function () {
         
         // user
         Route::prefix('/user')->group(function () {
-            Route::get('/', [UserDetailController::class, 'create']);
+            Route::get('/', [EmployeeController::class, 'index']);
             Route::post('/store', [UserDetailController::class, 'store']);
             // Route::get('/data', [EmployeeController::class, 'anyData']);            
             Route::post('/data', [EmployeeController::class, 'anyMoreData']);

@@ -3,8 +3,15 @@
 @section('content')
     <div class="card-box mb-30 ">
         <div class="row pd-20">
+            <div class="col-md-6">
+                <h4 class="text-blue h4">Absensi {{ $employee->name }} - {{ $employee->position }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="card-box mb-30 ">
+        <div class="row pd-20">
             <div class="col-auto">
-                <h4 class="text-blue h4">Absensi {{ $employee->user_details->name }} - {{ $employee->position }}</h4>
+                <h4 class="text-blue h4">Absensi {{ $employee->name }} - {{ $employee->position }}</h4>
             </div>
             <div class="col text-right">
                 <div class="btn-group">
@@ -74,6 +81,12 @@
 
         nik_employee = @json($nik_employee);
         year_month = @json($year_month);
+        cg('year_month', year_month);
+
+        function firstEmployeeHourMeter(){
+            year_month = @json($year_month);
+            arr_date_today
+        }
 
         reloadTable(year_month)
 
@@ -98,8 +111,6 @@
                             let isChecked = '';
                             if(element.uuid == row.status_absen_uuid){
                                 isChecked = 'checked';
-                            }else{
-                                isChecked = '';
                             }
                             el_status_absen = el_status_absen+ `<div class="col-sd-2">
                                             <div class="custom-control custom-radio">
@@ -123,7 +134,7 @@
                 data.push(cek_log)
             }
 
-            let urls = '{{ env('APP_URL') }}' + url
+            let urls = '/' + url
             console.log(urls)
             $('#' + id).DataTable({
                 processing: true,
@@ -141,11 +152,10 @@
         year_month = @json($year_month);
         let arr_year_month = year_month.split("-")
         $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
+        $('#btn-month').html(months[parseInt(arr_year_month[1])]);
         $('#btn-month').val(arr_year_month[1]);
 
         function refreshTable(val_year = null, val_month = null, val_day) {
-            console.log('val_year :' + val_year + 'val_month :' + val_month + 'val_day :' + val_day);
 
             let v_year = $('#btn-year').html();
             let v_month = $('#btn-month').val();
@@ -158,7 +168,7 @@
             if (val_month) {
                 v_month = val_month;
                 console.log(val_month);
-                $('#btn-month').html(months[val_month]);
+                $('#btn-month').html(months[parseInt(val_month)]);
                 $('#btn-month').val(val_month);
             }
             year_month = v_year + '-' + v_month;

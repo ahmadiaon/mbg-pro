@@ -41,6 +41,20 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 class EmployeeController extends Controller
 {
 
+    public function index(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'user-detail-index'
+        ];
+        return view('employee.index', [
+            'title'         => 'Daftar Karyawan',
+            'layout'    => $layout
+        ]);
+    }
+
     public function test(){
         $data = Employee::get_employee_all();
         return view('datatableshow', [ 'data'         => $data]);
@@ -50,22 +64,7 @@ class EmployeeController extends Controller
         return ResponseFormatter::toJson($data, 'data user_employee');
     }
 
-    public function index(){
-        // return Employee::getAll();
-        $religions = Religion::all();
-        $layout = [
-            'head_datatable'        => true,
-            'javascript_datatable'  => true,
-            'head_form'             => true,
-            'javascript_form'       => false,
-            'active'                        => 'employees-index'
-        ];
-        return view('employee.index', [
-            'title'         => 'Daftar Karyawan',
-            'layout'    => $layout,
-            'religions' => $religions
-        ]);
-    }
+   
 
     public function indexResign(){
         // return Employee::getAll();

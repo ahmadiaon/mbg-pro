@@ -3,16 +3,26 @@
 @section('content')
     <div class="card-box mb-30 " >
         <div class="row pd-20">
-            <div class="col-3">
-                <h4 class="text-blue h4">Database</h4>
+            <div class="col-auto">
+                <h4 class="text-blue h4">Asal Batu </h4>
             </div>
-            <div class="col-9 text-right">
-                <div class="btn-group">
+            <div class="col text-right">
+                <div class="btn-group">  
+                    <button onclick="createCoalFrom()" class="btn btn-secondary">Tambah</button>              
+                    
                     <div class="btn-group dropdown">
-                        {{-- <a href="/purchase-order/create"> --}}
-                        <button onclick="createCoalFrom()" class="btn btn-primary mr-10">Tambah</button>
-                        {{-- </a>                      --}}
+                        <button type="button" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
+                            aria-expanded="false">
+                            Menu <span class="caret"></span>
+                        </button>
+
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" id="btn-export" href="/database/coal-from/export">Export</a>
+                            <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
+                                href="">Import</a>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -99,6 +109,36 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-import" action="/database/coal-from/import" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import Data</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih File</label>
+                            <input name="uploaded_file" type="file"
+                                class="form-control-file form-control height-auto" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" onclick="startLoading()" class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection

@@ -22,6 +22,76 @@
         @include('template.admin.javascript.form')
     @endif
     <script>
+        function padToDigits(much, num) {
+            console.log('padToDigits')
+            return num.toString().padStart(much, '0');
+        }
+
+        function getDateTodayArr() {
+            console.log('getDateToday')
+            let date_now = new Date();
+            let day = padToDigits(2, date_now.getDate());
+            let month = padToDigits(2, date_now.getMonth() + 1);
+            let year = date_now.getFullYear();
+
+            let today = year + '-' + month + '-' + day;
+            var arr = {
+                "day": day,
+                "month": month,
+                "year": year
+            };
+            return arr;
+        }
+        cg('null', 'null');
+        let arr_date_today = @json(session('year_month'));
+        if (!arr_date_today) {
+            arr_date_today = getDateTodayArr();
+        }
+
+        cg('aa', arr_date_today)
+
+        function cg(message, data) {
+            console.log(message + ':');
+            console.log(data);
+        }
+
+        function setDateSession(year, month) {
+            arr_date_today = @json(session('year_month'));
+            if (!arr_date_today) {
+                let arr_date_today = getDateTodayArr();
+            } else {
+                if (year == arr_date_today.year && parseInt(month) == parseInt(arr_date_today.month)) {
+                    cg('same', 'same');
+                } else {
+                    $.ajax({
+                        url: '/support/set-date',
+                        type: "POST",
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            year: year,
+                            month: month,
+                        },
+                        success: function(response) {
+                            $('#success-modal').modal('show')
+                            console.log(response)
+                            arr_date_today = @json(session('year_month'));
+                            cg('arr_data', arr_date_today.year);
+                        },
+                        error: function(response) {
+                            alertModal()
+                        }
+                    });
+                }
+            }
+
+
+        }
+
+
+
+
+
+
         function isRequired(id) {
             var err = 0;
             console.log(id)
@@ -74,23 +144,12 @@
 									</div>`
             }
         };
-        function cg(message,data){
-            console.log(message+':');
-            console.log(data);
-        }
 
 
-        function getDateTodayArr() {
-            console.log('getDateToday')
-            let date_now = new Date();
-            let day = padToDigits(2, date_now.getDate());
-            let month = padToDigits(2, date_now.getMonth() + 1);
-            let year = date_now.getFullYear();
 
-            let today = year + '-' + month + '-' + day;
-            var arr = { "day": day, "month": month, "year": year };
-            return arr;
-        }
+
+
+
 
 
         function choosePage(pageId, data) {
@@ -111,10 +170,10 @@
                     firstCreateUserAddress(pageId, data);
                     break;
                 case 'create-user-education':
-                    firstCreateUserEducation(pageId,data);
+                    firstCreateUserEducation(pageId, data);
                     break;
                 case 'create-user-license':
-                    firstCreateUserLicense(pageId,data);
+                    firstCreateUserLicense(pageId, data);
                     break;
                 case 'create-user-health':
                     firstCreateUserHealth(pageId, data);
@@ -123,12 +182,12 @@
                     firstCreateUserEmployee(pageId, data);
                     break;
                 case 'create-employee-salary':
-                    firstCreateEmployeeSalary(pageId,data);
+                    firstCreateEmployeeSalary(pageId, data);
                     break;
-				case 'index-employee':
+                case 'index-employee':
                     firstIndexEmployee(data);
                     break;
-				case 'show-employee':
+                case 'show-employee':
                     firstShowEmployee(data);
                     break;
                 default:
@@ -161,13 +220,13 @@
         }
 
         function setChecked(idElement) {
-			console.log('setChecked')
+            console.log('setChecked')
             let idElName = idElement + '-' + idElement;
-			$('#' + idElName).remove();
+            $('#' + idElName).remove();
             if ($("#" + idElement).prop('checked') == true) {
                 $('#' + idElement).after(`<input type="hidden" name="${idElement}"  id="${idElName}"  value="Ya">`)
             } else {
-				$('#' + idElement).after(`<input type="hidden" name="${idElement}"  id="${idElName}"  value="Tidak">`)
+                $('#' + idElement).after(`<input type="hidden" name="${idElement}"  id="${idElName}"  value="Tidak">`)
             }
 
 
@@ -186,20 +245,20 @@
         }
 
         function setValue(url, table) {
-			console.log('setValue')
-			let data_user
+            console.log('setValue')
+            let data_user
             getData(url).then((data_value_element) => {
                 data_user = data_value_element.data;
-				// console.log(data_user);
+                // console.log(data_user);
                 if (data_user) {
                     for (var key in data_user) {
-						if(data_user[key] != null){
-							$('#' + key).val(data_user[key]).trigger('change.select2')
-							if (data_user[key] == 'Ya') {
-								$('#' + key).attr('checked', 'checked').trigger('change')
-							}
-						}
-                        
+                        if (data_user[key] != null) {
+                            $('#' + key).val(data_user[key]).trigger('change.select2')
+                            if (data_user[key] == 'Ya') {
+                                $('#' + key).attr('checked', 'checked').trigger('change')
+                            }
+                        }
+
                     }
                     $('#uuid-' + table).val(data_user.uuid)
                     $('#date_start-' + table).val(data_user.date_start)
@@ -208,13 +267,13 @@
                     console.log('data : null, from:user-education-single')
                 }
                 if ($('#date_start-' + table).val() == '') {
-					console.log(table)
+                    console.log(table)
                     $('#date_start-' + table).val(getDateToday());
                 }
 
             });
 
-			return data_user;
+            return data_user;
         }
 
 
@@ -331,7 +390,7 @@
             let _url = $('#form-' + idForm).attr('action');
             var form = $('#form-' + idForm)[0];
             var form_data = new FormData(form);
-            console.log(form_data)
+            // console.log(form_data)
             startLoading();
             return $.ajax({
                 url: _url,
@@ -350,7 +409,7 @@
         }
 
         function storeWithValidate(idForm) {
-			console.log('storeWithValidate')
+            console.log('storeWithValidate')
             let _url = $('#form-' + idForm).attr('action');
             var form = $('#form-' + idForm)[0];
             var form_data = new FormData(form);
@@ -399,7 +458,7 @@
         }
 
         function deleteConfirmed() {
-			console.log('deleteConfirmed')
+            console.log('deleteConfirmed')
             var uuid = $('#uuid_delete').val()
             let _token = $('meta[name="csrf-token"]').attr('content');
             let _url = $('#url_delete').val();
@@ -432,20 +491,17 @@
         }
 
         function getLastNdigits(number, n) {
-			console.log('getLastNdigits')
+            console.log('getLastNdigits')
             return Number(String(number).slice(-n));
         }
 
-        function padToDigits(much, num) {
-			console.log('padToDigits')
-            return num.toString().padStart(much, '0');
-        }
+
         var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
             "November", "Desember"
         ];
 
-        function monthName(month){
+        function monthName(month) {
             return months[parseInt(month)]
         }
     </script>

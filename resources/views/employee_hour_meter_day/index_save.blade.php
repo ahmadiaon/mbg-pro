@@ -141,7 +141,6 @@
 
 @section('js')
     <script>
-        let arr_date_today = getDateTodayArr();
         console.log('arr_date_today');
         console.log(arr_date_today);
 

@@ -32,11 +32,12 @@ use Illuminate\Support\Facades\Storage;
 
 class UserDetailController extends Controller
 {
-
+   
     public function store(Request $request){
+      
         $isEdit = true;
         $validateData = $request->all();
-
+        // return ResponseFormatter::toJson('validateData', 'from user-details');
         if($validateData['uuid'] == null){
             $isEdit = false;
             $validateData['uuid'] = ResponseFormatter::toUUID($request->name).'-'.rand(99,9999);
@@ -320,6 +321,51 @@ class UserDetailController extends Controller
         ];
         return view('employee.monitoring.index', [
             'title'         => 'Employee',
+            'layout'    => $layout
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+    public function createRecruitment(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'recruitment-create',
+        ];
+
+        $religions = Religion::all();
+        $pohs = Poh::all();
+        $companies = Company::all();
+        $departments = Department::all();
+        $positions = Position::all();
+        $roasters = Roaster::all();
+        $tax_statuses = TaxStatus::all();
+        $hour_meter_prices = HourMeterPrice::all();        
+        $premis = Premi::all();
+        
+        
+        return view('user_detail.recruitment.create', [
+            'title'         => 'Tambah Karyawan',
+            'religions' => $religions,
+            'pohs' => $pohs,
+            'companies' => $companies,
+            'departments' => $departments,
+            'positions' => $positions,
+            'tax_statuses' => $tax_statuses,
+            'roasters' => $roasters,
+            'hour_meter_prices' => $hour_meter_prices,
+            
+            'premis' => $premis,
+            'data'  => null,
             'layout'    => $layout
         ]);
     }

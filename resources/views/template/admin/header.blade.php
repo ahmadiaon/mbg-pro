@@ -37,7 +37,7 @@
 				</a>
 				<div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
 					<a class="dropdown-item" href="#"><i class="dw dw-user1"></i> Profile</a>
-					<a class="dropdown-item" href="/login"><i class="dw dw-logout"></i> Logout</a>
+					<a class="dropdown-item" href="/logout"><i class="dw dw-logout"></i> Logout</a>
 				</div>
 			</div>
 		</div>
