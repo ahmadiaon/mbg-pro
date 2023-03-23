@@ -61,7 +61,7 @@
             </div>
         </div>
         <div id="the-table">
-            <div class="pb-20" id="tablePrivilege">
+            <div class="pb-20" id="employee-payment">
                 <table id="table-employee-payment" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
@@ -207,114 +207,35 @@
 @endsection
 
 @section('js')
-    <script>
-        let year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
-        $('#btn-month').val(arr_year_month[1]);
-        $('#btn-export').attr('href', '/payment/export/' + year_month)
-        reloadTable(year_month)
+    <script>         
+        let year;
+        let month;
+        let v_year;
+        let v_month;
+        let _ur;
 
+        cg('arr_date_today', arr_date_today);
 
-        function showDataTableUserPrivilege(url, dataTable, id) {
-            let data = [];
-            var elements = {
-                mRender: function(data, type, row) {
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    return `<div class="name-avatar d-flex align-items-center">
-										<div class="avatar mr-2 flex-shrink-0">
-											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
-												height="40" alt="" />
-										</div>
-										<div class="txt">
-											<div class="weight-600">${row.name}</div>
-											<small>${row.position}</small></br>
-											<small>${row.nik_employee}</small>
-										</div>
-									</div>`
-                }
-            };
-            data.push(elements)
-            dataTable.forEach(element => {
-                var dataElement = {
-                    data: element,
-                    name: element
-                }
-                data.push(dataElement)
-            });
-            // description
-            var elem = {
-                mRender: function(data, type, row) {
+        function firstIndexEmployeePayment() {
+            let year = arr_date_today.year;
+            let month = arr_date_today.month;
+            let v_year = arr_date_today.year;
+            let v_month = arr_date_today.month;
+            let _url = 'payment/data/' + arr_date_today.year + '-' + arr_date_today.month;
+            
 
-                    return `<button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-placement="right"
-								title="${row.description}">
-								${row.payment_group}
-							</button>`
-                }
-            };
-            data.push(elem)
-
-
-
-            var elements = {
-                mRender: function(data, type, row) {
-
-                    return `
-									<div class="form-inline"> 
-										<a href="/payment/show/${row.uuid}">
-											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
-												<small>edit</small>
-											</button>
-										</a>
-									</div>`
-                }
-            };
-            data.push(elements)
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
-            $('#' + id).DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
-                ajax: urls,
-                columns: data
-            });
+            $('#btn-year').html(arr_date_today.year);
+            $('#btn-month').html(months[parseInt(arr_date_today.month)]);
+            $('#btn-month').val(arr_date_today.month);
+            $('#btn-export').attr('href', '/payment/export/' + arr_date_today.year + '-' + arr_date_today.month)
+            showDataTableEmployeePayment(_url, 'table-employee-payment')
         }
 
-        function refreshTable(val_year = null, val_month = null) {
-            console.log(val_year);
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
-            console.log(v_month);
-            if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
-            }
-            if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
-            }
-            let year_month = v_year + '-' + v_month;
-            reloadTable(year_month)
-        }
 
-        function reloadTable(year_month) {
-
-            $('#tablePrivilege').remove();
+        function showDataTableEmployeePayment(url, id) {
+            $('#employee-payment').remove();
             var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
+            <div class="pb-20" id="employee-payment">
                 <table id="table-employee-payment" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
@@ -329,12 +250,83 @@
             </div>`;
 
             $('#the-table').append(table_element);
+            let data = [];
+           
+            data.push(element_profile_employee)
+            let dataTable = [
+                'date',
+                 'value'
+            ];
+            
+            dataTable.forEach(element => {
+                var dataElement = {
+                    data: element,
+                    name: element
+                }
+                data.push(dataElement)
+            });
+            // description
+            var element_description = {
+                mRender: function(data, type, row) {
+                    // console.log(row)
+                    return `<button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-placement="right"
+								title="${row.description}">
+								${row.payment_group_uuid}
+							</button>`
+                }
+            };
+            data.push(element_description)
 
-            $('#btn-export').attr('href', 'payment/export/' + year_month)
-            console.log('year:' + year_month)
-            let _url = 'payment/data/' + year_month;
-            showDataTableUserPrivilege(_url, ['date', 'value'],
-                'table-employee-payment')
+
+
+            var element_edit = {
+                mRender: function(data, type, row) {
+
+                    return `
+									<div class="form-inline"> 
+										<a href="/payment/show/${row.uuid}">
+											<button  type="button" class="btn btn-primary mr-1  py-1 px-2">
+												<small>edit</small>
+											</button>
+										</a>
+									</div>`
+                }
+            };
+            data.push(element_edit)
+            let urls = '/' + url
+            console.log(id)
+            $('#' + id).DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                rowReorder: {
+                    selector: 'td:nth-child(2)'
+                },
+                ajax: urls,
+                columns: data
+            });
         }
+
+        function refreshTable(val_year = null, val_month = null) {
+            year = arr_date_today.year;
+            month = arr_date_today.month;
+
+            if (val_year) {
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
+            }
+
+            if (val_month) {
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(arr_date_today.month);
+            }
+            let _url = 'payment/data/' + arr_date_today.year + '-' + arr_date_today.month;
+            showDataTableEmployeePayment(_url, 'table-employee-payment')
+            setDateSession(year, month);
+        }
+
+        //setup RUN
+        firstIndexEmployeePayment();
     </script>
 @endsection

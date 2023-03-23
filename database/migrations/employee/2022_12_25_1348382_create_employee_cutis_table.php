@@ -15,16 +15,16 @@ class CreateEmployeeCutisTable extends Migration
     {
         Schema::create('employee_cutis', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->nullable();
-            $table->string('employee_uuid')->nullable();
-            $table->date('date_schedule_start_cuti')->nullable();
-            $table->date('date_schedule_end_cuti')->nullable();
-            $table->float('kompensasi_cuti')->nullable();
-            $table->string('status_cuti')->nullable();
-            $table->date('date_real_start_cuti')->nullable();
-            $table->date('date_real_end_cuti')->nullable();
-            $table->string('long_cuti')->nullable();
-            $table->string('value_money_cuti')->nullable();
+            $table->string('uuid')->nullable();//1
+            $table->string('employee_uuid')->nullable();//1
+            $table->date('date_schedule_start_cuti')->nullable();//1
+            $table->date('date_schedule_end_cuti')->nullable();//1
+            $table->float('kompensasi_cuti')->nullable();//1
+            $table->string('status_cuti')->nullable();//1
+            $table->date('date_real_start_cuti')->nullable();//1
+            $table->date('date_real_end_cuti')->nullable();//1
+            $table->string('long_cuti')->nullable();//1
+            $table->string('value_money_cuti')->nullable();//1
 
             $table->date('date_come_cuti')->nullable();
             $table->string('monitoring_cuti')->nullable();      //Sedang Cuti, Selesai, Harus Cuti, Harus Balik

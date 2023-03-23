@@ -7,7 +7,7 @@
                 @csrf
 
                 <input type="text" name="uuid" id="uuid-user-detail">
-
+                <input type="text" name="isEdit" id="isEdit-create-user-detail">
                 <div class="min-height-200px">
                     <div class="pd-20 card-box mb-20">
                         <div class="clearfix">

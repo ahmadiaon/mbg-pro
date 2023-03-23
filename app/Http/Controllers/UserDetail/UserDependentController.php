@@ -12,26 +12,22 @@ use App\Models\UserDetail\UserDetail;
 
 class UserDependentController extends Controller
 {
-    public function create($user_detail_uuid){
-        $data = UserDetail::where('uuid', $user_detail_uuid)->get()->first();
+    public function create($nik_employee = null, $is_edit = null){
         $layout = [
-            'head_core'            => true,
-            'javascript_core'       => true,
-            'head_datatable'        => false,
-            'javascript_datatable'  => false,
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
             'head_form'             => true,
             'javascript_form'       => true,
-            'active'                        => 'karyawan',
+            'active'                        => 'user-dependent',
         ];
         
         return view('user_detail.dependent.create', [
             'title'         => 'Tambah Karyawan',
-            'data'  =>'',
-            'status'    => $data->status,
-            'user_detail_uuid' =>$user_detail_uuid,
             'layout'    => $layout
         ]);
+
     }
+
     public function show($nik_employee){
         $data = Employee::where_employee_nik_employee_nullable($nik_employee);
         
@@ -56,24 +52,20 @@ class UserDependentController extends Controller
     }
 
     public function store(Request $request){      
-        $isEdit = true;
         $validateData = $request->all();
-
-        if($validateData['isEdit'] == null){
-            $isEdit = false;
-        } 
+        // return ResponseFormatter::toJson($validateData, 'store-user-dependent');
+        $data = session('recruitment-user');
+        if(empty($validateData['date_start'])) {
+            $validateData['date_start'] = $data['detail']['date_start'];
+        }
+        if(empty($validateData['user_detail_uuid'])) {
+            $validateData['user_detail_uuid'] = $validateData['uuid'] ;
+        }
 
         $validateData = UserDependent::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
-        if($isEdit){
-            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
-
-        }  
-        return ResponseFormatter::toJson($validateData, 'store-user-dependent');
-        
-        if($request->isEdit == 1){
-            return redirect()->intended('/user/profile/'.$request->nik_employee);
-        }
-        return redirect()->intended('/user-education/create/'.$request->user_detail_uuid);
+        $data_store = Employee::showWhereNik_employee($validateData['uuid']);
+        $data['detail'] = $data_store;
+        return ResponseFormatter::toJson($data, 'store-user-dependent');
     }
 
     public function anyDataOne($uuid){

@@ -27,10 +27,11 @@ class EmployeeCutiSetupController extends Controller
             'roaster_uuid' => $request->roaster_uuid,
             'date_start_work' => $request->date_start_work,
             'group_cuti_uuid' => $storeGroupEmployeeCuti->uuid,
-
             'date_start'    => $request->date_start,
             'date_end'    => $request->date_end,
         ]);
+
+
        
         return ResponseFormatter::toJson($strore, 'Data Stored');
     }
@@ -75,18 +76,41 @@ class EmployeeCutiSetupController extends Controller
     
 
     public function anyData(Request $request){
-        $data = EmployeeCutiSetup::join('employees','employees.uuid','employee_cuti_setups.employee_uuid')
-        ->join('user_details','user_details.uuid', 'employees.user_detail_uuid')
-        ->join('positions', 'positions.uuid', 'employees.position_uuid')
-        ->join('employee_cuti_groups', 'employee_cuti_groups.uuid', 'employee_cuti_setups.group_cuti_uuid')
-        ->get([
-            'employee_cuti_groups.name_group_cuti',
-            'user_details.name',
-            'positions.position',
-            'employees.uuid as employee_uuid',
-            'employee_cuti_setups.*',
-            'employees.*'
-        ]);
+       
+
+        if(!empty($request->filter['group_cuti_uuid'])){
+            $data = EmployeeCutiSetup::join('employees','employees.uuid','employee_cuti_setups.employee_uuid')
+            ->join('user_details','user_details.uuid', 'employees.user_detail_uuid')
+            ->join('positions', 'positions.uuid', 'employees.position_uuid')
+            ->join('employee_cuti_groups', 'employee_cuti_groups.uuid', 'employee_cuti_setups.group_cuti_uuid')
+            ->whereNull('employees.date_end')
+            ->whereNull('user_details.date_end')
+            ->where('employee_cuti_setups.group_cuti_uuid', $request->filter['group_cuti_uuid'])
+            ->get([
+                'employee_cuti_groups.name_group_cuti',
+                'user_details.name',
+                'positions.position',
+                'employees.uuid as employee_uuid',
+                'employee_cuti_setups.*',
+                'employees.*'
+            ]);
+        }else{
+            $data = EmployeeCutiSetup::join('employees','employees.uuid','employee_cuti_setups.employee_uuid')
+            ->join('user_details','user_details.uuid', 'employees.user_detail_uuid')
+            ->join('positions', 'positions.uuid', 'employees.position_uuid')
+            ->join('employee_cuti_groups', 'employee_cuti_groups.uuid', 'employee_cuti_setups.group_cuti_uuid')
+            ->whereNull('employees.date_end')
+            ->whereNull('user_details.date_end')
+            ->get([
+                'employee_cuti_groups.name_group_cuti',
+                'user_details.name',
+                'positions.position',
+                'employees.uuid as employee_uuid',
+                'employee_cuti_setups.*',
+                'employees.*'
+            ]);
+        }   
+
         return DataTables::of($data)    
         ->make(true);
     }

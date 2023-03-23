@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
+use App\Models\Company;
 use App\Models\Employee\Employee;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\User;
@@ -33,12 +35,17 @@ class AuthenticationController extends Controller
         ]);
 
          $dataUser = User::where('nik_employee', $request->username)->get()->first();
-        // dd($dataUser);
-        //  dd($aa = Hash::check($request->password, $dataUser->password));
         if($dataUser){
             try{
                 if(Hash::check($request->password, $dataUser->password)){
                     $dataUserOld = $dataUser;
+
+                $arr_employees= Employee::data_employee();
+                $arr_companies= Company::all();
+                $request->session()->put('data_employees', $arr_employees);                
+                $request->session()->put('data_companies', $arr_companies);
+
+                ResponseFormatter::setAllSession();
 
                 $col_dataUser = Employee::noGet_employeeAll_detail();
                 

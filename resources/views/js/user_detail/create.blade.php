@@ -20,7 +20,7 @@
         }
         globalStoreNoTable(idForm).then((data) => {
             let user = data.data;
-            console.log(user);
+            console.log(response);
             stopLoading();
             if ($('#uuid-' + idForm).val()) {
                 employees[user.employee_uuid] = user

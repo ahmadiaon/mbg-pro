@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 class EmployeePaymentController extends Controller
 {
     public function create(){
-        $employees = Employee::getAll();
+        $employees = Employee::data_employee();
         $payment_groups = PaymentGroup::all();
       
         $layout = [
@@ -44,31 +44,31 @@ class EmployeePaymentController extends Controller
     public function store(Request $request){
         $payments = Payment::where('uuid', $request->payment_uuid)->get()->first();
 
-        $validatedData = $request->validate([
-            'uuid' => '',
-            'employee_uuid' => '',
-            'payment_uuid' => '',
-            'value' => '',
-            'link_absen' => '',
-        ]);
-
-        $employee = Employee::where('uuid', $validatedData['employee_uuid'])->get()->first();
-
+        $validatedData = $request->all();
+        $employee = Employee::where('uuid', $validatedData['employee_uuid'])->whereNull('date_end')->get()->first();
 
         if($validatedData['link_absen'] != 'none'){
             $validatedDataAbsen = [
                 'employee_uuid' => $employee->machine_id,
                 'date' => $payments->date,
                 'status_absen_uuid' =>$validatedData['link_absen'] ,
+                'edited'=> 'edited'
             ];
-    
-            $validatedDataAbsen['uuid']  = $validatedDataAbsen['date'].'-'.$validatedDataAbsen['employee_uuid'];
-            $validatedDataAbsen['edited'] = 'edited';
-            $storeAbsen = EmployeeAbsen::updateOrCreate(['uuid' =>$validatedDataAbsen['uuid']],$validatedDataAbsen);
+            $date = date_create($payments->date);
+            
+            for($i=0; $i<$payments->long; $i++){    
+                $date_absen = $date -> format('Y-m-d');
+                
+                $validatedDataAbsen['uuid']  = $date_absen.'-'.$validatedDataAbsen['employee_uuid'];
+                $storeAbsen = EmployeeAbsen::updateOrCreate(['uuid' =>$validatedDataAbsen['uuid']],$validatedDataAbsen);
+                
+                $interval = date_interval_create_from_date_string('1 days');
+                $date->add($interval);
+            }
         }
         
         if(empty($validatedData['uuid'])){
-            $validatedData['uuid'] = $validatedData['employee_uuid'].'-'.$validatedData['payment_uuid'].'-'.rand(99,999);
+            $validatedData['uuid'] = $validatedData['employee_uuid'].'-'.$payments->payment_group_uuid.'-'.$payments->date.'-'.$payments->uuid;
         }
         $store = EmployeePayment::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
         return ResponseFormatter::toJson($store, "request");
@@ -81,9 +81,7 @@ class EmployeePaymentController extends Controller
          return response()->json(['code'=>200, 'message'=>'Data Deleted','data' => $request->uuid_delete], 200);   
     }
     public function index(){
-        // return 'aa';
         $companies = Company::all();
-        // dd($companies);
         $layout = [
             'head_datatable'        => true,
             'javascript_datatable'  => true,
@@ -92,9 +90,8 @@ class EmployeePaymentController extends Controller
             'active'                        => 'employee-payment'
         ];
         return view('employee_payment.index', [
-            'title'         => 'Purchase Order',
+            'title'         => 'Pembayaran',
             'layout'    => $layout,
-            'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'companies' => $companies
         ]);
     }
@@ -109,6 +106,8 @@ class EmployeePaymentController extends Controller
         ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
         ->leftJoin('positions','positions.uuid','employees.position_uuid')
         ->leftJoin('payment_groups','payment_groups.uuid','payments.payment_group_uuid')
+        ->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end')
         ->whereYear('payments.date', $year)
         ->whereMonth('payments.date', $month)
         ->get([
@@ -117,7 +116,8 @@ class EmployeePaymentController extends Controller
             'positions.position',
             'employee_payments.payment_uuid',
             'payments.description',
-            'payments.date',
+            // 'employee_payments.*',
+            'payments.*',
             'payments.uuid',
             'employee_payments.value',
             'payment_groups.payment_group'

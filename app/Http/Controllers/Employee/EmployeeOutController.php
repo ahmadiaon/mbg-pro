@@ -20,7 +20,7 @@ class EmployeeOutController extends Controller
 {
     
     public function index(){
-        $employees = Employee::getAll();
+        $employees = Employee::data_employee();
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -73,7 +73,7 @@ class EmployeeOutController extends Controller
                 $no_employee++;
             }
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
         return redirect()->back();

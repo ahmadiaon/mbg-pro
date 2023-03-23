@@ -98,7 +98,7 @@
                                     </button>
 
                                     <div class="dropdown-menu">
-                                        <a id="each-month" class="dropdown-item" onclick="refreshTable(null, null,null)"
+                                        <a id="each-month" class="dropdown-item" onclick="refreshTable(null, null)"
                                             href="#">Perbulan</a>
 
                                         <div class="row">
@@ -254,6 +254,12 @@
         let is_combined;
         let companies = @json($companies);
         let arr_coal_from = [];
+
+        let year;
+        let month;
+        let v_year;
+        let v_month;
+        let _ur;
 
 
         function firstEmployeeHourMeter() {
@@ -479,15 +485,19 @@
         }
 
         function refreshTable(val_year = null, val_month = null, val_day) {
+
             console.log('refreshTable');
+            year = arr_date_today.year;
+            month = arr_date_today.month;
+
             if (val_year) {
-                arr_date_today.year = val_year;
-                $('#btn-year').html(val_year);
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
             }
             if (val_month) {
                 arr_date_today.month = val_month;
                 $('#btn-month').html(monthName(arr_date_today.month));
-                $('#btn-month').val(val_month);
+                $('#btn-month').val(arr_date_today.month);
             }
 
             if (val_day) {
@@ -502,6 +512,7 @@
             $('#btn-day').html("Perbulan");
             setDatesMonth()
             showDataTableUserTonase();
+            setDateSession(year, month);
         }
 
         function setDatesMonth() {

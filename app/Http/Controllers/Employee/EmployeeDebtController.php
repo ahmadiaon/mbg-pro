@@ -27,7 +27,7 @@ class EmployeeDebtController extends Controller
             'active'                        => 'employee-debt'
         ];
         $payment_others = PaymentOther::all();
-        $employees = Employee::getAll();
+        $employees = Employee::data_employee();
         return view('employee_debt.index', [
             'title'         => 'Hutang',
             'layout'    => $layout,

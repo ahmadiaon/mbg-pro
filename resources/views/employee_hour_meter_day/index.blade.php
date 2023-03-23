@@ -53,7 +53,7 @@
                             </button>
 
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" onclick="refreshTable(null, 12 )" href="#">Perbulan</a>
+                                <a class="dropdown-item" onclick="refreshTable(null, null )" href="#">Perbulan</a>
 
                                 <div class="row">
                                     <div class="col-3">
@@ -143,31 +143,30 @@
 
 @section('js')
     <script>
-        let arr_date_today = getDateTodayArr();
         console.log('employee_hour_meter_day index');
         let nik_employee = @json($nik_employee);
         console.log(nik_employee)
 
-        function setViewEmployeeHourMeter(){
-            // arr_date_today.year = '2022';
-            // arr_date_today.month = '10';
-            // cg('month',monthName(arr_date_today.month));
+
+        let year;
+        let month;
+        let v_year;
+        let v_month;
+        let _ur;
+
+        function firstEmployeeHourMeter() {
+            year = arr_date_today.year;
+             month = arr_date_today.month;
+             v_year = arr_date_today.year;
+             v_month = arr_date_today.month;
+             
             $('#btn-year').html(arr_date_today.year);
             $('#btn-month').val(arr_date_today.month);
             $('#btn-month').html(monthName(arr_date_today.month));
             setDatesMonth();
-            arr_date_today.day = null
             showDataTableEmployeeHourMeteDay()
-           
-        }
-
-
-        function firstEmployeeHourMeter() {
-            arr_date_today = getDateTodayArr();
-            setViewEmployeeHourMeter();
             $('#btn-day').html("Perbulan");
             $('#btn-export').attr('href', '/hour-meter/export/' +arr_date_today.year+'-'+ arr_date_today.month)
-            // showDataTableEmployeeHourMeteDay()
         }
         firstEmployeeHourMeter()
 
@@ -284,16 +283,17 @@
 
         function refreshTable(val_year = null, val_month = null, val_day) {
             console.log('refreshTable');
+            year = arr_date_today.year;
+            month = arr_date_today.month;
 
             if (val_year) {
-                console.log(val_year);
-                arr_date_today.year = val_year;
-                $('#btn-year').html(val_year);
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
             }
             if (val_month) {
                 arr_date_today.month = val_month;
                 $('#btn-month').html(monthName(arr_date_today.month));
-                $('#btn-month').val(val_month);
+                $('#btn-month').val(arr_date_today.month);
             }
 
             if (val_day) {
@@ -307,7 +307,7 @@
             $('#btn-day').html("Perbulan");
             setDatesMonth()
             showDataTableEmployeeHourMeteDay();
-            // reloadTable(year_month)
+            setDateSession(year, month);
         }
   
     </script>

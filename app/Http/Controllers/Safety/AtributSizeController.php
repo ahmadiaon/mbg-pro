@@ -15,6 +15,9 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 class AtributSizeController extends Controller
 {
     public function index(){
+
+        $data_atribut_size_groups = AtributSize::where('size','group')->get();
+        // dd($data_atribut_size_groups);
         $layout = [
             'head_datatable'        => true,
             'javascript_datatable'  => true,
@@ -23,8 +26,11 @@ class AtributSizeController extends Controller
             'active'                        => 'atribut-size'
         ];
 
+        AtributSize::updateOrCreate(['uuid' => 'group'],['name_atribut' => 'GROUP', 'size'=>'group'] );
+
         return view('AtributSize.index', [
             'title'         => 'Satuan',
+            'data_atribut_size_groups' => $data_atribut_size_groups,
             'layout'    => $layout
         ]);
     }
@@ -38,7 +44,7 @@ class AtributSizeController extends Controller
 
 
     public function anyData(){
-        $data = AtributSize::all();
+        $data = AtributSize::orderBy('size')->get();
         return DataTables::of($data)    
         ->make(true);
     }
@@ -52,8 +58,10 @@ class AtributSizeController extends Controller
         
         $createSheet->setCellValue('B1', 'Atribut');
         $createSheet->setCellValue('A5', 'No.');
-        $createSheet->setCellValue('B5', 'Nama Atribut');
-        $createSheet->setCellValue('C5', 'Group Atribut');
+        $createSheet->setCellValue('B5', 'Kode Atribut');        
+        $createSheet->setCellValue('C5', 'Nama Atribut');     
+        $createSheet->setCellValue('D5', 'Nilai Atribut');
+        $createSheet->setCellValue('E5', 'Group Atribut');
 
 
         $crateWriter = new Xls($createSpreadsheet);
@@ -63,7 +71,9 @@ class AtributSizeController extends Controller
         foreach($arr_data as $item){
             $createSheet->setCellValue('A'.$row, $each);
             $createSheet->setCellValue('B'.$row, $item->uuid);
-            $createSheet->setCellValue('C'.$row, $item->size);
+            $createSheet->setCellValue('C'.$row, $item->name_atribut);     
+            $createSheet->setCellValue('D'.$row, $item->value_atribut);            
+            $createSheet->setCellValue('E'.$row, $item->size);
             $each++;$row++;
         }
         $crateWriter->save($name);
@@ -83,9 +93,10 @@ class AtributSizeController extends Controller
             $no_employee = 6;
 
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
-                $data['uuid'] = $sheet->getCell( 'B'.$no_employee)->getValue();                
-                $data['size'] = $sheet->getCell( 'C'.$no_employee)->getValue();
-                $data['uuid'] = ResponseFormatter::toUUID( $data['uuid']);    
+                $data['uuid'] = ResponseFormatter::toUuidLower($sheet->getCell( 'B'.$no_employee)->getValue());                
+                $data['size'] = ResponseFormatter::toUuidLower($sheet->getCell( 'E'.$no_employee)->getValue());
+                $data['name_atribut'] = $sheet->getCell( 'C'.$no_employee)->getValue();
+                $data['value_atribut'] = $sheet->getCell( 'D'.$no_employee)->getValue();
                 $data['date_start'] = '2000-01-01';    
                 if(!empty($data)){
                     $store = AtributSize::updateOrCreate(['uuid' => $data['uuid']], $data);
@@ -105,10 +116,12 @@ class AtributSizeController extends Controller
         $validateData = $request->all();
 
         if(empty($validateData['uuid'])){
-            $validateData['uuid'] = ResponseFormatter::toUUID($validateData['size']);
+            $validateData['uuid'] = ResponseFormatter::toUuidLower($validateData['name_atribut']);
         }
-
+       
         $strore = AtributSize::updateOrCreate(['uuid' => $request->uuid], $validateData);
+
+        ResponseFormatter::setAllSession();
         return ResponseFormatter::toJson($strore, 'Data Stored');
     }
 

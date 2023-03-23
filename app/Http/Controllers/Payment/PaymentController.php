@@ -20,32 +20,20 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 class PaymentController extends Controller
 {
     public function store(Request $request){
-        $validatedData = $request->validate([
-            'uuid' => '',
-            'payment_group_uuid' => '',
-            'date' => '',
-            'date_end' => '',
-            'long' => '',
-            'employee_create_uuid' => '',
-            'employee_know_uuid' => '',
-            'employee_approve_uuid' => '',
-            'description' => '',
-        ]);
+        $validatedData = $request->all();
         
 
 
         if(empty($validatedData['uuid'])){
-            $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['payment_group_uuid'].'-'.rand(99,999);
+            $validatedData['uuid'] = $validatedData['date'].'-'.$validatedData['payment_group_uuid'].'-'.ResponseFormatter::toUUID($validatedData['description']);
         }
-        // return ResponseFormatter::toJson($validatedData, "request");
+       
         $store = Payment::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
         return ResponseFormatter::toJson($store, "request");
         
     }
 
-    public function import(Request $request){
-
-        // return 'aaa';
+    public function import(Request $request){//used
         $the_file = $request->file('uploaded_file');
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
@@ -53,20 +41,10 @@ class PaymentController extends Controller
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
-            $row_limit    = $sheet->getHighestDataRow();
-            $column_limit = $sheet->getHighestDataColumn();
-            $row_range    = range( 2, $row_limit );
-            $column_range = range( 'C', $column_limit );
-            $startcount = 2;
-            $data = array();
 
             $abjads = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         
             // DESCRIPTION
-            $month_hm =  $sheet->getCell( 'C3')->getValue();
-            $year_hm = $sheet->getCell( 'C4')->getValue();
-            $datetime = Carbon::createFromFormat('Y-m', $year_hm.'-'.$month_hm);
-            // return $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
 
 
             $no_employee = 6;
@@ -78,32 +56,33 @@ class PaymentController extends Controller
             */
             // mobililsasi
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
-                $excelDate= $sheet->getCell( 'E'.$no_employee)->getValue();
-             
 
-                $date = ResponseFormatter::excelToDate($excelDate);
-           
-                $date_end = date('Y-m-d', strtotime($date. ' + 1 days'));
+                $excelDate= $sheet->getCell( 'E'.$no_employee)->getValue();     
+                $date = ResponseFormatter::excelToDate($excelDate);           
+                $date_end = $date;
+
                 $payment_group_uuid = ResponseFormatter::toUUID($sheet->getCell( 'F'.$no_employee)->getValue());
-                PaymentGroup::updateOrCreate(['uuid' => $payment_group_uuid], ['payment_group' => $payment_group_uuid, 'date_start' => '2022-01-01']);
+
+                PaymentGroup::updateOrCreate(['uuid' => $payment_group_uuid], ['payment_group' => $sheet->getCell( 'F'.$no_employee)->getValue(), 'date_start' => '2022-01-01']);
+                
                 $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
+
                 $data_payment = [
-                    'uuid' => $payment_group_uuid.'-'.$date.'-'.$nik_employee.'-'.$sheet->getCell( 'A'.$no_employee)->getValue(),
+                    'uuid' => $date.'-'.$payment_group_uuid.'-'.ResponseFormatter::toUUID($sheet->getCell( 'G'.$no_employee)->getValue()),
                     'payment_group_uuid' => $payment_group_uuid,
                     'date' => $date,
                     'date_end' => $date_end,
                     'long' => 1,
-                    'employee_create_uuid' => '',
-                    'employee_know_uuid' => '',
-                    'employee_approve_uuid' => '',
-                    'description' => $sheet->getCell( 'H'.$no_employee)->getValue(),
+                    'description' => $sheet->getCell( 'G'.$no_employee)->getValue(),
                 ];
+
                 Payment::updateOrCreate(['uuid' =>$data_payment['uuid'] ],$data_payment);
+
                 $data_employee_payment = [
-                    'uuid' => $payment_group_uuid.'-'.$date.'-'.$nik_employee.'-'.$sheet->getCell( 'A'.$no_employee)->getValue(),
+                    'uuid' => $nik_employee.'-'.$payment_group_uuid.'-'.$date.'-'.$data_payment['uuid'],
                     'employee_uuid' => $nik_employee,
                     'payment_uuid' => $data_payment['uuid'],
-                    'value' => $sheet->getCell( 'J'.$no_employee)->getValue(),
+                    'value' => $sheet->getCell( 'H'.$no_employee)->getValue(),
                     'link_absen' => 'none',
                 ];
                 EmployeePayment::updateOrCreate(['uuid' =>$data_employee_payment['uuid'] ],$data_employee_payment);
@@ -113,12 +92,12 @@ class PaymentController extends Controller
             return back();
             dd($employees);
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
     }
 
-    public function export($year_month){
+    public function export($year_month){//used
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
@@ -143,10 +122,8 @@ class PaymentController extends Controller
         $createSheet->setCellValue('D5', 'Jabatan');
         $createSheet->setCellValue('E5', 'TANGGAL');
         $createSheet->setCellValue('F5', 'Kegiatan');
-        $createSheet->setCellValue('G5', 'Jumlah');
-        $createSheet->setCellValue('H5', 'Keterangan');
-        $createSheet->setCellValue('I5', 'Harga Satuan (Rp.)');
-        $createSheet->setCellValue('J5', 'Total (Rp.)');
+        $createSheet->setCellValue('G5', 'Keterangan');
+        $createSheet->setCellValue('H5', 'Total (Rp.)');
 
 
         $payments = Payment::join('payment_groups','payment_groups.uuid','payments.payment_group_uuid')
@@ -154,6 +131,8 @@ class PaymentController extends Controller
         ->join('employees','employees.uuid','employee_payments.employee_uuid')
         ->join('user_details','user_details.uuid','employees.user_detail_uuid')
         ->join('positions','positions.uuid','employees.position_uuid')
+        ->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end')
         ->whereYear('payments.date', $year)
         ->whereMonth('payments.date', $month)
         ->get([
@@ -173,24 +152,12 @@ class PaymentController extends Controller
             $createSheet->setCellValue('C'.$employee_row,  $payment->name); 
             $createSheet->setCellValue('D'.$employee_row,  $payment->position); 
             $createSheet->setCellValue('E'.$employee_row,  $payment->date); 
-            $createSheet->setCellValue('F'.$employee_row,  $payment->description); 
-            $createSheet->setCellValue('G'.$employee_row,  '1'); 
-            $createSheet->setCellValue('H'.$employee_row,  $payment->payment_group); 
-            $createSheet->setCellValue('I'.$employee_row,  $payment->value); 
-            $createSheet->setCellValue('J'.$employee_row,  $payment->value); 
+            $createSheet->setCellValue('F'.$employee_row,  $payment->payment_group); 
+            $createSheet->setCellValue('G'.$employee_row,  $payment->description); 
+            $createSheet->setCellValue('H'.$employee_row,  $payment->value); 
 
             $employee_row++;
         }
-
-        // dd($payments);
-
-
-
-
-
-
-
-
 
         $crateWriter = new Xls($createSpreadsheet);
         $name = 'file/absensi/Pembayaran-'.$year_month.'-'.rand(99,9999).'file.xls';
@@ -205,7 +172,7 @@ class PaymentController extends Controller
         $payment = Payment::where('uuid', $uuid)->get()->first();
         $employee_payments = EmployeePayment::where('payment_uuid', $uuid)->get();
 
-        $employees = Employee::getAll();
+        $employees = Employee::data_employee();
         $payment_groups = PaymentGroup::get();
 
         $layout = [

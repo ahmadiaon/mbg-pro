@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Privilege;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 use App\Models\Privilege\Privilege;
 use App\Models\Privilege\UserPrivilege;
 use Illuminate\Http\Request;
@@ -30,12 +31,12 @@ class UserPrivilegeController extends Controller
     }
 
     public function store(Request $request){
-        // $data = $request->all();
+        $data = $request->all();
         $nik_employee = $request->nik_employee;
-        UserPrivilege::where('nik_employee',$nik_employee)->delete();
         $data = $request->except(['nik_employee','_token']);
         foreach($data as $item=>$value){
-            UserPrivilege::create([
+            UserPrivilege::updateOrCreate(['uuid'=>$nik_employee.'-'.$value],
+            [
                 'nik_employee' => $nik_employee,
                 'privilege_uuid'    => $value
             ]);
@@ -47,8 +48,8 @@ class UserPrivilegeController extends Controller
     }
     public function anyData(){
 
-        $data = UserPrivilege::all();
-
+        $data = Employee::data_employee();
+        // dd($data);
         return Datatables::of($data)     
         ->make(true);
     }

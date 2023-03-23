@@ -23,7 +23,7 @@
 @endsection
 
 @section('js')
-    @include('js.user_detail.create')
+    
     @include('js.user_detail.dependent.create')
     @include('js.user_detail.address.create')
     @include('js.user_detail.education.create')

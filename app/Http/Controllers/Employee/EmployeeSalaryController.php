@@ -4,25 +4,51 @@ namespace App\Http\Controllers\Employee;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeePremi;
 use App\Models\Employee\EmployeeSalary;
+use App\Models\HourMeterPrice;
 use App\Models\Premi;
 use Illuminate\Http\Request;
 
 class EmployeeSalaryController extends Controller
 {
+    public function create($nik_employee = null, $is_edit = null){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employee-salary',
+        ];
+        
+        $hour_meter_prices = HourMeterPrice::all();        
+        $premis = Premi::all();
+   
+
+        if($is_edit != null){
+            $is_edit = true;
+        }
+        
+        
+        return view('employee.salary.create', [
+            'title'         => 'Tambah Karyawan',            
+            'hour_meter_prices' => $hour_meter_prices,   
+            'premis' => $premis,
+            'layout'    => $layout
+        ]);
+    }
+
     public function store(Request $request){
+        $premis = Premi::all();      
+        $validateData = $request->all();
+        $data = session('recruitment-user');
+
+        // if($validateData['uuid'] == null){
+            $validateData['employee_uuid'] = $validateData['uuid'];
+        // }
 
         
-        // dd($request);
-        $premis = Premi::all();
-      
-        $validateData = $request->all();
-
-        if($validateData['uuid'] == null){
-            $validateData['uuid'] = $validateData['employee_uuid'];
-        }
-
         foreach($premis as $premi){
             if(!empty($validateData[$premi->uuid])){
                 EmployeePremi::updateOrCreate(['uuid'   => $validateData['employee_uuid'].'-'.$premi->uuid], [
@@ -37,9 +63,12 @@ class EmployeeSalaryController extends Controller
 
         $storeEmployeeSalary = EmployeeSalary::updateOrCreate(['uuid'   => $validateData['uuid']], $validateData);
        
-        $store = EmployeeSalary::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
-        return ResponseFormatter::toJson($validateData, 'Data Store User Education');
-        return ResponseFormatter::toJson($store, 'Data Store User Education');
+        // $store = EmployeeSalary::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
+
+        $data_store = Employee::showWhereNik_employee($validateData['uuid']);
+        $data['detail'] = $data_store;
+        session()->put('recruitment-user', $data);   
+        return ResponseFormatter::toJson($validateData, 'Data Store User Salary');
     }
 
     public function anyDataOne($uuid){

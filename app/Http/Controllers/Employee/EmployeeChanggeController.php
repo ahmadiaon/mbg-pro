@@ -24,7 +24,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 class EmployeeChanggeController extends Controller
 {
     public function index(){
-        $employees = Employee::getAll();
+        $employees = Employee::data_employee();
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,

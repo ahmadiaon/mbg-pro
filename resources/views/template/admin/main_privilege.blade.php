@@ -22,6 +22,8 @@
         @include('template.admin.javascript.form')
     @endif
     <script>
+        let data_database = @json(session('data_database'));
+
         function padToDigits(much, num) {
             console.log('padToDigits')
             return num.toString().padStart(much, '0');
@@ -42,13 +44,16 @@
             };
             return arr;
         }
-        cg('null', 'null');
+
+
+
         let arr_date_today = @json(session('year_month'));
         if (!arr_date_today) {
             arr_date_today = getDateTodayArr();
         }
 
-        cg('aa', arr_date_today)
+
+
 
         function cg(message, data) {
             console.log(message + ':');
@@ -56,9 +61,10 @@
         }
 
         function setDateSession(year, month) {
-            arr_date_today = @json(session('year_month'));
+            cg('set-date-session', arr_date_today);
             if (!arr_date_today) {
-                let arr_date_today = getDateTodayArr();
+                arr_date_today = getDateTodayArr();
+                cg('when not', arr_date_today);
             } else {
                 if (year == arr_date_today.year && parseInt(month) == parseInt(arr_date_today.month)) {
                     cg('same', 'same');
@@ -68,14 +74,16 @@
                         type: "POST",
                         data: {
                             _token: $('meta[name="csrf-token"]').attr('content'),
-                            year: year,
-                            month: month,
+                            year: arr_date_today.year,
+                            month: arr_date_today.month,
                         },
                         success: function(response) {
-                            $('#success-modal').modal('show')
-                            console.log(response)
-                            arr_date_today = @json(session('year_month'));
-                            cg('arr_data', arr_date_today.year);
+                            // $('#success-modal').modal('show')
+                            // cg('responsese', response);
+                            arr_date_today.day = response.data.day;
+                            arr_date_today.month = response.data.month;
+                            arr_date_today.year = response.data.year;
+                            // cg('arr_data', arr_date_today);
                         },
                         error: function(response) {
                             alertModal()
@@ -83,8 +91,6 @@
                     });
                 }
             }
-
-
         }
 
 
@@ -123,6 +129,7 @@
     </script>
     <script>
         let isDeleted = false;
+
         var element_profile_employee = {
             mRender: function(data, type, row) {
                 if (row.photo_path == null) {
@@ -145,6 +152,30 @@
             }
         };
 
+        var element_profile_employee_database = {
+
+            mRender: function(data, type, row) {
+
+                if (row.photo_path == null) {
+                    row.photo_path = '/vendors/images/photo4.jpg';
+                }
+                if (row.photo_path == null) {
+                    row.photo_path = '/vendors/images/photo4.jpg';
+                }
+                return `<div class="name-avatar d-flex align-items-center">
+										<div class="avatar mr-2 flex-shrink-0">
+											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
+												height="40" alt="" />
+										</div>
+										<div class="txt">
+											<div class="weight-600">${data_database.data_employees[row.employee_recruiter]['name']}</div>
+											<small>${data_database.data_employees[row.employee_recruiter]['nik_employee']}</small></br>
+											<small>${data_database.data_employees[row.employee_recruiter]['position']}</small>
+										</div>
+									</div>`
+            }
+        };
+
 
 
 
@@ -153,47 +184,74 @@
 
 
         function choosePage(pageId, data) {
-
+            cg('udin', 'abc')
 
             let idAppendElement = pageId;
-            $('.children-content').hide();
+            // $('.children-content').hide();
             $('#' + idAppendElement).show();
             // runFirstFunction
             switch (idAppendElement) {
-                case 'create-user-detail':
-                    firstCreateUserDetail(data);
+                case 'create-detail':
+                    cg('create-detail', data);
+                    // firstCreateUserDetail(data);
+                    break;
+                case 'create-user-detail-recruitment':
+                    cg('create-user-detail-recruitment', data);
+                    window.location.href = "/recruitment/user-detail/new";
+                    break;
+                case 'create-user-up':
+                    cg('create-user-up', data);
+                    window.location.href = "/recruitment/up";
+                    // firstCreateUserDetail(data);
                     break;
                 case 'create-user-dependent':
-                    firstCreateUserDependent(pageId, data);
+                    window.location.href = "/user-dependent/detail/" + data;
+                    // firstCreateUserDependent(pageId, data);
                     break;
                 case 'create-user-address':
+                    window.location.href = "/user-address/detail/" + data;
                     firstCreateUserAddress(pageId, data);
                     break;
                 case 'create-user-education':
+                    window.location.href = "/user-education/detail/" + data;
                     firstCreateUserEducation(pageId, data);
                     break;
                 case 'create-user-license':
+                    window.location.href = "/user-license/detail/" + data;
                     firstCreateUserLicense(pageId, data);
                     break;
                 case 'create-user-health':
+                    window.location.href = "/user-health/detail/" + data;
                     firstCreateUserHealth(pageId, data);
                     break;
                 case 'create-user-employee':
+                    window.location.href = "/user-employee/detail/" + data;
                     firstCreateUserEmployee(pageId, data);
                     break;
                 case 'create-employee-salary':
+                    window.location.href = "/employee-salary/detail/" + data;
                     firstCreateEmployeeSalary(pageId, data);
                     break;
                 case 'index-employee':
+                    window.location.href = "/employee-salary/detail/" + data;
                     firstIndexEmployee(data);
                     break;
                 case 'show-employee':
-                    firstShowEmployee(data);
+                    if (data == 'talent') {
+
+                    }
+                    window.location.href = "/user/show/" + data;
+                    // firstShowEmployee(data);
                     break;
                 default:
                     return false;
             }
         }
+
+        function goToHere(link_destination) {
+            window.location.href = link_destination;
+        }
+
 
 
         function addDays(date, days) {
@@ -213,11 +271,33 @@
                 dataType: 'json',
                 success: function(res) {
                     let data = res.data;
-                    console.log(data);
+
                 }
             });
 
         }
+
+        async function getPostData(url, post_data) {
+
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            post_data['_token'] = _token;
+            return $.ajax({
+                url: url,
+                type: 'POST',
+                data: post_data,
+                dataType: 'json',
+                success: function(res) {
+                    let data = res.data;
+                    if (data) {
+                        cg('getData', data)
+                    } else {
+                        cg('getData', 'get null')
+                    }
+                }
+            });
+
+        }
+
 
         function setChecked(idElement) {
             console.log('setChecked')
@@ -246,28 +326,48 @@
 
         function setValue(url, table) {
             console.log('setValue')
-            let data_user
+            let data_user;
             getData(url).then((data_value_element) => {
                 data_user = data_value_element.data;
-                // console.log(data_user);
+                cg('set value', data_user);
                 if (data_user) {
                     for (var key in data_user) {
                         if (data_user[key] != null) {
-                            $('#' + key).val(data_user[key]).trigger('change.select2')
-                            if (data_user[key] == 'Ya') {
-                                $('#' + key).attr('checked', 'checked').trigger('change')
+                            let type_input = $('#' + key).attr('type');
+                            if (type_input == 'file') {
+                                let fileInput = document.getElementById(key);
+                                cg(key, data_user[key] );
+                                // Create a new File object
+                                let myFile = new File(['Hello World!'], data_user[key] , {
+                                    type: 'text/plain',
+                                    lastModified: new Date(),
+                                });
+                                $('#show-'+key).attr("onclick", "showdoc('"+data_user[key]+"')" );
+
+                                // Now let's create a DataTransfer to get a FileList
+                                let dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(myFile);
+                                fileInput.files = dataTransfer.files;
+                            } else {
+                                $('#' + key).val(data_user[key]).trigger('change.select2')
+                                if (data_user[key] == 'Ya') {
+                                    $('#' + key).attr('checked', 'checked').trigger('change')
+                                }
                             }
                         }
 
                     }
-                    $('#uuid-' + table).val(data_user.uuid)
+                    $('#uuid-create-' + table).val(data_user.uuid)
                     $('#date_start-' + table).val(data_user.date_start)
+                }
+                if (typeof(ud_uuid) != 'undefined') {
+                    $('#user_detail_uuid-create-' + table).val(data_user.nik_number)
+                }
 
-                } else {
-                    console.log('data : null, from:user-education-single')
+                if (!$(`#isEdit-create-${table}`).val()) {
+                    $('.create-user-employee-back').hide();
                 }
                 if ($('#date_start-' + table).val() == '') {
-                    console.log(table)
                     $('#date_start-' + table).val(getDateToday());
                 }
 
@@ -315,7 +415,6 @@
             });
             var elements = {
                 mRender: function(data, type, row) {
-
                     return `
 									<div class="form-inline"> 
 										<button onclick="editData('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
@@ -333,7 +432,7 @@
             console.log(urls)
             $('#table-' + id).DataTable({
                 processing: true,
-                serverSide: true,
+                serverSide: false,
                 responsive: true,
                 rowReorder: {
                     selector: 'td:nth-child(2)'
@@ -342,7 +441,7 @@
                 columns: data
             });
         }
-
+        
         function stopLoading() {
             console.log('stop loading')
             $('.modal').modal('hide')
@@ -357,6 +456,28 @@
             console.log('start loading')
             $('#alert-modal').modal('show')
         }
+        function formatDate(d) {
+         
+         var    month = '' + (d.getMonth() + 1),
+             day = '' + d.getDate(),
+             year = d.getFullYear();
+
+         if (month.length < 2) month = '0' + month;
+         if (day.length < 2) day = '0' + day;
+
+         return [year, month, day].join('-');
+     }
+     function formatDateArr(d) {
+         
+         var    month = '' + (d.getMonth() + 1),
+             day = '' + d.getDate(),
+             year = d.getFullYear();
+
+         if (month.length < 2) month = '0' + month;
+         if (day.length < 2) day = '0' + day;
+
+         return {year:year, month:month, day:day};
+     }
 
         function modalCreateGlobal(id) {
             $('#modal-create-' + id).modal('show')
@@ -399,8 +520,10 @@
                 processData: false,
                 data: form_data,
                 success: function(response) {
-                    alert(JSON.stringify(response.data));
-                    console.log(response);
+                    
+                    // alert("Message:"+JSON.stringify(response.message)+"-"+JSON.stringify(response.data));
+                    // console.log(response);
+                    stopLoading();
                 },
                 error: function(response) {
                     alertModal()
@@ -495,15 +618,61 @@
             return Number(String(number).slice(-n));
         }
 
+        function showModalMessage(message) {
+            $('#message-text').text(message);
+            $('#message-modal-id').modal('show');
+        }
 
+        function countBetweenDate(date_from, date_until) {
+            var date1 = new Date(date_from); //from
+            var date2 = new Date(date_until); //until
+
+            var Difference_In_Time = date2.getTime() - date1.getTime();
+            var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+            return Difference_In_Days;
+
+        }
+
+        
         var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
             "November", "Desember"
         ];
+        function getLetter(num){
+            var letter = String.fromCharCode(num + 64);
+            return letter;
+        }
 
         function monthName(month) {
             return months[parseInt(month)]
         }
+
+        if (typeof(data_database) == 'undefined') {
+            cg('data_database', 'undefined')
+            if (typeof(@json(session('data_database'))) == 'undefined') {
+                cg('data_database', 'undefined')
+            } else {
+                cg('data_database', data_database)
+                getData('/support/setSessionDatabase');
+                getData('/support/setSessionDatabase').then((ses_data) => {
+                    cg('ses_data', ses_data);
+                });
+                location.reload();
+                data_database = @json(session('data_database'));
+                // cg('data_database', data_database);
+            }
+
+            cg('data_database', data_database);
+
+        } else if (data_database == null) {
+            cg('else data_database', data_database);
+            getData('/support/setSessionDatabase');
+            location.reload();
+        }
+        cg('data_database', data_database);
+        // getData('/support/setSessionDatabase').then((ses_data) => {
+        //     cg('ses_data', ses_data);
+        // });
     </script>
 </head>
 

@@ -28,11 +28,6 @@ class CreateCoalFromsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('coal_froms');

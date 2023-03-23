@@ -38,51 +38,70 @@
         }
     </style>
 @endsection
-@section('content')
-    <div class="card-box mb-30 ">
-        <div class="row pd-20">
-            <div class="col-auto">
-                <h4 class="text-blue h4">Daftar Setup cuti</h4>
-            </div>
-            <div class="col text-right">
-                <div class="btn-group">
-                    <div class="btn-group dropdown">
-                        <button type="date" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
-                            aria-expanded="false">
-                            Menu <span class="caret"></span>
-                        </button>
 
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" onclick="createModalSetup()" href="#">Tambah</a>
-                            <a class="dropdown-item" id="btn-export-setup"disabled
-                                href="/user/Karyawan Cuti/export/">Export</a>
-                            <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
-                                href="">Import</a>
+@section('content')
+    <div class="faq-wrap">
+        <div id="accordion">
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-block" data-toggle="collapse" data-target="#faq1">
+                        <h4 class="text-blue h4">Daftar Setup cuti</h4>
+                    </button>
+                </div>
+                <div id="faq1" class="collapse show" data-parent="#accordion">
+                    <div class="card-box mb-30 ">
+                        <div class="row pd-20">
+                            <div class="col-auto">
+                            </div>
+                            <div class="col text-right">
+                                <div class="btn-group">
+                                    <button onclick="openModalFilter()" class="btn btn-success">Filter</button>
+                                    <div class="btn-group dropdown">
+                                        <button type="date" class="btn btn-primary dropdown-toggle waves-effect"
+                                            data-toggle="dropdown" aria-expanded="false">
+                                            Menu <span class="caret"></span>
+                                        </button>
+
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" onclick="createModalSetup()" href="#">Tambah</a>
+                                            <a class="dropdown-item" id="btn-export-setup"disabled
+                                                href="/user/Karyawan Cuti/export/">Export</a>
+                                            <a class="dropdown-item" id="btn-import" data-toggle="modal"
+                                                data-target="#import-modal" href="">Import</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <div id="the-table-employee-cuti-setup">
+                            <div class="pb-20" id="parent-employee-cuti-setup">
+                                <table id="table-employee-cuti-setup" class="display nowrap stripe hover table"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Tanggal Awal Bekerja</th>
+                                            <th>Roaster</th>
+                                            <th>Group</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+
+
+
                     </div>
                 </div>
             </div>
+
         </div>
-
-        <div id="the-table-employee-cuti-setup">
-            <div class="pb-20" id="parent-employee-cuti-setup">
-                <table id="table-employee-cuti-setup" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Tanggal Cuti</th>
-                            <th>Roaster</th>
-                            <th>Group</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
-
-
 
     </div>
+
+
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-auto">
@@ -91,6 +110,7 @@
             @if (empty($nik_employee))
                 <div class="col text-right">
                     <div class="btn-group">
+
                         <div class="btn-group dropdown">
                             <button type="button" class="btn btn-secondary dropdown-toggle waves-effect"
                                 data-toggle="dropdown" aria-expanded="false" id="btn-year">
@@ -161,7 +181,22 @@
 
 
     <div class="bg-white pd-20 card-box mb-30 overflow-auto">
-        <h4 class="h4 text-blue">Timeline Cuti Karyawan</h4>
+
+        <div class="row">
+            <h4 class="h4 text-blue col-md-6">Timeline group cuti karyawan</h4>
+            <div class="col-md-2 text-rigth form-group row mr-1">
+                <select onchange="filterTimeLineGroup()" style="width: 100%;" name="group_cuti_uuid"
+                    id="group_cuti_uuid-timeline" class="custom-select2 form-control group_cuti_uuid">
+                    <option value="">Group Cuti</option>
+                </select>
+            </div>
+            <div class="col-md-4 text-rigth form-group row">
+                <select onchange="filterTimeLineEmployee()" style="width: 100%;" name="employee_uuid"
+                    id="employee_uuid-timeline" class="custom-select2 form-control employees">
+                    <option value="">Pilih Karyawan</option>
+                </select>
+            </div>
+        </div>
         <div style="width:3000px" id="chart6"></div>
     </div>
 
@@ -212,8 +247,8 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="">Pilih Karyawan</label>
-                                <select style="width: 100%;" name="employee_uuid" id="employee_uuid"
-                                    class="custom-select2 form-control">
+                                <select onchange="chooseEmployeeCutiSetup()" style="width: 100%;" name="employee_uuid"
+                                    id="employee_uuid-cuti-setup" class="custom-select2 form-control">
                                     <option value="">karyawan</option>
                                 </select>
                                 <div class="invalid-feedback" id="req-employee_uuid">
@@ -223,9 +258,6 @@
                             <div class="form-group">
                                 <label for="">Roaster Cuti</label>
                                 <select class="form-control" name="roaster_uuid" id="roaster_uuid">
-                                    <option value="70">10:2 70 Hari Kerja</option>
-                                    <option value="63">9:2 63 Hari Kerja</option>
-                                    <option value="56">8:2 56 Hari Kerja</option>
                                 </select>
                             </div>
                             <div class="form-group autocomplete">
@@ -234,7 +266,7 @@
                                     placeholder="Country">
                             </div>
                             <div class="form-group">
-                                <label for="">Tanggal Cuti</label>
+                                <label for="">Tanggal Awal Bekerja</label>
                                 <input class="form-control" type="date" name="date_start_work" id="date_start_work">
                             </div>
                             <div class="invalid-feedback" id="req-date_start_work">
@@ -265,9 +297,10 @@
                         ×
                     </button>
                 </div>
-                <form autocomplete="off" id="form-employee-cuti" action="/employee-cuti/store" method="post"
+                <form id="form-employee-cuti" action="/employee-cuti/store" method="post"
                     enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="uuid" id="uuid-cuti">
                     <div class="modal-body">
                         {{-- karyawan --}}
                         <div class="form-group">
@@ -276,9 +309,6 @@
                                 id="employee_uuid-cuti" class="custom-select2 form-control">
                                 <option value="">karyawan</option>
                             </select>
-                            <div class="invalid-feedback" id="req-employee_uuid-cuti">
-                                Data tidak boleh kosong
-                            </div>
                         </div>
 
                         {{-- jadwal cuti --}}
@@ -288,7 +318,7 @@
                                     <label for="">Jadwal Cuti</label>
                                 </div>
                                 <div class="col-md-8">
-                                    <select onselect="chooseScheduleCuti()" style="width: 100%;" name="schedule_cuti"
+                                    <select onchange="chooseScheduleCuti()" style="width: 100%;" name="schedule_cuti"
                                         id="schedule_cuti" class="custom-select2 form-control">
                                     </select>
                                     <div class="invalid-feedback" id="req-schedule_cuti">
@@ -358,21 +388,16 @@
                         {{-- poh --}}
                         <div class="form-group">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <select onchange="choosePoh()" style="width: 100%;" name="poh_uuid" id="poh_uuid"
                                         class="custom-select2 form-control form-poh_uuid
                                         form-poh_uuid">
-                                        <option value="dalam-kabupaten">Dalam Kabupaten</option>
-                                        <option value="dalam-pulau">Dalam Pulau</option>
-                                        <option value="luar-pulau">Luar Pulau</option>
+
                                     </select>
                                 </div>
-                                <div class="col-md-8">
+                                <div class="col-md-12 mt-3">
                                     <input type="text" name="kabupaten" id="kabupaten" class="form-control"
                                         placeholder="Kabupaten">
-                                    <div class="invalid-feedback" id="req-kabupaten">
-                                        Data tidak boleh kosong
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -400,12 +425,8 @@
                                     <label for="">Monitoring Cuti</label>
                                 </div>
                                 <div class="col-md-8">
-                                    <select onchange="chooseMonitoringCuti()" style="width: 100%;" name="monitoring_cuti" id="monitoring_cuti"
-                                        class="custom-select2 form-control">
-                                        <option value="Sedang Cuti">Sedang Cuti</option>
-                                        <option value="Harus Cuti">Harus Cuti</option>
-                                        <option value="Selesai Cuti">Selesai Cuti</option>
-                                        <option value="Harus Balik">Harus Balik</option>
+                                    <select onchange="chooseMonitoringCuti()" style="width: 100%;" name="monitoring_cuti"
+                                        id="monitoring_cuti" class="custom-select2 form-control">
                                     </select>
                                     <div class="invalid-feedback" id="req-monitoring_cuti">
                                         Data tidak boleh kosong
@@ -421,8 +442,9 @@
                                     <label for="">Tanggal Balik</label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input type="date" name="date_come_cuti" id="date_come_cuti" class="form-control">
-                                   
+                                    <input type="date" name="date_come_cuti" id="date_come_cuti"
+                                        class="form-control">
+
                                 </div>
                             </div>
                         </div>
@@ -439,9 +461,6 @@
             </div>
         </div>
     </div>
-
-
-
 
     <!-- Modal -->
     <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -466,13 +485,53 @@
         </div>
     </div>
 
+    <!-- Modal filter-->
+    <div class="modal fade customscroll" id="modal-filter" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                        Filter Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip"
+                        data-placement="bottom" title="" data-original-title="Close Modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pd-0">
+                    <div class="task-list-form">
+                        <ul>
+                            <li>
+                                <select onchange="tableEmployeeCutiSetup()" style="width: 100%;" name="group_cuti_uuid"
+                                    id="group_cuti_uuid" class="custom-select2 form-control group_cuti_uuid">
+                                    <option value="">Semua group cuti</option>
+                                </select>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js')
     <script>
+        // autocomplite
         let employee_cuti_groups = @json($employee_cuti_groups);
 
-        let countries = employee_cuti_groups;
+        cg('employee_cuti_groups', employee_cuti_groups);
+
+        let countries = [];
+
+        employee_cuti_groups.forEach(item => {
+            countries.push(item.name_group_cuti);
+        });
+
+
 
         function autocomplete(inp, arr) {
             /*the autocomplete function takes two arguments,
@@ -584,40 +643,217 @@
     </script>
 
     <script>
-        var data_cutis = @json($cutis);
-        var dataaaa = @json($data_cuti);
-        var employees_schedule_cuti = @json($employees_schedule_cuti);
+        let filter = {
+                group_cuti_uuid: null
+            };
+        let dataUser = @json(session('dataUser'));
 
-        data_cutis.forEach(element => {
-            the_start = element.y[0];
-            element.y[0] = new Date(the_start).getTime();
-            the_end = element.y[1];
-            element.y[1] = new Date(the_end).getTime();
-        });
+        let nik_employee = dataUser.nik_employee;
+        var employees_schedule_cuti = @json($employees_schedule_cuti);
     </script>
+
     <script src="/src/plugins/apexcharts/apexcharts.min.js"></script>
     <script src="/vendors/scripts/apexcharts-setting.js"></script>
+
     <script>
-        var employees = @json($employees);
-        employees.forEach(element => {
-            var elements = `<option value="${element.uuid}">${element.name} - ${element.position}</option>`;
-            // console.log(element);
-            $('#employee_uuid').append(elements);
-            $('#employee_uuid-cuti').append(elements);
-        });
+        function firstEmployeeCuti() {
+
+
+
+            employee_cuti_groups.forEach(cuti_group_element => {
+                $(`.group_cuti_uuid`).append(
+                    `<option value="${cuti_group_element.uuid}">${cuti_group_element.name_group_cuti}</option>`
+                );
+            });
+            Object.values(data_database.data_employees).forEach(element => {
+                var elements = `<option value="${element.uuid}">${element.name} - ${element.position}</option>`;
+                // console.log(element);
+                $('#employee_uuid-cuti-setup').append(elements);
+                $('#employee_uuid-cuti').append(elements);
+                $('.employees').append(elements);
+            });
+
+            Object.values(data_database.data_atribut_sizes.roaster_uuid).forEach(roaster_uuid_element => {
+                var elements =
+                    `<option value="${roaster_uuid_element.uuid}">${roaster_uuid_element.name_atribut}</option>`;
+
+                $('#roaster_uuid').append(elements);
+            });
+
+            Object.values(data_database.data_atribut_sizes.poh_uuid).forEach(poh_uuid_element => {
+                var elements =
+                    `<option value="${poh_uuid_element.uuid}">${poh_uuid_element.name_atribut}</option>`;
+
+                $('#poh_uuid').append(elements);
+            });
+
+            Object.values(data_database.data_atribut_sizes.monitoring_cuti).forEach(monitoring_cuti_element => {
+                var elements =
+                    `<option value="${monitoring_cuti_element.value_atribut}">${monitoring_cuti_element.name_atribut}</option>`;
+
+                $('#monitoring_cuti').append(elements);
+            });
+
+            loadChart();
+
+        }
+
+        function loadChart() {
+            
+            $('#chart6').empty();
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/employee-cuti/data-timeline',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    filter:filter,
+                    date:arr_date_today,                    
+                    nik_employee:nik_employee,
+                },
+                success: function(response) {
+                    console.log(response);
+                    data_schedule_cuti = response.data.cutis;
+                    data_schedule_cuti.forEach(element => {
+                        the_start = element.y[0];
+                        // cg('the_start',element);
+                        element.y[0] = new Date(the_start).getTime();
+                        the_end = element.y[1];
+                        element.y[1] = new Date(the_end).getTime();
+                    });
+
+                    data_real_cuti_timeline = response.data.data_real_cuti_timeline;
+                    data_real_cuti_timeline.forEach(element_real_cuti => {
+                        the_start = element_real_cuti.y[0];
+                        // cg('the_start',element_real_cuti);
+                        element_real_cuti.y[0] = new Date(the_start).getTime();
+                        the_end = element_real_cuti.y[1];
+                        element_real_cuti.y[1] = new Date(the_end).getTime();
+                    });
+
+                    let arr_length = data_real_cuti_timeline.length;
+                    
+                    arr_length = arr_length *150;
+                    cg('arr_length',arr_length)
+                    var options6 = {
+                        series: [{
+                            name: 'Roaster Cuti',
+                            data: data_schedule_cuti
+                        },
+                        {
+                            name: 'Pelaksanaan cuti',
+                            data: data_real_cuti_timeline
+                        }, ],
+
+                        chart: {
+                            height: 300,
+                            type: 'rangeBar',
+                            toolbar: {
+                                show: false,
+                            }
+                        },
+                        grid: {
+                            show: false,
+                            padding: {
+                                left: 0,
+                                right: 0
+                            }
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: true,
+                                barHeight: '80%'
+                            }
+                        },
+                        xaxis: {
+                            type: 'datetime'
+                        },
+                        stroke: {
+                            width: 1
+                        },
+                        fill: {
+
+                            type: 'solid',
+                            opacity: 0.6
+                        },
+                        legend: {
+                            position: 'top',
+                            horizontalAlign: 'left'
+                        }
+                    };
+                    
+
+
+                    var chart = new ApexCharts(document.querySelector("#chart6"), options6);
+                    chart.render();
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+
+        }
+
+        firstEmployeeCuti();
+
+        function openModalFilter() {
+            $('#modal-filter').modal('show');
+        }
+
+        function filterTimeLineGroup() {
+            let group_cuti_uuid = $('#group_cuti_uuid-timeline').val();
+            nik_employee = null;
+            cg('group_cuti_uuid-timeline', group_cuti_uuid);
+
+            filter.group_cuti_uuid = group_cuti_uuid;
+            loadChart();
+
+        }
+
+        function filterTimeLineEmployee(){
+            filter.group_cuti_uuid = null;
+            nik_employee = $('#employee_uuid-timeline').val();
+            loadChart();
+
+        }
+
+        function choseGroupCutiFilter() {
+            let group_cuti_uuid = $('#group_cuti_uuid').val()
+            $('#modal-filter').modal('hide');
+
+            filter = {
+                group_cuti_uuid: group_cuti_uuid
+            };
+            return filter;
+
+        }
+
+        function chooseEmployeeCutiSetup() {
+            let employee_uuid = $('#employee_uuid-cuti-setup').val();
+            let data_employee = data_database.data_employees[employee_uuid];
+            $(`#roaster_uuid`).val(data_employee.roaster_uuid)
+        }
 
         function chooseEmployee() {
             let employee_uuid = $('#employee_uuid-cuti').val();
+
+            let data_employee = data_database.data_employees[employee_uuid];
+            cg('poh', data_employee.poh_uuid);
+            $(`#poh_uuid`).val(data_employee.poh_uuid).trigger('change');
+            $(`#kabupaten`).val(data_employee.kabupaten);
+            cg('data_employee', data_employee);
             let looping = employees_schedule_cuti[employee_uuid];
             $('.emp').remove();
             looping.forEach(element => {
                 $('#schedule_cuti').append(`<option class="emp" value="${element}">${element}</option>`)
             });
+
             chooseScheduleCuti();
         }
 
         function chooseScheduleCuti() {
             let schedule_cuti = $('#schedule_cuti').val();
+            cg('chosee', schedule_cuti);
             let schedule_cutiArray = schedule_cuti.split(" sd ");
             $('#date_real_start_cuti').val(schedule_cutiArray[0]);
             $('#date_real_end_cuti').val(schedule_cutiArray[1]);
@@ -637,16 +873,11 @@
 
         function choosePoh() {
             let poh_uuid = $('#poh_uuid').val();
-            if (poh_uuid == 'dalam-pulau') {
-                $('#value_money_cuti').val(250000);
-            } else if (poh_uuid == 'luar-pulau') {
-                $('#value_money_cuti').val(1000000);
-            } else if (poh_uuid == 'dalam-kabupaten') {
-                $('#value_money_cuti').val(150000);
-            }
+            cg('choosePoh',poh_uuid);
+            $('#value_money_cuti').val(data_database.data_atribut_sizes.poh_uuid[poh_uuid]['value_atribut']);
         }
 
-        function chooseMonitoringCuti(){
+        function chooseMonitoringCuti() {
             let monitoring_cuti = $('#monitoring_cuti').val();
 
         }
@@ -661,11 +892,11 @@
             // To calculate the no. of days between two dates
             var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
-            $('#long_cuti').val(Difference_In_Days);
+            $('#long_cuti').val(Difference_In_Days + 1);
 
         }
 
-        
+
 
 
 
@@ -673,11 +904,11 @@
             let long_date = $('#long_cuti').val();
             var date1 = $("#date_real_start_cuti").val();
             var dateStart = new Date(date1);
-            let dateEnd = addDays(dateStart, parseInt(long_date));
+            let dateEnd = addDays(dateStart, (parseInt(long_date) - 1));
             let yearDate = dateEnd.getFullYear();
-            let monthDate =padToDigits(2, dateEnd.getMonth()+1);
-            let dayDate = padToDigits(2,dateEnd.getDate());
-            $("#date_real_end_cuti").val(yearDate+'-'+monthDate+'-'+dayDate);
+            let monthDate = padToDigits(2, dateEnd.getMonth() + 1);
+            let dayDate = padToDigits(2, dateEnd.getDate());
+            $("#date_real_end_cuti").val(yearDate + '-' + monthDate + '-' + dayDate);
         }
 
         function storeSetup(idForm) {
@@ -697,18 +928,14 @@
 
         chooseStatusCuti();
 
-        let year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
-        $('#btn-month').val(arr_year_month[1]);
-        $('#btn-day').html("Perbulan");
-        $('#btn-export').attr('href', '/employee-cuti/export/' + year_month)
-        $('#btn-export-setup').attr('href', '/employee-cuti-setup/export/' + year_month)
+        $('#btn-year').html(arr_date_today.year);
+        $('#btn-month').html(months[parseInt(arr_date_today.month)]);
+        $('#btn-month').val(arr_date_today.month);
+        $('#btn-export').attr('href', '/employee-cuti/export/' + arr_date_today.year + '-' + arr_date_today.month)
+        $('#btn-export-setup').attr('href', '/employee-cuti-setup/export/' + arr_date_today.year + '-' + arr_date_today
+            .month)
         tableEmployeeCutiSetup();
-        console.log("last day : " + year_month);
-
-        reloadTable(year_month)
+        reloadTable(arr_date_today.year + '-' + arr_date_today.month)
 
         function createModalSetup() {
             $('#create-modal-employee-cuti-setup').modal('show');
@@ -722,6 +949,22 @@
 
 
         function tableEmployeeCutiSetup() {
+            // persiapan table employee cuti setup 
+            $('#parent-employee-cuti-setup').empty();
+            let element_table_cuti_setup = `
+                                <table id="table-employee-cuti-setup" class="display nowrap stripe hover table"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Tanggal Awal Bekerja</th>
+                                            <th>Roaster</th>
+                                            <th>Group</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>`;
+            $('#parent-employee-cuti-setup').append(element_table_cuti_setup);
             let data = [];
             var element_employee = {
                 mRender: function(data, type, row) {
@@ -774,7 +1017,7 @@
 									</div>`
                 }
             };
-            data.push(element_action)
+            data.push(element_action);
 
             $('#table-employee-cuti-setup').DataTable({
                 processing: true,
@@ -787,23 +1030,22 @@
                     url: '/employee-cuti-setup/data',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
-                        year_month: year_month
+                        filter: choseGroupCutiFilter()
                     },
                     type: 'POST',
-
                 },
                 columns: data
             });
         }
 
-        function showDataTableEmployeeCuti(url, id) {
+        function showDataTableEmployeeCuti() {
             $('#parent-employee-cuti').remove();
             var table_element = ` 
             <div class="pb-20" id="parent-employee-cuti">
                 <table id="table-employee-cuti" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Nama</th>
+                            <th>Nama Karyawan Cuti</th>
                             <th>Tanggal Cuti</th>
                             <th>Lama</th>
                             <th>Tanggal Balik</th>
@@ -816,9 +1058,10 @@
             </div>`;
 
             $('#the-table').append(table_element);
-            $('#btn-export').attr('href', 'employee-cuti/export/' + year_month)
-            $('#btn-export-setup').attr('href', 'employee-cuti-setup/export/' + year_month)
-           
+            $('#btn-export').attr('href', 'employee-cuti/export/' + arr_date_today.year + '-' + arr_date_today.month)
+            $('#btn-export-setup').attr('href', 'employee-cuti-setup/export/' + arr_date_today.year + '-' + arr_date_today
+                .month)
+
 
 
             let data = [];
@@ -864,7 +1107,7 @@
                 mRender: function(data, type, row) {
                     return `
 									<div class="form-inline"> 
-										<button onclick="editData('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
+										<button onclick="editDataEmployeeCuti('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
 											<i class="icon-copy ion-gear-b"></i>
 										</button>
 										<button onclick="deleteData('` + row.uuid + `')" type="button" class="btn btn-danger mr-1  py-1 px-2">
@@ -875,8 +1118,7 @@
             };
             data.push(element_action)
 
-            console.log(id)
-            $('#' + id).DataTable({
+            $('#table-employee-cuti').DataTable({
                 processing: true,
                 serverSide: false,
                 responsive: true,
@@ -887,7 +1129,7 @@
                     url: '/employee-cuti/data',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
-                        year_month: year_month
+                        date: arr_date_today
                     },
                     type: 'POST',
 
@@ -911,8 +1153,8 @@
                     stopLoading()
                     data = response.data
                     console.log(data)
-                    $('#uuid').val(data.uuid),
-                        $('#employee_uuid').val(data.employee_uuid).trigger('change');
+                    $('#uuid').val(data.uuid)
+                    $('#employee_uuid-cuti-setup').val(data.employee_uuid).trigger('change');
                     $('#date_start_work').val(data.date_start_work)
                     $('#roaster_uuid').val(data.roaster_uuid).trigger('change');
                     $('#group_cuti_name').val(data.name_group_cuti)
@@ -934,32 +1176,65 @@
             $('#table_reload').val('employee-cuti')
         }
 
-        function refreshTable(val_year = null, val_month = null) {
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
+        function editDataEmployeeCuti(uuid){
+            
+            $.ajax({
+                url: '/employee-cuti/show/'+uuid,
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    let data = res.data;
+                    cg('res',res)
+                    let schdl = `${data.date_schedule_start_cuti} sd ${data.date_schedule_end_cuti}`;
+                    $('#employee_uuid-cuti').val(data.employee_uuid).trigger('change');
+                    $('#schedule_cuti').val(schdl).trigger('change');
+                    $('#status_cuti').val(data.status_cuti).trigger('change');
+                    $('#date_real_start_cuti').val(data.date_real_start_cuti).trigger('change');
+                    $('#long_cuti').val(data.long_cuti).trigger('change');                    
+                    $('#date_real_end_cuti').val(data.date_real_end_cuti).trigger('change');
+                    $('#kompensasi_cuti').val(data.kompensasi_cuti).trigger('change');
+                    let data_em = data_database.data_employees[data.employee_uuid];
+                    $('#poh_uuid').val(data_em.poh_uuid).trigger('change');
+                    $('#kabupaten').val(data_em.kabupaten).trigger('change');
+                    $('#value_money_cuti').val(data.value_money_cuti).trigger('change');
+                    $('#monitoring_cuti').val(data.monitoring_cuti).trigger('change');
+                    $('#date_come_cuti').val(data.date_come_cuti).trigger('change');
+                    $('#uuid-cuti').val(data.uuid).trigger('change');
+                   
+                    $('#create-modal-employee-cuti').modal('show');
+                }
+            });
+        }
 
-            console.log(v_month);
+        function refreshTable(val_year = null, val_month = null) {
+            cg('refreshtable', arr_date_today);
+            year = arr_date_today.year;
+            month = arr_date_today.month;
+
             if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
             }
             if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(arr_date_today.month);
             }
-            year_month = v_year + '-' + v_month;
+
+            $('#btn-export').attr('href', '/user/absensi/export/' + arr_date_today.year + '-' + arr_date_today.month)
+            $('#btn-export-template').attr('href', '/user/absensi/export-template/' + arr_date_today.year + '-' +
+                arr_date_today.month)
+            let _url = 'user/absensi/data/' + arr_date_today.year + '-' + arr_date_today.month;
+            // showDataTableEmployeeAbsen(_url, ['pay', 'cut', 'A'], 'table-absen')
+            setDateSession(year, month);
 
 
-            reloadTable(year_month)
+            reloadTable(arr_date_today.year + '-' + arr_date_today.month)
         }
 
 
         function reloadTable(year_month) {
-            console.log('year:' + year_month)
-            showDataTableEmployeeCuti('url', 'table-employee-cuti')
+            showDataTableEmployeeCuti()
         }
 
         function deleteDataSetup(uuid) {

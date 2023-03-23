@@ -202,8 +202,6 @@
                 _url = `user/absensi/data-employee/${year_month}/${nik_employee}`;
                 showDataTableUserPrivilege(_url, ['date'], 'table-privilege');
             }
-
-
         }
 
 

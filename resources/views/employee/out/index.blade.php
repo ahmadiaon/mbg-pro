@@ -62,7 +62,7 @@
             @endif
         </div>
         <div id="the-table">
-            <div class="pb-20" id="tablePrivilege">
+            <div class="pb-20" id="employee-out">
                 <table id="table-employee-out" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
@@ -106,9 +106,8 @@
             </form>
         </div>
     </div>
-    {{--modal create  --}}
-    <div class="modal fade" id="createModal"  role="dialog" aria-labelledby="import-modalTitle"
-        aria-hidden="true">
+    {{-- modal create  --}}
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <form id="form-employee-out" action="/employee-out/store" method="post" enctype="multipart/form-data">
                 @csrf
@@ -120,38 +119,38 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                            <div class="form-group">
-                                <label for="">Pilih Karyawan</label>
-                                <select style="width: 100%;" name="employee_uuid" id="employee_uuid"
-                                    class="custom-select2 form-control">
-                                    <option value="">karyawan</option>
-                                </select>
-                                <div class="invalid-feedback" id="req-employee_uuid">
-                                    Data tidak boleh kosong
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Status Keluar</label>
-                                <select class="form-control" name="out_status" id="out_status">
-                                    <option value="Resign">Resign</option>
-                                    <option value="S-PHK">S-PHK</option>
-                                    <option value="Pensiun">Pensiun</option>
-                                    <option value="Meninggal Dunia">Meninggal Dunia</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Tanggal Keluar</label>
-                                <input class="form-control" type="date" name="date_out" id="date_out">
-                            </div>
-                            <div class="invalid-feedback" id="req-date_out">
+                        <div class="form-group">
+                            <label for="">Pilih Karyawan</label>
+                            <select style="width: 100%;" name="employee_uuid" id="employee_uuid"
+                                class="custom-select2 form-control">
+                                <option value="">karyawan</option>
+                            </select>
+                            <div class="invalid-feedback" id="req-employee_uuid">
                                 Data tidak boleh kosong
                             </div>
-                            <div class="form-group">
-                                <label for="">Dokument</label>
-                                <input type="hidden" class="form-control" name="document_out_name" id="document_out_name">
-                                <input accept=".pdf" id="document_out" name="document_out" 
-                                    class="form-control" type="file">
-                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Status Keluar</label>
+                            <select class="form-control" name="out_status" id="out_status">
+                                <option value="Resign">Resign</option>
+                                <option value="S-PHK">S-PHK</option>
+                                <option value="Pensiun">Pensiun</option>
+                                <option value="Meninggal Dunia">Meninggal Dunia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Tanggal Keluar</label>
+                            <input class="form-control" type="date" name="date_out" id="date_out">
+                        </div>
+                        <div class="invalid-feedback" id="req-date_out">
+                            Data tidak boleh kosong
+                        </div>
+                        <div class="form-group">
+                            <label for="">Dokument</label>
+                            <input type="hidden" class="form-control" name="document_out_name" id="document_out_name">
+                            <input accept=".pdf" id="document_out" name="document_out" class="form-control"
+                                type="file">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -161,7 +160,7 @@
             </form>
         </div>
     </div>
-    {{--modal create with show dokument  --}}
+    {{-- modal create with show dokument  --}}
     <div class="modal fade bs-example-modal-lg" id="createModald" role="dialog" style="width:100%"
         aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -217,8 +216,8 @@
         </div>
     </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    <!-- Modal -->
+    <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -243,40 +242,35 @@
 
 @section('js')
     <script>
+        let year;
+        let month;
+        let v_year;
+        let v_month;
+        let _ur;
+
         var employees = @json($employees);
-        employees.forEach(element => {
-            var elements = `<option value="${element.uuid}">${element.name} - ${element.position}</option>`;
-            // console.log(element);
-            $('#employee_uuid').append(elements);
-        });
 
+        function firstIndexEmployeeOut() {
+            cg('arr', arr_date_today);
+            let year = arr_date_today.year;
+            let month = arr_date_today.month;
+            let v_year = arr_date_today.year;
+            let v_month = arr_date_today.month;
+            let _url = 'user/absensi/data/' + arr_date_today.year + '-' + arr_date_today.month;
 
-        let year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
-        $('#btn-month').val(arr_year_month[1]);
-        $('#btn-day').html("Perbulan");
-        $('#btn-export').attr('href', '/employee-out/export/' + year_month)
+            employees.forEach(element => {
+                var elements = `<option value="${element.uuid}">${element.name} - ${element.position}</option>`;
+                // console.log(element);
+                $('#employee_uuid').append(elements);
+            });
 
-        console.log("last day : " + year_month);
-
-        reloadTable(year_month)
-
-        $.ajax({
-            url: '/employee-out/data',
-            type: "POST",
-            data:  {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    year_month: year_month
-                },
-            success: function(response) {
-                console.log(response)
-            },
-            error: function(response) {
-                alertModal()					
-            }
-        });
+            $('#btn-year').html(arr_date_today.year);
+            $('#btn-month').html(months[parseInt(arr_date_today.month)]);
+            $('#btn-month').val(arr_date_today.month);
+            $('#btn-export').attr('href', '/employee-out/export/' + arr_date_today.year + '-' + arr_date_today.month)
+            showDataTableEmployeeOut( 'table-employee-out')
+        }
+        firstIndexEmployeeOut();
 
 
         function storePO() {
@@ -284,10 +278,10 @@
             let _url = "/employee-out/store";
             var document_out = $('#document_out')[0].files;
 
-            let muchErr =isRequired(['employee_uuid', 'date_out'])
-            console.log('req'+muchErr)
+            let muchErr = isRequired(['employee_uuid', 'date_out'])
+            console.log('req' + muchErr)
 
-            if(muchErr > 0){
+            if (muchErr > 0) {
                 return false;
             }
 
@@ -326,33 +320,31 @@
             $('#form-employee-out')[0].reset();
         }
 
-        // function showDataTableEmployeeHourMeterMonth(url, dataTable, id) {
-        function showDataTableEmployeeHourMeterMonth(url, id) {
-            console.log(year_month)
+        // function showDataTableEmployeeOut(url, dataTable, id) {
+        function showDataTableEmployeeOut(id) {
+
+            $('#employee-out').remove();
+            var table_element = ` 
+            <div class="pb-20" id="employee-out">
+                <table id="table-employee-out" class="display nowrap stripe hover table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Tanggal Keluar</th>
+                            <th>Alasan</th>
+                            <th>Dokumen</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>`;
+
+            $('#the-table').append(table_element);
+            $('#btn-export').attr('href', 'employee-out/export/' + arr_date_today.year+'-'+arr_date_today.month)
+
             let data = [];
 
-            var element_employee = {
-                mRender: function(data, type, row) {
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    if (row.photo_path == null) {
-                        row.photo_path = '/vendors/images/photo4.jpg';
-                    }
-                    return `<div class="name-avatar d-flex align-items-center">
-										<div class="avatar mr-2 flex-shrink-0">
-											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
-												height="40" alt="" />
-										</div>
-										<div class="txt">
-											<div class="weight-600">${row.name}</div>
-                                            <small>${row.position}</small></br>
-											<small>${row.nik_employee}</small>
-										</div>
-									</div>`
-                }
-            };
-            data.push(element_employee)
+            data.push(element_profile_employee)
 
             let dataTable = [
                 'date_out',
@@ -368,23 +360,23 @@
             });
 
             var elements_doc = {
-					mRender: function (data, type, row) {    
-                        let btn;
-                        if(row.document_path != null){
-                            btn =  `<div class="form-inline">
+                mRender: function(data, type, row) {
+                    let btn;
+                    if (row.document_path != null) {
+                        btn = `<div class="form-inline">
                                                         <button type="button" onclick="showdoc('${row.document_path}')" class="btn btn-sm btn-primary mr-1">Dokumen</button>
                                                     </div>`;
-                        }else{
-                            btn = 'kosong';
-                        }
-						return btn;
-					}
-				};
-			data.push(elements_doc)
+                    } else {
+                        btn = 'kosong';
+                    }
+                    return btn;
+                }
+            };
+            data.push(elements_doc)
 
             var element_action = {
                 mRender: function(data, type, row) {
-                    console.log(row)
+                    // console.log(row)
                     return `
 									<div class="form-inline"> 
 										<button onclick="editData('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
@@ -409,7 +401,7 @@
                     url: '/employee-out/data',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
-                        year_month: year_month
+                        year_month: arr_date_today.year+'-'+arr_date_today.month
                     },
                     type: 'POST',
 
@@ -417,60 +409,33 @@
                 columns: data
             });
         }
-        function deleteData(uuid){
+
+        function deleteData(uuid) {
             let _url = '/employee-out/delete'
-            
+
             $('#uuid_delete').val(uuid)
             $('#url_delete').val(_url)
             $('#confirm-modal').modal('show')
             $('#table_reload').val('employee-out')
-       }
-
-        function refreshTable(val_year = null, val_month = null, val_day) {
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
-
-            console.log(v_month);
-            if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
-            }
-            if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
-            }
-            year_month = v_year + '-' + v_month;
-
-
-            reloadTable(year_month)
         }
 
+        function refreshTable(val_year = null, val_month = null, val_day) {
+            year = arr_date_today.year;
+            month = arr_date_today.month;
 
-        function reloadTable(year_month) {
+            if (val_year) {
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
+            }
 
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-out" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Tanggal Keluar</th>
-                            <th>Alasan</th>
-                            <th>Dokumen</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>`;
-
-            $('#the-table').append(table_element);
-            $('#btn-export').attr('href', 'employee-out/export/' + year_month)
-            console.log('year:' + year_month)
-            showDataTableEmployeeHourMeterMonth('url', 'table-employee-out')
+            if (val_month) {
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(arr_date_today.month);
+            }
+            $('#btn-export').attr('href', '/user/absensi/export/' + arr_date_today.year + '-' + arr_date_today.month)
+            showDataTableEmployeeOut( 'table-employee-out')
+            setDateSession(year, month);
         }
     </script>
 @endsection

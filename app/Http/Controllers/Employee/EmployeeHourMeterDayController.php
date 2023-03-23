@@ -719,7 +719,6 @@ class EmployeeHourMeterDayController extends Controller
         ];
         return view('employee_hour_meter_day.index', [
             'title'         => 'Hour Meter',
-            'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'layout'    => $layout,
             'nik_employee' => ''
         ]);

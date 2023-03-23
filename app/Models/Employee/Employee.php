@@ -26,26 +26,109 @@ class Employee extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public static function getAll(){
-        return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
-        ->join('positions','positions.uuid','=','employees.position_uuid')
-        ->get([
-            'user_details.name',
-            'user_details.photo_path',
-            'positions.position',
-            'employees.employee_status',
-            'employees.uuid',
-            'employees.machine_id',
-            'employees.nik_employee',
-            'employees.uuid as employee_uuid'
-        ]);
-    }
+
+    
+
 
     public static function noGet_employeeAll(){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
-        ->join('employee_roasters','employee_roasters.employee_uuid','employees.uuid')
-        ->join('positions','positions.uuid','=','employees.position_uuid');
+        ->leftJoin('employee_roasters','employee_roasters.employee_uuid','employees.uuid')
+        ->leftJoin('positions','positions.uuid','=','employees.position_uuid')
+        ->leftJoin('departments','departments.uuid','=','employees.department_uuid');
     }
+
+    public static function data_employee(){
+        return Employee::join('user_details','user_details.uuid','employees.user_detail_uuid')
+        ->leftJoin('companies','companies.uuid','employees.company_uuid')
+        ->leftJoin('positions','positions.uuid','=','employees.position_uuid')
+        ->leftJoin('departments','departments.uuid','=','employees.department_uuid')
+        ->leftJoin('user_addresses','user_addresses.user_detail_uuid','=','employees.user_detail_uuid')
+        ->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end')        
+        ->where('employees.employee_status','!=', 'talent')
+        ->get([
+            'user_details.name',
+            'companies.company',
+            'positions.position',
+            'user_addresses.*',
+            'employees.*'
+        ]);
+    }
+
+
+    public static function showWhereNik_employee($nik_employee)
+    {
+        $data = UserDetail::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        $data_address = UserAddress::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        $data = collect($data);
+
+        if($data_address){
+            $data_address = collect($data_address);
+            $data = $data->merge($data_address); 
+        }
+
+        $data_address = Employee::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        if($data_address){
+            $data_address = collect($data_address);
+            $data = $data->merge($data_address); 
+        }
+        $data_address = UserEducation::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        if($data_address){
+            $data_address = collect($data_address);
+            $data = $data->merge($data_address); 
+        }
+
+        $data_address = UserHealth::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        if($data_address){
+            $data_address = collect($data_address);
+            $data = $data->merge($data_address); 
+        }
+        $data_address = UserLicense::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        if($data_address){
+            $data_address = collect($data_address);
+            $data = $data->merge($data_address); 
+        }
+
+        $data_address = UserDependent::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        if($data_address){
+            $data_address = collect($data_address);
+            // dd($data_address);
+            $data = $data->merge($data_address); 
+        }
+        $data_address = EmployeeSalary::where('employee_uuid', $nik_employee)->whereNull('date_end')->first();
+        // dd($data_address);
+        if($data_address){
+            $data_address = collect($data_address);
+            // dd($data_address);
+            $data = $data->merge($data_address); 
+        }
+
+        $data_documents = EmployeeDocument::where('employee_uuid', $nik_employee)->whereNull('date_end')->get();
+        foreach($data_documents as $item){
+            $data_add[$item->document_table_name] = $item->document_path;
+        }        
+        if(!empty($data_add)){
+            $data_address = collect($data_add);
+            // dd($data_address);
+            $data = $data->merge($data_address); 
+        }
+
+        $data_documents = EmployeePremi::where('employee_uuid', $nik_employee)->whereNull('date_end')->get();
+        // dd($data_documents);
+        foreach($data_documents as $item){
+            $data_add[$item->premi_uuid] = $item->premi_value;
+        }        
+        if(!empty($data_add)){
+            $data_address = collect($data_add);
+            $data = $data->merge($data_address); 
+        }
+
+        $data_previlege = UserPrivilege::where('nik_employee', $nik_employee)->get();
+        $data['user_privileges'] = $data_previlege;
+        // dd($data);
+        return $data;
+    }
+
 
     public static function noGet_employeeAll_detail(){
         return Employee::join('user_details','user_details.uuid','=','employees.user_detail_uuid')
@@ -80,23 +163,10 @@ class Employee extends Model
             'employees.uuid as employee_uuid',
             'user_details.name'
         ]);
-
-       
-
         return $employees;
     }
 
-    public static function get_employee_only_latest(){
-        $employees = Employee::whereNull('employees.date_end')
-        ->get();
-
-        $employees = $employees->keyBy(function ($item) {
-            return strval($item->uuid);
-        });
-
-       
-        return $employees;
-    }
+   
 
     public static function get_employee_all_latest_full_data(){
         $employees = Employee::join('positions','positions.uuid','employees.position_uuid')

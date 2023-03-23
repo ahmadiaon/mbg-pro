@@ -17,19 +17,41 @@ class UserAddressController extends Controller
     }
 
     public function store(Request $request){  
-        $isEdit = true;
-        $validateData = $request->all();
 
-        if($validateData['isEdit'] == null){
-            $isEdit = false;
+        $validateData = $request->all();        
+
+        $data = session('recruitment-user');
+        if(empty($validateData['date_start'])) {
+            $validateData['date_start'] = $data['detail']['date_start'];
+        }
+        if(empty($validateData['user_detail_uuid'])) {
+            $validateData['user_detail_uuid'] = $validateData['uuid'] ;
         }
         $validateData = UserAddress::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
+        $data_store = Employee::showWhereNik_employee($validateData['uuid']);
+        $data['detail'] = $data_store;
+        session()->put('recruitment-user', $data);
 
-        if($isEdit){
-            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
+        return ResponseFormatter::toJson($data_store, 'store-user-dependent');
+    }
 
-        }   
-        return ResponseFormatter::toJson($validateData, 'store-user-dependent');
+    public function create(){
+        
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'user-address',
+        ];
+        $pohs = Poh::all();
+        
+        return view('user_detail.address.create', [
+            'title'         => 'Alamat',
+            'pohs' => $pohs,
+            'layout'    => $layout
+        ]);
+
     }
 
     public function createRecruitment(Request $request){

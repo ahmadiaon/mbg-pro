@@ -122,6 +122,5 @@ class DepartmentController extends Controller
         $data = Department::where('id', $Department)->first();
         $post= Department::find($Department)->delete();
         return response()->json(['code'=>200, 'message'=>'Data deleted successfully','data' => $data], 200);
-
     }
 }

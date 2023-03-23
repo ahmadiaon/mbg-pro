@@ -12,20 +12,41 @@ use App\Models\UserDetail\UserEducation;
 class UserEducationController extends Controller
 {
     public function store(Request $request){
+        $validateData = $request->all();        
 
-        $isEdit = true;
-        $validateData = $request->all();
-
-        if($validateData['isEdit'] == null){
-            $isEdit = false;
+        $data = session('recruitment-user');
+        if(empty($validateData['date_start'])) {
+            $validateData['date_start'] = $data['detail']['date_start'];
+        }
+        if(empty($validateData['user_detail_uuid'])) {
+            $validateData['user_detail_uuid'] = $validateData['uuid'] ;
         }
 
+       
         $validateData = UserEducation::updateOrCreate(['uuid' => $validateData['uuid']], $validateData );
-        if($isEdit){
-            $validateData = Employee::noGet_employeeAll_detail()->where('user_details.uuid', $validateData['uuid'])->get()->first();
-
-        }  
+        $data_store = Employee::showWhereNik_employee($validateData['uuid']);
+        $data['detail'] = $data_store;
+        
+        session()->put('recruitment-user', $data);
+        return ResponseFormatter::toJson($data_store, 'store-user-education');
+ 
         return ResponseFormatter::toJson($validateData, 'Data Store User Education');
+
+    }
+
+    public function create(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'user-education',
+        ];
+        
+        return view('user_detail.education.create', [
+            'title'         => 'Pendidikan',
+            'layout'    => $layout
+        ]);
 
     }
 

@@ -48,18 +48,32 @@ class CompanyController extends Controller
 
     public function store(Request $request){
         $validateData = $request->all();
-
+        // return ResponseFormatter::toJson($validateData, 'Data Stored');
         if(empty($validateData['uuid'])){
             $validateData['uuid'] = ResponseFormatter::toUUID($validateData['company']);
         }
+        if(!empty($validateData['default_price'])){
+            CoalFrom::updateOrCreate(['uuid'=> $validateData['uuid']], [
+                'company_uuid'  => $validateData['uuid'],
+                'coal_from' => $validateData['long_company'],
+                'hauling_price' => $validateData['default_price']
+            ]);
+        }
+
+
+
 
         $strore = Company::updateOrCreate(['uuid' => $request->uuid], $validateData);
+        $arr_companies= Company::all();
+        $request->session()->put('data_companies', $arr_companies);
         return ResponseFormatter::toJson($strore, 'Data Stored');
     }
 
     public function export(){
-        $arr_data = Company::join('coal_types','coal_types.uuid', 'companies.coal_type_uuid')->get();
-        // dd($arr_data);
+        $arr_data = Company::join('coal_types','coal_types.uuid', 'companies.coal_type_uuid')
+        ->join('coal_froms','coal_froms.uuid', 'companies.uuid')
+        ->get();
+        dd($arr_data);
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
         $createSheet->setCellValue('A1', 'Database :');
@@ -69,6 +83,7 @@ class CompanyController extends Controller
         $createSheet->setCellValue('B5', 'Kode Perusahaan');
         $createSheet->setCellValue('C5', 'Nama Perusahaan');
         $createSheet->setCellValue('D5', 'Kalorie Batu');
+        $createSheet->setCellValue('E5', 'Harga Hauling');
 
         $crateWriter = new Xls($createSpreadsheet);
         $name = 'file/absensi/database-perusahaan-'.rand(99,9999).'file.xls';
@@ -79,6 +94,7 @@ class CompanyController extends Controller
             $createSheet->setCellValue('B'.$row, $item->company);
             $createSheet->setCellValue('C'.$row, $item->long_company);
             $createSheet->setCellValue('D'.$row, $item->type_name);
+            $createSheet->setCellValue('E'.$row, $item->type_name);
             $each++;$row++;
         }
         $crateWriter->save($name);

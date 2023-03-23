@@ -41,11 +41,11 @@ class BrandController extends Controller
 
 
     public function store(Request $request){
-
-        if(empty($request->uuid)){
-            $request->uuid = ResponseFormatter::toUUID($request->brand);
+        $validateData = $request->all();
+        if(empty($validateData['uuid'])){
+            $validateData['uuid'] = ResponseFormatter::toUUID($request->brand);
         }
-        $strore = Brand::updateOrCreate(['uuid' => $request->uuid], 
+        $strore = Brand::updateOrCreate(['uuid' => $validateData['uuid']], 
         [
             'brand' => $request->brand,
             'date_start'    => $request->date_start,

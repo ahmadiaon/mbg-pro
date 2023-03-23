@@ -1,5 +1,36 @@
 @extends('template.admin.main_privilege')
 @section('content')
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"><span class="border"></span>
+               
+            </div>
+            <div class="col-md-auto">
+            </div>
+            <div class="col col-lg-2">
+            </div>
+        </div>
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"><span class="border"></span>
+            </div>
+            <div class="col-md-auto">
+            </div>
+            <div class="col col-lg-2">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                1 of 3
+            </div>
+            <div class="col-md-auto">
+                Variable width content
+            </div>
+            <div class="col col-lg-2">
+                3 of 3
+            </div>
+        </div>
+    </div>
+
     <div class="mb-30">
         <div class="row">
             <div class="col-12">

@@ -23,12 +23,12 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-    public function pdfs(){
-       
+    public function pdfs(){       
         $pdf = Pdf::loadView('myPDF')->setPaper('a4', 'potret');
-        // ahmadi
-        // $pdf->setPaaper(array(0, 0, 396, 612));
         return $pdf->download('invoice.pdf');
+    }
+    public function setSessionDatabase(){
+        return ResponseFormatter::setAllSession();
     }
 
     public function setDate(Request $request){
@@ -40,9 +40,22 @@ class AdminController extends Controller
         session()->put('year_month', $data);
         return ResponseFormatter::toJson($data, 'set date');
     }
+
+    public function setSession(Request $request){
+        $data = [
+            'year'  => $request->year,
+            'month' => (int)$request->month,
+            'day'   => null
+        ];
+        session()->put('year_month', $data);
+        return ResponseFormatter::toJson($data, 'set date');
+    }
+
+    public function getSession($uniq_name){        
+        return ResponseFormatter::toJson(session($uniq_name), 'set date');
+    }
+
     public function exportTable($table_name){
-
-
         $arr_table_name = [
             'purchase_orders',
             'users',
@@ -303,8 +316,8 @@ class AdminController extends Controller
 
 
     }
-    public function index()
-    {
+
+    public function index(){
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -348,9 +361,7 @@ class AdminController extends Controller
         ]);
     }
 
-
-    public function listEmployee()
-    {
+    public function listEmployee(){
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,

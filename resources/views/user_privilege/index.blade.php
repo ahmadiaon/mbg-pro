@@ -14,7 +14,6 @@
                         <th>Nama</th>
                         <th>NIK</th>
                         <th>Jabatan</th>
-                        <th>Status Karyawan</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -154,7 +153,7 @@
 				};
 			data.push(elements)
 
-			let urls = '{{env('APP_URL')}}'+url
+			let urls = '/user-privilege-data';
 			console.log(urls)
 				$('#'+id).DataTable({
 					processing: true,
@@ -167,7 +166,7 @@
 					columns:  data
 				});			
 		}
-        showDataTableUserPrivilege('user-data', ['nik_employee', 'position','employee_status'], 'table-user-privilege')
+        showDataTableUserPrivilege('user-data', ['nik_employee', 'position'], 'table-user-privilege')
         
         function showCreateModal() {
             $('#createModal').modal('show')
@@ -199,8 +198,8 @@
                 },
                 success: function(response) {
                     stopLoading()
-                    data = response.data
-                    console.log(data)
+                    data = response.data;
+                    console.log(data);
                     $('#nik_employee').val(data.nik_employee)
                     $('#modal-header').text(data.name+' Privilege')
                     $('input:checkbox').removeAttr('checked');

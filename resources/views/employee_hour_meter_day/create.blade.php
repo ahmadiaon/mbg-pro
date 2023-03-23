@@ -318,10 +318,6 @@
                 $('#employee_uuid').val(nik_employee).trigger('change');
             }
             getLastHm()
-
-            // $('#hm-20000').prop("checked", true)
-
-
         }
 
         firstEmployeeHourMeterCreate();

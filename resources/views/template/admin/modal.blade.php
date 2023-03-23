@@ -69,8 +69,25 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" id="btn-success-modal-id" class="btn btn-primary" onclick="stopLoadingId()" data-dismiss="modal">
+                <button type="button" id="btn-success-modal-id" class="btn btn-primary" data-dismiss="modal">
                     Done
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="message-modal-id" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center font-18">
+                <h3 class="mb-20 blue-text">Pesan:</h3>
+                <p id="message-text">ini pemberitaannya</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" id="btn-message-modal-id" class="btn btn-primary"  data-dismiss="modal">
+                    ok
                 </button>
             </div>
         </div>
