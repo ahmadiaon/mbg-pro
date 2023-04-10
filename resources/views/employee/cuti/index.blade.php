@@ -646,10 +646,10 @@
         let filter = {
                 group_cuti_uuid: null
             };
-        let dataUser = @json(session('dataUser'));
 
         let nik_employee = dataUser.nik_employee;
         var employees_schedule_cuti = @json($employees_schedule_cuti);
+        cg('employees_schedule_cuti',employees_schedule_cuti);
     </script>
 
     <script src="/src/plugins/apexcharts/apexcharts.min.js"></script>
@@ -1110,7 +1110,7 @@
 										<button onclick="editDataEmployeeCuti('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
 											<i class="icon-copy ion-gear-b"></i>
 										</button>
-										<button onclick="deleteData('` + row.uuid + `')" type="button" class="btn btn-danger mr-1  py-1 px-2">
+										<button onclick="deleteDataEmployeeCuti('` + row.uuid + `')" type="button" class="btn btn-danger mr-1  py-1 px-2">
 											<i class="icon-copy ion-trash-b"></i>
 										</button>
 									</div>`
@@ -1167,7 +1167,7 @@
             });
         }
 
-        function deleteData(uuid) {
+        function deleteDataEmployeeCuti(uuid) {
             let _url = '/employee-cuti/delete'
 
             $('#uuid_delete').val(uuid)

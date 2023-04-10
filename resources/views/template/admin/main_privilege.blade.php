@@ -23,6 +23,7 @@
     @endif
     <script>
         let data_database = @json(session('data_database'));
+        let dataUser = @json(session('dataUser'));
 
         function padToDigits(much, num) {
             console.log('padToDigits')
@@ -176,7 +177,32 @@
             }
         };
 
+        var element_profile_employee_session = {
+            mRender: function(data, type, row) {
+                let date_employee_element_profile_employee_session = data_database.data_employees[row
+                    .employee_uuid];
+                let photo_path = '/vendors/images/photo4.jpg';
+                if (date_employee_element_profile_employee_session) {
+                    if (typeof(date_employee_element_profile_employee_session['photo_path']) != 'undefined') {
+                        if (date_employee_element_profile_employee_session['photo_path'] != null) {
+                            photo_path = date_employee_element_profile_employee_session.photo_path;
+                        }
+                    }
+                }
 
+                return `<div class="name-avatar d-flex align-items-center">
+                            <div class="avatar mr-2 flex-shrink-0">
+                                <img src="${photo_path}" class="border-radius-100 shadow" width="40"
+                                    height="40" alt="" />
+                            </div>
+                            <div class="txt">
+                                <div class="weight-600">${date_employee_element_profile_employee_session.name}</div>
+                                <small>${date_employee_element_profile_employee_session.nik_employee}</small></br>
+                                <small>${date_employee_element_profile_employee_session.position}</small>
+                            </div>
+                        </div>`
+            }
+        };
 
 
 
@@ -336,13 +362,13 @@
                             let type_input = $('#' + key).attr('type');
                             if (type_input == 'file') {
                                 let fileInput = document.getElementById(key);
-                                cg(key, data_user[key] );
+                                cg(key, data_user[key]);
                                 // Create a new File object
-                                let myFile = new File(['Hello World!'], data_user[key] , {
+                                let myFile = new File(['Hello World!'], data_user[key], {
                                     type: 'text/plain',
                                     lastModified: new Date(),
                                 });
-                                $('#show-'+key).attr("onclick", "showdoc('"+data_user[key]+"')" );
+                                $('#show-' + key).attr("onclick", "showdoc('" + data_user[key] + "')");
 
                                 // Now let's create a DataTransfer to get a FileList
                                 let dataTransfer = new DataTransfer();
@@ -441,7 +467,7 @@
                 columns: data
             });
         }
-        
+
         function stopLoading() {
             console.log('stop loading')
             $('.modal').modal('hide')
@@ -453,31 +479,36 @@
         }
 
         function alertModal() {
-            console.log('start loading')
             $('#alert-modal').modal('show')
         }
+
         function formatDate(d) {
-         
-         var    month = '' + (d.getMonth() + 1),
-             day = '' + d.getDate(),
-             year = d.getFullYear();
 
-         if (month.length < 2) month = '0' + month;
-         if (day.length < 2) day = '0' + day;
+            var month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
 
-         return [year, month, day].join('-');
-     }
-     function formatDateArr(d) {
-         
-         var    month = '' + (d.getMonth() + 1),
-             day = '' + d.getDate(),
-             year = d.getFullYear();
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
 
-         if (month.length < 2) month = '0' + month;
-         if (day.length < 2) day = '0' + day;
+            return [year, month, day].join('-');
+        }
 
-         return {year:year, month:month, day:day};
-     }
+        function formatDateArr(d) {
+
+            var month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return {
+                year: year,
+                month: month,
+                day: day
+            };
+        }
 
         function modalCreateGlobal(id) {
             $('#modal-create-' + id).modal('show')
@@ -520,9 +551,9 @@
                 processData: false,
                 data: form_data,
                 success: function(response) {
-                    
+
                     // alert("Message:"+JSON.stringify(response.message)+"-"+JSON.stringify(response.data));
-                    // console.log(response);
+                    console.log(response);
                     stopLoading();
                 },
                 error: function(response) {
@@ -614,7 +645,7 @@
         }
 
         function getLastNdigits(number, n) {
-            console.log('getLastNdigits')
+            // console.log('getLastNdigits')
             return Number(String(number).slice(-n));
         }
 
@@ -633,18 +664,24 @@
 
         }
 
-        
+
         var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
             "November", "Desember"
         ];
-        function getLetter(num){
+
+        function getLetter(num) {
             var letter = String.fromCharCode(num + 64);
             return letter;
         }
 
         function monthName(month) {
             return months[parseInt(month)]
+        }
+
+        function getStringDate(date) {
+            let arr_date = date.split('-');
+            return `${arr_date[2]} ${monthName(arr_date[1])} ${arr_date[0]}`;
         }
 
         if (typeof(data_database) == 'undefined') {
@@ -708,9 +745,11 @@
     <script>
         $(document).ready(function() {
             @yield('js_ready')
+            cg('dataUser', @json(session('dataUser')));
+
         });
     </script>
-
+    <script></script>
 </body>
 
 </html>

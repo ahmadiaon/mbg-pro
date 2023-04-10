@@ -930,6 +930,43 @@ class AllowanceController extends Controller
             }
             // end potongan alpa dan izin
 
+
+            /*
+
+            - BPJS Naker = Gajih Pokok x 2% 
+
+
+
+            - PPH21
+            PPh21 bulan ini = PKP / 12 x 5%
+            PKP = Penghasilan Netto Setahun - PTKP
+            Penghasilan Netto Setahun = (Penghasilan Netto Sebulan x 12) - (kekurangan bulan lalu * 12)
+            Penghasilan Netto Sebulan = Penghasilan Brutto Sebulan - Faktor Pengurang PKP
+            { Penghasilan Brutto Sebulan = Tunjangan Kehadiran + Insentif Produksi + Kekurangan Bulan Lalu + Gajih Pokok + Insentif + Tunjangan + JKK 1,74% + JK 0,3 % + kes 4%
+                - Tunjangan Kehadiran 
+                - Kekurangan Bulan Lalu 
+                - Gajih Pokok 
+                - Insentif 
+                - Tunjangan 
+                - JKK 1,74%  = BPJS Naker x 50 x 1,74 %
+                - JK 0,3 % = BPJS Naker x 50 x 0,3 %
+                - kes 4% = BPJS Naker x 50 x 4 %
+                
+                -  { Insentif Produksi = (Hauling + HM + Premi) x 50%
+
+                    }
+            }
+            
+            { Faktor Pengurang PKP = Biaya Jabatan(5%) + Iuran JHT(2%) + Iuran Pensiun(1%)
+                - Biaya Jabatan(5%) = Penghasilan Brutto Sebulan 5% (maks Rp. 500.000)
+                - Iuran JHT(2%) = Gajih Pokok 2%
+                - Iuran Pensiun(1%) = Gajih Pokok 1%
+            }
+
+
+
+            */
+
             $employee->cutted_total = $employee->pph21 + $employee->is_bpjs_ketenagakerjaan_pay + $employee->is_bpjs_kesehatan_pay + $employee->is_bpjs_pensiun_pay +$employee->cut_alpa_loan+$employee->cut_absen_loan;
 
             $employee->salary_netto = $employee->salary_netto_before_cut_debt = round($employee->gaji_kotor - $employee->cutted_total,0);           

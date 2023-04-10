@@ -20,7 +20,8 @@ class AuthenticationController extends Controller
             'title'         => 'Login'
         ]);
     }
-    public function logout(){
+    public function logout()
+    {
         session()->forget('dataUser');
         return view('authentication.login', [
             'title'         => 'Login'
@@ -34,44 +35,55 @@ class AuthenticationController extends Controller
             'password'          => 'required'
         ]);
 
-         $dataUser = User::where('nik_employee', $request->username)->get()->first();
-        if($dataUser){
-            try{
-                if(Hash::check($request->password, $dataUser->password)){
+        $dataUser = User::where('nik_employee', $request->username)->get()->first();
+        if ($dataUser) {
+            try {
+                if (Hash::check($request->password, $dataUser->password)) {
                     $dataUserOld = $dataUser;
 
-                $arr_employees= Employee::data_employee();
-                $arr_companies= Company::all();
-                $request->session()->put('data_employees', $arr_employees);                
-                $request->session()->put('data_companies', $arr_companies);
 
-                ResponseFormatter::setAllSession();
 
-                $col_dataUser = Employee::noGet_employeeAll_detail();
-                
-                $dataUser = $col_dataUser->where('nik_employee', $dataUser->nik_employee)->get()->first();
-              
-                $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($dataUser->nik_employee);
-                $dataUser->is_login  = true;
-                foreach($user_privileges as $user_privilege=>$value){
+                    $col_dataUser = Employee::noGet_employeeAll_detail();
+
+                    $dataUser = $col_dataUser->where('nik_employee', $dataUser->nik_employee)->get()->first();
+
+                    $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($dataUser->nik_employee);
+                    $dataUser->is_login  = true;
+
+                    // data privilege 
+                    $arr_privilege = [];
+                    $data_privilege = UserPrivilege::where('nik_employee', $dataUser->nik_employee)->get();
+                    foreach ($data_privilege as $item_privilege) {
+                        $arr_privilege[$item_privilege->privilege_uuid] = $item_privilege;
+                    }
+                    $dataUser->user_privileges = $arr_privilege;
+                    foreach ($user_privileges as $user_privilege => $value) {
                         $name_index = $user_privilege;
                         $dataUser->$name_index = $value;
-                }                
-                    if(!$dataUser){
-                        $dataUser =$dataUserOld;
-                        //  dd('/me/');
+                    }                    
+                    if (!$dataUser) {
+                        $dataUser = $dataUserOld;
                         $request->session()->put('dataUser', $dataUser);
-                    }else{
+                    } else {
                         $request->session()->put('dataUser', $dataUser);
-                        return redirect()->intended('/user');
                     }
-                }else{
+                    
+                    $arr_employees= Employee::data_employee();
+                    $arr_companies= Company::all();
+                    $request->session()->put('data_employees', $arr_employees);                
+                    $request->session()->put('data_companies', $arr_companies);
+
+                    ResponseFormatter::setAllSession();
+                    
+                    return redirect()->intended('/user');
+                    
+                } else {
                     return back()->with('loginError', 'Login Failed!');
                 }
             } catch (Exception $e) {
                 return back()->with('loginError', 'Login Failed!');
             }
-        }else{
+        } else {
             return back()->with('loginError', 'Login Failed!');
         }
     }

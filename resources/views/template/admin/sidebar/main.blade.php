@@ -85,6 +85,10 @@
                                         class="{{ $layout['active'] == 'employee-cuti' ? 'active' : '' }}"
                                         data-toggle="tooltip" data-placement="right" title="Manajemen Cuti">Cuti</a>
                                 </li>
+                                @if (!empty(session('dataUser')->read_list_absensi_employee))
+                                    <li><a class="{{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}"
+                                            href="/user/absensi">Absensi Karyawan</a></li>
+                                @endif
                                 <li><a href="/employee-changge"
                                         class="{{ $layout['active'] == 'employee-changge' ? 'active' : '' }}"
                                         data-toggle="tooltip" data-placement="right"
@@ -118,7 +122,7 @@
                                             href="/tonase">Tonase</a></li>
                                     <li><a class="{{ $layout['active'] == 'employee-payment' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right" title="Hour Meter"
-                                            href="/payment">Payment</a></li>
+                                            href="/payment">Borongan</a></li>
                                     <li><a class="{{ $layout['active'] == 'employee-other-payment' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right" title="Hour Meter"
                                             href="/other-payment">Pembayaran Lainnya</a></li>
@@ -126,10 +130,7 @@
                                             data-toggle="tooltip" data-placement="right" title="Hour Meter"
                                             href="/production">Produksi</a></li>
                                 @endif
-                                @if (!empty(session('dataUser')->read_list_absensi_employee))
-                                    <li><a class="{{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}"
-                                            href="/user/absensi">Absensi Karyawan</a></li>
-                                @endif
+                                
                                 <li><a class="{{ $layout['active'] == 'employee-allowance' ? 'active' : '' }}"
                                         href="/allowance">Total</a></li>
                             </ul>
@@ -151,6 +152,10 @@
                                         <a class="{{ $layout['active'] == 'employee-payment-debt' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right" title="Hour Meter"
                                             href="/employee-payment-debt">Pembayaran Hutang</a>
+                                    </li>
+                                    <li>
+                                        <a class="{{ $layout['active'] == 'employee-deduction' ? 'active' : '' }}"
+                                            href="/employee-deduction">Pengurang Lainnya</a>
                                     </li>
                                 @endif
                             </ul>
@@ -202,6 +207,9 @@
                                             href="/database/position">Jabatan</a></li>
                                     <li><a class="{{ $layout['active'] == 'Location' ? 'active' : '' }}"
                                             href="/database/location">Lokasi</a></li>
+                                            
+                                    <li><a class="{{ $layout['active'] == 'hm-bonus' ? 'active' : '' }}"
+                                        href="/database/hm-bonus">Bonus HM</a></li>
                                     {{-- <li><a class="{{ $layout['active'] == 'religion' ? 'active' : '' }}"
                                             href="/database/religion">Agama</a></li> --}}
                                     {{-- <li><a class="{{ $layout['active'] == 'poh' ? 'active' : '' }}"

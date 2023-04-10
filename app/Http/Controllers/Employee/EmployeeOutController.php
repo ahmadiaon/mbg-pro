@@ -8,6 +8,7 @@ use App\Models\Employee\EmployeeOut;
 use Carbon\Carbon;
 
 use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeeDocument;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -81,7 +82,8 @@ class EmployeeOutController extends Controller
 
     public function store(Request $request){
         $employee_uuid = $request->employee_uuid;
-
+        $validatedData = $request->all();
+        $data_employees = session('data_database')['data_employees'][$validatedData['employee_uuid']];
        
 
         $employee_out = [
@@ -90,7 +92,14 @@ class EmployeeOutController extends Controller
             'date_start'  => $request->date_out,
             'out_status'    => $request->out_status,
         ];
+        $arr_date_out = explode('-', $request->date_out);
         $store = EmployeeOut::updateOrCreate(['uuid' => $employee_uuid], $employee_out);
+       
+        
+        $store = Employee::updateOrCreate(['uuid' => $employee_uuid, 'date_end' => null], ['employee_status' => 'out']);
+        $endDateThisMonth = ResponseFormatter::getEndDay($arr_date_out[0].'-'.$arr_date_out[1]);
+        
+     
       
         if($request->file('document_out')) {
             $document_name =   $employee_uuid.'-'.mt_rand(5, 99985) . '.'.$request->document_out->getClientOriginalExtension();
@@ -103,6 +112,15 @@ class EmployeeOutController extends Controller
                 'document_path' => $document_name,
                 'document_table_name'   => 'employee_outs'
             ]);
+        }
+        $startDate = new \DateTime($request->date_out);
+        $endDate = new \DateTime($arr_date_out[0].'-'.$arr_date_out[1].'-'.$endDateThisMonth);
+        $validatedData['status_absen_uuid']  = 'X';
+        $validatedData['employee_uuid'] = $data_employees['machine_id'];
+        for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
+            $validatedData['date'] = $date->format('Y-m-d');
+            $validatedData['uuid']  = $validatedData['date'] . '-' .$validatedData['employee_uuid'];
+            $store = EmployeeAbsen::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
         }
 
 

@@ -205,6 +205,7 @@
 
             var element_position = {
                 mRender: function(data, type, row) {
+                    cg('',row);
                     return data_database.data_positions[row.position_uuid]['position']
                 }
             };

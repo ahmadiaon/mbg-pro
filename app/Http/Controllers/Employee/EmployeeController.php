@@ -12,7 +12,11 @@ use App\Models\Department;
 use App\Models\Position;
 use App\Models\Company;
 use App\Models\Dictionary;
+use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeeCompany;
+use App\Models\Employee\EmployeeCuti;
+use App\Models\Employee\EmployeeCutiGroup;
+use App\Models\Employee\EmployeeCutiSetup;
 use App\Models\Employee\EmployeeDebt;
 use App\Models\Employee\EmployeeDocument;
 use App\Models\Employee\EmployeeHourMeterDay;
@@ -45,6 +49,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -57,7 +62,7 @@ class EmployeeController extends Controller
             'javascript_form'       => true,
             'active'                        => 'user-employee',
         ];
-    
+
         return view('employee.create', [
             'title'         => 'Tambah Karyawan',
             'layout'    => $layout
@@ -73,6 +78,7 @@ class EmployeeController extends Controller
             'javascript_form'       => true,
             'active'                        => 'employees-index'
         ];
+        ResponseFormatter::setAllSession();
         return view('employee.index', [
             'title'         => 'Daftar Karyawan',
             'layout'    => $layout
@@ -109,26 +115,30 @@ class EmployeeController extends Controller
 
     public function delete(Request $request)
     {
+        $data_emp = Employee::whereNull('employees.date_end')->get()->first();
         $data = Employee::where('employees.nik_employee', $request->uuid)->delete();
-        $data = UserDetail::where('user_details.uuid', $request->uuid )->delete();
+        $data = UserDetail::where('user_details.uuid', $request->uuid)->delete();
         $data = Department::where('departments.uuid', $request->uuid)->delete();
-        $data = Position::where('positions.uuid', $request->uuid )->delete();
-        $data = EmployeeCompany::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeeDebt::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeeHourMeterDay::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeeTonase::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeePayment::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeePremi::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeeRoaster::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeeSalary::where('employee_uuid', $request->uuid )->delete();
-        $data = EmployeeOut::where('employee_uuid', $request->uuid )->delete();
-        $data = UserAddress::where('user_detail_uuid', $request->uuid )->delete();
-        $data = UserPrivilege::where('nik_employee', $request->uuid )->delete();
-        $data = UserHealth::where('user_detail_uuid', $request->uuid )->delete();
-        $data = UserLicense::where('user_detail_uuid', $request->uuid )->delete();
-        $data = UserReligion::where('user_detail_uuid', $request->uuid )->delete();
-        $data = UserEducation::where('user_detail_uuid', $request->uuid )->delete();
-        $data = UserDependent::where('user_detail_uuid', $request->uuid )->delete();
+        $data = Position::where('positions.uuid', $request->uuid)->delete();
+        $data = EmployeeCompany::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeDebt::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeHourMeterDay::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeTonase::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeePayment::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeePremi::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeRoaster::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeSalary::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeOut::where('employee_uuid', $request->uuid)->delete();
+        $data = UserAddress::where('user_detail_uuid', $request->uuid)->delete();
+        $data = UserPrivilege::where('nik_employee', $request->uuid)->delete();
+        $data = UserHealth::where('user_detail_uuid', $request->uuid)->delete();
+        $data = UserLicense::where('user_detail_uuid', $request->uuid)->delete();
+        $data = UserReligion::where('user_detail_uuid', $request->uuid)->delete();
+        $data = UserEducation::where('user_detail_uuid', $request->uuid)->delete();
+        $data = UserDependent::where('user_detail_uuid', $request->uuid)->delete();
+        $data = EmployeeAbsen::where('employee_uuid', $data_emp->machine_id)->delete();
+        $data = EmployeeCutiSetup::where('employee_uuid', $request->uuid)->delete();
+        $data = EmployeeCuti::where('employee_uuid', $request->uuid)->delete();
         return redirect()->back();
         // dd($data);
         return view('datatableshow', ['data'         => $data]);
@@ -332,6 +342,11 @@ class EmployeeController extends Controller
                 return strval($item->uuid);
             });
 
+            $get_all_group_cuti = EmployeeCutiGroup::all();
+            $get_all_group_cuti = $get_all_group_cuti->keyBy(function ($item) {
+                return strval($item->uuid);
+            });
+
             $get_all_employee_premis = EmployeePremi::whereNull('date_end')->get();
             $get_all_employee_premis = $get_all_employee_premis->keyBy(function ($item) {
                 return strval($item->uuid);
@@ -400,13 +415,14 @@ class EmployeeController extends Controller
                     if (!empty($sheet->getCell($item_index['index'] . $no_employee)->getValue())) {
                         switch ($item_index['data_type']) {
                             case 'uuid':
-                               if(!empty($arr_atribut_size[ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue())])){
+                                if (!empty($arr_atribut_size[ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue())])) {
                                     $attr_value = $arr_atribut_size[ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue())]->uuid;
                                     $employee_data_one[$item_index['database'] . '_uuid'] = $attr_value;
                                     $employee_data_one[$item_index['database']] =  $attr_value;
-                                }else{
+                                } else {
                                     $employee_data_one[$item_index['database'] . '_uuid'] = ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue());
-                                    $employee_data_one[$item_index['database']] =  ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue());    
+                                    $employee_data_one[$item_index['database']] =  ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue());
+                                    $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
                                 }
                                 break;
                             case 'string':
@@ -425,12 +441,18 @@ class EmployeeController extends Controller
                 // dd($employee_data_one);
                 if (!empty($employee_data_one['department_uuid'])) {
                     if (empty($get_all_department[$employee_data_one['department_uuid']])) {
-                        Department::updateOrCreate(['uuid' => $employee_data_one['department_uuid']], ['department' => $employee_data_one['department']]);
+                        Department::updateOrCreate(['uuid' => $employee_data_one['department_uuid']], ['department' => $employee_data_one['department_with_space']]);
                     }
                 }
                 if (!empty($employee_data_one['position_uuid'])) {
                     if (empty($get_all_position[$employee_data_one['position_uuid']])) {
-                        Position::updateOrCreate(['uuid' => $employee_data_one['position_uuid']], ['position' => $employee_data_one['position']]);
+                        Position::updateOrCreate(['uuid' => $employee_data_one['position_uuid']], ['position' => $employee_data_one['position_with_space']]);
+                    }
+                }
+
+                if (!empty($employee_data_one['group_cuti_uuid'])) {
+                    if (empty($get_all_group_cuti[$employee_data_one['group_cuti_uuid']])) {
+                        EmployeeCutiGroup::updateOrCreate(['uuid' => $employee_data_one['group_cuti_uuid']], ['name_group_cuti' => $employee_data_one['group_cuti_uuid_with_space']]);
                     }
                 }
 
@@ -454,16 +476,16 @@ class EmployeeController extends Controller
                         } else {
                             $employee_data_one['employee_status'] = 'Training';
                         }
-                    }else{
+                    } else {
                         $employee_data_one['employee_status'] = 'Profesional';
                     }
                 }
-                
 
-                if(!empty( $employee_data_one['last_education'])){
-                    $employee_data_one[$employee_data_one['last_education'].'_name'] = 'default';
-                    $employee_data_one[$employee_data_one['last_education'].'_place'] = 'default';
-                    $employee_data_one[$employee_data_one['last_education'].'_year'] = 2000;
+
+                if (!empty($employee_data_one['last_education'])) {
+                    $employee_data_one[$employee_data_one['last_education'] . '_name'] = 'default';
+                    $employee_data_one[$employee_data_one['last_education'] . '_place'] = 'default';
+                    $employee_data_one[$employee_data_one['last_education'] . '_year'] = 2000;
                 }
 
                 $employee_data_one['uuid'] = $employee_data_one['nik_employee'];
@@ -487,6 +509,10 @@ class EmployeeController extends Controller
                 }
                 // dd($employee_data_one);
                 echo $nik_employee . "-start employee</br>";
+                if (!empty($employee_data_one['date_out'])) {
+                    $employee_data_one['employee_status'] = 'Keluar';
+                    $storeEmployee = EmployeeOut::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                }
                 if (!empty($data_old)) {
                     // dd($data_old);
                     if ($data_old['date_start'] > $employee_data_one['date_start']) {
@@ -506,6 +532,8 @@ class EmployeeController extends Controller
                         $storeEmployee = UserAddress::create($employee_data_one);
                         $storeEmployee = UserEducation::create($employee_data_one);
                         $storeEmployee = UserDependent::create($employee_data_one);
+                        $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
+
                         // dd('a');
                     } elseif ($data_old['date_start'] == $employee_data_one['date_start']) {
 
@@ -515,6 +543,7 @@ class EmployeeController extends Controller
                         $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                         $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                         $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                        $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                         // dd('b');
                     } else {
 
@@ -524,6 +553,7 @@ class EmployeeController extends Controller
                         $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
                         $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
                         $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                        $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
 
                         $storeEmployee = Employee::create($employee_data_one);
                         $storeEmployee = EmployeeSalary::create($employee_data_one);
@@ -531,6 +561,7 @@ class EmployeeController extends Controller
                         $storeEmployee = UserAddress::create($employee_data_one);
                         $storeEmployee = UserEducation::create($employee_data_one);
                         $storeEmployee = UserDependent::create($employee_data_one);
+                        $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
                         // dd('c');
                     }
                 } else {
@@ -540,9 +571,13 @@ class EmployeeController extends Controller
                     $storeEmployee = UserAddress::create($employee_data_one);
                     $storeEmployee = UserEducation::create($employee_data_one);
                     $storeEmployee = UserDependent::create($employee_data_one);
+                    $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
                     // dd('d');
                 }
-               
+
+
+
+
                 echo $nik_employee . "-start user detail</br>";
 
                 $employee_data_one['role'] = 'employee';
@@ -550,7 +585,6 @@ class EmployeeController extends Controller
                 $storeUser = User::updateOrCreate(['uuid'    =>  $employee_data_one['uuid']], $employee_data_one);
 
                 echo $nik_employee . "-start salary</br>";
-                // return 'z';
 
                 foreach ($premis as $premi) {
                     if (!empty($employee_data_one[$premi->uuid])) {
@@ -582,11 +616,13 @@ class EmployeeController extends Controller
                         // dd($storeEmployee);
                     }
                 }
+
                 echo $nik_employee . "-end</br>";
                 // dd('user detail will');
                 ob_end_clean();
                 $no_employee++;
             }
+            ResponseFormatter::setAllSession();
         } catch (Exception $e) {
             // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
@@ -640,6 +676,7 @@ class EmployeeController extends Controller
             'position', //E
             'department', //F
             'contract_status', //G
+            'employee_status', //G
             'date_document_contract', //H   
             'date_start_contract',   //I
             'long_contract', //J
@@ -661,6 +698,10 @@ class EmployeeController extends Controller
             'site_uuid',
             'roaster_uuid',
             'contract_number_full',
+            'date_start_work',
+            'group_cuti_uuid',
+            'out_status',
+            'date_out'
         ];
         $data_religion = Religion::all();
         $data_database['religion_uuid']['data'] = $data_religion;
@@ -682,7 +723,7 @@ class EmployeeController extends Controller
         $data_database['last_education']['data'] = $data_religion;
         $data_database['last_education']['key'] = 'name_atribut';
 
-        $data_religion = AtributSize::where('size', 'employee_status')->get();
+        $data_religion = AtributSize::where('size', 'contract_status')->get();
         $data_database['contract_status']['data'] = $data_religion;
         $data_database['contract_status']['key'] = 'name_atribut';
 
@@ -908,16 +949,154 @@ class EmployeeController extends Controller
 
     public function anyMoreData(Request $request)
     {
-        $data = Employee::data_employee();
+        $validateData = $request->all();
+        $date_validateData = [];
+        $start =$end = null;
+        $date_validateData_arr = [];
+        if(!empty($validateData['filter']['date_range'])){
+            $date_validateData_arr = explode(' - ',$validateData['filter']['date_range']);
+            if(count($date_validateData_arr) > 1){
+                $start = ResponseFormatter::excelToDate($date_validateData_arr[0]);
+                $end = ResponseFormatter::excelToDate($date_validateData_arr[1]);                
+            }elseif(count($date_validateData_arr) == 1){
+                $start = ResponseFormatter::excelToDate($date_validateData_arr[0]);
+                $end = ResponseFormatter::excelToDate($date_validateData_arr[0]);
+            }
+        }
+        $date_range = [
+            'date_start' => $start,
+            'date_end' => $end,
+        ];
+
+        if (empty($validateData['filter']['arr_filter'])) {
+            $validateData['filter']['arr_filter'] = $validateData['filter']['value_checkbox'];
+        } else {
+            if (empty($validateData['filter']['arr_filter']['company'])) {
+                $validateData['filter']['arr_filter']['company'] = $validateData['filter']['value_checkbox']['company'];
+            }
+            if (empty($validateData['filter']['arr_filter']['site_uuid'])) {
+                $validateData['filter']['arr_filter']['site_uuid'] = $validateData['filter']['value_checkbox']['site_uuid'];
+            }
+        }
+
+        $query = Employee::leftJoin('user_details','user_details.uuid', 'employees.nik_employee')
+        ->leftJoin('positions','positions.uuid', 'employees.position_uuid')
+        ->leftJoin('employee_outs','employee_outs.employee_uuid', 'employees.nik_employee')
+        ->whereNull('employees.date_end')
+        ->whereNull('user_details.date_end')
+        ->where('employee_status', '!=', 'talent');
+        if ($validateData['filter']['contract_status'] != 'off') {
+            $query->where('contract_status', $validateData['filter']['contract_status']);
+        }
+        if ($validateData['filter']['employee_status'] != 'off') {
+            $query->where('employee_status', $validateData['filter']['employee_status']);
+        }
+        if (!empty($validateData['filter']['department_uuid'])) {
+            $query->where('department_uuid', $validateData['filter']['department_uuid']);
+        }
+
+        if (!empty($validateData['filter']['position_uuid'])) {
+            $query->where('position_uuid', $validateData['filter']['position_uuid']);
+        }
+
+        if($validateData['filter']['join_status'] != 'off' ){     
+            if(!empty($date_range['date_start'])){
+                if($validateData['filter']['join_status'] == '=='){
+                    $query->where('employees.employee_status', 'out');
+                }else{
+                    $query->where('employees.employee_status',$validateData['filter']['join_status'], 'out');
+                } 
+                $query->where('date_out','>=', $date_range['date_start'])->where('date_out','<=', $date_range['date_end']);
+            }
+        }
+
+        if($validateData['filter']['status_data'] != 'off' ){ 
+            if($validateData['filter']['status_data'] == '=='){
+                $query->where('employees.employee_status', 'out');
+            }else{
+                $query->where('employees.employee_status',$validateData['filter']['status_data'], 'out');
+            } 
+        }
+
+        if($validateData['filter']['status_join'] != 'off' ){     
+            if(!empty($date_range['date_start'])){
+                if($validateData['filter']['status_join'] == '=='){
+                    $query->where('employees.date_end_contract', '>', $date_range['date_start'] );
+                    $query->where('employees.date_end_contract', '<', $date_range['date_end'] );
+                }else{
+                    $query->where('employees.date_end_contract', '<', $date_range['date_start'] );
+                    $query->where('employees.date_end_contract', '>', $date_range['date_end'] );
+                } 
+
+
+            }else{
+                if($validateData['filter']['status_join'] == '=='){
+                    $query->where('employees.date_end_contract', '<', ResponseFormatter::getDateToday() );
+                }
+                if($validateData['filter']['status_join'] == '!='){
+                    $query->where('employees.date_end_contract', '>', ResponseFormatter::getDateToday() );
+                }
+            }
+        }
+
+        $data_table = $query->get();
+
+
+
+        $data_table_company_site = [];
+        
+
+        foreach ($data_table as $item_data_table) {
+            $data_table_company_site[$item_data_table->company_uuid . '-' . $item_data_table->site_uuid][$item_data_table->nik_employee] = $item_data_table;
+        }
+        $data_datatable = [];
+        $data_datatable_data = []; 
+        foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
+            foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
+                if(!empty($data_table_company_site[$item_company . '-' . $item_site_uuid])){
+                    if(count($data_table_company_site[$item_company . '-' . $item_site_uuid])>0){
+                        $data_datatable[$item_company . '-' . $item_site_uuid] = $data_table_company_site[$item_company . '-' . $item_site_uuid];
+                        $data_datatable_data = array_merge($data_datatable_data,  $data_table_company_site[$item_company . '-' . $item_site_uuid]);
+
+                    }
+                }                
+            }
+        }
+
+
+
+
+        $data = [
+            'data_table' => $data_table,
+            'data_datatable_data' => $data_datatable_data,
+            'filter' => $validateData,
+            'date_range' => $date_range,
+            'data_datatable' => $data_datatable,
+            'data_table_company_site' => $data_table_company_site,
+            'date_validateData_arr' => $date_validateData_arr
+        ];
+        return ResponseFormatter::toJson($data,  explode(' - ',$validateData['filter']['date_range']));
+
+        $data_employee = Employee::data_employee_detail();
+        $employees = DB::getSchemaBuilder()->getColumnListing('employees');
+        $user_details = DB::getSchemaBuilder()->getColumnListing('user_details');
+        $data = [
+            'employees_schema' => $employees,
+            'user_details_schema' => $user_details,
+            'data' => $data_employee,
+            'date_validateData_arr' => $date_validateData_arr
+        ];
+        return ResponseFormatter::toJson($data, 'Data index');
         return Datatables::of($data)
             ->make(true);
     }
-    
-    public function anyMoreDataGet()
+
+
+    public function testUdin()
     {
-        $data = Employee::data_employee();
-        dd($data);
-        return Datatables::of($data)
-            ->make(true);
+        $data = Employee::data_employee_detail();
+        var_dump($data);
+        die;
+        return view('datatableshow', ['data'         => $data]);
     }
 }

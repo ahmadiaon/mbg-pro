@@ -19,8 +19,8 @@ class CreateEmployeeTonasesTable extends Migration
             $table->string('employee_create_uuid')->nullable();
             $table->string('employee_know_uuid')->nullable();
             $table->string('employee_approve_uuid')->nullable();
+            $table->string('tiket_number')->nullable(); 
             $table->string('vehicle_uuid')->nullable();
-
             
             $table->string('employee_uuid')->nullable();
             $table->string('coal_from_uuid')->nullable();

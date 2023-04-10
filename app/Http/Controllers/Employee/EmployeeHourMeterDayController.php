@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Employee;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeHourMeterBonus;
 use App\Models\Employee\EmployeeHourMeterDay;
 use App\Models\HourMeterPrice;
 use App\Models\Identity;
@@ -65,43 +66,99 @@ class EmployeeHourMeterDayController extends Controller
 
     // used index
     public function moreAnyData(Request $request){        
-        $data = Employee::leftJoin('user_details','user_details.uuid','employees.user_detail_uuid' )
-        ->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
-        ->join('positions','positions.uuid', 'employees.position_uuid' )->whereNull('employees.date_end')
-        ->whereNull('user_details.date_end')
-        ->whereYear('employee_hour_meter_days.date', $request->year)
-        ->whereMonth('employee_hour_meter_days.date', $request->month);
-        if(!empty($request->day)){
-            $data = $data->whereDay('employee_hour_meter_days.date', $request->day);
+        $validatedData = $request->all();
+        $arr_merge = [];
+        $arr_hour_meters_count = []; 
+        $hour_meters_count = [];
+        $hour_meters = [];
+
+        $data_formula_bonus_hm = EmployeeHourMeterBonus::orderBy('min_hm', 'asc')->get();
+        //berdasarkan bulan yg diambil
+
+
+
+
+
+        if(!empty($validatedData['filter']['arr_site_uuid'])){
+            $validatedData['filter_arr_site'] = 'yes';
+            foreach($validatedData['filter']['arr_site_uuid'] as $item_arrr_site){
+                $get_hm = EmployeeHourMeterDay::join('employees','employees.nik_employee', 'employee_hour_meter_days.employee_uuid')
+                ->whereDate('employee_hour_meter_days.date', '>=', $validatedData['filter']['date_filter']['date_start_filter_hm'])
+                ->whereDate('employee_hour_meter_days.date', '<=', $validatedData['filter']['date_filter']['date_end_filter_hm'])
+                ->where('employees.site_uuid', $item_arrr_site)
+                ->get('employee_hour_meter_days.*')->toArray();
+                $arr_merge = array_merge($arr_merge,$get_hm);
+
+                $get_hour_meters_count = EmployeeHourMeterDay::join('employees','employees.nik_employee', 'employee_hour_meter_days.employee_uuid')
+                ->whereDate('employee_hour_meter_days.date', '>=', $validatedData['filter']['date_filter']['date_start_filter_hm'])
+                ->whereDate('employee_hour_meter_days.date', '<=', $validatedData['filter']['date_filter']['date_end_filter_hm'])
+                ->where('employees.site_uuid', $item_arrr_site)
+                ->groupBy(
+                    'employee_hour_meter_days.employee_uuid',
+                    'employee_hour_meter_days.hour_meter_price_uuid',
+                )
+                ->select( 
+                    'employee_hour_meter_days.employee_uuid',
+                    'employee_hour_meter_days.hour_meter_price_uuid',
+                    DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
+                    DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
+                )
+                ->get()->toArray();
+                $arr_hour_meters_count = array_merge($arr_hour_meters_count,$get_hour_meters_count);
+            }
+            $hour_meters_count = $arr_hour_meters_count;
+            $hour_meters = $arr_merge;
+        }else{
+            $hour_meters_count = EmployeeHourMeterDay::whereDate('employee_hour_meter_days.date', '>=', $validatedData['filter']['date_filter']['date_start_filter_hm'])
+            ->whereDate('employee_hour_meter_days.date', '<=', $validatedData['filter']['date_filter']['date_end_filter_hm'])
+            ->groupBy(
+                'employee_hour_meter_days.employee_uuid',
+                'employee_hour_meter_days.hour_meter_price_uuid',
+                
+               )
+            ->select( 
+                'employee_hour_meter_days.employee_uuid',
+                'employee_hour_meter_days.hour_meter_price_uuid',
+                DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
+                DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
+            )
+            ->get();
+
+            $hour_meters = EmployeeHourMeterDay::whereDate('employee_hour_meter_days.date', '>=', $validatedData['filter']['date_filter']['date_start_filter_hm'])
+            ->whereDate('employee_hour_meter_days.date', '<=', $validatedData['filter']['date_filter']['date_end_filter_hm'])
+            ->get();
         }
-        if(!empty($request->employee_uuid)){
-            $data = $data->where('employee_hour_meter_days.employee_uuid', $request->employee_uuid);
+        $validatedData['hour_meters'] = (empty($hour_meters))?null:$hour_meters;
+        
+        $arr_employee_hour_meter = [];
+        foreach($hour_meters as $item_hour_meter){
+            $item_hour_meter['full_value'] = $item_hour_meter['value'] ;
+            foreach($data_formula_bonus_hm as $item_bonus_hm){
+                if($item_hour_meter['value'] >= $item_bonus_hm->min_hm){
+                    $item_hour_meter['full_value'] = $item_hour_meter['value'] + ($item_hour_meter['value'] *$item_bonus_hm->percent_hm /100) ;
+                }
+            }
+            if(empty($arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']])){
+                $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['employee_uuid'] = $item_hour_meter['employee_uuid'];
+                $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['hour_meter_price_uuid'] = $item_hour_meter['hour_meter_price_uuid'];
+                $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['count_slip_hm'] = '-';
+                $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['sum_hm'] = '-';
+                $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['sum_hm_bonus'] = 0;
+            }
+            $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['sum_hm_bonus'] =  $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['sum_hm_bonus'] + $item_hour_meter['full_value'];   
+            $arr_employee_hour_meter[$item_hour_meter['employee_uuid'].'-'.$item_hour_meter['hour_meter_price_uuid']]['date'][$item_hour_meter['date']][] = $item_hour_meter;
+          }
+
+        // count and sum 
+        foreach($hour_meters_count as $item_hour_meters_count){
+            $arr_employee_hour_meter[$item_hour_meters_count['employee_uuid'].'-'.$item_hour_meters_count['hour_meter_price_uuid']]['count_slip_hm'] = $item_hour_meters_count['count_hour_meter'];
+            $arr_employee_hour_meter[$item_hour_meters_count['employee_uuid'].'-'.$item_hour_meters_count['hour_meter_price_uuid']]['sum_hm'] = $item_hour_meters_count['hour_meter_value'];
         }
-        $data =$data
-        ->groupBy(
-            'employees.nik_employee',
-            'user_details.photo_path',
-            'positions.position',
-            'employees.uuid',
-            'employees.nik_employee',
-           )
-           ->groupBy(
-            'user_details.name',
-           )
-        ->select( 
-            'user_details.name',
-            'user_details.photo_path',
-            'positions.position',
-            'employees.uuid',
-            'employees.nik_employee',
-            DB::raw("count(employee_hour_meter_days.value) as count_hour_meter"),
-            DB::raw("SUM(employee_hour_meter_days.value) as hour_meter_value"),
-            DB::raw("SUM(employee_hour_meter_days.full_value) as hour_meter_full_value"),
-        )
-        ->get();
-        return Datatables::of($data)
-        ->make(true);
-        return ResponseFormatter::toJson($data,'bbb');
+
+
+        
+        $validatedData['datatable'] = (empty($arr_employee_hour_meter))?null:$arr_employee_hour_meter;
+        return ResponseFormatter::toJson($validatedData, $data_formula_bonus_hm);
     }
 
     //used on create 
@@ -127,30 +184,27 @@ class EmployeeHourMeterDayController extends Controller
         $data = $data->get();
         return ResponseFormatter::toJson($data,'bbb');
     }
+
     // used to store 
     public function store(Request $request){
         $validatedData = $request->all();
-        // return ResponseFormatter::toJson($validatedData,'store employee-hour-meter-day');
+
         if(empty($validatedData['uuid'])){
             $validatedData['uuid']  = $validatedData['date'].'-'.$validatedData['employee_uuid'].'-'.rand(99,9999);
         }
 
-        if(empty($validatedData['isBonusAktive'])){
-            $validatedData['is_bonus'] = 'bonus';
+        if(empty($validatedData['is_bonus'])){
+            $validatedData['is_bonus'] = null;
         }
-        $store = EmployeeHourMeterDay::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
+        if(!empty($validatedData['value'])){
+            $store = EmployeeHourMeterDay::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
+        }
+        if($validatedData['value'] < 1){
+            $store =  EmployeeHourMeterDay::where('uuid' , $validatedData['uuid'])->delete();
+        }
 
-        $the_data = Employee::noGet_employeeAll_detail()->join('employee_hour_meter_days','employee_hour_meter_days.employee_uuid', 'employees.nik_employee' )
-        ->where('employee_hour_meter_days.uuid', $store->uuid)->get()->first();
-
-        return ResponseFormatter::toJson($the_data,'store employee-hour-meter-day');
-
-
-
-  
-        
         return ResponseFormatter::toJson($store, 'Data Stored');
-    }
+    }//used
     
     public function show(Request $request){        
         
@@ -158,7 +212,7 @@ class EmployeeHourMeterDayController extends Controller
         
         $data = EmployeeHourMeterDay::where('uuid', $request->uuid)->get()->first();
         return ResponseFormatter::toJson($data, 'Data Stored');
-    }
+    }//used
 
 
 
@@ -358,6 +412,7 @@ class EmployeeHourMeterDayController extends Controller
             'layout'    => $layout
         ]);
     }
+
     // done
     public function export($year_month){
         $arr_bonus = [

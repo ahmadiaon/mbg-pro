@@ -53,11 +53,7 @@ class EmployeeCutiController extends Controller
         ]);
         // return view('datatableshow', [ 'data'         => $employee_setup_cutis]);
 
-        // dd($employee_setup_cutis);
-        $cuti = [];
         $employee_cuti = [];
-        $work=[];
-        $date_today = Carbon::today();
         $date_half_year_prev = Carbon::today()->subDay(180);
         $date_half_year_next =  Carbon::today()->addDay(180);
 
@@ -83,19 +79,8 @@ class EmployeeCutiController extends Controller
                 $date_start_cuti= Carbon::createFromFormat('Y-m-d', $date_works)->addDay(($date_));
                 $date_end_cuti = Carbon::createFromFormat('Y-m-d', $date_works)->addDay($long_cuti);
                
-
-               
-                if(($date_work > $date_half_year_prev) && ($date_work < $date_half_year_next) ){
-                    $data_cuti= [
-                        'x' => $employee_setup_cuti->name,
-                        'y' => [
-                            $date_start_cuti, $date_end_cuti
-                        ]
-                    ];
-
-                    $cuti[] =$data_cuti;
-                    $date_cuti_employe[] = $date_start_cuti->format('Y-m-d').' sd '.$date_end_cuti->format('Y-m-d');
-                    
+                if(($date_work > $date_half_year_prev) && ($date_work < $date_half_year_next) ){                   
+                    $date_cuti_employe[] = $date_start_cuti->format('Y-m-d').' sd '.$date_end_cuti->format('Y-m-d');                    
                 }else{
                     $isLoop = false;
                 }
@@ -113,10 +98,8 @@ class EmployeeCutiController extends Controller
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'layout'    => $layout,
             'nik_employee' => '',
-            'data_cuti' => $data_cuti,
             'employees_schedule_cuti' => $employee_cuti,
             'employee_cuti_groups' => $group_names,
-            'cutis' => $cuti
         ]);
     }
 
@@ -135,8 +118,6 @@ class EmployeeCutiController extends Controller
 
         $cuti = [];
         $employee_cuti = [];
-        $work=[];
-        $date_today = Carbon::today();
         $date_half_year_prev = Carbon::createFromFormat('Y-m-d', $request->date['year'].'-'.$request->date['month'].'-01');
         $date_half_year_prev->subDay(180);
         $date_half_year_next =  Carbon::createFromFormat('Y-m-d', $request->date['year'].'-'.$request->date['month'].'-01');
@@ -486,6 +467,18 @@ class EmployeeCutiController extends Controller
     public function delete(Request $request)
     {
         $validatedData = $request->all();
+        $data_database = session('data_database');
+        $data_prev = EmployeeCuti::where('employee_cutis.uuid', $validatedData['uuid'] )->get()->first();
+        $validatedData['employee_uuid'] = $data_database['data_employees'][$data_prev['employee_uuid']]['machine_id'];
+    
+        $startDate = new \DateTime($data_prev['date_real_start_cuti']);
+        $endDate = new \DateTime($data_prev['date_real_end_cuti']);
+        
+        for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
+            $validatedData['date'] = $date->format('Y-m-d');
+            $validatedData['uuid']  = $validatedData['date'] . '-' .$validatedData['employee_uuid'];
+            $store = EmployeeAbsen::where('uuid' , $validatedData['uuid'])->delete();
+            }
          $store = EmployeeCuti::where('uuid',$request->uuid)->delete();
          
  

@@ -2,9 +2,12 @@
 
 namespace App\Helpers;
 
+use App\Models\CoalFrom;
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\Dictionary;
 use App\Models\Employee\Employee;
+use App\Models\Payment\PaymentGroup;
 use App\Models\Poh;
 use App\Models\Position;
 use App\Models\Religion;
@@ -13,6 +16,7 @@ use App\Models\StatusAbsen;
 use App\Models\UserDetail\UserDetail;
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Support\Facades\DB;
 
 class ResponseFormatter
 {
@@ -152,11 +156,12 @@ class ResponseFormatter
     return $arr_employee_talent;
   }
 
-  public static function numberToAlfhabet($letters){
+  public static function numberToAlfhabet($letters)
+  {
     $alphabet = range('A', 'Z');
-    
+
     return $alphabet[$letters];
-}
+  }
 
 
 
@@ -177,7 +182,36 @@ class ResponseFormatter
       return strval($item->uuid);
     });
 
+    $arr_math_status_absens = StatusAbsen::groupBy('math')->get('math');
+    $arr_math_status_absens = $arr_math_status_absens->keyBy(function ($item) {
+      return strval($item->math);
+    });
+
+
+    $arr_coal_from = CoalFrom::all();
+    $arr_coal_from = $arr_coal_from->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $arr_dictionary = Dictionary::all();
+    $arr_dictionary = $arr_dictionary->keyBy(function ($item) {
+      return strval($item->database);
+    });
+
+    $data_arr_company_coal_from = [];
+    foreach ($arr_coal_from as $item_arr_status_absens) {
+      $data_arr_company_coal_from[$item_arr_status_absens->company_uuid][$item_arr_status_absens->uuid] = $item_arr_status_absens;
+    }
+
     $arr_companies = Company::all();
+    $arr_companies_obj = $arr_companies->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+    foreach ($arr_companies_obj as $item_arr_companies) {
+      if ($item_arr_companies->uuid != "MBLE") {
+        $item_arr_companies->coal_from = $data_arr_company_coal_from[$item_arr_companies->uuid];
+      }
+    }
 
     session()->put('data_employees', $arr_employees);
     session()->put('data_companies', $arr_companies);
@@ -214,17 +248,35 @@ class ResponseFormatter
     $data_employee_talents = self::data_employee_talent();
 
 
-      $data_database = [
-        'data_employees' => $arr_employees,
-        'data_employee_talents' => $data_employee_talents,
-        'data_departments' => $arr_departments,
-        'data_positions' => $arr_position,
-        'data_companies' => $arr_companies,
-        'data_atribut_sizes' => $data_atribut_size,
-        'data_religions' => $arr_religion,
-        'data_pohs' => $arr_pohs,
-        'data_status_absens' => $arr_status_absens,
-      ];
+    $employees = DB::getSchemaBuilder()->getColumnListing('employees');
+    $user_details = DB::getSchemaBuilder()->getColumnListing('user_details');
+
+    $arr_payment_group = PaymentGroup::all();
+    $arr_payment_group = $arr_payment_group->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+
+    $data_database = [
+      'table_schema' => [
+        'employees' => $employees,
+        'user_details' => $user_details,
+      ],
+      'data_employees' => $arr_employees,
+      'data_employee_talents' => $data_employee_talents,
+      'data_departments' => $arr_departments,
+      'data_coal_froms' => $arr_coal_from,
+      'data_positions' => $arr_position,
+      'data_companies' => $arr_companies,
+      'data_company_obj' => $arr_companies_obj,
+      'data_atribut_sizes' => $data_atribut_size,
+      'data_religions' => $arr_religion,
+      'data_pohs' => $arr_pohs,
+      'data_dictionaries' => $arr_dictionary,
+      'data_status_absens' => $arr_status_absens,
+      'data_math_status_absens' => $arr_math_status_absens,
+      'data_payment_groups' => $arr_payment_group,
+    ];
     session()->put('data_database', $data_database);
     return $data_database;
     // return ResponseFormatter::toJson($data_database, 'data_database');

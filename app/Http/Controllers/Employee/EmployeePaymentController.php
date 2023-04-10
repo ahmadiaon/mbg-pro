@@ -18,10 +18,11 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeePaymentController extends Controller
 {
-    public function create(){
+    public function create()
+    {
         $employees = Employee::data_employee();
         $payment_groups = PaymentGroup::all();
-      
+
         $layout = [
             'head_core'            => true,
             'javascript_core'       => true,
@@ -41,47 +42,48 @@ class EmployeePaymentController extends Controller
         ]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $payments = Payment::where('uuid', $request->payment_uuid)->get()->first();
 
         $validatedData = $request->all();
         $employee = Employee::where('uuid', $validatedData['employee_uuid'])->whereNull('date_end')->get()->first();
 
-        if($validatedData['link_absen'] != 'none'){
+        if ($validatedData['link_absen'] != 'none') {
             $validatedDataAbsen = [
                 'employee_uuid' => $employee->machine_id,
                 'date' => $payments->date,
-                'status_absen_uuid' =>$validatedData['link_absen'] ,
-                'edited'=> 'edited'
+                'status_absen_uuid' => $validatedData['link_absen'],
+                'edited' => 'edited'
             ];
             $date = date_create($payments->date);
-            
-            for($i=0; $i<$payments->long; $i++){    
-                $date_absen = $date -> format('Y-m-d');
-                
-                $validatedDataAbsen['uuid']  = $date_absen.'-'.$validatedDataAbsen['employee_uuid'];
-                $storeAbsen = EmployeeAbsen::updateOrCreate(['uuid' =>$validatedDataAbsen['uuid']],$validatedDataAbsen);
-                
+
+            for ($i = 0; $i < $payments->long; $i++) {
+                $date_absen = $date->format('Y-m-d');
+
+                $validatedDataAbsen['uuid']  = $date_absen . '-' . $validatedDataAbsen['employee_uuid'];
+                $storeAbsen = EmployeeAbsen::updateOrCreate(['uuid' => $validatedDataAbsen['uuid']], $validatedDataAbsen);
+
                 $interval = date_interval_create_from_date_string('1 days');
                 $date->add($interval);
             }
         }
-        
-        if(empty($validatedData['uuid'])){
-            $validatedData['uuid'] = $validatedData['employee_uuid'].'-'.$payments->payment_group_uuid.'-'.$payments->date.'-'.$payments->uuid;
+
+        if (empty($validatedData['uuid'])) {
+            $validatedData['uuid'] = $validatedData['employee_uuid'] . '-' . $payments->payment_group_uuid . '-' . $payments->date . '-' . $payments->uuid;
         }
         $store = EmployeePayment::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
         return ResponseFormatter::toJson($store, "request");
-        
     }
-    
-    public function delete(Request $request){
-         $store = EmployeePayment::where('uuid',$request->uuid)->delete();
- 
-         return response()->json(['code'=>200, 'message'=>'Data Deleted','data' => $request->uuid_delete], 200);   
+
+    public function delete(Request $request)
+    {
+        $store = EmployeePayment::where('uuid', $request->uuid)->delete();
+
+        return response()->json(['code' => 200, 'message' => 'Data Deleted', 'data' => $request->uuid_delete], 200);
     }
-    public function index(){
-        $companies = Company::all();
+    public function index()
+    {
         $layout = [
             'head_datatable'        => true,
             'javascript_datatable'  => true,
@@ -92,42 +94,90 @@ class EmployeePaymentController extends Controller
         return view('employee_payment.index', [
             'title'         => 'Pembayaran',
             'layout'    => $layout,
-            'companies' => $companies
         ]);
     }
-    
-    public function anyDataMonth($year_month){
-        $date = explode("-", $year_month);
-        $year = $date[0];
-        $month = $date[1];
 
-        $data = EmployeePayment::join('payments', 'payments.uuid' , 'employee_payments.payment_uuid')
-        ->leftJoin('employees','employees.uuid','employee_payments.employee_uuid')
-        ->leftJoin('user_details','user_details.uuid','employees.user_detail_uuid')
-        ->leftJoin('positions','positions.uuid','employees.position_uuid')
-        ->leftJoin('payment_groups','payment_groups.uuid','payments.payment_group_uuid')
-        ->whereNull('employees.date_end')
-        ->whereNull('user_details.date_end')
-        ->whereYear('payments.date', $year)
-        ->whereMonth('payments.date', $month)
-        ->get([
-            'user_details.name',
-            'employees.nik_employee',
-            'positions.position',
-            'employee_payments.payment_uuid',
-            'payments.description',
-            // 'employee_payments.*',
-            'payments.*',
-            'payments.uuid',
-            'employee_payments.value',
-            'payment_groups.payment_group'
-        ]);
-        // dd($data);
+    public function anyDataMonth(Request $request)
+    {
+        $validateData = $request->all();
+        $data_database = session('data_database');
+        $data_employees = $data_database['data_employees'];
+
+        if (empty($validateData['filter']['arr_filter'])) {
+            $validateData['filter']['arr_filter'] = $validateData['filter']['value_checkbox'];
+        } else {
+            if (empty($validateData['filter']['arr_filter']['company'])) {
+                $validateData['filter']['arr_filter']['company'] = $validateData['filter']['value_checkbox']['company'];
+            }
+            if (empty($validateData['filter']['arr_filter']['payment_group_uuid'])) {
+                $validateData['filter']['arr_filter']['payment_group_uuid'] = $validateData['filter']['value_checkbox']['payment_group_uuid'];
+            }
+            if (empty($validateData['filter']['arr_filter']['site_uuid'])) {
+                $validateData['filter']['arr_filter']['site_uuid'] = $validateData['filter']['value_checkbox']['site_uuid'];
+            }
+        }
 
 
-        
-        
-        return Datatables::of($data)
-        ->make(true);
+        $arr_data_tonase = [];
+
+        $data_table = [];
+        $data_basic = EmployeePayment::join('payments', 'payments.uuid', 'employee_payments.payment_uuid')
+            ->join('payment_groups', 'payment_groups.uuid', 'payments.payment_group_uuid')
+            ->join('employees', 'employees.nik_employee', 'employee_payments.employee_uuid')
+            ->where('payments.date', '>=', $validateData['filter']['date_filter']['date_start_filter_range'])
+            ->where('payments.date', '<=', $validateData['filter']['date_filter']['date_end_filter_range'])
+            ->get([
+                'employees.site_uuid',
+                'employees.company_uuid',
+                'employee_payments.*',
+                'payment_groups.payment_group',
+                'payments.*',
+                'payments.payment_group_uuid',
+                'employee_payments.*',
+            ]);
+
+
+        $datatable = [];
+        if (!empty($validateData['filter']['arr_filter'])) {
+            foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
+                foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
+                    if ($validateData['filter']['is_combined']  == 'true') {
+                        $data_table[$item_company . '-' . $item_site_uuid] = ['detail'];
+                    } else {
+                        foreach ($validateData['filter']['arr_filter']['payment_group_uuid'] as $item_payment_group_uuid) {
+                            $data_table[$item_company . '-' . $item_site_uuid . '-' . $item_payment_group_uuid] = ['detail'];
+                        }
+                    }
+                }
+            }
+
+            foreach ($data_basic as $i_db) {
+                if (!empty($data_table[$i_db->company_uuid . '-' . $i_db->site_uuid . '-' . $i_db->payment_group_uuid])) {
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data'][] = $i_db;
+                    if (empty($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'])) {
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] = 0;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] = 0;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'] = $i_db->employee_uuid;
+                    }
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] + 1;
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] + $i_db->value;
+                }
+            }
+            foreach($datatable as $i_dt){
+                if(count($i_dt) > 0){
+                    foreach($i_dt as $index_i_dt=>$value_i_dt){
+                        $data_datatable[] = $value_i_dt;
+                    }
+                }                
+            }
+            $data = [
+                'request'    => $validateData,
+                'data_basic'  => $data_basic,
+                'data_table'  => $data_table,
+                'datatable' => $datatable,
+                'data_datatable' => $data_datatable,
+            ];
+            return ResponseFormatter::toJson($data, 'anyData employee payment');
+        }
     }
 }
