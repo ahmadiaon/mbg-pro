@@ -4,7 +4,7 @@
     <div class="card-box mb-30 " >
         <div class="row pd-20">
             <div class="col-3">
-                <h4 class="text-blue h4">Database</h4>
+                <h4 class="text-blue h4">Premi</h4>
             </div>
             <div class="col-9 text-right">
                 <div class="btn-group">
@@ -58,15 +58,8 @@
 
                         <div class="form-group">
                             <label for=""> Kalkulasi Batu </label>
-                            <div class="row" id="provoleges">
-                            @foreach ($companies as $item)
-                                <div class="col-md-4 col-sm-12">
-                                    <div class="custom-control custom-checkbox mb-5">
-                                        <input value="{{$item->uuid}}" type="checkbox" name="{{$item->uuid}}" class="custom-control-input" id="{{$item->uuid}}">
-                                        <label class="custom-control-label" for="{{$item->uuid}}">{{$item->company}}</label>
-                                    </div>                                
-                                </div>
-                            @endforeach
+                            <div class="row" id="coal-from-company">
+                            
                             </div>
                         </div>
 
@@ -107,9 +100,23 @@
 
 @section('js')
     <script>
+        
+        Object.values(data_database.data_companies).forEach(company_element => {
+                $('#coal-from-company').append(` <div class="col-md-4 col-sm-12">
+                                    <div class="custom-control custom-checkbox mb-5">
+                                        <input value="${company_element.uuid}" type="checkbox" name="${company_element.uuid}" class="custom-control-input companies" id="${company_element.uuid}">
+                                        <label class="custom-control-label" for="${company_element.uuid}">${company_element.company}</label>
+                                    </div>                                
+                                </div>`);
+            });
+
+
+
         showDataTableAction('database/premi/data', ['uuid','premi_name','date_start','date_end'], 'premi')
         function createCoalFrom(){
+            $('.companies').prop('checked', '');
             $('#createCoalFrom').modal('show')
+            
             $('#form-premi')[0].reset();
         }
        function store(idForm){
@@ -144,8 +151,9 @@
                     $('#premi_name').val(data.premi_name)  
                     $('#hauling_price').val(data.hauling_price)  
                     $('#date_start').val(data.date_start)  
+                    $('.companies').prop('checked', false);
                     data.production_premis.forEach(element => {
-                        $('#'+element.company_uuid).attr( 'checked', true )
+                        $('#'+element.company_uuid).prop( 'checked', true )
                     });
                     $('#date_end').val(data.date_end)  
                     $('#createCoalFrom').modal('show')  

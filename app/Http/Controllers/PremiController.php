@@ -20,11 +20,9 @@ class PremiController extends Controller
             'javascript_form'       => true,
             'active'                        => 'premi'
         ];
-        $companies = Company::all();
         return view('premi.index', [
             'title'         => 'Premi',
             'layout'    => $layout,
-            'companies' => $companies
         ]);
     }
     public function anyData(){
@@ -52,13 +50,13 @@ class PremiController extends Controller
 
 
     public function store(Request $request){
-        // $data = $request->all();
+        $validateData = $request->all();
         $premi_name = $request->premi_name;
 
         if(empty($request->uuid)){
-            $request->uuid = ResponseFormatter::toUUID($request->premi_name);
+            $validateData['uuid'] = ResponseFormatter::toUUID($request->premi_name);
         }
-        $strore = Premi::updateOrCreate(['uuid' => $request->uuid], 
+        $strore = Premi::updateOrCreate(['uuid' => $validateData['uuid']], 
         [
             'premi_name' => $request->premi_name,
             'date_start'    => $request->date_start,
@@ -69,7 +67,7 @@ class PremiController extends Controller
         foreach($data as $item=>$value){
             ProductionPremi::updateOrCreate(
             [
-                'uuid'  => $request->uuid.'-'.$value
+                'uuid'  => $validateData['uuid'].'-'.$value
             ],
             [
                 'premi_uuid' => $strore->uuid,
@@ -85,9 +83,7 @@ class PremiController extends Controller
                 'variable_code' => 'pay_premi_'.$premi->uuid,
                 'date_start'    => $premi->date_start
             ]);
-        }
-
-        
+        }      
         
         return ResponseFormatter::toJson($data, 'Data Stored');
     }

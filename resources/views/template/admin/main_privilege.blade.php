@@ -470,6 +470,7 @@
 
         function stopLoading() {
             console.log('stop loading')
+            $('#loading-modal').modal('hide')
             $('.modal').modal('hide')
         }
 
@@ -554,7 +555,7 @@
 
                     // alert("Message:"+JSON.stringify(response.message)+"-"+JSON.stringify(response.data));
                     console.log(response);
-                    stopLoading();
+                    showModalMessage('berhasil');
                 },
                 error: function(response) {
                     alertModal()
@@ -652,6 +653,8 @@
         function showModalMessage(message) {
             $('#message-text').text(message);
             $('#message-modal-id').modal('show');
+            
+            stopLoading();
         }
 
         function countBetweenDate(date_from, date_until) {
@@ -662,6 +665,36 @@
             var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
             return Difference_In_Days;
 
+        }
+
+        function toNumber(numberOf) {
+            return numberOf.replace(/[^0-9]/g, '');
+        }
+
+        function toRupiah(arg) {
+
+            let idElement = arg.getAttribute('id');
+            let arr_idElement = idElement.split('rupiah-');
+            if ($('#rupiah-' + idElement).length == 0) {
+                $(`#${idElement}`).attr("name", `rupiah-${idElement}`);
+                $(`#${idElement}`).after(
+                    `
+                    <input type="text" name="${idElement}"
+                                id="rupiah-${idElement}" class="form-control">
+                    `
+                );
+            }
+            let valueElement = $(`#${idElement}`).val();
+            var charFrontElement = valueElement.substr(0, 4);
+            var valueNumberElement = valueElement.split('Rp. ')[1];
+            if (charFrontElement != 'Rp. ') {
+                $(`#${idElement}`).val('Rp. ');
+            } else {
+                $(`#${idElement}`).val('Rp. ' + toNumber(valueNumberElement).toString().replace(/\B(?=(\d{3})+(?!\d))/g,
+                    '.'));
+                $(`#rupiah-${idElement}`).val(toNumber(valueNumberElement));
+            }
+            cg('valueElement', $('#rupiah-' + idElement).length);
         }
 
 

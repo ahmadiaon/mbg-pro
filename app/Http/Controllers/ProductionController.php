@@ -77,22 +77,19 @@ class ProductionController extends Controller
             }
             return back();
         } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
     }
 
     public function store(Request $request){
-        $data = $request->all();
-
-        $store = Production::updateOrCreate(['uuid' => $request->date_production.'-'.$request->premi_uuid] ,
-        [
-            'premi_uuid'    => $request->premi_uuid,
-            'value_production'    => $request->value_production,
-            'date_production'   => $request->date_production
-        ]);
+        $validateData = $request->all();
+        if(empty($validateData['uuid'])){
+            $validateData['uuid'] = $validateData['date_production'].'-'.$validateData['premi_uuid'];
+        }
+        $store = Production::updateOrCreate(['uuid' => $validateData['uuid']] ,$validateData);
         
-        return ResponseFormatter::toJson($store, 'Data Stored');
+        return ResponseFormatter::toJson($validateData, 'Data Stored');
     }
 
     public function create(){
@@ -116,20 +113,27 @@ class ProductionController extends Controller
         ]);
     }
 
-    public function anyData($year_month){
-        $date = explode("-", $year_month);
+    public function anyData(Request $request){
+        $validateData = $request->all();
+
+        $date = explode("-", $validateData['filter']['date_filter']['date_end_filter_range']);
         $year = $date[0];
         $month = $date[1];
+        
 
-        $data = Production::whereYear('productions.date_production', $year)
+        $datax = Production::join('premis', 'premis.uuid', 'productions.premi_uuid')
+        ->whereYear('productions.date_production', $year)
         ->whereMonth('productions.date_production', $month)
         ->get([
+            'premis.premi_name',
             'productions.*'
         ]);
+        
+        $data = [
+            'request' => $validateData,
+            'data_datatable' => $datax
+        ];
+        return ResponseFormatter::toJson($data, 'from production');
 
-        return Datatables::of($data)     
-        ->make(true);
-
-        return view('datatableshow', [ 'data'         => $data]);
     }
 }

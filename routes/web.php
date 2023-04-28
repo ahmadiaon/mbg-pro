@@ -265,7 +265,7 @@ Route::middleware(['islogin'])->group(function () {
 
     Route::prefix('/production')->group(function () {
         Route::get('/', [ProductionController::class, 'index']);
-        Route::get('/data/{year_month}', [ProductionController::class, 'anyData']);
+        Route::post('/data', [ProductionController::class, 'anyData']);
         Route::get('/create', [ProductionController::class, 'create']);
         Route::post('/create', [ProductionController::class, 'store']);
         Route::post('/show', [ProductionController::class, 'show']);
@@ -364,7 +364,7 @@ Route::middleware(['islogin'])->group(function () {
     Route::prefix('/other-payment')->group(function () {
         Route::get('/', [EmployeePaymentOtherController::class, 'index']);
         Route::post('/import', [EmployeePaymentOtherController::class, 'import']);
-        Route::get('/data/{year_month}', [EmployeePaymentOtherController::class, 'anyDataMonth']);
+        Route::post('/data', [EmployeePaymentOtherController::class, 'anyDataMonth']);
         Route::post('/show', [EmployeePaymentOtherController::class, 'show']);
         Route::post('/delete', [EmployeePaymentOtherController::class, 'delete']);
 
@@ -376,7 +376,8 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/', [EmployeeDebtController::class, 'index']);
         Route::get('/export/{year_month}', [EmployeeDebtController::class, 'export']);
         Route::post('/import', [EmployeeDebtController::class, 'import']);
-        Route::get('data', [EmployeeDebtController::class, 'anyData']);
+        Route::post('data', [EmployeeDebtController::class, 'anyData']);
+        Route::post('/store', [EmployeeDebtController::class, 'store']);
     });
 
 
@@ -390,9 +391,11 @@ Route::middleware(['islogin'])->group(function () {
 
     Route::prefix('/employee-deduction')->group(function () {
         Route::get('/', [EmployeeDeductionController::class, 'index']);
-        Route::get('/export/{year_month}', [EmployeeDebtController::class, 'export']);
-        Route::post('/import', [EmployeeDebtController::class, 'import']);
-        Route::get('data', [EmployeeDebtController::class, 'anyData']);
+        Route::get('/export/{year_month}', [EmployeeDeductionController::class, 'export']);
+        Route::post('/import', [EmployeeDeductionController::class, 'import']);
+        Route::post('/store', [EmployeeDeductionController::class, 'store']);
+        Route::post('/data', [EmployeeDeductionController::class, 'anyData']);
+        Route::post('/delete', [EmployeeDeductionController::class, 'delete']);
     });
 
 

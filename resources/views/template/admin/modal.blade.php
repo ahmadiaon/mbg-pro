@@ -86,7 +86,7 @@
                 <p id="message-text">ini pemberitaannya</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" id="btn-message-modal-id" class="btn btn-primary"  data-dismiss="modal">
+                <button type="button" id="btn-message-modal-id" onclick="stopLoading()" class="btn btn-primary"  data-dismiss="modal">
                     ok
                 </button>
             </div>

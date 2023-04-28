@@ -234,8 +234,8 @@
                                             href="/database/premi">Premi</a></li>
                                     {{-- <li><a class="{{ $layout['active'] == 'tax-status' ? 'active' : '' }}"
                                             href="/database/tax-status">Status Pajak</a></li> --}}
-                                    <li><a class="{{ $layout['active'] == 'payment-other' ? 'active' : '' }}"
-                                            href="/database/payment-other">Pembayaran Lain</a></li>
+                                    {{-- <li><a class="{{ $layout['active'] == 'payment-other' ? 'active' : '' }}"
+                                            href="/database/payment-other">Pembayaran Lain</a></li> --}}
                                     <li><a class="{{ $layout['active'] == 'dictionary' ? 'active' : '' }}"
                                             href="/database/dictionary">Kamus</a></li>
                                     <li><a class="{{ $layout['active'] == 'atribut-size' ? 'active' : '' }}"

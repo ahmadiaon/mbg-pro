@@ -48,7 +48,8 @@
                         </button>
 
                         <div class="dropdown-menu">
-                            <a class="dropdown-item"  id="btn-create"  data-toggle="modal" data-target="#employee-production">Tambah</a>
+                            <a class="dropdown-item" id="btn-create" data-toggle="modal"
+                                data-target="#employee-production">Tambah</a>
                             <a class="dropdown-item" id="btn-export"disabled href="/user/absensi/export/">Export</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                 href="">Import</a>
@@ -61,16 +62,8 @@
             </div>
         </div>
         <div id="the-table">
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-production" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Premi</th>
-                            <th>Value</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
+            <div class="pb-20" id="production">
+
             </div>
         </div>
     </div>
@@ -105,149 +98,97 @@
         </div>
     </div>
 
-	    <!-- Simple ADD -->
-		<div class="modal fade" id="employee-production" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
+    <!-- Simple ADD -->
+    <div class="modal fade" id="employee-production" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-employee-production" action="/production/create" method="post" enctype="multipart/form-data">
+            <form id="form-employee-production" action="/production/create" method="post"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content pd-20">
-						<input type="text" name="uuid" id="uuid">
-						<div class="form-group">
-							<label for="">Premi</label>
-							<select class="selectpicker form-control" name="premi_uuid" id="premi_uuid">
-								@foreach ($premis as $premi )
-								<option value="{{ $premi->uuid}}">{{ $premi->premi_name}}</option>
-								@endforeach
-							</select>
-							<div class="invalid-feedback" id="req-premi_uuid">
-								Data tidak boleh kosong
-							</div>
-						</div>
-
-						<div class="form-group">
-						<label for="">Tanggal</label>
-						<input type="date" name="date_production"  id="date_production" class="form-control" value="{{$today}}">
-						<div class="invalid-feedback" id="req-date_production">
-							Data tidak boleh kosong
-						</div
-						</div>
-					
-						<div class="form-group">
-						<label for="">Nilai</label>
-						<input type="text" class="form-control" name="value_production" id="value_production" value="">
-						<div class="invalid-feedback" id="req-value_production">
-							Data tidak boleh kosong
-						</div
-						</div>
-					
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="button" onclick="store('employee-production')" class="btn btn-primary">Upload</button>
+                    <input type="text" name="uuid" id="uuid">
+                    <div class="form-group">
+                        <label for="">Premi</label>
+                        <select class="selectpicker form-control" name="premi_uuid" id="premi_uuid">
+                            @foreach ($premis as $premi)
+                                <option value="{{ $premi->uuid }}">{{ $premi->premi_name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="invalid-feedback" id="req-premi_uuid">
+                            Data tidak boleh kosong
+                        </div>
                     </div>
-                </div>
+
+                    <div class="form-group">
+                        <label for="">Tanggal</label>
+                        <input type="date" name="date_production" id="date_production" class="form-control"
+                            value="{{ $today }}">
+                        <div class="invalid-feedback" id="req-date_production">
+                            Data tidak boleh kosong
+                        </div </div>
+
+                        <div class="form-group">
+                            <label for="">Nilai</label>
+                            <input type="text" class="form-control" name="value_production" id="value_production"
+                                value="">
+                            <div class="invalid-feedback" id="req-value_production">
+                                Data tidak boleh kosong
+                            </div </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="button" onclick="store('employee-production')"
+                                    class="btn btn-primary">Upload</button>
+                            </div>
+                        </div>
             </form>
         </div>
     </div>
-
-  
 @endsection
 
 @section('js')
     <script>
-        let year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
-        $('#btn-month').val(arr_year_month[1]);
-        $('#btn-export').attr('href', '/production/export/' + year_month)
-        reloadTable(year_month)
+        var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
+        var end = new Date(arr_date_today.year, arr_date_today.month, 0);
 
-		function deleteData(uuid){
+        let filter = {
+            'date_filter': {
+                date_start_filter_range: formatDate(start),
+                date_end_filter_range: formatDate(end),
+            }
+        };
+
+        $('#btn-year').html(arr_date_today.year);
+        $('#btn-month').html(months[parseInt(arr_date_today.month)]);
+        $('#btn-month').val(arr_date_today.month);
+
+
+        let year_month = @json($year_month);
+        let arr_year_month = year_month.split("-");
+
+
+        function deleteData(uuid) {
             let _url = '/production/delete'
-            
+
             $('#uuid_delete').val(uuid)
             $('#url_delete').val(_url)
             $('#confirm-modal').modal('show')
-            $('#table_reload').val('employee-production')
-       }
-
-	   function store(idForm){
-            if(isRequired(['premi_uuid','date_production', 'value_production'])    > 0){ return false; }
-            var isStored = globalStore(idForm)            
-       }
-
-
-        function showDataTableUserPrivilege(url, dataTable, id) {
-            let data = [];
-            dataTable.forEach(element => {
-                var dataElement = {
-                    data: element,
-                    name: element
-                }
-                data.push(dataElement)
-            });
-
-
-            var elements = {
-                mRender: function(data, type, row) {
-
-                    return `
-						<div class="form-inline"> 
-							
-							<button onclick="editData('${row.uuid}')"  type="button" class="btn btn-primary mr-1  py-1 px-2">
-								<small>edit</small>
-							</button>
-							
-							<button onclick="deleteData('${row.uuid}')"  type="button" class="btn btn-danger mr-1  py-1 px-2">
-								<small>Hapus</small>
-							</button>
-						</div>`
-                }
-            };
-            data.push(elements)
-
-
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
-            $('#' + id).DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
-                ajax: urls,
-                columns: data
-            });
+            $('#table_reload').val('table-production')
         }
 
-        function refreshTable(val_year = null, val_month = null) {
-            console.log(val_year);
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
-            console.log(v_month);
-            if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
+        function store(idForm) {
+            if (isRequired(['premi_uuid', 'date_production', 'value_production']) > 0) {
+                return false;
             }
-            if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
-            }
-            let year_month = v_year + '-' + v_month;
-            reloadTable(year_month)
+            var isStored = globalStore(idForm)
+            showDataTableProduction()
         }
 
-        function reloadTable(year_month) {
 
-            $('#tablePrivilege').remove();
+        function showDataTableProduction() {
+            $('#production').empty();
             var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-production" class="display nowrap stripe hover table" style="width:100%">
+                <table id="table-production" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
                         <tr>
                             <th>Premi</th>
@@ -255,17 +196,91 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                </table>
-            </div>`;
-            $('#the-table').append(table_element);
-            $('#btn-export').attr('href', 'production/export/' + year_month)
-            console.log('year:' + year_month)
-            let _url = 'production/data/' + year_month;
-            showDataTableUserPrivilege(_url, ['premi_uuid', 'value_production'],
-                'table-employee-production')
+                </table>`;
+            $('#production').append(table_element);
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/production/data',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    filter: filter
+                },
+                success: function(response) {
+                    cg('response', response)
+                    let data = [];
+                    var el_value = {
+                        mRender: function(data, type, row) {
+
+                            return `${row.premi_name}
+						MT
+                        `
+                        }
+                    }
+
+                    data.push(el_value)
+
+                    var el_value = {
+                        mRender: function(data, type, row) {
+
+                            return `${row.value_production}
+						MT
+                        `
+                        }
+                    }
+
+                    data.push(el_value)
+
+                    var elements = {
+                        mRender: function(data, type, row) {
+
+                            return `
+						<div class="form-inline"> 							
+							<button onclick="editData('${row.uuid}')"  type="button" class="btn btn-primary mr-1  py-1 px-2">
+								<small>edit</small>
+							</button>							
+							<button onclick="deleteData('${row.uuid}')"  type="button" class="btn btn-danger mr-1  py-1 px-2">
+								<small>Hapus</small>
+							</button>
+						</div>`
+                        }
+                    };
+                    data.push(elements);
+
+                    let data_datatable = response.data.data_datatable;
+                    $('#table-production').DataTable({
+                        scrollX: true,
+                        serverSide: false,
+                        data: data_datatable,
+                        columns: data
+                    });
+                },
+                error: function(response) {
+                    // alertModal()
+                }
+            });
+            return false;
         }
 
-		function editData(uuid){
+        function refreshTable(val_year = null, val_month = null) {
+            year = arr_date_today.year;
+            month = arr_date_today.month;
+
+            if (val_year) {
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
+            }
+
+            if (val_month) {
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(arr_date_today.month);
+            }
+            setDateSession(year, month);
+        }
+
+
+        function editData(uuid) {
             let _token = $('meta[name="csrf-token"]').attr('content');
             let _url = "/production/show";
             // startLoading();
@@ -281,20 +296,20 @@
                     data = response.data
                     console.log(data)
                     $('#uuid').val(data.uuid),
-                    $('#premi_uuid').val(data.premi_uuid)      
-                    $('#date_production').val(data.date_production)  
-                    $('#value_production').val(data.value_production)  
+                        $('#premi_uuid').val(data.premi_uuid)
+                    $('#date_production').val(data.date_production)
+                    $('#value_production').val(data.value_production)
 
 
 
-                    $('#employee-production').modal('show')  
+                    $('#employee-production').modal('show')
                 },
                 error: function(response) {
                     console.log(response)
-                    alertModal()	
+                    alertModal()
                 }
             });
-       }
-
+        }
+        showDataTableProduction()
     </script>
 @endsection

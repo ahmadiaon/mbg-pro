@@ -65,6 +65,7 @@ class CompanyController extends Controller
 
         $strore = Company::updateOrCreate(['uuid' => $request->uuid], $validateData);
         $arr_companies= Company::all();
+        ResponseFormatter::setAllSession();
         $request->session()->put('data_companies', $arr_companies);
         return ResponseFormatter::toJson($strore, 'Data Stored');
     }

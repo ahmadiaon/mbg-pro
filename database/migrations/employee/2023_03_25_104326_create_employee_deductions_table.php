@@ -22,7 +22,6 @@ class CreateEmployeeDeductionsTable extends Migration
             $table->date('date_employee_deduction')->nullable();
             $table->float('value_employee_deduction')->nullable();
             $table->string('description_deduction_uuid')->nullable();            
-
             $table->string('pay_uuid')->nullable();
             $table->timestamps();
         });
