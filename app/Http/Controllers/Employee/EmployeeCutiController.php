@@ -58,12 +58,6 @@ class EmployeeCutiController extends Controller
         $date_half_year_next =  Carbon::today()->addDay(180);
 
         foreach($employee_setup_cutis as $employee_setup_cuti){
-            /*
-                loop employees:
-
-
-
-            */
             $isLoop = true;
             $date_cuti_employe = [];
             $date_works = $employee_setup_cuti->date_start_work;          
@@ -81,7 +75,9 @@ class EmployeeCutiController extends Controller
                
                 if(($date_work > $date_half_year_prev) && ($date_work < $date_half_year_next) ){                   
                     $date_cuti_employe[] = $date_start_cuti->format('Y-m-d').' sd '.$date_end_cuti->format('Y-m-d');                    
-                }else{
+                }
+
+                if($date_work > $date_half_year_next){
                     $isLoop = false;
                 }
                 
@@ -209,7 +205,9 @@ class EmployeeCutiController extends Controller
                     $cuti[] =$data_cuti;
                     $date_cuti_employe[] = $date_start_cuti->format('Y-m-d').' sd '.$date_end_cuti->format('Y-m-d');
                     
-                }else{
+                }
+                
+                if($date_work > $date_half_year_next){
                     $isLoop = false;
                 }
                 $date_work = Carbon::createFromFormat('Y-m-d', $date_works)->addDay($day_new_work);

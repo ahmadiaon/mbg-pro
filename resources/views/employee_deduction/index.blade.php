@@ -119,7 +119,7 @@
 
                         <div class="dropdown-menu">
                             <a class="dropdown-item" onclick="modalAddDataEmployeeDeduction()" href="#">Tambah</a>
-                            <a class="dropdown-item" id="btn-export"disabled href="/user/absensi/export/">Export</a>
+                            <a class="dropdown-item" id="btn-export"disabled href="/employee-deduction/export/">Export</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                 href="">Import</a>
                             {{-- <a class="dropdown-item" id="btn-import-mobilisasi" data-toggle="modal"
@@ -143,18 +143,18 @@
     <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-import" action="/payment/import" method="post" enctype="multipart/form-data">
+            <form id="form-import" action="/employee-deduction/import" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Import Pembayaran</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import File</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Pilih File Pembayaran</label>
+                            <label>Pilih File Pengurang</label>
                             <input name="uploaded_file" type="file"
                                 class="form-control-file form-control height-auto" />
                         </div>
@@ -172,18 +172,18 @@
     <div class="modal fade" id="import-modal-loading" tabindex="-1" role="dialog" aria-labelledby="import-modalTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-import" action="/payment/import" method="post" enctype="multipart/form-data">
+            <form id="form-import" action="/employee-deduction/import" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Import Loading</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import File</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Pilih File Pembayaran Loading</label>
+                            <label>Pilih File Pengurang</label>
                             <input name="uploaded_file" type="file"
                                 class="form-control-file form-control height-auto" />
                         </div>

@@ -50,7 +50,7 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" id="btn-create" data-toggle="modal"
                                 data-target="#employee-production">Tambah</a>
-                            <a class="dropdown-item" id="btn-export"disabled href="/user/absensi/export/">Export</a>
+                            <a class="dropdown-item" id="btn-export"disabled href="/production/export/">Export</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                 href="">Import</a>
                             {{-- <a class="dropdown-item" id="btn-import-mobilisasi" data-toggle="modal"

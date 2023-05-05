@@ -99,10 +99,21 @@ class ResponseFormatter
 
   public static function toFloat($data)
   {
+    
     $data = str_replace(',', '.', $data);
     $data = (float)$data;
     return $data;
   }
+
+  public static function toNumber($data)
+  {
+    
+    $data = preg_replace("/[^0-9]/", "", $data);
+    $data = (int)$data;
+    return $data;
+  }
+
+
 
   public static function toJson($data, $message = "success")
   {

@@ -62,25 +62,25 @@ class EmployeeTonseController extends Controller
 
         $createSheet->setCellValue('C1', 'Excel');
         $createSheet->setCellValue('B2', 'Perusahaan');
-        $createSheet->setCellValue('D2', 'Harga');
+        $createSheet->setCellValue('B8', 'Harga');
 
         $createSheet->setCellValue('B3', 'Bulan');
         $createSheet->setCellValue('B4', 'Tahun');
 
         $createSheet->setCellValue('C3', $month);
         $createSheet->setCellValue('C4', $year);
-        $createSheet->setCellValue('A5', 'No');
-        $createSheet->setCellValue('B5', 'NIK');
-        $createSheet->setCellValue('C5', 'Nama');
-        $createSheet->setCellValue('D5', 'Jabatan');
+        $createSheet->setCellValue('A20', 'No');
+        $createSheet->setCellValue('B20', 'NIK');
+        $createSheet->setCellValue('C20', 'Nama');
+        $createSheet->setCellValue('D20', 'Jabatan');
 
         for ($i = 1; $i <= $day_month; $i++) {
             $first = $i + 3;
             $second = $first + 1 + $day_month;
             $third = $second + 1 + $day_month;
-            $createSheet->setCellValue($abjads[$first] . '5', $i);
-            $createSheet->setCellValue($abjads[$second] . '5', $i);
-            $createSheet->setCellValue($abjads[$third] . '5', $i);
+            $createSheet->setCellValue($abjads[$first] . '20', $i);
+            $createSheet->setCellValue($abjads[$second] . '20', $i);
+            $createSheet->setCellValue($abjads[$third] . '20', $i);
         }
 
         $zip = new ZipArchive;
@@ -89,12 +89,12 @@ class EmployeeTonseController extends Controller
 
 
             foreach ($arr_coal_from as $coal_from) {
-                $createSheet->setCellValue('D3', $coal_from->hauling_price);
+                $createSheet->setCellValue('C8', $coal_from->hauling_price);
                 $createSheet->setCellValue('C2', $coal_from->company_uuid);
-                $createSheet->setCellValue('E2', 'Asal Batu');
-                $createSheet->setCellValue('E3', $coal_from->coal_from);
-                $createSheet->setCellValue('F2', 'Kode Asal Batu');
-                $createSheet->setCellValue('F3', $coal_from->coal_from_uuid);
+                $createSheet->setCellValue('B6', 'Asal Batu');
+                $createSheet->setCellValue('C6', $coal_from->coal_from);
+                $createSheet->setCellValue('B7', 'Kode Asal Batu');
+                $createSheet->setCellValue('C7', $coal_from->coal_from_uuid);
 
                 $crateWriter = new Xls($createSpreadsheet);
                 $name = 'file/absensi/Tonase -' . $coal_from->company_uuid . '-' . $coal_from->coal_from . '-' . $year_month . '-' . rand(99, 9999) . 'file.xls';
@@ -380,6 +380,7 @@ class EmployeeTonseController extends Controller
     // used good
     public function import(Request $request)
     {
+        // sistem update belum
         $the_file = $request->file('uploaded_file');
 
         $createSpreadsheet = new spreadsheet();
@@ -394,15 +395,16 @@ class EmployeeTonseController extends Controller
             $month_hm =  $sheet->getCell('C3')->getValue();
             $year_hm = $sheet->getCell('C4')->getValue();
             $datetime = Carbon::createFromFormat('Y-m', $year_hm . '-' . $month_hm);
-            $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+            $day_month = ResponseFormatter::getEndDay($year_hm . '-' . $month_hm);
 
-            $price_code = $sheet->getCell('D3')->getValue();
+            $price_code = $sheet->getCell('C8')->getValue();
             $company_uuid = $sheet->getCell('C2')->getValue();
-            $coal_from_uuid = $sheet->getCell('f3')->getValue();
-
-            $no_employee = 6;
+            // dd( $company_uuid );
+            $coal_from_uuid = $sheet->getCell('C7')->getValue();
+            $all_row_data = [];
+            $no_employee = 21;
             $employees = [];
-            if ($sheet->getCell('E' . '5')->getValue() == $sheet->getCell('F' . '5')->getValue()) {
+            if ($sheet->getCell('E' . '20')->getValue() == $sheet->getCell('F' . '20')->getValue()) {
 
                 while ((int)$sheet->getCell('A' . $no_employee)->getValue() != null) {
                     $date_row = 3;
@@ -437,37 +439,72 @@ class EmployeeTonseController extends Controller
                     $no_employee++;
                 }
             } else {
+                // dd($day_month);
                 while ((int)$sheet->getCell('A' . $no_employee)->getValue() != null) {
+                    $arr_data_employee_hour_meter_day = EmployeeTonase::whereYear('date', $year_hm)
+                        ->whereMonth('date', $month_hm)
+                        ->where('coal_from_uuid', $coal_from_uuid)
+                        ->delete();
                     $date_row = 3;
                     $nik_employee = ResponseFormatter::toUUID($sheet->getCell('B' . $no_employee)->getValue());
 
                     for ($day = 1; $day <= $day_month; $day++) { //hm biasa
-                        $cell_ritase = $abjads[$date_row + $day] . $no_employee;
-                        $cell_tonase = $abjads[$date_row + $day_month + $day + 1] . $no_employee;
-                        $cell_full_tonase = $abjads[$date_row + $day_month + $day + 1 + $day_month + 1] . $no_employee;
-
+                        
+                        $cell_ritase = $abjads[($date_row + $day)] . $no_employee;
+                        $cell_tonase = $abjads[($date_row + (int)$day_month + $day + 1)] . $no_employee;
+                        
                         if ($sheet->getCell($cell_ritase)->getValue() != null) {
-
-                            $data_each_day = [
-                                'nik_employee'  => $nik_employee,
-                                'date'  => $year_hm . '-' . $month_hm . '-' . $day,
-                                'ritase'       => $sheet->getCell($cell_ritase)->getValue(),
+                            $validatedData = [
+                                'uuid' =>  $company_uuid.'-'.$nik_employee.'-'.ResponseFormatter::excelToDate( $year_hm . '-' . $month_hm . '-' . $day).'-'.$sheet->getCell('A' . $no_employee)->getValue(),
+                                'employee_uuid' => $nik_employee,
+                                'coal_from_uuid' => $coal_from_uuid,
                                 'tonase_value' => $sheet->getCell($cell_tonase)->getValue(),
-                                'tonase_full_value' =>   $sheet->getCell($cell_full_tonase)->getValue(),
-                                'coal_from_uuid'  => $coal_from_uuid,
-                                'price_code'  => $price_code,
-                                'company_uuid'  => $company_uuid,
+                                'date' => ResponseFormatter::excelToDate( $year_hm . '-' . $month_hm . '-' . $day),
+                                'company_uuid' => $company_uuid,
+                                'ritase' => $sheet->getCell($cell_ritase)->getValue()
                             ];
-                            // dd($data_each_day);
-                            EmployeeTonase::where('employee_uuid', $nik_employee)->where('date', $data_each_day['date'])->where('coal_from_uuid', $coal_from_uuid)->delete();
-                            EmployeeTonase::where('employee_uuid', $nik_employee)->where('date', $data_each_day['date'])->where('company_uuid', $company_uuid)->delete();
-                            EmployeeTonseController::funcStore($data_each_day);
+                          
 
-                            $employees[$day] = $data_each_day;
+                            $validatedData['each_ritase'] = round($validatedData['tonase_value'] / $validatedData['ritase'], 2);
+                            $validatedData['over'] = $validatedData['tonase_value'] - $validatedData['each_ritase'] * $validatedData['ritase'];
+                            $validatedData['tonase_value'] = $validatedData['each_ritase'];
+
+                            for ($i = 1; $i < $validatedData['ritase']; $i++) {
+                                $validatedData['uuid'] = $validatedData['employee_uuid'] . '-' . $validatedData['date'] . '-' . rand(99, 9999);
+                                
+                                $row_data = [
+                                    'uuid' => $company_uuid.'-'.$nik_employee.'-'.ResponseFormatter::excelToDate( $year_hm . '-' . $month_hm . '-' . $day).'-'.$sheet->getCell('A' . $no_employee)->getValue().$i,
+                                    'employee_uuid' => $nik_employee,
+                                    'coal_from_uuid' => $coal_from_uuid,
+                                    'tonase_value' =>$validatedData['tonase_value'],
+                                    'date' => ResponseFormatter::excelToDate( $year_hm . '-' . $month_hm . '-' . $day),
+                                    'company_uuid' => $company_uuid,
+                                ];
+                                $all_row_data[] = $row_data;
+                                
+                            }
+                            
+                            $validatedData['uuid'] = null;
+                            $validatedData['tonase_value'] = $validatedData['each_ritase'] + $validatedData['over'];
+                           
+                            $row_data = [
+                                'uuid' => $company_uuid.'-'.$nik_employee.'-'.ResponseFormatter::excelToDate( $year_hm . '-' . $month_hm . '-' . $day).'-'.$sheet->getCell('A' . $no_employee)->getValue(),
+                                'employee_uuid' => $nik_employee,
+                                'coal_from_uuid' => $coal_from_uuid,
+                                'tonase_value' => $validatedData['tonase_value'],
+                                'date' => ResponseFormatter::excelToDate( $year_hm . '-' . $month_hm . '-' . $day),
+                                'company_uuid' => $company_uuid,
+                            ];
+                            
+                            $all_row_data[] = $row_data;
                         }
-                    }
+                    }                   
                     $no_employee++;
                 }
+                // dd( $all_row_data);
+                $xy =EmployeeTonase::insert(
+                    $all_row_data
+                );
             }
 
             return back();
@@ -500,10 +537,7 @@ class EmployeeTonseController extends Controller
 
     public function store(Request $request)
     {
-
         $validatedData = $request->all();
-
-
         if ($validatedData['ritase'] > 1) {
             $validatedData['each_ritase'] = round($validatedData['tonase_value'] / $validatedData['ritase'], 2);
             $validatedData['over'] = $validatedData['tonase_value'] - $validatedData['each_ritase'] * $validatedData['ritase'];

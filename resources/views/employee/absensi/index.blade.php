@@ -1,6 +1,81 @@
 @extends('template.admin.main_privilege')
 
 @section('content')
+    <div class="mb-20 row">
+        {{-- form filter --}}
+        <div class="col-md-5 mb-10">
+            <div class="card-box pd-20" id="the-filter-employee-tonase">
+                <h4 class="text-blue h4">Filter</h4>
+
+                <div class="form-group row mb-20">
+                    <label class="col-auto" for="">Perusahaan</label>
+                    <div class="col text-right custom-control custom-checkbox mb-5">
+                        <input onchange="checkedAll('company')" type="checkbox" class="custom-control-input"
+                            id="checked-all-company">
+                        <label class="custom-control-label" for="checked-all-company">Pilih
+                            Semua</label>
+                    </div>
+                    <div class="col-12 justify-content-md-center row company-filter">
+
+                    </div>
+                </div>
+
+                <div class="form-group row mb-20">
+                    <label class="col-auto" for="">Site</label>
+                    <div class="col text-right custom-control custom-checkbox mb-5">
+                        <input onchange="checkedAll('site_uuid')" type="checkbox" class="custom-control-input"
+                            id="checked-all-site_uuid">
+                        <label class="custom-control-label" for="checked-all-site_uuid">Pilih
+                            Semua</label>
+                    </div>
+                    <div class="col-12 justify-content-md-center row site-filter">
+
+                    </div>
+                </div>
+
+                <div class="form-group mb-20">
+                    <div class="form-group row">
+                        <label class="col-auto">Jenis Pembayaran</label>
+                        <div class="col text-right custom-control custom-checkbox mb-5">
+                            <input onchange="checkedAll('payment_group_uuid')" type="checkbox" class="custom-control-input"
+                                id="checked-all-payment_group_uuid">
+                            <label class="custom-control-label" for="checked-all-payment_group_uuid">Pilih
+                                Semua</label>
+                        </div>
+                        <div class="col-auto custom-control custom-checkbox mb-5">
+                            <input type="checkbox" class="custom-control-input " id="is_combined" name="is_combined">
+                            <label class="custom-control-label" for="is_combined">Gabungkan</label>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-md-center payment_group_uuid">
+
+                    </div>
+                </div>
+
+
+
+                {{-- rentang wAKTU --}}
+                <div class="form-group row">
+                    <label class="col-md-12 text-center">Rentang Waktu</label>
+                    <div class="col-md-6">
+                        <select onchange="loopDateFilter()" style="width: 100%;" name="date_start_filter_range"
+                            id="date_start_filter_range" class="custom-select2 form-control">
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select style="width: 100%;" name="date_end_filter_range" id="date_end_filter_range"
+                            class="custom-select2 form-control">
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="onSaveFilter()" type="button" class="col-md-auto btn btn-primary text-rigth">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-auto">
@@ -23,8 +98,8 @@
                         </div>
                     </div>
                     <div class="btn-group dropdown">
-                        <button type="button" class="btn btn-secondary dropdown-toggle waves-effect" data-toggle="dropdown"
-                            aria-expanded="false" id="btn-month" value="">
+                        <button type="button" class="btn btn-secondary dropdown-toggle waves-effect"
+                            data-toggle="dropdown" aria-expanded="false" id="btn-month" value="">
                             <span class="caret"></span>
                         </button>
 
@@ -44,8 +119,8 @@
                         </div>
                     </div>
                     <div class="btn-group dropdown">
-                        <button type="button" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
-                            aria-expanded="false">
+                        <button type="button" class="btn btn-primary dropdown-toggle waves-effect"
+                            data-toggle="dropdown" aria-expanded="false">
                             Menu <span class="caret"></span>
                         </button>
 
@@ -54,7 +129,8 @@
                                 onclick="openModalAbsen()">Ketidakhadiran</a>
                             <a class="dropdown-item" onclick="exportAbsen()" id="btn-export" href="#">Export +
                                 Data</a>
-                            <a class="dropdown-item" id="btn-export-template" href="/user/absensi/export-template/">Export
+                            <a class="dropdown-item" id="btn-export-template"
+                                href="/user/absensi/export-template/">Export
                                 Template</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                 href="">Import</a>
@@ -143,7 +219,6 @@
                 <div class="modal-body pd-0">
                     <form>
                         <div class="task-list-form">
-
                             <ul>
                                 <li>
                                     <div class="form-group row">
@@ -341,11 +416,8 @@
                 success: function(response) {
                     cg('response', response);
                     var dlink = document.createElement("a");
-
                     dlink.href = `/${response.data}`;
-
                     dlink.setAttribute("download", "");
-
                     dlink.click();
                 },
                 error: function(response) {
@@ -633,7 +705,7 @@
                     $('#the-table').append(table_element);
                     let data = [];
                     let dataTable = [
-                        'pay', 'cut', 'A'
+                        'pay', 'cut', 'alpa'
                     ];
 
                     data.push(element_profile_employee)
@@ -712,7 +784,7 @@
                                         `
                             }
                         };
-                        
+
                         data.push(element_date)
                     });
                     $('#table-absen').DataTable({

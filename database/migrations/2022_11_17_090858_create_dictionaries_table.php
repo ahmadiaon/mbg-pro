@@ -16,7 +16,8 @@ class CreateDictionariesTable extends Migration
         Schema::create('dictionaries', function (Blueprint $table) {
             $table->id();
             $table->string('database')->nullable();
-            $table->string('excel')->nullable();            
+            $table->string('excel')->nullable();      
+            $table->string('table')->nullable();            
             $table->string('data_type')->nullable();
             $table->timestamps();
         });

@@ -14,7 +14,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
-use Illuminate\Support\Facades\DB;
 
 class EmployeeDebtController extends Controller
 {
@@ -45,14 +44,17 @@ class EmployeeDebtController extends Controller
         if (empty($validatedData['uuid'])) {
             $validatedData['uuid'] = $validatedData['employee_uuid'] . '-' .  $validatedData['date_debt'];
         }
-
         $storeData = EmployeeDebt::updateOrCreate(['uuid' =>  $validatedData['uuid']], $validatedData);
-
         return ResponseFormatter::toJson($storeData, 'Data Stored');
     }
 
-    public function export($year_month)
+    public function export()
     {
+        $data_databases = (session('data_database'));
+        $data_employees = $data_databases['data_employees'];        
+        $arr_date_today = (session('year_month'));
+        
+        $year_month = $arr_date_today['year'] . '-' . $arr_date_today['month'];
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
@@ -72,7 +74,7 @@ class EmployeeDebtController extends Controller
         $createSheet->setCellValue('D5', 'Jabatan');
         $createSheet->setCellValue('E5', 'Tanggal Pinjaman');
         $createSheet->setCellValue('F5', 'Besar Pinjaman');
-        $createSheet->setCellValue('D5', 'Jabatan');
+        $createSheet->setCellValue('G5', 'Besar Sisa Pinjaman');
         $crateWriter = new Xls($createSpreadsheet);
         $name = 'file/absensi/file-pinjaman-' . $year_month . '-' . rand(99, 9999) . 'file.xls';
         $crateWriter->save($name);
@@ -86,7 +88,8 @@ class EmployeeDebtController extends Controller
         $the_file = $request->file('uploaded_file');
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
-
+        // BELUM DIHAPUS DATA YANG LAMA
+        // hapus perbulan
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
@@ -112,19 +115,32 @@ class EmployeeDebtController extends Controller
 
                 $value_debt = $sheet->getCell('F' . $no_employee)->getValue();
                 $value_debt = (int)$value_debt;
+               
 
 
                 $employee_debt = [
-                    'uuid' => $employee_uuid . '-' . $default_date,
+                    'uuid' => $employee_uuid . '-' . $date_debt,
                     'employee_uuid' => $employee_uuid,
                     'date_debt' =>  $date_debt,
                     'value_debt' => $value_debt,
                     'min_payment_debt' => 0,
                     'max_payment_debt' => $value_debt,
                 ];
-                // dd(  $employee_debt);
                 $store_employee_debt = EmployeeDebt::updateOrCreate(['uuid'  => $employee_debt['uuid']], $employee_debt);
-
+                EmployeeDebt::where('employee_uuid', $employee_uuid)->delete();
+                EmployeePaymentDebt::where('employee_uuid', $employee_uuid)->delete();
+                if(!empty($sheet->getCell('G' . $no_employee)->getValue())){
+                    $currentDateTime =  new Carbon($date_debt);
+                    $currentDateTime->subMonths(1);
+                    $employee_debt = [
+                        'uuid' => $employee_uuid . '-' . $date_debt,
+                        'employee_uuid' =>  $employee_uuid,
+                        'date_payment_debt' =>$currentDateTime->isoFormat('Y-MM-DD'),
+                        'value_payment_debt' => $value_debt - (float)$sheet->getCell('G' . $no_employee)->getValue(),
+                    ];
+                    $store_employee_payment_debt = EmployeePaymentDebt::updateOrCreate(['uuid'  => $employee_debt['uuid']], $employee_debt);
+                    
+                }
                 $no_employee++;
             }
             return back();
@@ -165,7 +181,11 @@ class EmployeeDebtController extends Controller
                 'employee_debts.*'
             ]);
         $data_datatable = [];
+        $employee_have_debt = [];
         $datatable = [];
+        $data_debt_uuid = [];
+        $data_payment_debt_uuid = [];
+        $data_datatable_uuid = [];
         if (!empty($validateData['filter']['arr_filter'])) {
             foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
                 foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
@@ -174,43 +194,77 @@ class EmployeeDebtController extends Controller
             }
 
             foreach ($data_basic as $i_db) {
-                $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data_debt'][] = $i_db;
-                if (empty($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'])) {
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_debt'] = 0;
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'] = 0;
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'] = $i_db->employee_uuid;
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['max_payment_debt'] = $i_db->max_payment_debt;   
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['date_debt'] = $i_db->date_debt;    
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data_payment_debt'] = [];      
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['status_debt'] = 'Belum Lunas';      
-                                  
-                }
-                if($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['date_debt'] < $i_db->date_debt){
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['max_payment_debt'] = $i_db->max_payment_debt;   
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['date_debt'] = $i_db->date_debt;             
-                }
-                $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_debt'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_debt'] + 1;
-                $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'] + $i_db->value_debt;
-                $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['remaining'] =$datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'];
-           
-            }
-
-            
-
-            foreach ($datatable as $i_dt) {
-                if (count($i_dt) > 0) {
-                    foreach ($i_dt as $index_i_dt => $value_i_dt) {
-                        $data_datatable[] = $value_i_dt;
+                if (!empty($data_table[$i_db->company_uuid . '-' . $i_db->site_uuid])) {
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data_debt'][$i_db->uuid] = $i_db;
+                    $data_debt_uuid[$i_db->uuid] = $i_db;
+                    if (empty($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'])) {
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_debt'] = 0;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment_debt'] = 0;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment_debt'] = 0;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'] = 0;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'] = $i_db->employee_uuid;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['max_payment_debt'] = $i_db->max_payment_debt;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['date_debt'] = $i_db->date_debt;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data_payment_debt'] = [];
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['status_debt'] = 'Belum Lunas';
                     }
+                    if ($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['date_debt'] < $i_db->date_debt) {
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['max_payment_debt'] = $i_db->max_payment_debt;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['date_debt'] = $i_db->date_debt;
+                    }
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_debt'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_debt'] + 1;
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'] + $i_db->value_debt;
+                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['remaining'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_debt'];
+
+                    $data_datatable_uuid[$i_db->employee_uuid] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid];
                 }
             }
+
+            $data_basic_payment_debt = EmployeePaymentDebt::get();
+
+            foreach ($data_basic_payment_debt as $item_data_basic_payment_debt) {
+                if (!empty($data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid])) {
+                    $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['data_payment_debt'][$item_data_basic_payment_debt->uuid] = $item_data_basic_payment_debt;
+                    $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['remaining'] = $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['remaining'] - $item_data_basic_payment_debt->value_payment_debt;
+                    $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['count_payment_debt'] =  $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['count_payment_debt'] + 1;
+                    $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['sum_payment_debt'] =  $data_datatable_uuid[$item_data_basic_payment_debt->employee_uuid]['sum_payment_debt'] + $item_data_basic_payment_debt->value_payment_debt;
+                    $data_payment_debt_uuid[$item_data_basic_payment_debt->uuid] = $item_data_basic_payment_debt;
+                }
+            }
+
+            foreach ($data_datatable_uuid as $i_dt) {
+                $data_datatable[] = $i_dt;
+                if ($i_dt['remaining'] > 0) {
+                    $employee_have_debt[] = $i_dt['employee_uuid'];
+                }
+            }
+
+
+            // foreach ($datatable as $i_dt) {
+            //     if (count($i_dt) > 0) {
+            //         foreach ($i_dt as $index_i_dt => $value_i_dt) {
+            //             $data_datatable[] = $value_i_dt;
+            //             if($value_i_dt['remaining'] > 0){
+            //                 $employee_have_debt[] = $value_i_dt['employee_uuid'];
+            //             }
+            //         }
+            //     }
+            // }
+
+
+
 
             $data = [
                 'request'    => $validateData,
                 'data_basic'  => $data_basic,
+                'data_debt_uuid'  => $data_debt_uuid,
                 'data_table'  => $data_table,
                 'datatable' => $datatable,
                 'data_datatable' => $data_datatable,
+                'data_datatable_uuid' => $data_datatable_uuid,
+                'data_basic_payment_debt' => $data_basic_payment_debt,
+                'employee_have_debt' => $employee_have_debt,
+                'data_payment_debt_uuid' => $data_payment_debt_uuid
             ];
 
             return ResponseFormatter::toJson($data, 'anyData employee payment');
@@ -224,5 +278,12 @@ class EmployeeDebtController extends Controller
             // 'data_uuid' => $data_uuid
         ];
         return ResponseFormatter::toJson($data, 'data datatable debt');
+    }
+
+    public function delete(Request $request)
+    { //used
+        $validatedData = $request->all();
+        $storeData = EmployeeDebt::where('uuid', $validatedData['uuid'])->delete();
+        return ResponseFormatter::toJson($storeData, 'Data Stored');
     }
 }

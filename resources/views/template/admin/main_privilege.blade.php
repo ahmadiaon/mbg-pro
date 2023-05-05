@@ -177,6 +177,30 @@
             }
         };
 
+        var element_profile_employee_database_payrol = {
+
+            mRender: function(data, type, row) {
+
+                if (row.photo_path == null) {
+                    row.photo_path = '/vendors/images/photo4.jpg';
+                }
+                if (row.photo_path == null) {
+                    row.photo_path = '/vendors/images/photo4.jpg';
+                }
+                return `<div class="name-avatar d-flex align-items-center">
+                            <div class="avatar mr-2 flex-shrink-0">
+                                <img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
+                                    height="40" alt="" />
+                            </div>
+                            <div class="txt">
+                                <div class="weight-600">${data_database.data_employees[row.nik_employee]['name']}</div>
+                                <small>${data_database.data_employees[row.nik_employee]['nik_employee']}</small></br>
+                                <small>${data_database.data_employees[row.nik_employee]['position']}</small>
+                            </div>
+                        </div>`
+            }
+        };
+
         var element_profile_employee_session = {
             mRender: function(data, type, row) {
                 let date_employee_element_profile_employee_session = data_database.data_employees[row
@@ -653,7 +677,7 @@
         function showModalMessage(message) {
             $('#message-text').text(message);
             $('#message-modal-id').modal('show');
-            
+
             stopLoading();
         }
 
@@ -695,6 +719,42 @@
                 $(`#rupiah-${idElement}`).val(toNumber(valueNumberElement));
             }
             cg('valueElement', $('#rupiah-' + idElement).length);
+        }
+
+        function toValueRupiah(numberValue) {
+            let rupiahFormat = numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            rupiahFormat = 'Rp. ' + rupiahFormat;
+            return rupiahFormat;
+        }
+
+        function deleteDataConfirmed() {
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            let uuid_delete = $('#uuid-delete-confirm').val();
+            let url_delete = $('#url-delete-confirm').val();
+
+            $.ajax({
+                url: url_delete,
+                type: "POST",
+                data: {
+                    _token: _token,
+                    uuid: uuid_delete
+                },
+                success: function(response) {
+                    cg('response', response);
+                    showModalMessage('Data terhapus');
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+        }
+
+        function deleteDataModalShow(uuid, contentDelete, urlDelete) {
+            $('#message-delete-confirm').text(contentDelete);
+            $('#uuid-delete-confirm').val(uuid);
+            $('#url-delete-confirm').val(urlDelete);
+            $('#confirm-modal-delete').modal('show');
+            return false;
         }
 
 

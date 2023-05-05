@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Employee;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\CoalFrom;
-use App\Models\Company;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeePayment;
@@ -13,8 +11,6 @@ use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\DB;
 
 class EmployeePaymentController extends Controller
 {
@@ -119,13 +115,15 @@ class EmployeePaymentController extends Controller
 
 
         $arr_data_tonase = [];
-
+        $data_datatable= [];
+        $datatable = [];
         $data_table = [];
-        $data_basic = EmployeePayment::join('payments', 'payments.uuid', 'employee_payments.payment_uuid')
-            ->join('payment_groups', 'payment_groups.uuid', 'payments.payment_group_uuid')
-            ->join('employees', 'employees.nik_employee', 'employee_payments.employee_uuid')
+        $data_basic = EmployeePayment::leftJoin('payments', 'payments.uuid', 'employee_payments.payment_uuid')
+            ->leftJoin('payment_groups', 'payment_groups.uuid', 'payments.payment_group_uuid')
+            ->leftJoin('employees', 'employees.nik_employee', 'employee_payments.employee_uuid')
             ->where('payments.date', '>=', $validateData['filter']['date_filter']['date_start_filter_range'])
             ->where('payments.date', '<=', $validateData['filter']['date_filter']['date_end_filter_range'])
+            // ->groupBy('employee_payments.uuid')
             ->get([
                 'employees.site_uuid',
                 'employees.company_uuid',
@@ -137,7 +135,7 @@ class EmployeePaymentController extends Controller
             ]);
 
 
-        $datatable = [];
+        
         if (!empty($validateData['filter']['arr_filter'])) {
             foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
                 foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
@@ -150,17 +148,20 @@ class EmployeePaymentController extends Controller
                     }
                 }
             }
-
+            $uuid = [];
             foreach ($data_basic as $i_db) {
                 if (!empty($data_table[$i_db->company_uuid . '-' . $i_db->site_uuid . '-' . $i_db->payment_group_uuid])) {
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data'][] = $i_db;
-                    if (empty($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'])) {
-                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] = 0;
-                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] = 0;
-                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'] = $i_db->employee_uuid;
-                    }
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] + 1;
-                    $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] + $i_db->value;
+                    if(empty($uuid[$i_db->uuid])){
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['data'][] = $i_db;
+                        if (empty($datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'])) {
+                            $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] = 0;
+                            $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] = 0;
+                            $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['employee_uuid'] = $i_db->employee_uuid;
+                        }
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['count_payment'] + 1;
+                        $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] = $datatable[$i_db->company_uuid . '-' . $i_db->site_uuid][$i_db->employee_uuid]['sum_payment'] + $i_db->value;
+                        $uuid[$i_db->uuid] = true;
+                    }                   
                 }
             }
             foreach($datatable as $i_dt){

@@ -516,9 +516,29 @@
                                 </div>`
                 }
             };
-            data.push(elements)
+            data.push(elements);
 
             let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/user/data-x',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    filter: filter
+                },
+                success: function(response) {
+                    let data_datable = [];
+
+                    cg('response',response );
+                  
+                },
+
+                error: function(response) {
+                    console.log(response)
+                }
+            });
+
+            _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
                 url: '/user/data',
                 type: "POST",
@@ -535,7 +555,7 @@
                             data_datable.push(element_data_datable_obj);
                         });
                     }
-                    cg('response', data_datable);
+                    cg('response', response);
                     $('#table-user-employees').DataTable({
                         scrollX: true,
                         serverSide: false,

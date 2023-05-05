@@ -1,7 +1,7 @@
 {{-- loading modal --}}
 
 
-<div class="modal fade" id="loading-modal" tabindex="1"  role="dialog" aria-labelledby="myLargeModalLabel"
+<div class="modal fade" id="loading-modal"   role="dialog" aria-labelledby="myLargeModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -108,13 +108,39 @@
             <div class="modal-body">
                 <p>Apakah Anda Yakin Untuk Mengahapus data ini?</p>
             </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button onclick="deleteConfirmed()" type="button" class="btn btn-danger">Hapus</button>
+            <div class="modal-footer justify-content-center row">
+                <button type="button" class="col btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button onclick="deleteConfirmed()" type="button" class="col btn btn-danger">Hapus</button>
             </div>
         </div>
     </div>
 </div>
+
+{{-- modal confirm delete --}}
+<div id="confirm-modal-delete" class="modal fade">
+    <div class="modal-dialog  modal-sm modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header flex-column">
+                <div class="icon-box">
+                    <i class="icon-copy ion-android-delete"></i>
+                </div>
+                
+                <h4 class="modal-title w-100">Hapus Data?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><b id="message-delete-confirm"></b></p>
+                <input type="text" name="uuid-delete-confirm" id="uuid-delete-confirm">
+                <input type="text" name="url-delete-confirm" id="url-delete-confirm">
+            </div>
+            <div class="modal-footer justify-content-center row">
+                <button type="button" class="col btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button onclick="deleteDataConfirmed()" type="button" class="col btn btn-danger">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">

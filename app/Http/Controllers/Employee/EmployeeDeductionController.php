@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Employee;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeDeduction;
+use App\Models\Safety\AtributSize;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class EmployeeDeductionController extends Controller
 {
@@ -124,9 +128,111 @@ class EmployeeDeductionController extends Controller
         }
     }
 
-    public function delete(Request $request){//used
-        $store = EmployeeDeduction::where('uuid',$request->uuid)->delete();
+    public function delete(Request $request)
+    { //used
+        $store = EmployeeDeduction::where('uuid', $request->uuid)->delete();
 
         return ResponseFormatter::toJson($store, 'Data deleted');
-   }
+    }
+
+    public function export()
+    {
+        $data_databases = (session('data_database'));
+        $data_employees = $data_databases['data_employees'];
+        $arr_date_today = (session('year_month'));
+
+        $year_month = $arr_date_today['year'] . '-' . $arr_date_today['month'];
+        $date = explode("-", $year_month);
+        $year = $date[0];
+        $month = $date[1];
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        $createSheet->setCellValue('C1', 'Template Pengurang Lainnya');
+
+        $createSheet->setCellValue('B1', 'Excel');
+        $createSheet->setCellValue('B3', 'Bulan');
+        $createSheet->setCellValue('B4', 'Tahun');
+
+        $createSheet->setCellValue('C3', $month);
+        $createSheet->setCellValue('C4', $year);
+        $createSheet->setCellValue('A5', 'No');
+        $createSheet->setCellValue('B5', 'NIK');
+        $createSheet->setCellValue('C5', 'Nama');
+        $createSheet->setCellValue('D5', 'Jabatan');
+        $createSheet->setCellValue('E5', 'Tanggal');
+        $createSheet->setCellValue('F5', 'Besar');
+        $createSheet->setCellValue('G5', 'Jenis');
+        $createSheet->setCellValue('H5', 'Keterangan');
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/file-pengurang-lainnya-' . $year_month . '-' . rand(99, 9999) . 'file.xls';
+        $crateWriter->save($name);
+
+        // return 'aaa';
+        return response()->download($name);
+    }
+
+    public function import(Request $request)
+    {
+        $the_file = $request->file('uploaded_file');
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        // BELUM DIHAPUS DATA YANG LAMA
+        // hapus perbulan
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet        = $spreadsheet->getActiveSheet();
+
+            $abjads = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ', 'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ', 'CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CI', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CO', 'CP', 'CQ', 'CR', 'CS', 'CT', 'CU', 'CV', 'CW', 'CX', 'CY', 'CZ', 'DA', 'DB', 'DC', 'DD', 'DE', 'DF', 'DG', 'DH', 'DI', 'DJ', 'DK', 'DL', 'DM', 'DN', 'DO', 'DP', 'DQ', 'DR', 'DS', 'DT', 'DU', 'DV', 'DW', 'DX', 'DY', 'DZ'];
+            $year = $sheet->getCell('C4')->getValue();
+            $month = $sheet->getCell('C3')->getValue();
+            $year_month = $year . '-' . $month;
+            $day_month = ResponseFormatter::getEndDay($year_month);
+
+            $dates = $year . '-' . $month . '-' . '1';
+            $default_date = $year_month . '-' . $day_month;
+            $no_employee = 6;
+            $employees = [];
+
+            while ((int)$sheet->getCell('A' . $no_employee)->getValue() != null) {
+                $employee_uuid = ResponseFormatter::toUUID($sheet->getCell('B' . $no_employee)->getValue());
+
+                $date_deduction = ResponseFormatter::excelToDate($sheet->getCell('E' . $no_employee)->getValue());
+                if (empty($date_deduction)) {
+                    $date_deduction = $default_date;
+                }
+
+                $payment_other = $sheet->getCell('G' . $no_employee)->getValue();
+                $payment_other_uuid = ResponseFormatter::toUUID($payment_other);
+
+
+                $value_deduction = $sheet->getCell('F' . $no_employee)->getValue();
+                $value_deduction = (int)$value_deduction;
+
+                $arr_data_payment_other = [
+                    'uuid' => $payment_other_uuid,
+                    'name_atribut' => $payment_other,
+                    'size' => 'group_deduction_uuid',
+                    'value_atribut' => 'value',
+                ];
+                // dd($arr_data_payment_other);
+                AtributSize::updateOrCreate(['uuid' => $arr_data_payment_other['uuid']], $arr_data_payment_other);
+
+                $employee_deduction = [
+                    'uuid' => $employee_uuid . '-' . $date_deduction . '-' . ResponseFormatter::toUUID($sheet->getCell('H' . $no_employee)->getValue()),
+                    'employee_uuid' => $employee_uuid,
+                    'date_employee_deduction' =>  $date_deduction,
+                    'group_deduction_uuid' => $payment_other_uuid,
+                    'value_employee_deduction' => $value_deduction,
+                    'description_deduction_uuid' => $sheet->getCell('H' . $no_employee)->getValue(),
+                ];
+                $store_employee_deduction = EmployeeDeduction::updateOrCreate(['uuid'  => $employee_deduction['uuid']], $employee_deduction);
+                $no_employee++;
+                // dd($store_employee_deduction);
+            }
+            return back();
+        } catch (Exception $e) {
+            // $error_code = $e->errorInfo[1];
+            return back()->withErrors('There was a problem uploading the data!');
+        }
+    }
 }

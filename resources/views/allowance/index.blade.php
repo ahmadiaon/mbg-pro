@@ -9,6 +9,44 @@
 @endsection
 
 @section('content')
+    <div class="mb-20 row">
+        {{-- form filter --}}
+        <div class="col-md-5 mb-10">
+            <div class="card-box pd-20" id="the-filter-employee-tonase">
+                <h4 class="text-blue h4">Filter</h4>
+
+                <div class="form-group row mb-20">
+                    <label class="col-auto" for="">Perusahaan</label>
+                    <div class="col text-right custom-control custom-checkbox mb-5">
+                        <input onchange="checkedAll('company')" type="checkbox" class="custom-control-input"
+                            id="checked-all-company">
+                        <label class="custom-control-label" for="checked-all-company">Pilih
+                            Semua</label>
+                    </div>
+                    <div class="col-12 justify-content-md-center row company-filter">
+
+                    </div>
+                </div>
+
+                <div class="form-group row mb-20">
+                    <label class="col-auto" for="">Site</label>
+                    <div class="col text-right custom-control custom-checkbox mb-5">
+                        <input onchange="checkedAll('site_uuid')" type="checkbox" class="custom-control-input"
+                            id="checked-all-site_uuid">
+                        <label class="custom-control-label" for="checked-all-site_uuid">Pilih
+                            Semua</label>
+                    </div>
+                    <div class="col-12 justify-content-md-center row site-filter">
+
+                    </div>
+                </div>
+                <button onclick="onSaveFilter()" type="button" class="col-md-auto btn btn-primary text-rigth">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-auto">
@@ -63,9 +101,8 @@
                                     <input type="hidden" name="from" value="export">
                                     <input type="hidden" id="export-year_month" name="year_month" value="2022-10">
                                     <button type="submit" class="dropdown-item">Export</button>
-                                    {{-- <a class="dropdown-item" id="btn-export"  href="#">Export</a> --}}
                                 </form>
-                                
+
                                 <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                     href="">Import</a>
                             </div>
@@ -167,10 +204,213 @@
 
 @section('js')
     <script>
-        let data_user=[];
+        let data_datable = [];
+        let value_checkbox = {
+            'company': null,
+            'site_uuid': null,
+        };
 
-        function modalDescription(uuid){
-            
+        let arr_filter = {
+            'company': [],
+            'site_uuid': []
+        };
+
+        let filter = {
+            'value_checkbox': [],
+            'arr_filter': {
+                'company': [],
+                'site_uuid': []
+            },
+            'date': arr_date_today
+        };
+
+
+        function checkedAll(name) {
+            cg('name', name);
+            let isAllChecked = $('#checked-all-' + name)[0].checked;
+            if (isAllChecked) {
+                arr_filter[name] = value_checkbox[name];
+                $('.element-' + name).prop('checked', true);
+
+            } else {
+                $('.element-' + name).prop('checked', false);
+                arr_filter[name] = [];
+            }
+            cg('arr_coal_from', arr_filter);
+        }
+
+
+        function changeChecked(idEl_, uuid, name) {
+            cg('name', name);
+            let value_id = $(`input[type='checkbox'][name='${idEl_}']:checked`).val();
+            if (value_id) {
+                arr_filter[name].push(value_id);
+            } else {
+                const index = arr_filter[name].indexOf(uuid);
+                const x = arr_filter[name].splice(index, 1);
+            }
+            cg('arr_filter', arr_filter);
+        }
+
+        function onSaveFilter() {
+            filter.arr_filter = arr_filter;
+            filter.date = arr_date_today;
+            cg('onSaveFilter', filter);
+            showTable();
+            // showDataTableEmployeePayment()
+        }
+
+        function firstIndex() {
+            let arrrr = [];
+            Object.values(data_database.data_companies).forEach(company_uuid_element => {
+                $('.company-filter').append(`
+                    <div class="col-auto">
+                        <div class="custom-control custom-checkbox mb-5">
+                            <input onchange="changeChecked('filter-company-${company_uuid_element.uuid}','${company_uuid_element.uuid}', 'company')" type="checkbox" class="custom-control-input element-company" value="${company_uuid_element.uuid}"
+                                id="filter-company-${company_uuid_element.uuid}" name="filter-company-${company_uuid_element.uuid}">
+                            <label class="custom-control-label" for="filter-company-${company_uuid_element.uuid}">${company_uuid_element.company}</label>
+                        </div>
+                    </div>
+                `);
+                arrrr.push(company_uuid_element.uuid);
+            });
+            value_checkbox['company'] = arrrr;
+            arrrr = [];
+            Object.values(data_database.data_employees).forEach(employee_uuid_element => {
+                $('.employees').append(`
+                    <option value="${employee_uuid_element.nik_employee}">${employee_uuid_element.name} - ${employee_uuid_element.position}</option>
+                `);
+
+            });
+
+            Object.values(data_database.data_atribut_sizes.site_uuid).forEach(site_uuid_element => {
+                $('.site-filter').append(`
+                    <div class="col-auto">
+                        <div class="custom-control custom-checkbox mb-5">
+                            <input onchange="changeChecked('filter-site_uuid-${site_uuid_element.uuid}','${site_uuid_element.uuid}', 'site_uuid')" type="checkbox" class="custom-control-input element-site_uuid" value="${site_uuid_element.uuid}"
+                                id="filter-site_uuid-${site_uuid_element.uuid}" name="filter-site_uuid-${site_uuid_element.uuid}">
+                            <label class="custom-control-label" for="filter-site_uuid-${site_uuid_element.uuid}">${site_uuid_element.name_atribut}</label>
+                        </div>
+                    </div>
+                `);
+                arrrr.push(site_uuid_element.uuid);
+            });
+            value_checkbox['site_uuid'] = arrrr;
+            filter.value_checkbox = value_checkbox;
+
+            onSaveFilter();
+            $('#btn-year').html(arr_date_today.year);
+            $('#btn-month').html(months[parseInt(arr_date_today.month)]);
+            $('#btn-month').val(arr_date_today.month);
+        }
+
+        firstIndex();
+
+        function showTable() {
+            $('#tablePrivilege').remove();
+            var table_element = ` 
+                <div class="pb-20" id="tablePrivilege">
+                    <table id="table-employee-hour-meter" class="display nowrap stripe hover table" cellspacing="0" style="width:100%">
+                        <thead>
+                            <tr id="header-table">
+                            
+                            </tr>
+                        </thead>
+                    </table>
+                </div>`;
+
+
+            $('#the-table').append(table_element);
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/allowance/data-filter',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    filter: filter
+                },
+                success: function(response) {
+                    cg('response', response)
+                    let data_datable_O = response.data.employee_this_month_uuid;
+
+                    Object.values(data_datable_O).forEach(element => {
+                        data_datable.push(element);
+                    });
+
+                    let data_column = [];
+
+                    let identities = {
+                        date_start_contract: 'TMK',
+                        salary_netto_adjust: 'Gajih Bersih',
+                    };
+
+                    let header_element = '';
+                    let elements = '';
+
+                    let arr_identities = [];
+                    $('#header-table').append(`<th>Karyawan</th>`);
+                    for (var key in identities) {
+                        header_element = `<th>${identities[key]}</th>`;
+                        $('#header-table').append(header_element);
+                        arr_identities.push(key);
+                    }
+                    $('#header-table').append(`<th>Action</th>`);
+                    // return false;
+                    data_column.push(element_profile_employee_database_payrol);
+
+                    let el_table = {
+                        mRender: function(data, type, row) {
+                            return row.date_start_contract;
+                        }
+                    };
+                    data_column.push(el_table);
+
+                    el_table = {
+                        mRender: function(data, type, row) {
+                            return toValueRupiah(row['allowance']['gajih_pokok']['value']);
+                        }
+                    };
+                    data_column.push(el_table);
+
+                    elements = {
+                        mRender: function(data, type, row) {
+                            return `
+                                <div class="form-inline"> 
+                                    <button onclick="modalDescription('${row.nik_employee}')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
+                                        <i class="icon-copy ion-gear-b"></i>
+                                    </button>
+                                </div>`
+                        }
+                    };
+                    data_column.push(elements);
+
+                    $('#table-employee-hour-meter').DataTable({
+                        scrollX: true,
+                        scrollY: "600px",
+                        paging: false,
+                        // fixedColumns: {
+                        //     leftColumns: 2
+                        // },
+                        serverSide: false,
+                        data: data_datable,
+                        columns: data_column
+                    });
+
+
+                },
+                error: function(response) {
+                    // alertModal()
+                }
+            });
+        }
+
+
+
+
+        let data_user = [];
+
+        function modalDescription(uuid) {
+
             let user_show = dataTaa[uuid]
             $('.employee-description').empty()
             for (var key in user_show) {
@@ -192,6 +432,7 @@
             //     console.log(element)
             // });
         }
+
         let year_month = @json($year_month);
         let arr_year_month = year_month.split("-")
         let v_year = $('#btn-year').html();
@@ -208,39 +449,34 @@
         let premis = @json($premis);
         let dataTaa;
 
-        
 
 
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[arr_year_month[1]]);
-        $('#btn-month').val(arr_year_month[1]);
-        $('#btn-export').attr('href', '/hour-meter/export/' + year_month)
-        
-        $('#export-year_month').val(year_month)
-        refreshTable();
-        
+
+
+        // refreshTable();
+
 
         function showDataTableEmployeeHourMeterMonth(url, dataTable, id) {
             $.ajax({
-                url:  '/allowance/data',
+                url: '/allowance/data',
                 type: "POST",
-                data:  {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        year_month: year_month,
-                        from:'allowance'
-                    },
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    year_month: year_month,
+                    from: 'allowance'
+                },
                 success: function(response) {
                     // $('#success-modal').modal('show')
-            		
+
                     dataTaa = response.message
                     // console.log(dataTaa)
-            		// $('#table-'+idForm).DataTable().ajax.reload();
+                    // $('#table-'+idForm).DataTable().ajax.reload();
                 },
                 error: function(response) {
-                    alertModal()					
-            	}
+                    alertModal()
+                }
             });
-            
+
             $('#tablePrivilege').remove();
             var table_element = ` 
             <div class="pb-20" id="tablePrivilege">
@@ -293,7 +529,7 @@
 
             elements = {
                 mRender: function(data, type, row) {
-                 
+
                     return `
                     <div class="form-inline"> 
                         <button onclick="modalDescription('${row.nik_employee}')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
@@ -304,7 +540,7 @@
             };
             data_column.push(elements)
 
-            
+
 
             // return false;
 
@@ -328,38 +564,30 @@
                     },
                     type: 'POST',
                 },
-                
+
                 columns: data_column
             });
         }
 
         function refreshTable(val_year = null, val_month = null) {
-            console.log('val_year :' + val_year + 'val_month :' + val_month);
+            year = arr_date_today.year;
+            month = arr_date_today.month;
 
-            v_year = $('#btn-year').html();
-            v_month = $('#btn-month').val();
-            console.log(v_month);
             if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
             }
+
             if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(arr_date_today.month);
             }
-            v_month = String(v_month).padStart(2, '0')
-            lastDay = new Date(v_year, v_month, 0);
-            lastDay = lastDay.getDate();
-            console.log(lastDay);
-            year_month = v_year + '-' + v_month;
-            $('#btn-export').attr('href', 'hour-meter/data/' + year_month)           
-            $('#export-year_month').val(year_month)
-            let _url = 'hour-meter/data/' + year_month;
-            showDataTableEmployeeHourMeterMonth(_url, ['nik_employee', 'name'],
-                'table-employee-hour-meter')
+            onSaveFilter();
+            setDateSession(year, month);
+
+            // showDataTableEmployeeHourMeterMonth('hour-meter/data/2022-04', ['nik_employee', 'name'],
+            //     'table-employee-hour-meter')
         }
     </script>
 @endsection

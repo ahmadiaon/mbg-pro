@@ -149,11 +149,6 @@
                                             href="/employee-debt">Hutang HO</a>
                                     </li>
                                     <li>
-                                        <a class="{{ $layout['active'] == 'employee-payment-debt' ? 'active' : '' }}"
-                                            data-toggle="tooltip" data-placement="right" title="Hour Meter"
-                                            href="/employee-payment-debt">Pembayaran Hutang</a>
-                                    </li>
-                                    <li>
                                         <a class="{{ $layout['active'] == 'employee-deduction' ? 'active' : '' }}"
                                             href="/employee-deduction">Pengurang Lainnya</a>
                                     </li>

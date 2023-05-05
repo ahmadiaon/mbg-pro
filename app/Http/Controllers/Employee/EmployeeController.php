@@ -99,6 +99,8 @@ class EmployeeController extends Controller
         $data = EmployeePremi::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
         $data = EmployeeRoaster::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
         $data = EmployeeSalary::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
+        $data = EmployeeCutiSetup::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
+        $data = EmployeeCuti::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
         $data = EmployeeOut::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
         $data = UserAddress::where('user_detail_uuid', '!=', 'MBLE-0422003')->delete();
         $data = UserPrivilege::where('nik_employee', '!=', 'MBLE-0422003')->delete();
@@ -284,12 +286,8 @@ class EmployeeController extends Controller
         $the_file = $request->file('uploaded_file');
 
         $createSpreadsheet = new spreadsheet();
-        $createSheet = $createSpreadsheet->getActiveSheet();
-        // $string = "IRWAN. s        U        ";
-
-        // $string = ResponseFormatter::isString($string);
-
-        // return $string;
+        $createSheet = $createSpreadsheet->getActiveSheet();        
+        $date_now = Carbon::now()->subMonth();
 
 
         try {
@@ -316,7 +314,8 @@ class EmployeeController extends Controller
                 ];
                 $no_row++;
             }
-            // dd($arr_index);
+            
+            
 
             $no_employee = 3;
             $employees = [];
@@ -424,6 +423,7 @@ class EmployeeController extends Controller
                                     $employee_data_one[$item_index['database']] =  ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue());
                                     $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
                                 }
+                                $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
                                 break;
                             case 'string':
                                 // $employee_data_one[$item_index['database'].'_uuid'] = ResponseFormatter::toUUID($sheet->getCell( $item_index['index'].$no_employee)->getValue());
@@ -439,6 +439,9 @@ class EmployeeController extends Controller
                 }
                 // dd($data_old);
                 // dd($employee_data_one);
+                // if($employee_data_one['nik_employee'] == 'MB-PL-220824'){
+                //     dd($employee_data_one);
+                // }
                 if (!empty($employee_data_one['department_uuid'])) {
                     if (empty($get_all_department[$employee_data_one['department_uuid']])) {
                         Department::updateOrCreate(['uuid' => $employee_data_one['department_uuid']], ['department' => $employee_data_one['department_with_space']]);
@@ -455,6 +458,8 @@ class EmployeeController extends Controller
                         EmployeeCutiGroup::updateOrCreate(['uuid' => $employee_data_one['group_cuti_uuid']], ['name_group_cuti' => $employee_data_one['group_cuti_uuid_with_space']]);
                     }
                 }
+
+                
 
                 if (!empty($employee_data_one['bpjs_ketenagakerjaan'])) {
                     $employee_data_one['is_bpjs_kesehatan'] = 'Ya';
@@ -504,6 +509,79 @@ class EmployeeController extends Controller
                 if (!empty($employee_data_one['hour_meter_prices'])) {
                     $employee_data_one['hour_meter_price_uuid'] = $employee_data_one['hour_meter_prices'];
                 }
+
+                // default if null
+                // roaster
+                if (empty($employee_data_one['roaster_uuid'])) {
+                    $employee_data_one['roaster_uuid'] = '70';
+                }
+
+                // date_start_contract
+                if (empty($employee_data_one['date_start_contract'])) {
+                    $employee_data_one['date_start_contract'] = $employee_data_one['date_document_contract'];
+                }
+
+                // contract_status
+                if (empty($employee_data_one['contract_status'])) {
+                    $employee_data_one['contract_status'] = 'PKWT';
+                }
+
+                // site_uuid
+                if (empty($employee_data_one['site_uuid'])) {
+                    $employee_data_one['site_uuid'] = 'PL';
+                }
+
+                // company_uuid
+                if (empty($employee_data_one['company_uuid'])) {
+                    $employee_data_one['company_uuid'] = 'PL';
+                }
+
+                // machine_id
+                if (empty($employee_data_one['machine_id'])) {
+                    $employee_data_one['machine_id'] = $employee_data_one['nik_employee'] ;
+                }
+
+                // date_start_work
+                if (empty($employee_data_one['date_start_work'])) {
+                    $date_swcount = new Carbon($employee_data_one['date_document_contract']);
+                    $date_swcount->addMonths(3);
+                    $date_swcount->addDays(14);
+                    $employee_data_one['date_start_work'] = $date_swcount->format("Y-m-d");
+                }
+                // dd($employee_data_one);
+                // long_contract
+                if (empty($employee_data_one['long_contract'])) {
+                    $employee_data_one['long_contract'] = 12 ;
+                }
+
+                // group_cuti_uuid
+                if (empty($employee_data_one['group_cuti_uuid'])) {
+                    $employee_data_one['group_cuti_uuid'] = $employee_data_one['position_uuid'] ;
+                    if (empty($get_all_group_cuti[$employee_data_one['group_cuti_uuid']])) {
+                        EmployeeCutiGroup::updateOrCreate(['uuid' => $employee_data_one['position_uuid']], ['name_group_cuti' => $employee_data_one['position_with_space']]);
+                    }
+                }
+                // date_end_contract
+                if (empty($employee_data_one['date_end_contract'])) {
+                    $date_start_contract_where_null = new Carbon($employee_data_one['date_start_contract']);
+                    $date_start_contract_where_null->addMonths(3)->format("Y-m-d");
+
+                    if ($date_now > $date_start_contract_where_null) { 
+                        while ($date_now > $date) {
+                            $date_start_contract = $date;
+                            $date->addMonths(12);
+                        }                        
+                        $employee_data_one['employee_status'] = 'Profesional';
+                        $employee_data_one['long_contract'] = '12';
+                    }else{
+                        if (empty($employee_data_one['employee_status'])) {
+                            $employee_data_one['employee_status'] = 'Training';
+                            $employee_data_one['long_contract'] = '3';
+                        }                        
+                    }
+                    $employee_data_one['date_end_contract'] = $date->format("Y-m-d");
+                }
+
                 if (!empty($employee_data_one['date_end'])) {
                     dd($employee_data_one);
                 }
@@ -513,6 +591,8 @@ class EmployeeController extends Controller
                     $employee_data_one['employee_status'] = 'Keluar';
                     $storeEmployee = EmployeeOut::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                 }
+                
+                // dd($employee_data_one);
                 if (!empty($data_old)) {
                     // dd($data_old);
                     if ($data_old['date_start'] > $employee_data_one['date_start']) {
@@ -587,6 +667,7 @@ class EmployeeController extends Controller
                 echo $nik_employee . "-start salary</br>";
 
                 foreach ($premis as $premi) {
+                   
                     if (!empty($employee_data_one[$premi->uuid])) {
                         $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
                         $employee_data_one['premi_uuid'] = $premi->uuid;
@@ -615,7 +696,20 @@ class EmployeeController extends Controller
                         }
                         // dd($storeEmployee);
                     }
+                    $data_old_arr =[];
+                    if(!empty($get_all_employee_premis[$nik_employee . '-' . $premi->uuid])){
+                        if(empty($employee_data_one[$premi->uuid])){
+                            $employee_data_one['premi_value'] = 0;
+                            $employee_data_one['premi_uuid'] = $premi->uuid;
+                            $employee_data_one['uuid'] = $nik_employee . '-' . $premi->uuid;
+                            $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $get_all_employee_premis[$nik_employee . '-' . $premi->uuid]['id']], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = EmployeePremi::create($employee_data_one);
+                        }
+                        $data_old_arr[] = $get_all_employee_premis[$nik_employee . '-' . $premi->uuid];
+                    }
+                    
                 }
+                // dd($data_old_arr);
 
                 echo $nik_employee . "-end</br>";
                 // dd('user detail will');
@@ -703,6 +797,50 @@ class EmployeeController extends Controller
             'out_status',
             'date_out'
         ];
+
+        $column_import = [
+
+            'employees' => [
+                'machine_id',
+                'nik_employee',
+                'position_uuid',
+                'department_uuid',
+                'company_uuid',
+                'site_uuid',
+                'roaster_uuid',
+                'contract_number',
+                'contract_number_full',
+                'contract_status',
+                'date_start_contract',
+                'date_end_contract',
+                'date_document_contract',
+                'long_contract',
+                'employee_status',
+                'tax_status_uuid',
+                'is_bpjs_kesehatan',
+                'is_bpjs_ketenagakerjaan',
+                'is_bpjs_pensiun',
+            ],
+            'user_details' => [
+                'name',
+                'nik_number',
+                'kk_number',
+                'citizenship',
+                'gender',
+                'place_of_birth',
+                'date_of_birth',
+                'religion_uuid',
+                'blood_group',
+                'status',
+                'npwp_number',
+                'financial_number',
+                'financial_name',
+                'bpjs_ketenagakerjaan',
+                'bpjs_kesehatan',
+                'phone_number',
+            ]
+        ];
+
         $data_religion = Religion::all();
         $data_database['religion_uuid']['data'] = $data_religion;
         $data_database['religion_uuid']['key'] = 'religion';
@@ -930,7 +1068,6 @@ class EmployeeController extends Controller
 
     public function profile($nik_employee)
     {
-
         $data = Employee::noGet_employeeAll_detail()->where('employees.uuid', $nik_employee)->first();
 
         $layout = [
@@ -951,14 +1088,14 @@ class EmployeeController extends Controller
     {
         $validateData = $request->all();
         $date_validateData = [];
-        $start =$end = null;
+        $start = $end = null;
         $date_validateData_arr = [];
-        if(!empty($validateData['filter']['date_range'])){
-            $date_validateData_arr = explode(' - ',$validateData['filter']['date_range']);
-            if(count($date_validateData_arr) > 1){
+        if (!empty($validateData['filter']['date_range'])) {
+            $date_validateData_arr = explode(' - ', $validateData['filter']['date_range']);
+            if (count($date_validateData_arr) > 1) {
                 $start = ResponseFormatter::excelToDate($date_validateData_arr[0]);
-                $end = ResponseFormatter::excelToDate($date_validateData_arr[1]);                
-            }elseif(count($date_validateData_arr) == 1){
+                $end = ResponseFormatter::excelToDate($date_validateData_arr[1]);
+            } elseif (count($date_validateData_arr) == 1) {
                 $start = ResponseFormatter::excelToDate($date_validateData_arr[0]);
                 $end = ResponseFormatter::excelToDate($date_validateData_arr[0]);
             }
@@ -979,12 +1116,12 @@ class EmployeeController extends Controller
             }
         }
 
-        $query = Employee::leftJoin('user_details','user_details.uuid', 'employees.nik_employee')
-        ->leftJoin('positions','positions.uuid', 'employees.position_uuid')
-        ->leftJoin('employee_outs','employee_outs.employee_uuid', 'employees.nik_employee')
-        ->whereNull('employees.date_end')
-        ->whereNull('user_details.date_end')
-        ->where('employee_status', '!=', 'talent');
+        $query = Employee::leftJoin('user_details', 'user_details.uuid', 'employees.nik_employee')
+            ->leftJoin('positions', 'positions.uuid', 'employees.position_uuid')
+            ->leftJoin('employee_outs', 'employee_outs.employee_uuid', 'employees.nik_employee')
+            ->whereNull('employees.date_end')
+            ->whereNull('user_details.date_end')
+            ->where('employee_status', '!=', 'talent');
         if ($validateData['filter']['contract_status'] != 'off') {
             $query->where('contract_status', $validateData['filter']['contract_status']);
         }
@@ -999,42 +1136,40 @@ class EmployeeController extends Controller
             $query->where('position_uuid', $validateData['filter']['position_uuid']);
         }
 
-        if($validateData['filter']['join_status'] != 'off' ){     
-            if(!empty($date_range['date_start'])){
-                if($validateData['filter']['join_status'] == '=='){
+        if ($validateData['filter']['join_status'] != 'off') {
+            if (!empty($date_range['date_start'])) {
+                if ($validateData['filter']['join_status'] == '==') {
                     $query->where('employees.employee_status', 'out');
-                }else{
-                    $query->where('employees.employee_status',$validateData['filter']['join_status'], 'out');
-                } 
-                $query->where('date_out','>=', $date_range['date_start'])->where('date_out','<=', $date_range['date_end']);
+                } else {
+                    $query->where('employees.employee_status', $validateData['filter']['join_status'], 'out');
+                }
+                $query->where('date_out', '>=', $date_range['date_start'])->where('date_out', '<=', $date_range['date_end']);
             }
         }
 
-        if($validateData['filter']['status_data'] != 'off' ){ 
-            if($validateData['filter']['status_data'] == '=='){
+        if ($validateData['filter']['status_data'] != 'off') {
+            if ($validateData['filter']['status_data'] == '==') {
                 $query->where('employees.employee_status', 'out');
-            }else{
-                $query->where('employees.employee_status',$validateData['filter']['status_data'], 'out');
-            } 
+            } else {
+                $query->where('employees.employee_status', $validateData['filter']['status_data'], 'out');
+            }
         }
 
-        if($validateData['filter']['status_join'] != 'off' ){     
-            if(!empty($date_range['date_start'])){
-                if($validateData['filter']['status_join'] == '=='){
-                    $query->where('employees.date_end_contract', '>', $date_range['date_start'] );
-                    $query->where('employees.date_end_contract', '<', $date_range['date_end'] );
-                }else{
-                    $query->where('employees.date_end_contract', '<', $date_range['date_start'] );
-                    $query->where('employees.date_end_contract', '>', $date_range['date_end'] );
-                } 
-
-
-            }else{
-                if($validateData['filter']['status_join'] == '=='){
-                    $query->where('employees.date_end_contract', '<', ResponseFormatter::getDateToday() );
+        if ($validateData['filter']['status_join'] != 'off') {
+            if (!empty($date_range['date_start'])) {
+                if ($validateData['filter']['status_join'] == '==') {
+                    $query->where('employees.date_end_contract', '>', $date_range['date_start']);
+                    $query->where('employees.date_end_contract', '<', $date_range['date_end']);
+                } else {
+                    $query->where('employees.date_end_contract', '<', $date_range['date_start']);
+                    $query->where('employees.date_end_contract', '>', $date_range['date_end']);
                 }
-                if($validateData['filter']['status_join'] == '!='){
-                    $query->where('employees.date_end_contract', '>', ResponseFormatter::getDateToday() );
+            } else {
+                if ($validateData['filter']['status_join'] == '==') {
+                    $query->where('employees.date_end_contract', '<', ResponseFormatter::getDateToday());
+                }
+                if ($validateData['filter']['status_join'] == '!=') {
+                    $query->where('employees.date_end_contract', '>', ResponseFormatter::getDateToday());
                 }
             }
         }
@@ -1044,22 +1179,21 @@ class EmployeeController extends Controller
 
 
         $data_table_company_site = [];
-        
+
 
         foreach ($data_table as $item_data_table) {
             $data_table_company_site[$item_data_table->company_uuid . '-' . $item_data_table->site_uuid][$item_data_table->nik_employee] = $item_data_table;
         }
         $data_datatable = [];
-        $data_datatable_data = []; 
+        $data_datatable_data = [];
         foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
             foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
-                if(!empty($data_table_company_site[$item_company . '-' . $item_site_uuid])){
-                    if(count($data_table_company_site[$item_company . '-' . $item_site_uuid])>0){
+                if (!empty($data_table_company_site[$item_company . '-' . $item_site_uuid])) {
+                    if (count($data_table_company_site[$item_company . '-' . $item_site_uuid]) > 0) {
                         $data_datatable[$item_company . '-' . $item_site_uuid] = $data_table_company_site[$item_company . '-' . $item_site_uuid];
                         $data_datatable_data = array_merge($data_datatable_data,  $data_table_company_site[$item_company . '-' . $item_site_uuid]);
-
                     }
-                }                
+                }
             }
         }
 
@@ -1075,7 +1209,7 @@ class EmployeeController extends Controller
             'data_table_company_site' => $data_table_company_site,
             'date_validateData_arr' => $date_validateData_arr
         ];
-        return ResponseFormatter::toJson($data,  explode(' - ',$validateData['filter']['date_range']));
+        return ResponseFormatter::toJson($data,  explode(' - ', $validateData['filter']['date_range']));
 
         $data_employee = Employee::data_employee_detail();
         $employees = DB::getSchemaBuilder()->getColumnListing('employees');
@@ -1089,6 +1223,58 @@ class EmployeeController extends Controller
         return ResponseFormatter::toJson($data, 'Data index');
         return Datatables::of($data)
             ->make(true);
+    }
+
+    public function anyMoreData_(Request $request){
+        $validateData = $request->all();
+
+        $query = Employee::leftJoin('user_details', 'user_details.uuid', 'employees.nik_employee')
+            ->leftJoin('positions', 'positions.uuid', 'employees.position_uuid')
+            ->leftJoin('employee_outs', 'employee_outs.employee_uuid', 'employees.nik_employee')
+            ->whereNull('employees.date_end')
+            ->whereNull('user_details.date_end')
+            ->where('employee_status', '!=', 'talent')
+            ->get();
+
+        if (empty($validateData['filter']['arr_filter'])) {
+            $validateData['filter']['arr_filter'] = $validateData['filter']['value_checkbox'];
+        } else {
+            if (empty($validateData['filter']['arr_filter']['company'])) {
+                $validateData['filter']['arr_filter']['company'] = $validateData['filter']['value_checkbox']['company'];
+            }
+            if (empty($validateData['filter']['arr_filter']['site_uuid'])) {
+                $validateData['filter']['arr_filter']['site_uuid'] = $validateData['filter']['value_checkbox']['site_uuid'];
+            }
+        }
+        $filter_company_x_site = [];
+        $employee_filter_company_x_site = [];
+        $employee_non_filter_company_x_site = [];
+        foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
+            foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
+                $filter_company_x_site[$item_company . '-' . $item_site_uuid] = ['detail'];
+            }
+        }
+
+       
+        
+        foreach($query as $item_query){
+            if(!empty($filter_company_x_site[$item_query->company_uuid.'-'.$item_query->site_uuid] )){
+                $employee_filter_company_x_site[] = $item_query;
+            }else{
+                $employee_non_filter_company_x_site[] = $item_query;
+            }
+        }
+
+        $data = [
+            'query' => $query,
+            'employee_filter_company_x_site' => $employee_filter_company_x_site,
+            'employee_non_filter_company_x_site' => $employee_non_filter_company_x_site,
+            'query' => $query,
+            'query' => $query,
+            'request' => $validateData
+        ];
+
+        return ResponseFormatter::toJson($data, 'query');
     }
 
 

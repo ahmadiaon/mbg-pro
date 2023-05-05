@@ -21,30 +21,18 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeePaymentDebtController extends Controller
 {
-    public function index(){
-        $layout = [
-            'head_datatable'        => true,
-            'javascript_datatable'  => true,
-            'head_form'             => true,
-            'javascript_form'       => true,
-            'active'                        => 'employee-payment-debt'
-        ];
-        $payment_others = PaymentOther::all();
-        $employees = Employee::data_employee();
-        return view('employee_payment_debt.index', [
-            'title'         => 'Pembayaran Hutang',
-            'layout'    => $layout,
-            'employees' => $employees,
-            'payment_others'    => $payment_others,
-            'year_month'        => Carbon::today()->isoFormat('Y-M')
-        ]);
+    
+    public function delete(Request $request)
+    { //used
+        $validatedData = $request->all();
+        $storeData = EmployeePaymentDebt::where('uuid' , $validatedData['uuid'])->delete();
+        return ResponseFormatter::toJson($storeData, 'Data Stored');
     }
 
     public function import(Request $request){
         $the_file = $request->file('uploaded_file');
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
-
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
@@ -54,47 +42,27 @@ class EmployeePaymentDebtController extends Controller
             $month = $sheet->getCell('C3')->getValue();
             
             $year_month = $year.'-'.$month;
-            $day_month = ResponseFormatter::getEndDay($year_month);
-
-            $dates = $year.'-'.$month.'-'.'1';            
-            $default_date = $year_month.'-'.$day_month;
+            $default_date = $year_month.'-01';
 
             $no_employee = 6;
             $employees = [];
-
-            while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
-                
+            while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){                
                 $employee_uuid = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
                 $value_payment_debt = $sheet->getCell( 'F'.$no_employee)->getValue();
                 $value_payment_debt = (int)$value_payment_debt;  
                 $date_debt = ResponseFormatter::excelToDate($sheet->getCell( 'E'.$no_employee)->getValue());
-                
                 if(empty($date_debt)){
                     $date_debt = $default_date;
                 }
 
-                $get_employee_debt = EmployeeDebt::where('employee_uuid', $employee_uuid)->get();
-
-                if($get_employee_debt->count() <= 0){
-                    $employee_debt = [
-                        'uuid' => $employee_uuid.'-'.$default_date,
-                        'employee_uuid' => $employee_uuid,
-                        'date_debt' =>  $date_debt,
-                        'value_debt' => $value_payment_debt ,
-                        'min_payment_debt' => 0,
-                        'max_payment_debt' => $value_payment_debt,
-                    ];
-                    $store_employee_debt = EmployeeDebt::updateOrCreate(['uuid'  => $employee_debt], $employee_debt);
-                }
-
-                $employee_payment_debt = [
-                    'uuid' => $employee_uuid.'-'.$default_date,
+                $row_data = [
+                    'uuid' => $employee_uuid.'-'.$date_debt,
                     'employee_uuid' => $employee_uuid,
-                    'date_payment_debt' =>  $date_debt,
-                    'value_payment_debt' => $value_payment_debt
+                    'date_payment_debt' => $date_debt,
+                    'value_payment_debt' => $value_payment_debt,
                 ];
-                $store_employee_payment = EmployeePaymentDebt::updateOrCreate(['uuid' => $employee_payment_debt['uuid']],$employee_payment_debt);
-
+                // dd($row_data);
+                $store_employee_debt = EmployeePaymentDebt::updateOrCreate(['uuid'  => $row_data['uuid']], $row_data);
                 $no_employee++;
             }
             return back();
@@ -103,7 +71,9 @@ class EmployeePaymentDebtController extends Controller
             return back()->withErrors('There was a problem uploading the data!');
         }
     }
-    public function export($year_month){
+    public function export(){
+        $arr_date_today = (session('year_month'));        
+        $year_month = $arr_date_today['year'] . '-' . $arr_date_today['month'];        
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
@@ -131,81 +101,16 @@ class EmployeePaymentDebtController extends Controller
         return response()->download($name);
 
     }
+    public function store(Request $request)
+    { //used
+        $validatedData = $request->all();
 
-    public function anyDataMonth($year_month){
-        $date = explode("-", $year_month);
-        $year = $date[0];
-        $month = $date[1];
-
-        $arr_employee_debt = Employee::noGet_employeeAll_detail()->join('employee_debts','employee_debts.employee_uuid', 'employees.uuid')
-        ->groupBy(
-            'user_details.photo_path',
-            'user_details.name',
-            'employees.nik_employee',
-            'positions.position',
-        )
-        ->select(
-            'user_details.photo_path',
-            'user_details.name',
-            'employees.nik_employee',
-            'positions.position',
-            DB::raw("SUM(employee_debts.value_debt) as value_debt")
-        )
-        ->get();
-        $arr_employee_debt = ResponseFormatter::createIndexArray($arr_employee_debt,'nik_employee');
-
-
-
-        $data = EmployeePaymentDebt::join('employees','employees.uuid', 'employee_payment_debts.employee_uuid')
-        ->join('positions','positions.uuid','employees.position_uuid')
-        ->join('user_details','user_details.uuid','employees.user_detail_uuid')
-        ->whereYear('employee_payment_debts.date_payment_debt', $year)
-        ->whereMonth('employee_payment_debts.date_payment_debt', $month)
-        ->groupBy(
-            'user_details.name',
-            'employee_payment_debts.employee_uuid',
-            'positions.position',
-            'employees.nik_employee',
-        )
-        ->select( 
-            'user_details.name',
-            'employee_payment_debts.employee_uuid',
-            'positions.position',
-            'employees.nik_employee',
-            DB::raw("SUM(employee_payment_debts.value_payment_debt) as value_payment_debt")
-        )
-        ->get();
-
-        $data_sum = EmployeePaymentDebt::join('employees','employees.uuid', 'employee_payment_debts.employee_uuid')
-        ->join('positions','positions.uuid','employees.position_uuid')
-        ->join('user_details','user_details.uuid','employees.user_detail_uuid')
-        ->groupBy(
-            'user_details.name',
-            'employee_payment_debts.employee_uuid',
-            'positions.position',
-            'employees.nik_employee',
-        )
-        ->select( 
-            'user_details.name',
-            'employee_payment_debts.employee_uuid',
-            'positions.position',
-            'employees.nik_employee',
-            DB::raw("SUM(employee_payment_debts.value_payment_debt) as value_payment_debt")
-        )
-        ->get();
-        $data_sum = ResponseFormatter::createIndexArray($data_sum,'nik_employee');
-
-
-        foreach($data as $dt){
-            $dt->value_debt = $arr_employee_debt[$dt->employee_uuid]->value_debt ;
-            $dt->remaining_old_debt = $arr_employee_debt[$dt->employee_uuid]->value_debt -$data_sum[$dt->employee_uuid]->value_payment_debt + $dt->value_payment_debt;
-            
-            $dt->remaining_new_debt = $arr_employee_debt[$dt->employee_uuid]->value_debt -  $dt->value_payment_debt ;
+        if (empty($validatedData['uuid'])) {
+            $validatedData['uuid'] = $validatedData['employee_uuid'] . '-' .  $validatedData['date_payment_debt'];
         }
 
-       
-        return ResponseFormatter::toJson($data, 'data employee payment debt');
-        return DataTables::of($data)
-        ->make(true);
+        $storeData = EmployeePaymentDebt::updateOrCreate(['uuid' =>  $validatedData['uuid']], $validatedData);
+
+        return ResponseFormatter::toJson($storeData, 'Data Stored');
     }
 }

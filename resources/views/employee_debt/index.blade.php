@@ -64,6 +64,7 @@
             <div class="col text-right">
                 <div class="btn-group">
                     <div class="btn-group dropdown">
+                        <button class="btn btn-primary" onclick="showModalPaymentDebt()">Bayar Hutang</button>
                         <button type="button" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
                             aria-expanded="false">
                             Menu <span class="caret"></span>
@@ -71,9 +72,12 @@
 
                         <div class="dropdown-menu">
                             <a onclick="modalCreateEmployeeDebt()" class="dropdown-item" href="#">Tambah</a>
-                            <a class="dropdown-item" id="btn-export"disabled href="/user/absensi/export/">Export</a>
+                            <a class="dropdown-item" id="btn-export"disabled href="/employee-debt/export/">Export Hutang</a>
+                            <a class="dropdown-item" id="btn-export"disabled href="/employee-payment-debt/export">Export Pembayaran</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
-                                href="">Import</a>
+                                href="">Import Hutang</a>
+                                <a class="dropdown-item" id="btn-import-payment" data-toggle="modal" data-target="#import-modal-payment-debt"
+                                href="">Import Pembayaran</a>
                             {{-- <a class="dropdown-item" id="btn-import-mobilisasi" data-toggle="modal"
                                 data-target="#import-modal-loading" href="">Import loading</a> --}}
                         </div>
@@ -153,12 +157,13 @@
         </div>
     </div>
 
-     <!-- payment debt -->
+    <!-- payment debt -->
     <div class="modal fade" id="modalCreateEmployeePaymentDebt" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form action="/employee-payment-debt/store" id="form-employee-payment-debt" method="POST" enctype="multipart/form-data">
+                <form action="/employee-payment-debt/store" id="form-employee-payment-debt" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <input type="text" name="uuid" id="uuid-employee_payment_debt" class="form-control">
                     <div class="modal-header">
@@ -172,42 +177,35 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="">Karyawan</label>
-                            <select name="employee_uuid" id="employee_uuid-employee_payment_debt" style="width: 100%"
-                                class="custom-select2 form-control employees">
+                            <select onchange="selectEmployeePaymentDebt(this)" name="employee_uuid"
+                                id="employee_uuid-employee_payment_debt" style="width: 100%"
+                                class="custom-select2 form-control">
                                 <option value="">karyawan</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="">Tanggal berhutang</label>
-
-                            <input type="date" name="date_debt" id="date_debt" class="form-control">
+                            <label for="">Total Hutang</label>
+                            <input disabled type="text" id="payment_debt-sum_payment_debt" class="form-control">
                         </div>
-
                         <div class="form-group">
-                            <label for="">Besar hutang</label>
-
-                            <input type="text" name="value_debt" id="value_debt" class="form-control"
+                            <label for="">Sisa Hutang</label>
+                            <input disabled type="text" id="payment_debt-remaining" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Tanggal bayar</label>
+                            <input type="date" name="date_payment_debt" id="date_payment_debt" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Besar pembayaran</label>
+                            <input type="text" name="value_payment_debt" id="value_payment_debt" class="form-control"
                                 onkeyup="toRupiah(this)" value="Rp. ">
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-3" for="">Besar cicilan</label>
-                            <div class="col-md-9 row" id="persent-instalment">
-
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="">Maksimal Cicilan</label>
-                            <input type="text" name="max_payment_debt" id="max_payment_debt" class="form-control"
-                                onkeyup="toRupiah(this)" value="Rp. " onclick="otherValueMaxPaymentDebt()">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             Close
                         </button>
-                        <button type="button" onclick="store('employee-debt')" class="btn btn-primary">
+                        <button type="button" onclick="storePayment('employee-payment-debt')" class="btn btn-primary">
                             Save changes
                         </button>
                     </div>
@@ -246,10 +244,41 @@
             </form>
         </div>
     </div>
+
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="import-modal-payment-debt" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-import" action="/employee-payment-debt/import" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import Pembayaran Hutang</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih File Pembayaran Hutang</label>
+                            <input name="uploaded_file" type="file"
+                                class="form-control-file form-control height-auto" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" onclick="startLoading()" class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('js')
     <script>
+        let data_debt = [];
+        let data_debt_uuid = [];
+        let data_datables = [];
         let nik_employee = null;
         let data_uuid = null;
         let value_checkbox = {
@@ -295,7 +324,7 @@
                             </div>
                         </div>`);
             });
-            
+
             Object.values(data_database.data_companies).forEach(company_uuid_element => {
                 $('.company-filter').append(`
                     <div class="col-auto">
@@ -397,8 +426,7 @@
                     <thead>
                         <tr>
                             <th>Detail Karyawan</th>
-                            <th>Tanggal Berhutang</th>
-                            <th>Total Hutang</th>
+                            <th>Detail Hutang</th>
                             <th>Maksimal Cicilan</th>
                             <th>Sisa Hutang</th>
                             <th>Riwayat Pembayaran</th>
@@ -408,7 +436,7 @@
                 </table>
             `);
 
-            
+
 
             let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
@@ -420,13 +448,23 @@
                 },
                 success: function(response) {
                     cg('response', response);
-                    
-                    return false;
+                    let employee_have_debt = response.data.employee_have_debt;
+                    data_debt = response.data.data_datatable_uuid;
+                    data_datables = response.data;
+                    data_debt_uuid = response.data.data_debt_uuid;
+
+
+                    employee_have_debt.forEach(employee_uuid_element => {
+                        $('#employee_uuid-employee_payment_debt').append(`
+                            <option value="${employee_uuid_element}"> ${employee_uuid_element} - ${data_database.data_employees[employee_uuid_element]['name']} -  ${data_database.data_employees[employee_uuid_element]['position']}</option>
+                        `);
+                    });
+
                     let data = [];
                     let element_ton = ``;
                     data.push(element_profile_employee_session);
-                    data_uuid = response.data.data_uuid;
-                    var element_data = {
+                    // debt       xxxxxxxxxxxxxxxxxxxxxxx
+                    var element_data_payment = {
                         mRender: function(data, type, row) {
                             element_ton = ``;
                             let el_head = `
@@ -439,7 +477,7 @@
                                                 data-toggle="collapse"
                                                 data-target="#${row.employee_uuid}"
                                             >
-                                            ${row.count_payment} Pengurang / Rp. ${row.sum_payment}
+                                            ${row.count_debt} Hutang Sebesar ${toValueRupiah(row.sum_debt)}
                                             </button>
                                         </div>                
                                          <div id="${row.employee_uuid}" class="collapse" data-parent="#faq-${row.employee_uuid}">                                
@@ -450,34 +488,27 @@
                                 </div>`;
 
 
-                            row['data'].forEach(element => {
+                            Object.values(row.data_debt).forEach(element => {
                                 element_ton = `${element_ton}
-
                                     <div class="card mb-5" id="${element.uuid}">
                                         <div  class="card-body mb-0">
-                                            <div class="row">
-                                                <h5 class="mt-1 col h4">
-                                                    ${element.name_atribut}    
+                                            <div class="row mt-2">
+                                                <h5 class=" col-6  text-blue h5">
+                                                    ${toValueRupiah(element.value_debt)}                                                    
                                                 </h5>
-                                                <h5 class="mt-2 col text-right text-blue h4">
-                                                    Rp. ${element.value_employee_deduction}                                                    
-                                                </h5>
-                                                
-                                            </div>     
-                                                <blockquote class="blockquote mb-0 row">
-                                                    <p class="col">
-                                                        ${element.date_employee_deduction} 
-                                                    </p>
-                                                    <div class="form-inline"> 
-                                                        <button onclick="editData('` + element.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
+                                                <div class="col-6 text-right"> 
+                                                        <button onclick="editDebt('` + element.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
                                                             <i class="icon-copy ion-gear-b"></i>
                                                         </button>
-                                                        <button onclick="deleteData('` + element.uuid + `')" type="button" class="btn btn-danger mr-1  py-1 px-2">
+                                                        <button onclick="deleteDataModalShow('` + element.uuid + `', 'Hutang ${toValueRupiah(element.value_debt)}', '/employee-debt/delete')" type="button" class="btn btn-danger mr-1  py-1 px-2">
                                                             <i class="icon-copy ion-trash-b"></i>
                                                         </button>
                                                     </div>
+                                                
+                                            </div>     
+                                                <blockquote class="blockquote mb-0 row">
                                                     <footer class="col-12 blockquote-footer">
-                                                        ${element.description_deduction_uuid}  
+                                                        ${element.date_debt}  
                                                     </footer>
                                                 </blockquote>  
                                                                                                         
@@ -494,16 +525,107 @@
                         }
                     }
 
+                    data.push(element_data_payment);
+
+                    let element_max_payment_debt = {
+                        mRender: function(data, type, row) {
+                            return toValueRupiah(row.max_payment_debt);
+                        }
+                    }
+
+                    data.push(element_max_payment_debt)
+
+                    let element_remaining = {
+                        mRender: function(data, type, row) {
+                            return toValueRupiah(row.remaining);
+                        }
+                    }
+
+                    data.push(element_remaining)
+
+
+
+                    // PAYMENT       xxxxxxxxxxxxxxxxxxxxxxx
+                    var element_data = {
+                        mRender: function(data, type, row) {
+                            element_ton = ``;
+                            let el_head = `
+                            <div class="faq-wrap">
+                                <div id="faq-${row.employee_uuid}" class="card">                                   
+                                        <div class="card-header mb-2">
+                                            <button
+                                            style="white-space: nowrap;"
+                                                class="btn btn-block collapsed"
+                                                data-toggle="collapse"
+                                                data-target="#${row.employee_uuid}"
+                                            >
+                                            ${row.count_payment_debt} Pembayaran total ${toValueRupiah(row.sum_payment_debt)}
+                                            </button>
+                                        </div>                
+                                         <div id="${row.employee_uuid}" class="collapse" data-parent="#faq-${row.employee_uuid}">                                
+                                `;
+                            let el_tail = `       
+                                        </div>
+                                    </div>
+                                </div>`;
+
+
+                            Object.values(row.data_payment_debt).forEach(element => {
+                                element_ton = `${element_ton}
+
+                                    <div class="card mb-5" id="${element.uuid}">
+                                        <div  class="card-body mb-0">
+                                            <div class="row">
+                                                <h5 class="mt-1 col-8 h4">
+                                                    ${toValueRupiah(element.value_payment_debt)}   
+                                                </h5>
+                                                <h5 class="mt-2 col-4 text-right text-blue h4">                                                    
+                                                    <div class="form-inline"> 
+                                                        <button onclick="editPaymentDebt('` + element.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
+                                                            <i class="icon-copy ion-gear-b"></i>
+                                                        </button>
+                                                        <button onclick="deleteDataModalShow('` + element.uuid + `', 'Hapus Pembayaran ${toValueRupiah(element.value_payment_debt)}','/employee-payment-debt/delete' )" type="button" class="btn btn-danger mr-1  py-1 px-2">
+                                                            <i class="icon-copy ion-trash-b"></i>
+                                                        </button>
+                                                    </div>                                                 
+                                                </h5>
+                                                
+                                            </div>     
+                                                <blockquote class="blockquote mb-0 row">
+                                                    <footer class="col-12 blockquote-footer">
+                                                        ${element.date_payment_debt}  
+                                                    </footer>
+                                                </blockquote>                                                                                                          
+                                        </div>
+                                    </div>                            
+                            `;
+                            });
+                            return `
+                                        ${el_head}
+                                        ${element_ton}
+                                        ${el_tail}
+                                        `
+                        }
+                    }
+
                     data.push(element_data);
 
+                    let element_status_debt = {
+                        mRender: function(data, type, row) {
+                            return row.status_debt;
+                        }
+                    }
+
+                    data.push(element_status_debt);
 
                     let data_datable = response.data.data_datatable;
-                    $('#table-employee-deduction').DataTable({
+                    $('#table-employee-debt').DataTable({
                         scrollX: true,
                         serverSide: false,
                         data: data_datable,
                         columns: data
                     });
+                    return false;
 
                 },
                 error: function(response) {
@@ -541,6 +663,19 @@
             $('#modal-null').prop("checked", true);
         }
 
+        function showModalPaymentDebt() {
+            $('#modalCreateEmployeePaymentDebt').modal('show');
+            $('#form-employee-payment-debt')[0].reset();
+        }
+
+        function selectEmployeePaymentDebt(agr_element) {
+            let valueselectEmployeePaymentDebt = $(`#${agr_element.getAttribute('id')}`).val();
+            $(`#payment_debt-remaining`).val(toValueRupiah(data_debt[valueselectEmployeePaymentDebt]['remaining']));
+            $(`#payment_debt-sum_payment_debt`).val(toValueRupiah(data_debt[valueselectEmployeePaymentDebt][
+                'sum_debt'
+            ]));
+            cg('value', data_debt[valueselectEmployeePaymentDebt]);
+        }
 
 
 
@@ -565,158 +700,50 @@
             $('#form-employee-debt')[0].reset();
         }
 
-        function deleteData(uuid) {
-            let _url = 'employee-debt/delete'
-
-            $('#uuid_delete').val(uuid)
-            $('#url_delete').val(_url)
-            $('#confirm-modal').modal('show')
-            $('#table_reload').val('employee-debt')
-        }
+        
 
         function store(idForm) {
             if (isRequiredCreate(['employee_uuid-employee_debt', 'date_debt', 'value_debt', 'max_payment_debt']) > 0) {
                 return false;
             }
-            var isStored = globalStoreNoTable(idForm);
-        }
-
-        function editData(uuid) {
-            let _token = $('meta[name="csrf-token"]').attr('content');
-            let _url = "/employee-debt/show";
-            // startLoading();
-            $.ajax({
-                url: _url,
-                type: "POST",
-                data: {
-                    uuid: uuid,
-                    _token: _token
-                },
-                success: function(response) {
-                    stopLoading()
-                    data = response.data
-                    console.log(data)
-                    $('#uuid').val(data.uuid)
-                    $('#payment_other_uuid').val(data.payment_other_uuid).trigger('change');
-                    $('#payment_other_description').val(data.payment_other_description)
-                    $('#payment_other_much').val(data.payment_other_much)
-                    $('#payment_other_date').val(data.payment_other_date)
-                    $('#payment_other_value').val(data.payment_other_value)
-                    $('#employee_uuid').val(data.employee_uuid).trigger('change');
-                    $('#modalCreateEmployeeDebt').modal('show')
-                },
-                error: function(response) {
-                    console.log(response)
-                    alertModal()
-                }
+            var isStored = globalStoreNoTable(idForm).then((data_value_element) => {
+                onSaveFilter();
             });
         }
 
-        function showDataTableUserPrivilege(url, dataTable, id) {
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-debt" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Total Hutang</th>
-                            <th>Sisa Hutang</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>`;
-
-            $('#the-table').append(table_element);
-
-
-            let data = [];
-
-            data.push(element_profile_employee)
-
-            dataTable.forEach(element => {
-                var dataElement = {
-                    data: element,
-                    name: element
-                }
-                data.push(dataElement)
-            });
-
-            var elements = {
-                mRender: function(data, type, row) {
-
-                    return `
-                    <div class="form-inline"> 
-                        <button onclick="editData('` + row.uuid + `')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
-                            <i class="icon-copy ion-gear-b"></i>
-                        </button>
-                        <button onclick="deleteData('` + row.uuid + `')" type="button" class="btn btn-danger mr-1  py-1 px-2">
-                            <i class="icon-copy ion-trash-b"></i>
-                        </button>
-                    </div>`
-                }
-            };
-            data.push(elements)
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
-            $('#' + id).DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
-                ajax: '/employee-debt/data',
-                columns: data
-            });
-        }
-
-        function refreshTable(val_year = null, val_month = null) {
-            console.log(val_year);
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
-            console.log(v_month);
-            if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
+        function storePayment(idForm) {
+            if (isRequiredCreate(['employee_uuid-employee_payment_debt', 'date_payment_debt', 'value_payment_debt']) > 0) {
+                return false;
             }
-            if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[val_month]);
-                $('#btn-month').val(val_month);
-            }
-            let year_month = v_year + '-' + v_month;
-            reloadTable(year_month)
+            var isStored = globalStoreNoTable(idForm).then((data_value_element) => {
+                onSaveFilter();
+            });
         }
 
-        function reloadTable(year_month) {
+        function editDebt(uuid) {
+            cg('edit', data_debt_uuid[uuid]);
+            $('#uuid-employee_debt').val(data_debt_uuid[uuid]['uuid'])
+            $('#employee_uuid-employee_debt').val(data_debt_uuid[uuid]['employee_uuid']).trigger('change');
+            $('#date_debt').val(data_debt_uuid[uuid]['date_debt']);
+            $('#value_debt').trigger('keyup');
+            $('#value_debt').val(toValueRupiah(data_debt_uuid[uuid]['value_debt']));
+            $('#rupiah-value_debt').val(data_debt_uuid[uuid]['value_debt']);
+            $('#max_payment_debt').val(toValueRupiah(data_debt_uuid[uuid]['max_payment_debt'])).trigger('keyup');
+            $('#rupiah-max_payment_debt').val(data_debt_uuid[uuid]['max_payment_debt']).trigger('keyup');
+            $('#modalCreateEmployeeDebt').modal('show');
+        }
 
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-debt" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Tanggal</th>
-                            <th>Total Hutang</th>
-                            <th>Sisa Hutang</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>`;
-
-            $('#the-table').append(table_element);
-
-            $('#btn-export').attr('href', 'employee-debt/export/' + year_month)
-            console.log('year:' + year_month)
-            let _url = 'employee-debt/data/' + year_month;
-            showDataTableUserPrivilege(_url, ['value_debt', 'remaining_new_debt'],
-                'table-employee-debt')
+        function editPaymentDebt(uuid) {
+            cg('edit', data_datables['data_payment_debt_uuid'][uuid]);
+            $('#uuid-employee_payment_debt').val(data_datables['data_payment_debt_uuid'][uuid]['uuid'])
+            $('#employee_uuid-employee_payment_debt').val(data_datables['data_payment_debt_uuid'][uuid]['employee_uuid'])
+                .trigger('change');
+            $('#date_payment_debt').val(data_datables['data_payment_debt_uuid'][uuid]['date_payment_debt']);
+            $('#value_payment_debt').trigger('keyup');
+            $('#value_payment_debt').val(toValueRupiah(data_datables['data_payment_debt_uuid'][uuid][
+            'value_payment_debt']));
+            $('#rupiah-value_payment_debt').val(data_datables['data_payment_debt_uuid'][uuid]['value_payment_debt']);
+            $('#modalCreateEmployeePaymentDebt').modal('show');
         }
     </script>
 @endsection

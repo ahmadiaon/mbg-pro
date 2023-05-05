@@ -657,9 +657,6 @@
 
     <script>
         function firstEmployeeCuti() {
-
-
-
             employee_cuti_groups.forEach(cuti_group_element => {
                 $(`.group_cuti_uuid`).append(
                     `<option value="${cuti_group_element.uuid}">${cuti_group_element.name_group_cuti}</option>`
@@ -693,7 +690,6 @@
 
                 $('#monitoring_cuti').append(elements);
             });
-
             loadChart();
 
         }
@@ -843,6 +839,7 @@
             $(`#kabupaten`).val(data_employee.kabupaten);
             cg('data_employee', data_employee);
             let looping = employees_schedule_cuti[employee_uuid];
+            cg();
             $('.emp').remove();
             looping.forEach(element => {
                 $('#schedule_cuti').append(`<option class="emp" value="${element}">${element}</option>`)
@@ -873,7 +870,7 @@
 
         function choosePoh() {
             let poh_uuid = $('#poh_uuid').val();
-            cg('choosePoh',poh_uuid);
+            cg('choosePoh',data_database.data_atribut_sizes.poh_uuid);
             $('#value_money_cuti').val(data_database.data_atribut_sizes.poh_uuid[poh_uuid]['value_atribut']);
         }
 

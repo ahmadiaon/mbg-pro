@@ -46,7 +46,8 @@ class PaymentController extends Controller
         
             // DESCRIPTION
 
-
+            $month_ =  $sheet->getCell('C3')->getValue();
+            $year_ = $sheet->getCell('C4')->getValue();
             $no_employee = 6;
             $employees = [];
             /*
@@ -55,17 +56,49 @@ class PaymentController extends Controller
             EmployeeHourMeterDay::
             */
             // mobililsasi
-            while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
+            $row_data_payment = [];
+            $row_data_employee_payment = [];
+            $all_row_data_payment = [];
+            $all_row_data_employee_payment = [];
+            $arr_data_employee_hour_meter_day = EmployeePayment::join('payments','payments.uuid','employee_payments.payment_uuid')
+                        ->whereYear('payments.date', $year_)
+                        ->whereMonth('payments.date', $month_)
+                        ->delete();
 
+            $arr_data_employee_hour_ = Payment::whereYear('date', $year_)
+                        ->get();
+
+            // dd($arr_data_employee_hour_);
+            while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                 $excelDate= $sheet->getCell( 'E'.$no_employee)->getValue();     
                 $date = ResponseFormatter::excelToDate($excelDate);           
                 $date_end = $date;
 
                 $payment_group_uuid = ResponseFormatter::toUUID($sheet->getCell( 'F'.$no_employee)->getValue());
+                $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
 
                 PaymentGroup::updateOrCreate(['uuid' => $payment_group_uuid], ['payment_group' => $sheet->getCell( 'F'.$no_employee)->getValue(), 'date_start' => '2022-01-01']);
                 
-                $nik_employee = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
+                $row_data_payment = [
+                    'uuid' => $date.'-'.ResponseFormatter::toUUID($sheet->getCell( 'G'.$no_employee)->getValue()),
+                    'payment_group_uuid' =>$payment_group_uuid,
+                    'date' =>  $date,
+                    'date_end' =>  $date,
+                    'description' => $sheet->getCell( 'G'.$no_employee)->getValue(),
+                    'long'  => 1,
+                ];
+
+                $all_row_data_payment[] = $row_data_payment;
+
+                $row_data_employee_payment = [
+                    'uuid' => $nik_employee.'-'.$row_data_payment['uuid'],
+                    'employee_uuid' =>$nik_employee,
+                    'payment_uuid' =>  $row_data_payment['uuid'],
+                    'value' =>  ResponseFormatter::toNumber($sheet->getCell( 'H'.$no_employee)->getValue()),
+                    'link_absen' => 'none',
+                ];
+
+                $all_row_data_employee_payment[] = $row_data_employee_payment;
 
                 $data_payment = [
                     'uuid' => $date.'-'.$payment_group_uuid.'-'.ResponseFormatter::toUUID($sheet->getCell( 'G'.$no_employee)->getValue()),
@@ -76,19 +109,15 @@ class PaymentController extends Controller
                     'description' => $sheet->getCell( 'G'.$no_employee)->getValue(),
                 ];
 
-                Payment::updateOrCreate(['uuid' =>$data_payment['uuid'] ],$data_payment);
-
-                $data_employee_payment = [
-                    'uuid' => $nik_employee.'-'.$payment_group_uuid.'-'.$date.'-'.$data_payment['uuid'],
-                    'employee_uuid' => $nik_employee,
-                    'payment_uuid' => $data_payment['uuid'],
-                    'value' => $sheet->getCell( 'H'.$no_employee)->getValue(),
-                    'link_absen' => 'none',
-                ];
-                EmployeePayment::updateOrCreate(['uuid' =>$data_employee_payment['uuid'] ],$data_employee_payment);
-              
                 $no_employee++;
             }
+            $xy =Payment::insert(
+                $all_row_data_payment
+            );
+            $xyz =EmployeePayment::insert(
+                $all_row_data_employee_payment
+            );
+            // dd($all_row_data_employee_payment);
             return back();
             dd($employees);
         } catch (Exception $e) {
@@ -97,7 +126,9 @@ class PaymentController extends Controller
         }
     }
 
-    public function export($year_month){//used
+    public function export(){//used
+        $arr_date_today = (session('year_month'));
+        $year_month = $arr_date_today['year'] . '-' . $arr_date_today['month'];
         $date = explode("-", $year_month);
         $year = $date[0];
         $month = $date[1];
