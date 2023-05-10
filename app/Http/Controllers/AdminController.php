@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Dictionary;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeHourMeterDay;
+use App\Models\Employee\EmployeeOut;
 use App\Models\Identity;
 use App\Models\User;
 use App\Models\UserDetail\UserDetail;
@@ -328,6 +329,82 @@ class AdminController extends Controller
             'active'                        => 'index'
         ];
 
+        // ====VARIABLE===
+        $date_today = ResponseFormatter::getDateToday();
+        $explode_date_today = explode('-', $date_today);
+
+        $date_eigth_before = new Carbon($date_today);
+        $date_eigth_before->subMonths(7);
+        $date_eigth_before->subDays($explode_date_today[2]-1);
+
+        $date_eigth_before_date = $date_eigth_before->format("Y-m-d");
+
+        // dd($date_eigth_before_date);
+        $explode_date_eigth_before_date = explode('-', $date_eigth_before_date); 
+
+
+        $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1]);
+        $date_end_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-'.$date_end_this_month_day;
+        $date_start_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-01';
+        $data_date = [];
+        while($date_start_this_month < $date_today){
+            $data_date[] = $date_start_this_month;
+            $date_eigth_before = new Carbon($date_start_this_month);
+            $date_eigth_before->addMonths(1);
+            $explode_date_eigth_before_date = explode('-', $date_eigth_before_date); 
+
+            $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1]);
+            $date_end_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-'.$date_end_this_month_day;
+            $date_start_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-01';
+
+        }
+        dd($data_date);
+        $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_today[0].'-'.$explode_date_today[1]);
+        $date_end_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-'.$date_end_this_month_day;
+        $date_start_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-01';
+        
+        $get_employee_total_this_month = Employee::whereNull('date_end')
+        ->where('date_document_contract', '<=', $date_end_this_month)
+        ->count();
+
+        $get_employee_out_total_this_month = EmployeeOut::where('date_out', '<=', $date_end_this_month)
+        ->where('date_out', '>=', $date_start_this_month)
+        ->count();
+
+        $get_employee_in_total_this_month = Employee::whereNull('date_end')
+        ->where('date_document_contract', '<=', $date_end_this_month)
+        ->where('date_document_contract', '>=', $date_start_this_month)
+        ->count();
+
+        dd($get_employee_in_total_this_month);
+
+
+        $data_flow_employee = [
+                    'month' => [
+                        'Jan' => [
+                            'employee_out' => 10,
+                            'employee_in' => 20,
+                            'total_employee' => 100
+                        ]
+                    ]
+                ];
+
+        $data_for_grafik_flow_employee = [
+            'month' => [
+                'Jan',
+                'Feb',                
+                'Mar'
+            ],
+            'data_in' =>[10,20,10],
+            'data_out' =>[20,20,13],
+            'data_total' =>[10,20,13],
+        ];
+
+
+
+
+        // dd($date_eigth_before->format("Y-m-d"));
+
         $departments = Employee::get_employee_all_latest_full_data_no_get();
         $departments = $departments->groupBy([
             'department_uuid',
@@ -338,6 +415,7 @@ class AdminController extends Controller
             DB::raw("count(department_uuid) as count"),
         )
         ->get();
+
         // dd($departments);
         $arr_department = [];
         $arr_department = [];
@@ -351,12 +429,19 @@ class AdminController extends Controller
            
         }
 
+
+        /*
+            => 8 bulan kebelakang dari sekarang
+
+        */
+
         // dd($arr_department);
         
         return view('admin.index', [
             'title'         => 'Beranda',
             'year_month'        => Carbon::today()->isoFormat('Y-M'),
             'arr_department'    => $arr_department,
+            'data_for_grafik_flow_employee'  => $data_for_grafik_flow_employee,
             'layout'        => $layout,
         ]);
     }

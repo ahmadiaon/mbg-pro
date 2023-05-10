@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeeDocument;
+use App\Models\Safety\AtributSize;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
@@ -46,6 +47,9 @@ class EmployeeOutController extends Controller
 
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
+        $data_databases = session('data_database');
+        $data_employees = $data_databases['data_employees'];
+        $out_status = $data_databases['data_atribut_sizes']['status_out'];
 
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
@@ -55,26 +59,67 @@ class EmployeeOutController extends Controller
         
             $no_employee = 6;
             $employees = [];
-
+            $all_data_row_employee_out = [];
             while((int)$sheet->getCell( 'A'.$no_employee)->getValue() != null){
                 $date_row = 3;
-
                 $employee_uuid = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
                 $date = ResponseFormatter::excelToDate($sheet->getCell( 'F'.$no_employee)->getValue());
-
-
-                $employee_out = [
-                    'employee_uuid'  => $employee_uuid,
-                    'out_status' =>  $sheet->getCell( 'E'.$no_employee)->getValue(),
-                    'date_out'    => $date
+                $out_status_uuid = ResponseFormatter::toUUID($sheet->getCell( 'E'.$no_employee)->getValue());
+                if(empty($out_status_uuid)){
+                    $out_status_uuid = 'unknown_out_status';
+                }
+                if(empty($out_status[$out_status_uuid])){
+                    $store_atribut_size = AtributSize::updateOrCreate(
+                        ['uuid' => $out_status_uuid],
+                        [
+                            'uuid' => $out_status_uuid,
+                            'name_atribut' => $sheet->getCell( 'E'.$no_employee)->getValue(),
+                            'size' => 'status_out',
+                            'value' => $out_status_uuid,
+                        ]
+                    );
+                    if($store_atribut_size){
+                        $out_status[$out_status_uuid] = $store_atribut_size ;
+                    }                    
+                }
+                $row_data = [
+                    'employee_uuid' => ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue()),
+                    'out_status' => $out_status_uuid,
+                    'date_out' => $date,
+                    'uuid' => $employee_uuid,
                 ];
+                $all_data_row_employee_out[] = $row_data;
+                $arr_date = explode('-',$date);
+                $endDateThisMonth = ResponseFormatter::getEndDay($arr_date[0].'-'.$arr_date[1]);
 
-                EmployeeOut::updateOrCreate(['uuid'=> $employee_uuid ],$employee_out);
-               
+                $startDate = new \DateTime($date);
+                $endDate = new \DateTime($arr_date[0].'-'.$arr_date[1].'-'.$endDateThisMonth);
+
+                $all_row_data_absen = [];
+                $machine_id = $data_employees[$employee_uuid]['machine_id'];
+
+                $delete_absen = EmployeeAbsen::where('employee_uuid', $machine_id)
+                ->where('date', '>=' ,$startDate->format('Y-m-d'))
+                ->where('date', '<=' ,$endDate->format('Y-m-d'))
+                ->delete();
+                for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
+                    $row_data_absen = [];
+                    $row_data_absen['employee_uuid'] = $machine_id;
+                    $row_data_absen['status_absen_uuid']  = 'X';
+                    $row_data_absen['date'] = $date->format('Y-m-d');
+                    $row_data_absen['uuid']  = $row_data_absen['date'] . '-' .$row_data_absen['employee_uuid'];
+
+                    $all_row_data_absen[] = $row_data_absen;
+                }
+                $insertAbsen = EmployeeAbsen::insert(
+                    $all_row_data_absen
+                );
                 $no_employee++;
             }
+            $insertAbsen = EmployeeOut::insert(
+                $all_data_row_employee_out
+            );
         } catch (Exception $e) {
-            // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
         return redirect()->back();
@@ -120,9 +165,11 @@ class EmployeeOutController extends Controller
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
             $validatedData['date'] = $date->format('Y-m-d');
             $validatedData['uuid']  = $validatedData['date'] . '-' .$validatedData['employee_uuid'];
-            $store = EmployeeAbsen::updateOrCreate(['uuid' => $validatedData['uuid']], $validatedData);
+            $store = EmployeeAbsen::updateOrCreate([
+                'employee_uuid' => $validatedData['employee_uuid'],
+                'date' => $validatedData['date'],
+            ], $validatedData);
         }
-
 
         return ResponseFormatter::toJson($store, 'no file data request');        
     }
@@ -175,7 +222,7 @@ class EmployeeOutController extends Controller
         // return ResponseFormatter::toJson($employee_outs, 'bbb');
     }
 
-    public function export($year_month){
+    public function export(){
         $row = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         
         $createSpreadsheet = new spreadsheet();

@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Models\Dictionary;
 use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeOut;
 use App\Models\Payment\PaymentGroup;
 use App\Models\Poh;
 use App\Models\Position;
@@ -183,6 +184,11 @@ class ResponseFormatter
       return strval($item->nik_employee);
     });
 
+    $data_employee_out = EmployeeOut::all();
+    $data_employee_out = $data_employee_out->keyBy(function ($item) {
+      return strval($item->employee_uuid);
+    });
+
     $arr_religion = Religion::all();
     $arr_religion = $arr_religion->keyBy(function ($item) {
       return strval($item->uuid);
@@ -273,7 +279,8 @@ class ResponseFormatter
         'employees' => $employees,
         'user_details' => $user_details,
       ],
-      'data_employees' => $arr_employees,
+      'data_employees' => $arr_employees,      
+      'data_employee_out' => $data_employee_out,
       'data_employee_talents' => $data_employee_talents,
       'data_departments' => $arr_departments,
       'data_coal_froms' => $arr_coal_from,

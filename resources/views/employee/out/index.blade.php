@@ -51,7 +51,7 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" onclick="createCoalFrom()" href="#">Tambah</a>
                                 <a class="dropdown-item" id="btn-export"disabled
-                                    href="/user/Karyawan Keluar/export/">Export</a>
+                                    href="/employee-out/export">Export</a>
                                 <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                     href="">Import</a>
                             </div>
@@ -132,10 +132,7 @@
                         <div class="form-group">
                             <label for="">Status Keluar</label>
                             <select class="form-control" name="out_status" id="out_status">
-                                <option value="Resign">Resign</option>
-                                <option value="S-PHK">S-PHK</option>
-                                <option value="Pensiun">Pensiun</option>
-                                <option value="Meninggal Dunia">Meninggal Dunia</option>
+                          
                             </select>
                         </div>
                         <div class="form-group">
@@ -248,7 +245,6 @@
         let v_month;
         let _ur;
 
-        var employees = @json($employees);
 
         function firstIndexEmployeeOut() {
             cg('arr', arr_date_today);
@@ -258,16 +254,19 @@
             let v_month = arr_date_today.month;
             let _url = 'user/absensi/data/' + arr_date_today.year + '-' + arr_date_today.month;
 
-            employees.forEach(element => {
+            Object.values(data_database.data_employees).forEach(element => {
                 var elements = `<option value="${element.uuid}">${element.name} - ${element.position}</option>`;
                 // console.log(element);
                 $('#employee_uuid').append(elements);
+            });
+            Object.values(data_database.data_atribut_sizes.status_out).forEach(element_out_status => {
+                var elements = `<option value="${element_out_status.uuid}">${element_out_status.name_atribut}</option>`;
+                $('#out_status').append(elements);
             });
 
             $('#btn-year').html(arr_date_today.year);
             $('#btn-month').html(months[parseInt(arr_date_today.month)]);
             $('#btn-month').val(arr_date_today.month);
-            $('#btn-export').attr('href', '/employee-out/export/' + arr_date_today.year + '-' + arr_date_today.month)
             showDataTableEmployeeOut( 'table-employee-out')
         }
         firstIndexEmployeeOut();
@@ -340,7 +339,6 @@
             </div>`;
 
             $('#the-table').append(table_element);
-            $('#btn-export').attr('href', 'employee-out/export/' + arr_date_today.year+'-'+arr_date_today.month)
 
             let data = [];
 
@@ -433,7 +431,6 @@
                 $('#btn-month').html(monthName(arr_date_today.month));
                 $('#btn-month').val(arr_date_today.month);
             }
-            $('#btn-export').attr('href', '/user/absensi/export/' + arr_date_today.year + '-' + arr_date_today.month)
             showDataTableEmployeeOut( 'table-employee-out')
             setDateSession(year, month);
         }

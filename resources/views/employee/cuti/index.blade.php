@@ -229,6 +229,7 @@
             </form>
         </div>
     </div>
+
     {{-- cuti setup --}}
     <div class="modal fade" id="create-modal-employee-cuti-setup" role="dialog"
         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -284,6 +285,7 @@
 
         </div>
     </div>
+    
     {{-- cuti --}}
     <div class="modal fade" id="create-modal-employee-cuti" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">

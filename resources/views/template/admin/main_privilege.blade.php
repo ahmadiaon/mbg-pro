@@ -139,7 +139,12 @@
                 if (row.photo_path == null) {
                     row.photo_path = '/vendors/images/photo4.jpg';
                 }
-                return `<div class="name-avatar d-flex align-items-center">
+                let bg = '';
+                if(data_database['data_employee_out'][row.nik_employee]){
+                    bg = 'bg-warning';
+                }
+                return `    <div class="card-box ${bg} pd-10">
+                                    <div class="name-avatar d-flex align-items-center">
 										<div class="avatar mr-2 flex-shrink-0">
 											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
 												height="40" alt="" />
@@ -149,21 +154,26 @@
 											<small>${row.position}</small></br>
 											<small>${row.nik_employee}</small>
 										</div>
-									</div>`
+									</div>
+                                </div>`
             }
         };
 
         var element_profile_employee_database = {
 
             mRender: function(data, type, row) {
-
-                if (row.photo_path == null) {
-                    row.photo_path = '/vendors/images/photo4.jpg';
+                let bg = '';
+                if(data_database['data_employee_out'][row.employee_recruiter]){
+                    bg = 'bg-warning';
                 }
                 if (row.photo_path == null) {
                     row.photo_path = '/vendors/images/photo4.jpg';
                 }
-                return `<div class="name-avatar d-flex align-items-center">
+                if (row.photo_path == null) {
+                    row.photo_path = '/vendors/images/photo4.jpg';
+                }
+                return `     <div class="card-box ${bg} pd-10">
+                                    <div class="name-avatar d-flex align-items-center">
 										<div class="avatar mr-2 flex-shrink-0">
 											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
 												height="40" alt="" />
@@ -173,7 +183,8 @@
 											<small>${data_database.data_employees[row.employee_recruiter]['nik_employee']}</small></br>
 											<small>${data_database.data_employees[row.employee_recruiter]['position']}</small>
 										</div>
-									</div>`
+									</div>
+                                </div>`
             }
         };
 
@@ -187,7 +198,13 @@
                 if (row.photo_path == null) {
                     row.photo_path = '/vendors/images/photo4.jpg';
                 }
-                return `<div class="name-avatar d-flex align-items-center">
+                let bg = '';
+                if(data_database['data_employee_out'][row.nik_employee]){
+                    bg = 'bg-warning';
+                }
+                return `
+                    <div class="card-box ${bg} pd-10">
+                        <div class="name-avatar d-flex align-items-center">
                             <div class="avatar mr-2 flex-shrink-0">
                                 <img src="${row.photo_path}" class="border-radius-100 shadow" width="40"
                                     height="40" alt="" />
@@ -197,7 +214,8 @@
                                 <small>${data_database.data_employees[row.nik_employee]['nik_employee']}</small></br>
                                 <small>${data_database.data_employees[row.nik_employee]['position']}</small>
                             </div>
-                        </div>`
+                        </div>
+                    </div>`
             }
         };
 
@@ -722,7 +740,9 @@
         }
 
         function toValueRupiah(numberValue) {
-            let rupiahFormat = numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            let float_number = parseFloat(numberValue); 
+            let _numberValue = parseFloat(float_number.toFixed(0));
+            let rupiahFormat = _numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             rupiahFormat = 'Rp. ' + rupiahFormat;
             return rupiahFormat;
         }

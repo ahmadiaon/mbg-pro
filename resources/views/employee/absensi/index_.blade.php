@@ -568,7 +568,7 @@
                     Object.values(data_datatable).forEach(element => {
                         for_data_datatable.push(element);
                     });
-                    cg('response', data_datatable);
+                    cg('response', response);
                     let data = [];
 
                     data.push(element_profile_employee);
@@ -635,10 +635,8 @@
                                             onclick="editAbsenLive('status_absen_uuid-text-${uuid}','${row.nik_employee}','${element_data}','${row.machine_id}')"
                                             class="btn btn-${color_button_el}"
                                             id="status_absen_uuid-text-${uuid}">
-                                            ${status_absen_el}
-                                            
-                                        </button>
-                                       
+                                            ${status_absen_el}                                            
+                                        </button>                                       
                                         `
                             }
                         };
@@ -649,6 +647,8 @@
 
                     $('#table-absen').DataTable({
                         scrollX: true,
+                        scrollY: "600px",
+                        paging:false,
                         serverSide: false,
                         data: for_data_datatable,
                         columns: data
@@ -691,9 +691,14 @@
                     cek_log:$('#cek_log-live').val()
                 },
                 success: function(response) {
-                    cg('response', response);
-                    $('#status_absen_uuid-text-').text();
-                    $('#status_absen_uuid-text-').attr('class', 'btn btn-');
+                    cg('response editStoreLive', `status_absen_uuid-text-${response.data.uuid}`);
+
+                    // status_absen_uuid-text-2023-01-05-MBLE-230857
+                    
+                    $(`#status_absen_uuid-text-${response.data.uuid}`).text(response.data.status_absen_uuid);
+                    $(`#status_absen_uuid-text-${response.data.uuid}`).attr('class',
+                        `btn btn-${color_button[data_database.data_status_absens[response.data.status_absen_uuid]['math']]}`
+                    );
                     stopLoading();
                 },
                 error: function(response) {
@@ -765,10 +770,8 @@
                     `<option value="${data_employee_element.machine_id}">${data_employee_element.name} - ${data_employee_element.position}</option>`
                 );
             });
-            loopDateFilter()
-
-
-
+            loopDateFilter();
+            onSaveFilter();
 
 
 
@@ -786,170 +789,11 @@
             $('#btn-month').val(arr_date_today.month);
             $('#btn-export-template').attr('href', '/user/absensi/export-template/' + arr_date_today.year + '-' +
                 arr_date_today.month)
-            // showDataTableEmployeeAbsen(_url, ['pay', 'cut', 'A'], 'table-absen')
         }
 
         firstIndexEmployeeAbsen();
 
-        function showDataTableEmployeeAbsen(url, dataTable, id) {
-            $('#tableabsen').remove();
-
-            let unknown_absen = $('#unknown_absen')[0].checked;
-
-            let _token = $('meta[name="csrf-token"]').attr('content');
-            $.ajax({
-                url: '/user/absensi/data',
-                type: "POST",
-                data: {
-                    _token: _token,
-                    day: arr_date_today.day,
-                    month: arr_date_today.month,
-                    year: arr_date_today.year,
-                    nik_employee: null,
-                    filter: filter
-                },
-                success: function(response) {
-                    cg('response', response);
-                    data_datatable = response.data.data_datatable;
-                    if (unknown_absen) {
-                        data_datatable = response.data.data_database_with_unknown;
-                        cg('response here', 'response');
-                    }
-
-                    var start = new Date(response.data.request.filter['date_filter'][
-                        'date_start_filter_absen'
-                    ]);
-                    var end = new Date(response.data.request.filter['date_filter']['date_end_filter_absen']);
-                    cg('start', start);
-                    cg('end', end);
-
-                    var loop = new Date(start);
-                    let el_date_month_header = [];
-
-                    let arr_date = [];
-                    while (loop <= end) {
-                        el_date_month_header = `${el_date_month_header}<th>${formatDateArr(loop).day}</th>`;
-                        arr_date.push(formatDate(loop));
-                        //don't remove it
-                        var newDate = loop.setDate(loop.getDate() + 1);
-                        loop = new Date(newDate);
-                    }
-
-                    var table_element = ` 
-                                         <div class="pb-20" id="tableabsen">
-                                            <table id="table-absen" class="display nowrap stripe hover table" style="width:100%">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Nama</th>
-                                                        <th>Dibayar</th>
-                                                        <th>Potongan</th>                                                        
-                                                        <th>Alpa</th>     
-                                                         <th>Action</th>
-                                                         ${el_date_month_header}
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>`;
-
-                    $('#the-table').append(table_element);
-                    let data = [];
-                    let dataTable = [
-                        'pay', 'cut', 'alpa'
-                    ];
-
-
-                    data.push(element_profile_employee)
-                    dataTable.forEach(element => {
-                        var dataElement = {
-                            data: element,
-                            name: element
-                        }
-                        data.push(dataElement)
-                    });
-                    var elements = {
-                        mRender: function(data, type, row) {
-                            return `
-									<div class="form-inline"> 
-                                        <a href="/user/absensi/detail/${ arr_date_today.year}-${arr_date_today.month}/${row.nik_employee}">
-										<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
-											<i class="dw dw-edit2"></i>
-										</button>
-                                        </a>
-									</div>`
-                        }
-                    };
-                    data.push(elements);
-
-                    arr_date.forEach(element_data => {
-                        var element_date = {
-                            mRender: function(data, type, row) {
-                                let color_button_el = 'light';
-                                let status_absen_el = 'X';
-                                let uuid = `${element_data}-${row.machine_id}`;
-                                let cek_log = '-';
-                                if (row.data) {
-                                    if (row.data[element_data]) {
-                                        uuid = row.data[element_data]['uuid']
-                                        color_button_el = color_button[row.data[element_data][
-                                            'math'
-                                        ]];
-                                        status_absen_el = row.data[element_data][
-                                            'status_absen_code'
-                                        ];
-                                        cek_log = row.data[element_data]['cek_log'];
-                                    }
-                                }
-                                let el_status_absen_status = ``;
-
-
-                                Object.values(data_database.data_status_absens).forEach(
-                                    status_absen_element => {
-                                        el_status_absen_status =
-                                            `${el_status_absen_status}
-                                    <button type="button" onclick="storeAbsen('${uuid}','${status_absen_element.uuid}')" class="dropdown-item">${status_absen_element.uuid}</button>`;
-                                    });
-
-
-
-                                return `
-                                <form action="/user/absensi/store" id="form-${uuid}" method="POST"
-                                    enctype="multipart/form-data">
-                                    @csrf
-                                        <input type="hidden" name="uuid" value="${uuid}">
-                                        <input type="hidden" name="employee_uuid" id="${row.machine_id}" value="${row.machine_id}">
-                                        <input type="hidden" name="status_absen_uuid" id="status_absen_uuid-${uuid}" value="">                                        
-                                        <input type="hidden" name="date" value="${element_data}">
-                                        <input type="hidden" name="edited" value="edited">
-                                        <button type="button" name="status_absen_uuid" 
-                                            class="btn btn-${color_button_el}"
-                                            data-toggle="dropdown" aria-expanded="false"  
-                                            id="status_absen_uuid-text-${uuid}">
-                                            ${status_absen_el}
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <label for="">${cek_log }</label>
-                                            ${el_status_absen_status}
-                                        </div>
-                                </form>
-                                        `
-                            }
-                        };
-
-                        data.push(element_date)
-                    });
-
-                    $('#table-absen').DataTable({
-                        scrollX: true,
-                        serverSide: false,
-                        data: data_datatable,
-                        columns: data
-                    });
-                },
-                error: function(response) {
-                    alertModal()
-                }
-            });
-        }
+        
 
         function changeAbsen() {
             $(`#`).empty()

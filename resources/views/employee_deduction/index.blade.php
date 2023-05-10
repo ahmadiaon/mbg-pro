@@ -255,7 +255,7 @@
                                 <div class="form-group">
                                     <label for="">Harga</label>
                                     <input type="text" name="value_employee_deduction" id="value_employee_deduction"
-                                        class="form-control">
+                                        class="form-control"  onkeyup="toRupiah(this)" value="Rp. ">
 
                                 </div>
                             </div>
@@ -419,8 +419,11 @@
             let dataEditDeduction = data_uuid[uuid];
             $('#uuid').val(dataEditDeduction.uuid)
             $('#employee_uuid').val(dataEditDeduction.employee_uuid).trigger('change');
-            $('#date_employee_deduction').val(dataEditDeduction.date_employee_deduction)
-            $('#value_employee_deduction').val(dataEditDeduction.value_employee_deduction)
+            $('#date_employee_deduction').val(dataEditDeduction.date_employee_deduction) 
+            $('#value_employee_deduction').trigger('keyup');
+            $('#value_employee_deduction').val(toValueRupiah(dataEditDeduction.value_employee_deduction));
+            $('#rupiah-value_employee_deduction').val(dataEditDeduction.value_employee_deduction);
+           
             $('#description_deduction_uuid').val(dataEditDeduction.description_deduction_uuid)
             $('#group_deduction_uuid').val(dataEditDeduction.group_deduction_uuid).trigger('change');
             $('#modalAddDataEmployeeDeduction').modal('show')
@@ -571,7 +574,7 @@
                                                 data-toggle="collapse"
                                                 data-target="#${row.employee_uuid}"
                                             >
-                                            ${row.count_payment} Pengurang / Rp. ${row.sum_payment}
+                                            ${row.count_payment} Pengurang / ${toValueRupiah(row.sum_payment)}
                                             </button>
                                         </div>                
                                          <div id="${row.employee_uuid}" class="collapse" data-parent="#faq-${row.employee_uuid}">                                
@@ -592,7 +595,7 @@
                                                     ${element.name_atribut}    
                                                 </h5>
                                                 <h5 class="mt-2 col text-right text-blue h4">
-                                                    Rp. ${element.value_employee_deduction}                                                    
+                                                    ${ toValueRupiah(element.value_employee_deduction)}                                                    
                                                 </h5>
                                                 
                                             </div>     

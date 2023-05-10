@@ -802,7 +802,10 @@
                 }
             });
         }
-
+        function resetData(){
+            console.log('resetData')
+            $('#employee_uuid').val('').trigger('change');
+        }
 
 
 

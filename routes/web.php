@@ -203,7 +203,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/data', [EmployeeOutController::class, 'dataOut']);
         Route::post('/store', [EmployeeOutController::class, 'store']);
         Route::post('/import', [EmployeeOutController::class, 'import']);
-        Route::get('/export/{year_month}', [EmployeeOutController::class, 'export']);
+        Route::get('/export', [EmployeeOutController::class, 'export']);
         Route::post('/delete', [EmployeeOutController::class, 'delete']);
     });
 
@@ -257,11 +257,8 @@ Route::middleware(['islogin'])->group(function () {
     //    allowance
     Route::prefix('/allowance')->group(function () {
         Route::get('/', [AllowanceController::class, 'index']);
-        Route::get('/test/{year_month}', [AllowanceController::class, 'moreAnyData']);
-        Route::post('/data', [AllowanceController::class, 'moreAnyData']);
+        Route::post('/export', [AllowanceController::class, 'export']);
         Route::post('/data-filter', [AllowanceController::class, 'countPayrol']);
-
-        Route::post('/more-data', [AllowanceController::class, 'moreAnyData']);
     });
 
     Route::prefix('/production')->group(function () {
@@ -786,7 +783,6 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/', [EmployeeController::class, 'index']);
 
         Route::get('/delete', [EmployeeController::class, 'deleteAll']); //on index menu delete all
-        Route::post('/data', [EmployeeController::class, 'anyMoreData']);   
         Route::post('/data-x', [EmployeeController::class, 'anyMoreData_']);   
         Route::post('/delete/employee', [EmployeeController::class, 'delete']);   
 

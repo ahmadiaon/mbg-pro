@@ -95,16 +95,9 @@
                             </button>
 
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/hour-meter/create">Tambah</a>
-                                <form action="/allowance/data" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="hidden" name="from" value="export">
-                                    <input type="hidden" id="export-year_month" name="year_month" value="2022-10">
-                                    <button type="submit" class="dropdown-item">Export</button>
-                                </form>
-
-                                <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
-                                    href="">Import</a>
+                          
+                                <a class="dropdown-item" id="btn-import" onclick="exportTable()"
+                                    href="#">Export</a>
                             </div>
                         </div>
 
@@ -136,7 +129,41 @@
         </div>
     </div>
 
-    <div class="modal fade bs-example-modal-lg" id="modal-description-allowance" tabindex="-1" role="dialog"
+    <div class="modal fade bs-example-modal-lg" id="modal-description-allowance" role="dialog"
+        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        detail pendapatan
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row employee-description">
+                        <dt class="col-sm-3">Description lists</dt>
+                        <dd class="col-sm-9">
+                            A description list is perfect for defining terms.
+                        </dd>
+
+                     
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        Save changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bs-example-modal-lg" id="modal-description-allowance-base" tabindex="-1" role="dialog"
         aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -205,6 +232,9 @@
 @section('js')
     <script>
         let data_datable = [];
+        
+        let dataTaa;
+        let database_payrol;
         let value_checkbox = {
             'company': null,
             'site_uuid': null,
@@ -332,7 +362,9 @@
                 success: function(response) {
                     cg('response', response)
                     let data_datable_O = response.data.employee_this_month_uuid;
-
+                    dataTaa = data_datable_O;
+                    database_payrol = response.data.database_payrol;
+                    data_datable = [];
                     Object.values(data_datable_O).forEach(element => {
                         data_datable.push(element);
                     });
@@ -367,7 +399,7 @@
 
                     el_table = {
                         mRender: function(data, type, row) {
-                            return toValueRupiah(row['allowance']['gajih_pokok']['value']);
+                            return toValueRupiah(row['item_payrol']['gajih_bersih']);
                         }
                     };
                     data_column.push(el_table);
@@ -387,7 +419,7 @@
                     $('#table-employee-hour-meter').DataTable({
                         scrollX: true,
                         scrollY: "600px",
-                        paging: false,
+                        paging: true,
                         // fixedColumns: {
                         //     leftColumns: 2
                         // },
@@ -404,169 +436,237 @@
             });
         }
 
-
-
-
         let data_user = [];
 
         function modalDescription(uuid) {
 
-            let user_show = dataTaa[uuid]
+            let user_show = dataTaa[uuid]['item_payrol'];
+            cg('user_show',user_show);
             $('.employee-description').empty()
-            for (var key in user_show) {
-                $('.employee-description').append(`
-                <dt class="col-sm-3">${user_show[key]['name']}</dt>
-                    <dd class="col-sm-3">
-                        ${user_show[key]['value']}
-                    </dd>
-                `)
-                console.log(user_show[key]['name']);
+            $('.employee-description').append(`
+                <div class="col-sm-6" id="item_detail_karyawan">
+                    <dt class="col-sm-12 text-center">IDENTITAS</dt>
+                </div>`);
 
-                // header_element = `<th>${user_show[key]}</th>`;
-                // $('#header-table').append(header_element);
-                // arr_identities.push(key);
+            let item_detail_karyawan = database_payrol['item_detail_karyawan'];
+            
+            item_detail_karyawan.forEach(element => {
+                if(user_show[element]){
+                    $('#item_detail_karyawan').append(`
+                    <div class="col-sm-12 row">
+                        <dt class="col-6">${element}</dt>
+                            <dd class="col-6">
+                                ${user_show[element]}
+                            </dd>
+                    </div>
+                    `)
+                }                
+            });
+            $('.employee-description').append(`
+                <div class="col-6 row" id="detail_payrol">
+                   
+                </div>`);
+
+            $('#detail_payrol').append(`
+                <div class="col-12 faq-wrap" >
+                    <h5 class="mb-20 h5 text-blue">Total Dibayar Rp. ${toValueRupiah(user_show['gajih_bersih'])}</h5>
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse" data-target="#item_pendapatan_kotor">
+                                    GAJIH KOTOR
+                                </button>
+                            </div>
+                            <div class="collapse show" data-parent="#accordion">
+                                <div  id="item_pendapatan_kotor" class="card-body row">
+                                
+                                </div>
+                                <footer class="blockquote-footer mb-5 ml-10">
+									<b>${toValueRupiah(user_show['gajih_kotor'])}</b>
+								</footer>
+                            </div>
+                        </div>
+
+                      
+                    </div>
+                </div>               
+                `);
+
+            let arr_gajih_kotor = database_payrol['item_pendapatan_kotor'];
+            
+            arr_gajih_kotor.forEach(element => {
+                if(user_show[element]){
+                    $('#item_pendapatan_kotor').append(`
+                    <div class="col-md-12 row">
+                        <dt class="col-6">${element}</dt>
+                            <dd class="col-6">
+                                ${toValueRupiah(user_show[element])}
+                            </dd>
+                    </div>
+                    `)
+                }                
+            });
+
+            
+
+            if(user_show['pengurang_pendapatan'] > 0){
+                $('#accordion').append(
+                    `
+                    <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse" data-target="#item_pengurang_pendapatan">
+                                    PENGURANG PENDAPATAN
+                                </button>
+                            </div>
+                            <div class="collapse show" data-parent="#accordion">
+                                <div  id="item_pengurang_pendapatan" class="card-body row">
+                                
+                                </div>
+                                <footer class="blockquote-footer mb-5 ml-10">
+									<b>${toValueRupiah(user_show['pengurang_pendapatan'])}</b>
+								</footer>
+                            </div>
+                        </div>
+                    `
+                );
+                let item_pengurang_pendapatan = database_payrol['item_pengurang_pendapatan'];
+   
+                item_pengurang_pendapatan.forEach(element => {
+                    if(user_show[element]){
+                        $('#item_pengurang_pendapatan').append(`
+                        <div class="col-md-12 row">
+                            <dt class="col-7">${element}</dt>
+                                <dd class="col-5">
+                                    ${toValueRupiah(user_show[element])}
+                                </dd>
+                        </div>
+                        `)
+                    }                
+                });
             }
+
+            if(user_show['premi'] > 0){
+                $('#accordion').append(
+                    `
+                    <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse" data-target="#pay_premies">
+                                    Detail Premi
+                                </button>
+                            </div>
+                            <div class="collapse show" data-parent="#accordion">
+                                <div  id="pay_premies" class="card-body row">
+                                
+                                </div>
+                                <footer class="blockquote-footer mb-5 ml-10">
+									<b>${toValueRupiah(user_show['premi'])}</b>
+								</footer>
+                            </div>
+                        </div>
+                    `
+                );
+                let pay_premies = database_payrol['pay_premies'];
+   
+                pay_premies.forEach(element => {
+                    if(user_show[element]){
+                        $('#pay_premies').append(`
+                        <div class="col-md-12 row">
+                            <dt class="col-6">${element}</dt>
+                                <dd class="col-6">
+                                    ${toValueRupiah(user_show[element])}
+                                </dd>
+                        </div>
+                        `)
+                    }                
+                });
+            }
+
+            if(user_show['hour_meter'] > 0){
+                $('#accordion').append(
+                    `
+                    <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse" data-target="#hour_meter_item">
+                                    Detail HM
+                                </button>
+                            </div>
+                            <div class="collapse show" data-parent="#accordion">
+                                <div  id="hour_meter_item" class="card-body row">
+                                
+                                </div>
+                                <footer class="blockquote-footer mb-5 ml-10">
+									<b>${toValueRupiah(user_show['hour_meter'])}</b>
+								</footer>
+                            </div>
+                        </div>
+                    `
+                );
+                let hour_meter_item = database_payrol['hour_meter_item'];
+                        cg('hour_meter_item', user_show);
+                hour_meter_item.forEach(element => {
+                    if(user_show['hour_'+element]){
+                        $('#hour_meter_item').append(`
+                        <div class="col-md-12 row">
+                            <dt class="col-6">${toValueRupiah(element)} X ${user_show['hour_'+element]} </dt>
+                                <dd class="col-6">
+                                    Total HM ${toValueRupiah(user_show['pay_'+element])}
+                                </dd>
+                        </div>
+                        `)
+                    }                
+                });
+            }
+            
+            if(user_show['tonase'] > 0){
+                $('#accordion').append(
+                    `
+                    <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse" data-target="#rute_hauling">
+                                    Hauling
+                                </button>
+                            </div>
+                            <div class="collapse show" data-parent="#accordion">
+                                <div  id="rute_hauling" class="card-body row">
+                                
+                                </div>
+                                <footer class="blockquote-footer mb-5 ml-10">
+									<b>${toValueRupiah(user_show['tonase'])}</b>
+								</footer>
+                            </div>
+                        </div>
+                    `
+                );
+                let rute_hauling = database_payrol['rute_hauling'];
+                        cg('rute_hauling', user_show);
+                rute_hauling.forEach(element => {
+                    cg('rute_hauling', element);
+                    if(user_show['much_'+element]){
+                        $('#rute_hauling').append(`
+                        <div class="col-md-12 row">
+                            <dt class="col-6">Rute ${database_payrol['name_rute_hauling_'+element]} : ${user_show['much_'+element]} MT </dt>
+                                <dd class="col-4">
+                                    ${toValueRupiah(user_show['pay_'+element])}
+                                </dd>
+                        </div>
+                        `)
+                    }                
+                });
+            }
+            cg('xxxxx', dataTaa[user_show['nik_employee']]);
+
+         
+            
+            // for (var key in user_show) {
+            //     // cg('key',key);
+            //     $('.employee-description').append(`
+            //     <dt class="col-sm-3">${key}</dt>
+            //         <dd class="col-sm-3">
+            //             ${user_show[key]}
+            //         </dd>
+            //     `)
+            // }
             $('#modal-description-allowance').modal('show');
-            // console.log(user_show)
-            // user_show.forEach(element => {
-            //     console.log(element)
-            // });
-        }
-
-        let year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        let v_year = $('#btn-year').html();
-        let v_month = $('#btn-month').val();
-
-        var date = new Date(),
-            y = date.getFullYear(),
-            m = date.getMonth();
-        var lastDay = new Date(y, m + 1, 0);
-        let day_month = lastDay.getDate();
-        let moreData;
-        let hour_meter_prices = @json($hour_meter_prices);
-        let companies = @json($companies);
-        let premis = @json($premis);
-        let dataTaa;
-
-
-
-
-
-        // refreshTable();
-
-
-        function showDataTableEmployeeHourMeterMonth(url, dataTable, id) {
-            $.ajax({
-                url: '/allowance/data',
-                type: "POST",
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    year_month: year_month,
-                    from: 'allowance'
-                },
-                success: function(response) {
-                    // $('#success-modal').modal('show')
-
-                    dataTaa = response.message
-                    // console.log(dataTaa)
-                    // $('#table-'+idForm).DataTable().ajax.reload();
-                },
-                error: function(response) {
-                    alertModal()
-                }
-            });
-
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-            <div class="pb-20" id="tablePrivilege">
-                <table id="table-employee-hour-meter" class="display nowrap stripe hover table" cellspacing="0" style="width:100%">
-                    <thead>
-                        <tr id="header-table">
-                           
-                        </tr>
-                    </thead>
-                </table>
-            </div>`;
-
-            console.log('year_month : ' + year_month);
-
-            $('#the-table').append(table_element);
-            let data_column = [];
-
-            let identities = {
-
-                date_start_contract: 'TMK',
-                salary_netto_adjust: 'Gajih Bersih',
-            };
-
-            let header_element = '';
-            let elements = '';
-
-            let arr_identities = [];
-            $('#header-table').append(`<th>Karyawan</th>`);
-            for (var key in identities) {
-                header_element = `<th>${identities[key]}</th>`;
-                $('#header-table').append(header_element);
-                arr_identities.push(key);
-            }
-            $('#header-table').append(`<th>Action</th>`);
-            // return false;
-            data_column.push(element_profile_employee);
-
-            arr_identities.forEach(element_identity => {
-                elements = {
-                    mRender: function(data, type, row) {
-                        if (row.employee_uuid == 'MBLE-0321100005') {
-
-                            // console.log(row);
-                        }
-                        return row[element_identity];
-                    }
-                };
-                data_column.push(elements);
-            });
-
-            elements = {
-                mRender: function(data, type, row) {
-
-                    return `
-                    <div class="form-inline"> 
-                        <button onclick="modalDescription('${row.nik_employee}')" type="button" class="btn btn-secondary mr-1  py-1 px-2">
-                            <i class="icon-copy ion-gear-b"></i>
-                        </button>
-                    </div>`
-                }
-            };
-            data_column.push(elements)
-
-
-
-            // return false;
-
-
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
-            $('#' + id).DataTable({
-                scrollX: true,
-                scrollY: "400px",
-                paging: false,
-                // fixedColumns: {
-                //     leftColumns: 2
-                // },
-                serverSide: false,
-                ajax: {
-                    url: '/allowance/data',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        year_month: year_month,
-                        from: 'allowance'
-                    },
-                    type: 'POST',
-                },
-
-                columns: data_column
-            });
         }
 
         function refreshTable(val_year = null, val_month = null) {
@@ -585,9 +685,31 @@
             }
             onSaveFilter();
             setDateSession(year, month);
-
-            // showDataTableEmployeeHourMeterMonth('hour-meter/data/2022-04', ['nik_employee', 'name'],
-            //     'table-employee-hour-meter')
         }
+
+        function exportTable() {
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            cg('data_datable', data_datable);
+            let data_ex = JSON.stringify(data_datable);
+            $.ajax({
+                url: '/allowance/export',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data_export: data_ex,
+                },
+                success: function(response) {
+                    cg('response', response);
+                    var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+        }
+
     </script>
 @endsection

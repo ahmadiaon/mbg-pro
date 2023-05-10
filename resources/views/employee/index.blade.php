@@ -92,6 +92,14 @@
                                     </div>
                                 </div>
 
+                                {{-- status  --}}
+                                <div class="form-group row mb-20">
+                                    <label class="col-md-5" for="">rentang waktu </label>
+                                    <input class="col-6 form-control datetimepicker-range" placeholder="Select Month"
+                                        name="date_range_this_time_in_out" id="date_range_this_time_in_out" type="text" />
+                                </div>
+
+
                                 {{-- Kondisi Data --}}
                                 <div class="form-group row mb-20">
                                     <label class="col-3" for="">Status</label>
@@ -116,6 +124,12 @@
                                             <label class="custom-control-label" for="status_data_off">Off</label>
                                         </div>
                                     </div>
+                                </div>
+                                 {{-- status  --}}
+                                 <div class="form-group row mb-20">
+                                    <label class="col-md-5" for="">rentang waktu</label>
+                                    <input class="col-6 form-control" placeholder="Select Month" 
+                                        name="date_range_in_out" id="date_range_in_out" type="date" />
                                 </div>
 
                                 {{-- jabatan --}}
@@ -173,13 +187,13 @@
                                 {{-- status kontrak saat ini --}}
                                 <div class="form-group row mb-20">
                                     <label class="col-md-3" for="">kontrak</label>
-                                    <div class="col-auto">
+                                    {{-- <div class="col-auto">
                                         <div class="custom-control custom-radio mb-5">
                                             <input type="radio" id="luarsa" name="status_join"
                                                 class="custom-control-input" value="!=" />
                                             <label class="custom-control-label" for="luarsa">Luarsa</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-auto">
                                         <div class="custom-control custom-radio mb-5">
                                             <input type="radio" id="kadaluarsa" name="status_join"
@@ -314,6 +328,9 @@
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                                 ×
                             </button>
+                            
+
+                          
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
@@ -367,6 +384,11 @@
 
 @section('js')
     <script>
+        var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
+        var end = new Date(arr_date_today.year, arr_date_today.month, 0);
+        $('#date_range_in_out').val(`${formatDate(end)}`);
+        $('#date_range_this_time_in_out').val(`${formatDate(start)} - ${formatDate(end)}`);
+        $('#date_range').val(`${formatDate(start)} - ${formatDate(end)}`);
         let filter = {
             employee_status: 'Training',
             contract_status: 'off'
@@ -435,6 +457,8 @@
             filter.status_join = $("input[type='radio'][name='status_join']:checked").val();
             filter.status_data = $("input[type='radio'][name='status_data']:checked").val();
             filter.date_range = $('#date_range').val();
+            filter.date_range_in_out = $('#date_range_in_out').val();
+            filter.date_range_this_time_in_out = $('#date_range_this_time_in_out').val();
 
 
             filter.department_uuid = $(`#department_uuid`).val();
@@ -466,6 +490,8 @@
                 });
             }
             $('#table-user').empty();
+            
+            // ${element_header_table_employees}
 
             let element_table = `
                     <table id="table-user-employees" class="display nowrap stripe hover table" style="width:100%">
@@ -482,7 +508,7 @@
             $('#table-user').append(element_table);
 
             // datatable
-            data.push(element_profile_employee)
+            data.push(element_profile_employee_database_payrol)
 
             if (filter.show_type != 'simple') {
                 data_table_schema['employees'].forEach(element_employee_schema => {
@@ -527,28 +553,11 @@
                     filter: filter
                 },
                 success: function(response) {
-                    let data_datable = [];
+                    // let data_datable = [];
 
-                    cg('response',response );
-                  
-                },
-
-                error: function(response) {
-                    console.log(response)
-                }
-            });
-
-            _token = $('meta[name="csrf-token"]').attr('content');
-            $.ajax({
-                url: '/user/data',
-                type: "POST",
-                data: {
-                    _token: _token,
-                    filter: filter
-                },
-                success: function(response) {
+                    cg('response data-x',response );
                     datax = response.data;
-                    let data_datable_obj = datax.data_datatable_data;
+                    let data_datable_obj = datax.employee_filter_company_x_site;
                     let data_datable = [];
                     if (data_datable_obj) {
                         Object.values(data_datable_obj).forEach(element_data_datable_obj => {
@@ -558,10 +567,13 @@
                     cg('response', response);
                     $('#table-user-employees').DataTable({
                         scrollX: true,
+                        scrollY: "600px",
+                        paging:false,
                         serverSide: false,
                         data: data_datable,
                         columns: data
                     });
+                  
                 },
 
                 error: function(response) {
@@ -569,9 +581,36 @@
                 }
             });
 
+            // _token = $('meta[name="csrf-token"]').attr('content');
+            // $.ajax({
+            //     url: '/user/data',
+            //     type: "POST",
+            //     data: {
+            //         _token: _token,
+            //         filter: filter
+            //     },
+            //     success: function(response) {
+            //         datax = response.data;
+            //         let data_datable_obj = datax.data_datatable_data;
+            //         let data_datable = [];
+            //         if (data_datable_obj) {
+            //             Object.values(data_datable_obj).forEach(element_data_datable_obj => {
+            //                 data_datable.push(element_data_datable_obj);
+            //             });
+            //         }
+            //         cg('response', response);
+            //         $('#table-user-employees').DataTable({
+            //             scrollX: true,
+            //             serverSide: false,
+            //             data: data_datable,
+            //             columns: data
+            //         });
+            //     },
 
-
-
+            //     error: function(response) {
+            //         console.log(response)
+            //     }
+            // });
             return false;
         }
 

@@ -40,7 +40,7 @@ class EmployeeAbsenController extends Controller
 
         $json_test_json = json_encode($json_test);
         // dd(json_encode($json_test));
-        return view('employee.absensi.index', [
+        return view('employee.absensi.index_', [
             'title'         => 'Absensi Karyawan',
             'layout'    => $layout
         ]);
@@ -975,7 +975,7 @@ class EmployeeAbsenController extends Controller
 
         foreach ($data_employee_absen_detail as $item_data_employee_absen_detail) {
             if (!empty($employee_data_machine_id[$item_data_employee_absen_detail->employee_uuid])) {
-                if (!empty($math_filter[$item_data_employee_absen_detail->math])) {
+                // if (!empty($math_filter[$item_data_employee_absen_detail->math])) {
                     $arr_data = $employee_data_uuid[$employee_data_machine_id[$item_data_employee_absen_detail->employee_uuid]]['data'];
                     $arr_data[$item_data_employee_absen_detail->date] = $item_data_employee_absen_detail;
                     $employee_data_uuid[$employee_data_machine_id[$item_data_employee_absen_detail->employee_uuid]]['data'] = $arr_data;
@@ -985,8 +985,9 @@ class EmployeeAbsenController extends Controller
                     $value_count = $value_count + 1;
                     $arr_count_absen['count_'.$item_data_employee_absen_detail->status_absen_uuid] = $value_count ;
                     $arr_count_absen['count_'.$item_data_employee_absen_detail->math] = (int)$arr_count_absen['count_'.$item_data_employee_absen_detail->math] + 1;
+                    $arr_count_absen['count_unknown_absen']--; 
                     $employee_data_uuid[$employee_data_machine_id[$item_data_employee_absen_detail->employee_uuid]]['absensi'] = $arr_count_absen;
-                }
+                // }
             }
         }
         $data_filter_math = [];
@@ -1384,7 +1385,7 @@ class EmployeeAbsenController extends Controller
         ], $validatedData);
 
         $store = EmployeeAbsen::join('status_absens', 'status_absens.uuid', 'employee_absens.status_absen_uuid')
-        ->where('employee_absens.employee_uuid', $store->employee_uuid)
+        ->where('employee_absens.id', $store->id)
         ->get([
             'status_absens.status_absen_code',
             'status_absens.math',

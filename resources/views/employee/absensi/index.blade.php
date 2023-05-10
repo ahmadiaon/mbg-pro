@@ -789,6 +789,7 @@
                     });
                     $('#table-absen').DataTable({
                         scrollX: true,
+                        scrollY: "600px",
                         serverSide: false,
                         data: data_datatable,
                         columns: data
