@@ -346,37 +346,65 @@ class AdminController extends Controller
         $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1]);
         $date_end_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-'.$date_end_this_month_day;
         $date_start_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-01';
-        $data_date = [];
+        $data_for_grafik_flow_employee = [];
+        
+        $date_today = new Carbon($date_today);
+        $date_today->subMonths(1);
         while($date_start_this_month < $date_today){
-            $data_date[] = $date_start_this_month;
+            
             $date_eigth_before = new Carbon($date_start_this_month);
             $date_eigth_before->addMonths(1);
+            $date_eigth_before_date = $date_eigth_before->format("Y-m-d");
             $explode_date_eigth_before_date = explode('-', $date_eigth_before_date); 
 
             $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1]);
             $date_end_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-'.$date_end_this_month_day;
             $date_start_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-01';
 
+            $get_employee_total_this_month = Employee::whereNull('date_end')
+            ->where('date_document_contract', '<=', $date_end_this_month)
+            ->count();
+    
+            $get_employee_out_total_this_month = EmployeeOut::where('date_out', '<=', $date_end_this_month)
+            ->where('date_out', '>=', $date_start_this_month)
+            ->count();
+
+            $get_employee_out_total_before_this_month = EmployeeOut::where('date_out', '<=', $date_end_this_month)
+            ->count();
+    
+            $get_employee_in_total_this_month = Employee::whereNull('date_end')
+            ->where('date_document_contract', '<=', $date_end_this_month)
+            ->where('date_document_contract', '>=', $date_start_this_month)
+            ->count();
+
+            $data_for_grafik_flow_employee['month'][] = ResponseFormatter::getMonthName((int)$explode_date_eigth_before_date[1]);
+            $data_for_grafik_flow_employee['data_aktif'][] = $get_employee_total_this_month - $get_employee_out_total_before_this_month;
+            $data_for_grafik_flow_employee['data_in'][] = $get_employee_in_total_this_month;
+            $data_for_grafik_flow_employee['data_out'][] = $get_employee_out_total_this_month;
+            $data_for_grafik_flow_employee['data_total'][] = $get_employee_total_this_month ;
+
+
+
         }
-        dd($data_date);
-        $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_today[0].'-'.$explode_date_today[1]);
-        $date_end_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-'.$date_end_this_month_day;
-        $date_start_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-01';
+        // dd($data_date);
+        // $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_today[0].'-'.$explode_date_today[1]);
+        // $date_end_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-'.$date_end_this_month_day;
+        // $date_start_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-01';
         
-        $get_employee_total_this_month = Employee::whereNull('date_end')
-        ->where('date_document_contract', '<=', $date_end_this_month)
-        ->count();
+        // $get_employee_total_this_month = Employee::whereNull('date_end')
+        // ->where('date_document_contract', '<=', $date_end_this_month)
+        // ->count();
 
-        $get_employee_out_total_this_month = EmployeeOut::where('date_out', '<=', $date_end_this_month)
-        ->where('date_out', '>=', $date_start_this_month)
-        ->count();
+        // $get_employee_out_total_this_month = EmployeeOut::where('date_out', '<=', $date_end_this_month)
+        // ->where('date_out', '>=', $date_start_this_month)
+        // ->count();
 
-        $get_employee_in_total_this_month = Employee::whereNull('date_end')
-        ->where('date_document_contract', '<=', $date_end_this_month)
-        ->where('date_document_contract', '>=', $date_start_this_month)
-        ->count();
+        // $get_employee_in_total_this_month = Employee::whereNull('date_end')
+        // ->where('date_document_contract', '<=', $date_end_this_month)
+        // ->where('date_document_contract', '>=', $date_start_this_month)
+        // ->count();
 
-        dd($get_employee_in_total_this_month);
+        // dd($get_employee_in_total_this_month);
 
 
         $data_flow_employee = [
@@ -389,16 +417,16 @@ class AdminController extends Controller
                     ]
                 ];
 
-        $data_for_grafik_flow_employee = [
-            'month' => [
-                'Jan',
-                'Feb',                
-                'Mar'
-            ],
-            'data_in' =>[10,20,10],
-            'data_out' =>[20,20,13],
-            'data_total' =>[10,20,13],
-        ];
+        // $data_for_grafik_flow_employee = [
+        //     'month' => [
+        //         'Jan',
+        //         'Feb',                
+        //         'Mar'
+        //     ],
+        //     'data_in' =>[10,20,10],
+        //     'data_out' =>[20,20,13],
+        //     'data_total' =>[10,20,13],
+        // ];
 
 
 

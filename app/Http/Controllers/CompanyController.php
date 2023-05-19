@@ -7,6 +7,7 @@ use App\Models\CoalFrom;
 use App\Models\CoalType;
 use App\Models\Company;
 use App\Models\Dictionary as ModelsDictionary;
+use App\Models\Privilege\Privilege;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
@@ -29,11 +30,18 @@ class CompanyController extends Controller
             'javascript_form'       => true,
             'active'                        => 'company'
         ];
+
+        // $companies = Company::all();
+
+        // foreach($companies as $item_companies){
+        //     Privilege::updateOrCreate(['uuid' => 'company_privilege_'.$item_companies->uuid ], ['privilege' =>'company_privilege_'.$item_companies->uuid  ]);
+        // }
         return view('company.index', [
             'title'         => 'Perusahaan',
             'coal_types'    => $coal_types,
             'layout'    => $layout,
         ]);
+
     }
 
     public function anyData()
@@ -66,8 +74,8 @@ class CompanyController extends Controller
 
 
 
-
         $strore = Company::updateOrCreate(['uuid' => $request->uuid], $validateData);
+        Privilege::updateOrCreate(['uuid' => 'company_privilege_'.$strore->uuid ], ['privilege' =>'company_privilege_'.$strore->uuid  ]);
         $strore = ModelsDictionary::updateOrCreate(
             ['database' => $request->uuid],
             [
@@ -137,6 +145,7 @@ class CompanyController extends Controller
                 if (!empty($data)) {
                     $store = Company::updateOrCreate(['uuid' => $data['uuid']], $data);
                 }
+                Privilege::updateOrCreate(['uuid' => 'company_privilege_'.$store->uuid ], ['privilege' =>'company_privilege_'.$store->uuid  ]);
                 $no_employee++;
             }
         } catch (Exception $e) {

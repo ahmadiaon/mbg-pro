@@ -18,6 +18,7 @@ class CreateStatusAbsensTable extends Migration
             $table->string('uuid')->nullable();
             $table->string('status_absen_code')->nullable();
             $table->string('status_absen_description')->nullable();
+            $table->string('color')->nullable();
             $table->string('math')->nullable();
             $table->date('use_start')->nullable();
             $table->date('use_end')->nullable();

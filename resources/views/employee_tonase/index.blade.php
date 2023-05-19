@@ -5,61 +5,78 @@
         <div class="row">
 
             {{-- form tonase --}}
-            <div class="col-md-7 mb-10">
-                <form action="/tonase/store" id="form-tonase" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="card-box pd-20" id="the-filter-employee-tonase">
-                        <h4 class="text-blue h4">Tambah data</h4>
-                        <div class="row">
-                            <div class="form-group col-md-8">
-                                <label for="">Karyawan</label>
-                                <select name="employee_uuid" id="employee_uuid"
-                                    class="custom-select2 form-control employees">
-                                    <option value="">karyawan</option>
-                                </select>
+            <div class="col-md-7 row ">
+                <div class="col-12 mb-1">
+                    <form class="mb-20" action="/tonase/store" id="form-tonase" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="card-box pd-20" id="the-filter-employee-tonase">
+                            <h4 class="text-blue h4">Tambah data</h4>
+                            <div class="row">
+                                <div class="form-group col-md-8">
+                                    <label for="">Karyawan</label>
+                                    <select name="employee_uuid" id="employee_uuid"
+                                        class="custom-select2 form-control employees">
+                                        <option value="">karyawan</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="">Tanggal</label>
+                                    <input type="date" class="form-control" name="date" id="date">
+                                </div>
                             </div>
-                            <div class="form-group col-md-4">
-                                <label for="">Tanggal</label>
-                                <input type="date" class="form-control" name="date" id="date">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="">No tiket</label>
+                                    <input type="text" class="form-control" name="tiket_number" id="tiket_number">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="">Tonase</label>
+                                    <input type="text" class="form-control" name="tonase_value" id="tonase_value">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="">Rit</label>
+                                    <input type="text" class="form-control" name="ritase" value="1" id="ritase">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3" for="">Perusahaan</label>
+    
+                                <input type="hidden" id="company_uuid" name="company_uuid">
+                                <div class="col-md-9 row" id="companies-form">
+    
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3" for="">Rute</label>
+                                <input type="hidden" id="coal_from_uuid" name="coal_from_uuid">
+                                <div class="col-md-9 row" id="element-coal-from">
+    
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button type="button" onclick="storeTonase('tonase','')"
+                                        class="btn btn-primary text-right">Simpan</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="">No tiket</label>
-                                <input type="text" class="form-control" name="tiket_number" id="tiket_number">
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="">Tonase</label>
-                                <input type="text" class="form-control" name="tonase_value" id="tonase_value">
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label for="">Rit</label>
-                                <input type="text" class="form-control" name="ritase" value="1" id="ritase">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3" for="">Perusahaan</label>
+                    </form>
 
-                            <input type="hidden" id="company_uuid" name="company_uuid">
-                            <div class="col-md-9 row" id="companies-form">
-
+                    <div class="card-box pd-20 mt-10" id="description-tonase">
+                        <h4 class="text-blue h4">Deskripsi</h4>
+                        <div class="row  pd-20">
+                            <div class="form-group row">
+                                <label class="col-6" for="">Total Tonase</label>
+                                <input class="form-control col-6" disabled type="text" id="total-tonase" name="" value="4000">                               
                             </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3" for="">Rute</label>
-                            <input type="hidden" id="coal_from_uuid" name="coal_from_uuid">
-                            <div class="col-md-9 row" id="element-coal-from">
-
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <button type="button" onclick="storeTonase('tonase','')"
-                                    class="btn btn-primary text-right">Simpan</button>
+                            <div class="form-group row">
+                                <label class="col-6" for="">Total Ritase</label>
+                                <input class="form-control col-6" disabled type="text" id="total-ritase" name="" value="100">                               
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+                
             </div>
 
             {{-- form filter --}}
@@ -130,6 +147,8 @@
                     </button>
                 </div>
             </div>
+
+  
             
             <div class="col-12">
                 <!-- Simple Datatable start -->
@@ -818,6 +837,8 @@
                 success: function(response) {
                     cg('response', response)
                     let data_datatable = response.data.datatable;
+                    $('#total-ritase').val(response['data']['data_total']['ritase']);
+                    $('#total-tonase').val(response['data']['data_total']['tonase']);
                     $('#table-employee-tonase').DataTable({
                         scrollX: true,
                         serverSide: false,

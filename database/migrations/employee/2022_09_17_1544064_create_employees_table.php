@@ -21,6 +21,7 @@ class CreateEmployeesTable extends Migration
             $table->string('user_detail_uuid')->nullable();
             $table->string('machine_id')->nullable();
             $table->string('nik_employee')->nullable();
+            $table->string('nik_employee_with_space')->nullable();
             $table->string('position_uuid')->nullable();
             $table->string('department_uuid')->nullable();
             $table->string('company_uuid')->nullable();            

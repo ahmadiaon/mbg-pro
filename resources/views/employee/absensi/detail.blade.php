@@ -4,14 +4,14 @@
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-md-6">
-                <h4 class="text-blue h4">Absensi {{ $employee->name }} - {{ $employee->position }}</h4>
+                <h4 class="text-blue h4">Absensi </h4>
             </div>
         </div>
     </div>
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-auto">
-                <h4 class="text-blue h4">Absensi {{ $employee->name }} - {{ $employee->position }}</h4>
+                <h4 class="text-blue h4">Absensi </h4>
             </div>
             <div class="col text-right">
                 <div class="btn-group">
@@ -54,15 +54,69 @@
         </div>
         <div id="the-table">
             <div class="pb-20" id="tablePrivilege">
-                <table id="table-privilege" class="display nowrap stripe hover table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Status</th>
-                            <th>Cek Log</th>
-                        </tr>
-                    </thead>
-                </table>
+                <div class="row pd-20" id="row-absen">
+                    <div class="col-auto  md-2 card-box pd-2 mr-3">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto md-2 mr-3 card-box">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto  md-2 card-box pd-2 mr-3">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto md-2 mr-3 card-box">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto  md-2 card-box pd-2 mr-3">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto md-2 mr-3 card-box">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto  md-2 card-box pd-2 mr-3">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto md-2 mr-3 card-box">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto  md-2 card-box pd-2 mr-3">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+                    <div class="col-auto md-2 mr-3 card-box">
+                        <div class="form-group">
+                            <label for="">1 sen</label>
+                            <div class=""><button class="btn btn-primary">DS</button></div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -71,170 +125,161 @@
 
 @section('js')
     <script>
-        let employees = @json($employee);
-        let is = @json($is);
-        let data;
-        let _url;
-        let nik_employee;
-        let year_month;
-        let el_status_absen;
+        let nik_employee = @json(session('dataUser')->nik_employee);
+        var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
+        var end = new Date(arr_date_today.year, arr_date_today.month, 0);
+        let value_checkbox = {
+            'company': null,
+            'site_uuid': null,
+            'math': null
+        };
 
-        nik_employee = @json($nik_employee);
-        year_month = @json($year_month);
-        cg('year_month', year_month);
+        let arr_filter = {
+            'company': [],
+            'site_uuid': [],
+            'math': []
+        };
 
-        function firstEmployeeHourMeter(){
-            year_month = @json($year_month);
-            arr_date_today
-        }
+        let filter = {
+            'value_checkbox': [],
+            'is_combined': true,
+            'show_type': 'employee',
+            'arr_filter': {
+                'company': [],
+                'site_uuid': [],
+                'math': []
+            },
+            'date_filter': {
+                date_start_filter_absen: formatDate(start),
+                date_end_filter_absen: formatDate(end),
+            },
+            nik_employee: nik_employee
+        };
 
-        reloadTable(year_month)
+        function firstIndexEmployeeAbsen() {
+            $('#btn-year').html(arr_date_today.year);
+            $('#btn-month').html(months[parseInt(arr_date_today.month)]);
+            $('#btn-month').val(arr_date_today.month);
 
-        function showDataTableUserPrivilege(url, dataTable, id) {
-            console.log(dataTable)
-            let data = [];
-            dataTable.forEach(element => {
-                    var dataElement = {
-                        data: element,
-                        name: element
-                    }
-                    data.push(dataElement)
-                });
-            if (is == 'admin') {
-          
-                var date = {
-                    mRender: function(data, type, row) {
-                        let status_absens = @json($status_absen);
-                        el_status_absen = '';
-                        el_status_absen = '<div class="row">';
-                        status_absens.forEach(element => {
-                            let isChecked = '';
-                            if(element.uuid == row.status_absen_uuid){
-                                isChecked = 'checked';
-                            }
-                            el_status_absen = el_status_absen+ `<div class="col-sd-2">
-                                            <div class="custom-control custom-radio">
-                                                <input onchange="updateAbsen('${element.uuid}','${row.date}')" ${isChecked} type="radio" id="${row.date}-${element.uuid}" name="${row.date}" class="custom-control-input">
-                                                <label class="custom-control-label" for="${row.date}-${element.uuid}">${element.uuid}</label>
-                                            </div>
-                                        </div>`;
-                        });
-                        el_status_absen = el_status_absen+ '</div>';
-                        return el_status_absen
-                    }
-                };
-                data.push(date)
+            let arrrr = [];
 
-                var cek_log = {
-                    mRender: function(data, type, row) {
-                       
-                        return row.cek_log;
-                    }
-                };
-                data.push(cek_log)
-            }
-
-            let urls = '/' + url
-            console.log(urls)
-            $('#' + id).DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
-                ajax: urls,
-                columns: data
+            Object.values(data_database.data_companies).forEach(company_uuid_element => {
+                arrrr.push(company_uuid_element.uuid);
             });
+            value_checkbox['company'] = arrrr;
+
+            arrrr = [];
+            Object.values(data_database.data_atribut_sizes.site_uuid).forEach(site_uuid_element => {
+                arrrr.push(site_uuid_element.uuid);
+            });
+            value_checkbox['site_uuid'] = arrrr;
+            arrrr = [];
+            Object.values(data_database.data_math_status_absens).forEach(math_element => {
+                arrrr.push(math_element.math);
+            });
+            arrrr.push('unknown_absen');
+            value_checkbox['math'] = arrrr;
+            filter.value_checkbox = value_checkbox;
+
+
+            showDataTable();
         }
 
-        console.log(employees.machine_id);
-        year_month = @json($year_month);
-        let arr_year_month = year_month.split("-")
-        $('#btn-year').html(arr_year_month[0]);
-        $('#btn-month').html(months[parseInt(arr_year_month[1])]);
-        $('#btn-month').val(arr_year_month[1]);
-
-        function refreshTable(val_year = null, val_month = null, val_day) {
-
-            let v_year = $('#btn-year').html();
-            let v_month = $('#btn-month').val();
-            console.log(v_month);
-            if (val_year) {
-                console.log(val_year);
-                v_year = val_year;
-                $('#btn-year').html(val_year);
-            }
-            if (val_month) {
-                v_month = val_month;
-                console.log(val_month);
-                $('#btn-month').html(months[parseInt(val_month)]);
-                $('#btn-month').val(val_month);
-            }
-            year_month = v_year + '-' + v_month;
+        function showDataTable() {
 
 
-            console.log(year_month);
-            $('#tablePrivilege').remove();
-            var table_element = ` 
-                                         <div class="pb-20" id="tablePrivilege">
-                                            <table id="table-privilege" class="display nowrap stripe hover table" style="width:100%">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Tanggal</th>
-                                                        <th>Status</th>
-                                                        <th>Cek Log</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>`;
-            
-             $('#the-table').append(table_element);
 
-            reloadTable(year_month)
-        }
-
-        function reloadTable(year_month) {
-            if (is == 'me') {
-                _url = `user/absensi/data-employee/${year_month}/${nik_employee}`;
-                showDataTableUserPrivilege(_url, ['date', 'status_absen_uuid', 'cek_log'], 'table-privilege');
-            }else{
-                _url = `user/absensi/data-employee/${year_month}/${nik_employee}`;
-                showDataTableUserPrivilege(_url, ['date'], 'table-privilege');
-            }
-        }
-
-
-        function updateAbsen(status_absen_uuid, date) {
-            let employee_uuid = @json($employee->machine_id);
-            console.log(status_absen_uuid + date + employee_uuid);
+            cg('filter', filter);
             let _token = $('meta[name="csrf-token"]').attr('content');
-            let _url = "/user/absensi/store";
-            console.log('aaaaaa');
-            let nik_employee = @json($employee->nik_employee);
-            
             $.ajax({
-                url: _url,
+                url: '/user/absensi/data-x',
                 type: "POST",
                 data: {
-                    employee_uuid: employee_uuid,
-                    date: date,
-                    year_month: year_month,
-                    nik_employee: nik_employee,
-                    status_absen_uuid: status_absen_uuid,
-                    _token: _token
+                    _token: _token,
+                    filter: filter
                 },
                 success: function(response) {
-                    console.log("response")
-                    console.log(response);
-                    $('#sa-custom-position').click();
+                    data_datatable = response.data.data_filter_math;
+                    let data_absensi = data_datatable[nik_employee]['data'];
+                    cg('data_absensi', data_absensi);
+                    
+                    let for_data_datatable = [];
+                    Object.values(data_datatable).forEach(element => {
+                        for_data_datatable.push(element);
+                    });
+                    cg('response', response);
 
+                    var start = filter.date_filter.date_start_filter_absen;
+                    var end =filter.date_filter.date_end_filter_absen;
+                    $('#row-absen').empty();
+                    var loop = new Date(start);
+                    let el_date_month_header = [];
+
+                    cg(loop, end);
+                    let arr_date = [];
+                    var date_end = new Date(end);
+                    while (loop <= date_end) {
+                        let status_absen_code = '?';
+                        let color_button_status_absen = 'ligth'
+
+                        // cg('date', formatDate(loop));
+                        if(data_absensi[formatDate(loop)]){
+                            status_absen_code = data_absensi[formatDate(loop)]['status_absen_code'];
+                            color_button_status_absen = color_button[data_absensi[formatDate(loop)]['math']]
+                        }
+                        $('#row-absen').append(`
+                         <div class="col-auto  md-2 card-box pd-2 mr-3">
+                            <div class="form-group">
+                                <label for="">${loop.getDate()} sen</label>
+                                <div class=""><button class="btn btn-${color_button_status_absen}">${status_absen_code}</button></div>
+                            </div>
+                        </div>`);
+                        //don't remove it
+                        var newDate = loop.setDate(loop.getDate() + 1);
+                        loop = new Date(newDate);
+                    }
+                    cg('arr_date',arr_date);
                 },
                 error: function(response) {
-                    alertModal();
-                    console.log(response);
+                    alertModal()
                 }
             });
         }
+
+        function refreshTable(val_year = null, val_month = null) {
+            cg('refreshtable', arr_date_today);
+            year = arr_date_today.year;
+            month = arr_date_today.month;
+
+            if (val_year) {
+                arr_date_today.year = val_year
+                $('#btn-year').html(arr_date_today.year);
+            }
+
+            if (val_month) {
+                arr_date_today.month = val_month;
+                $('#btn-month').html(monthName(arr_date_today.month));
+                $('#btn-month').val(arr_date_today.month);
+            }
+            let date_filter = {
+                date_start_filter_absen: `${arr_date_today.year }-${arr_date_today.month}-${getFirstDate(arr_date_today.year ,arr_date_today.month).getDate()}`,
+                date_end_filter_absen: `${arr_date_today.year }-${arr_date_today.month}-${getEndDate(arr_date_today.year ,arr_date_today.month).getDate()}`,
+            };
+
+            filter.date_filter = date_filter;
+
+            cg('filter', getFirstDate(arr_date_today.year, arr_date_today.month))
+            // return false;
+            $('#btn-export-template').attr('href', '/user/absensi/export-template/' + arr_date_today.year + '-' +
+                arr_date_today.month)
+            $(`#date_start_filter_absen`).empty();
+            $(`#date_start_filter_absen`).val(null);
+
+            showDataTable();
+            setDateSession(year, month);
+        }
+
+
+        firstIndexEmployeeAbsen();
     </script>
 @endsection

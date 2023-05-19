@@ -72,7 +72,8 @@ class EmployeeTonseController extends Controller
         $createSheet->setCellValue('A20', 'No');
         $createSheet->setCellValue('B20', 'NIK');
         $createSheet->setCellValue('C20', 'Nama');
-        $createSheet->setCellValue('D20', 'Jabatan');
+        $createSheet->setCellValue('D20', 'Jabatan');        
+        $createSheet->setCellValue('E19', 'Total Ritase');
 
         for ($i = 1; $i <= $day_month; $i++) {
             $first = $i + 3;
@@ -588,6 +589,10 @@ class EmployeeTonseController extends Controller
         $arr_data_tonase = [];
 
         $data_table = [];
+        $data_total = [
+            'ritase' => 0,
+            'tonase'=> 0
+        ];
         if (!empty($validateData['filter']['arr_filter'])) {
             foreach ($validateData['filter']['arr_filter']['company'] as $item_company) {
                 foreach ($validateData['filter']['arr_filter']['site_uuid'] as $item_site_uuid) {
@@ -605,7 +610,7 @@ class EmployeeTonseController extends Controller
                         'employees.company_uuid',                        
                         'employee_tonases.company_uuid as company_coal',
                     ]);
-
+               
 
                 foreach ($data_tonase as $item_data_tonase) {
                     $arr_data_tonase[$item_data_tonase->uuid] = $item_data_tonase;
@@ -626,9 +631,15 @@ class EmployeeTonseController extends Controller
                     //     $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['data'][$item_data_tonase->date]
                     // }
 
+                    $data_total['ritase'] = $data_total['ritase']+ 1;
+                    $data_total['tonase'] = $data_total['tonase'] + $item_data_tonase->tonase_value;
+                    $data_total['tonase'] = round($data_total['tonase'], 2);
+
+
                     $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['company_coal'] = $item_data_tonase->company_coal; 
                     $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['data'][$item_data_tonase->date][] = $item_data_tonase;
                     $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['sum_tonase'] = $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['sum_tonase'] + $item_data_tonase->tonase_value;
+                    $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['sum_tonase'] = round($data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['sum_tonase'] ,3);
                     $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['count_tonase'] = $data_table[$item_data_tonase->company_uuid . '-' . $item_data_tonase->site_uuid][$item_data_tonase->employee_uuid . $employee_tonase_uuid]['count_tonase'] +1;
                 
                 }
@@ -655,6 +666,7 @@ class EmployeeTonseController extends Controller
         }
 
         $data = [
+            'data_total' => $data_total,
             'request'    => $validateData,
             'data_table'  => $data_table,
             'data_tonase'=> $arr_data_tonase,

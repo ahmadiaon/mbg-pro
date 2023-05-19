@@ -97,6 +97,60 @@
                 </div>
             </div>
 
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#cuti-warning">
+                        <h4 class="text-blue h4">Daftar peringatan percutian</h4>
+                    </button>
+                </div>
+                <div id="cuti-warning" class="collapse" data-parent="#accordion">
+                    <div class="card-box mb-30 ">
+                        <div class="row pd-20">
+                            <div class="col-auto">
+                            </div>
+                            <div class="col text-right">
+                                <div class="btn-group">
+                                    <button onclick="openModalFilter()" class="btn btn-success">Filter</button>
+                                    <div class="btn-group dropdown">
+                                        <button type="date" class="btn btn-primary dropdown-toggle waves-effect"
+                                            data-toggle="dropdown" aria-expanded="false">
+                                            Menu <span class="caret"></span>
+                                        </button>
+
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" onclick="createModalSetup()" href="#">Tambah</a>
+                                            <a class="dropdown-item" id="btn-export-setup"disabled
+                                                href="/user/Karyawan Cuti/export/">Export</a>
+                                            <a class="dropdown-item" id="btn-import" data-toggle="modal"
+                                                data-target="#import-modal" href="">Import</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="the-table-employee-cuti-warning">
+                            <div class="pb-20" id="parent-employee-cuti-warning">
+                                <table id="table-employee-cuti-warning" class="display nowrap stripe hover table"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Mulai Cuti</th>
+                                            <th>Akhir Cuti</th>
+                                            <th>Monitoring</th>
+                                            <th>Monitoring</th>
+                                            <th>Monitoring</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -285,7 +339,7 @@
 
         </div>
     </div>
-    
+
     {{-- cuti --}}
     <div class="modal fade" id="create-modal-employee-cuti" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
@@ -524,9 +578,7 @@
     <script>
         // autocomplite
         let employee_cuti_groups = @json($employee_cuti_groups);
-
         cg('employee_cuti_groups', employee_cuti_groups);
-
         let countries = [];
 
         employee_cuti_groups.forEach(item => {
@@ -646,18 +698,84 @@
 
     <script>
         let filter = {
-                group_cuti_uuid: null
-            };
+            group_cuti_uuid: null
+        };
 
         let nik_employee = dataUser.nik_employee;
         var employees_schedule_cuti = @json($employees_schedule_cuti);
-        cg('employees_schedule_cuti',employees_schedule_cuti);
+        cg('employees_schedule_cuti', employees_schedule_cuti);
     </script>
 
     <script src="/src/plugins/apexcharts/apexcharts.min.js"></script>
     <script src="/vendors/scripts/apexcharts-setting.js"></script>
 
     <script>
+        let _tokens = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+            url: '/employee-cuti/data-warning',
+            type: "POST",
+            data: {
+                _token: _tokens,
+                filter: filter,
+                date: arr_date_today,
+                nik_employee: nik_employee,
+            },
+            success: function(response) {
+                cg('responsee', response);
+                let for_data_datatable = response.data.arr_warning;
+                cg('for_data_datatable', for_data_datatable);
+                // return false;
+                let data = [];
+                data.push(element_profile_employee_session);
+
+                let dataTable = [
+                    'date_real_start_cuti',
+                    'date_real_end_cuti',
+                    'date_schedule_start_cuti',
+                    'date_schedule_end_cuti',                   
+                    'monitoring_cuti'
+                ];
+
+                dataTable.forEach(element => {
+                    var dataElement = {
+                        data: element,
+                        name: element
+                    }
+                    data.push(dataElement)
+                });
+
+                $('#parent-employee-cuti-warning').empty();
+                    var table_element = ` 
+                    <table id="table-employee-cuti-warning" class="display nowrap stripe hover table"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Aktual Mulai</th>
+                                            <th>Aktual Selesai</th>
+                                            <th>Jadwal Mulai</th>
+                                            <th>Jadwal Akhir</th>
+                                            <th>Monitoring</th>
+                                        </tr>
+                                    </thead>
+                                </table>`;
+
+                    $('#parent-employee-cuti-warning').append(table_element);
+
+                $('#table-employee-cuti-warning').DataTable({
+                    scrollX: false,
+                    scrollY: "600px",
+                    paging: false,
+                    serverSide: false,
+                    data: for_data_datatable,
+                    columns: data
+                });
+            },
+            error: function(response) {
+                alertModal()
+            }
+        });
+
         function firstEmployeeCuti() {
             employee_cuti_groups.forEach(cuti_group_element => {
                 $(`.group_cuti_uuid`).append(
@@ -697,7 +815,9 @@
         }
 
         function loadChart() {
-            
+
+
+
             $('#chart6').empty();
             let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
@@ -705,12 +825,12 @@
                 type: "POST",
                 data: {
                     _token: _token,
-                    filter:filter,
-                    date:arr_date_today,                    
-                    nik_employee:nik_employee,
+                    filter: filter,
+                    date: arr_date_today,
+                    nik_employee: nik_employee,
                 },
                 success: function(response) {
-                    console.log(response);
+                    cg('responsee', response);
                     data_schedule_cuti = response.data.cutis;
                     data_schedule_cuti.forEach(element => {
                         the_start = element.y[0];
@@ -730,18 +850,19 @@
                     });
 
                     let arr_length = data_real_cuti_timeline.length;
-                    
-                    arr_length = arr_length *150;
-                    cg('arr_length',arr_length)
+
+                    arr_length = arr_length * 150;
+                    cg('arr_length', arr_length)
                     var options6 = {
                         series: [{
-                            name: 'Roaster Cuti',
-                            data: data_schedule_cuti
-                        },
-                        {
-                            name: 'Pelaksanaan cuti',
-                            data: data_real_cuti_timeline
-                        }, ],
+                                name: 'Roaster Cuti',
+                                data: data_schedule_cuti
+                            },
+                            {
+                                name: 'Pelaksanaan cuti',
+                                data: data_real_cuti_timeline
+                            },
+                        ],
 
                         chart: {
                             height: 300,
@@ -779,7 +900,7 @@
                             horizontalAlign: 'left'
                         }
                     };
-                    
+
 
 
                     var chart = new ApexCharts(document.querySelector("#chart6"), options6);
@@ -808,7 +929,7 @@
 
         }
 
-        function filterTimeLineEmployee(){
+        function filterTimeLineEmployee() {
             filter.group_cuti_uuid = null;
             nik_employee = $('#employee_uuid-timeline').val();
             loadChart();
@@ -872,7 +993,7 @@
 
         function choosePoh() {
             let poh_uuid = $('#poh_uuid').val();
-            cg('choosePoh',data_database.data_atribut_sizes.poh_uuid);
+            cg('choosePoh', data_database.data_atribut_sizes.poh_uuid);
             $('#value_money_cuti').val(data_database.data_atribut_sizes.poh_uuid[poh_uuid]['value_atribut']);
         }
 
@@ -1175,21 +1296,21 @@
             $('#table_reload').val('employee-cuti')
         }
 
-        function editDataEmployeeCuti(uuid){
-            
+        function editDataEmployeeCuti(uuid) {
+
             $.ajax({
-                url: '/employee-cuti/show/'+uuid,
+                url: '/employee-cuti/show/' + uuid,
                 type: 'GET',
                 dataType: 'json',
                 success: function(res) {
                     let data = res.data;
-                    cg('res',res)
+                    cg('res', res)
                     let schdl = `${data.date_schedule_start_cuti} sd ${data.date_schedule_end_cuti}`;
                     $('#employee_uuid-cuti').val(data.employee_uuid).trigger('change');
                     $('#schedule_cuti').val(schdl).trigger('change');
                     $('#status_cuti').val(data.status_cuti).trigger('change');
                     $('#date_real_start_cuti').val(data.date_real_start_cuti).trigger('change');
-                    $('#long_cuti').val(data.long_cuti).trigger('change');                    
+                    $('#long_cuti').val(data.long_cuti).trigger('change');
                     $('#date_real_end_cuti').val(data.date_real_end_cuti).trigger('change');
                     $('#kompensasi_cuti').val(data.kompensasi_cuti).trigger('change');
                     let data_em = data_database.data_employees[data.employee_uuid];
@@ -1199,7 +1320,7 @@
                     $('#monitoring_cuti').val(data.monitoring_cuti).trigger('change');
                     $('#date_come_cuti').val(data.date_come_cuti).trigger('change');
                     $('#uuid-cuti').val(data.uuid).trigger('change');
-                   
+
                     $('#create-modal-employee-cuti').modal('show');
                 }
             });

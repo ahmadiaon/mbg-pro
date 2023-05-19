@@ -83,6 +83,7 @@
             </div>
         </div>
     </div>
+
     <div class="card-box mb-30 ">
         <div class="row pd-20">
             <div class="col-auto">
@@ -135,6 +136,8 @@
                                 onclick="openModalAbsen()">Ketidakhadiran</a>
                             <a class="dropdown-item" onclick="exportAbsen()" id="btn-export" href="#">Export +
                                 Data</a>
+                            <a class="dropdown-item"  id="btn-export-dialy"
+                                href="/user/absensi/dialy-report">Dialy Report</a>
                             <a class="dropdown-item" id="btn-export-template"
                                 href="/user/absensi/export-template/">Export
                                 Template</a>
@@ -319,6 +322,41 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal ketidakhadiran-->
+    <div class="modal fade" id="export-dialy" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Form Ketidakhadiran
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <form autocomplete="off" id="form-absen" action="/user/absensi/store-dialy" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        {{-- karyawan --}}
+                        <div class="form-group">
+                            <label for="">Pilih Tanggal</label>
+                            <input type="date" class="form-control" name="date_dialy" id="date_dialy">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button onclick="storeAbsenModal('absen')" type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js')
@@ -364,12 +402,7 @@
         let dt_start;
         let data_datatable;
 
-        let color_button = {
-            alpa: 'danger',
-            pay: 'primary',
-            unpay: 'secondary',
-            cut: 'warning'
-        };
+
 
         let arr_site_uuid = [];
         let arr_status_absen = [];
@@ -441,12 +474,19 @@
             changeLong();
         }
 
+        function openModalExportDialy() {
+            let dt_today = getDateTodayArr();
+            $('#date_dialy').val(`${dt_today.year}-${dt_today.month}-${dt_today.day}`);
+            $('#export-dialy').modal('show');
+        }
+
         function exportAbsen() {
+            startLoading();
             let _token = $('meta[name="csrf-token"]').attr('content');
             cg('data_datatable', data_datatable);
             let data_ex = JSON.stringify(data_datatable);
             $.ajax({
-                url: '/user/absensi/export',
+                url: '/user/absensi/export+data',
                 type: "POST",
                 data: {
                     _token: _token,
@@ -455,6 +495,7 @@
                 },
                 success: function(response) {
                     cg('response', response);
+                    stopLoading;
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
@@ -506,8 +547,6 @@
 
 
 
-
-
         function onSaveFilter() {
             filter.arr_filter = arr_filter;
             let date_filter = {
@@ -516,6 +555,7 @@
             };
             filter.date_filter = date_filter;
             cg('filter', filter);
+            filter.nik_employee = null;
             showDataTable();
         }
 
@@ -648,7 +688,7 @@
                     $('#table-absen').DataTable({
                         scrollX: true,
                         scrollY: "600px",
-                        paging:false,
+                        paging: false,
                         serverSide: false,
                         data: for_data_datatable,
                         columns: data
@@ -688,13 +728,13 @@
                     employee_uuid: $('#employee_uuid-edit-live').val(),
                     date: $('#date-edit-live').val(),
                     status_absen_uuid: status_absen_uuid,
-                    cek_log:$('#cek_log-live').val()
+                    cek_log: $('#cek_log-live').val()
                 },
                 success: function(response) {
                     cg('response editStoreLive', `status_absen_uuid-text-${response.data.uuid}`);
 
                     // status_absen_uuid-text-2023-01-05-MBLE-230857
-                    
+
                     $(`#status_absen_uuid-text-${response.data.uuid}`).text(response.data.status_absen_uuid);
                     $(`#status_absen_uuid-text-${response.data.uuid}`).attr('class',
                         `btn btn-${color_button[data_database.data_status_absens[response.data.status_absen_uuid]['math']]}`
@@ -709,11 +749,11 @@
 
 
         function firstIndexEmployeeAbsen() {
-
             let arrrr = [];
-
             Object.values(data_database.data_companies).forEach(company_uuid_element => {
-                $('.company-filter').append(`
+                if (dataUser['user_privileges'][`company_privilege_${company_uuid_element.uuid}`]) {
+                    arrrr.push(company_uuid_element.uuid);
+                    $('.company-filter').append(`
                     <div class="col-auto">
                         <div class="custom-control custom-checkbox mb-5">
                             <input onchange="changeChecked('filter-company-${company_uuid_element.uuid}','${company_uuid_element.uuid}', 'company')" type="checkbox" class="custom-control-input element-company" value="${company_uuid_element.uuid}"
@@ -722,24 +762,25 @@
                         </div>
                     </div>
                 `);
-                arrrr.push(company_uuid_element.uuid);
+                }
+
             });
             value_checkbox['company'] = arrrr;
 
             arrrr = [];
             Object.values(data_database.data_atribut_sizes.site_uuid).forEach(site_uuid_element => {
-                $('.site-filter').append(`
-                    <div class="col-auto">
-                        <div class="custom-control custom-checkbox mb-5">
-                            <input onchange="changeChecked('filter-site_uuid-${site_uuid_element.uuid}','${site_uuid_element.uuid}', 'site_uuid')" type="checkbox" class="custom-control-input element-site_uuid" value="${site_uuid_element.uuid}"
-                                id="filter-site_uuid-${site_uuid_element.uuid}" name="filter-site_uuid-${site_uuid_element.uuid}">
-                            <label class="custom-control-label" for="filter-site_uuid-${site_uuid_element.uuid}">${site_uuid_element.name_atribut}</label>
+                if (dataUser['user_privileges'][`site_privilege_${site_uuid_element.uuid}`]) {
+                    $('.site-filter').append(`
+                        <div class="col-auto">
+                            <div class="custom-control custom-checkbox mb-5">
+                                <input onchange="changeChecked('filter-site_uuid-${site_uuid_element.uuid}','${site_uuid_element.uuid}', 'site_uuid')" type="checkbox" class="custom-control-input element-site_uuid" value="${site_uuid_element.uuid}"
+                                    id="filter-site_uuid-${site_uuid_element.uuid}" name="filter-site_uuid-${site_uuid_element.uuid}">
+                                <label class="custom-control-label" for="filter-site_uuid-${site_uuid_element.uuid}">${site_uuid_element.name_atribut}</label>
+                            </div>
                         </div>
-                    </div>
-                `);
-
-
-                arrrr.push(site_uuid_element.uuid);
+                    `);
+                    arrrr.push(site_uuid_element.uuid);
+                }
             });
             value_checkbox['site_uuid'] = arrrr;
             arrrr = [];
@@ -771,7 +812,7 @@
                 );
             });
             loopDateFilter();
-            onSaveFilter();
+            showDataTable();
 
 
 
@@ -793,7 +834,7 @@
 
         firstIndexEmployeeAbsen();
 
-        
+
 
         function changeAbsen() {
             $(`#`).empty()

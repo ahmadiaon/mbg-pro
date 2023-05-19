@@ -11,6 +11,7 @@ use App\Models\Employee\EmployeeOut;
 use App\Models\Payment\PaymentGroup;
 use App\Models\Poh;
 use App\Models\Position;
+use App\Models\Premi;
 use App\Models\Religion;
 use App\Models\Safety\AtributSize;
 use App\Models\StatusAbsen;
@@ -83,6 +84,36 @@ class ResponseFormatter
     $result = $date_end[2] . "-" . array_search($date_end[1], $months) . "-" . $date_end[0];
     $result = Carbon::createFromFormat('Y-m-d',  $result);
     return $result;
+  }
+
+  public static function excelToDateArray($date = null)
+  {
+
+    
+    if ($date != null) {
+      if ($date == '') {
+        return null;
+      }
+      if (gettype($date) == 'string') {
+        $cls_date = new DateTime($date);
+        $return = $cls_date->format('Y-m-d');
+      } else {
+        $miliseconds = ($date - (25567 + 2)) * 86400 * 1000;
+        $seconds = $miliseconds / 1000;
+        $return = date("Y-m-d", $seconds);
+      }
+      $result = Carbon::createFromFormat('Y-m-d',  $return);
+      $date = [
+        'year'=> $result->isoFormat('Y'),
+        'month'=> $result->isoFormat('MM'),
+        'day'=> $result->isoFormat('DD'),
+      ];
+      return $date;
+
+
+    } else {
+      return null;
+    }
   }
 
   public static function getMonthName($data = null)
@@ -273,6 +304,11 @@ class ResponseFormatter
       return strval($item->uuid);
     });
 
+    $data_premis = Premi::all();
+    $data_premis = $data_premis->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
 
     $data_database = [
       'table_schema' => [
@@ -290,6 +326,7 @@ class ResponseFormatter
       'data_atribut_sizes' => $data_atribut_size,
       'data_religions' => $arr_religion,
       'data_pohs' => $arr_pohs,
+      'data_premis' => $data_premis,
       'data_dictionaries' => $arr_dictionary,
       'data_status_absens' => $arr_status_absens,
       'data_math_status_absens' => $arr_math_status_absens,
@@ -344,4 +381,27 @@ class ResponseFormatter
       return null;
     }
   }
+
+  public static function to2Digit($num){
+    return str_pad($num, 2, "0", STR_PAD_LEFT);
+  }
 }
+
+
+/*
+Border::BORDER_DASHDOT
+Border::BORDER_DASHDOTDOT
+Border::BORDER_DASHED
+Border::BORDER_DOTTED
+Border::BORDER_DOUBLE
+Border::BORDER_HAIR
+Border::BORDER_MEDIUM
+Border::BORDER_MEDIUMDASHDOT
+Border::BORDER_MEDIUMDASHDOTDOT
+Border::BORDER_MEDIUMDASHED
+Border::BORDER_NONE
+Border::BORDER_SLANTDASHDOT
+Border::BORDER_THICK
+Border::BORDER_THIN
+
+*/

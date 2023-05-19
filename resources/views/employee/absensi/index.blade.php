@@ -98,8 +98,8 @@
                         </div>
                     </div>
                     <div class="btn-group dropdown">
-                        <button type="button" class="btn btn-secondary dropdown-toggle waves-effect"
-                            data-toggle="dropdown" aria-expanded="false" id="btn-month" value="">
+                        <button type="button" class="btn btn-secondary dropdown-toggle waves-effect" data-toggle="dropdown"
+                            aria-expanded="false" id="btn-month" value="">
                             <span class="caret"></span>
                         </button>
 
@@ -298,6 +298,42 @@
 
 
     <!-- Modal ketidakhadiran-->
+    <div class="modal fade" id="export-dialy" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Form Ketidakhadiran
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <form autocomplete="off" id="form-absen" action="/user/absensi/store-dialy" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        {{-- karyawan --}}
+                        <div class="form-group">
+                            <label for="">Pilih Tanggal</label>
+                            <input type="date" class="form-control" name="date_dialy" id="date_dialy">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button onclick="storeAbsenModal('absen')" type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal ketidakhadiran-->
     <div class="modal fade" id="create-absen" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -398,6 +434,10 @@
             $('#create-absen').modal('show');
             $('#long_absen').val('1');
             changeLong();
+        }
+
+        function openModalExportDialy() {
+            $('#export-dialy').modal('show');
         }
 
         function exportAbsen() {

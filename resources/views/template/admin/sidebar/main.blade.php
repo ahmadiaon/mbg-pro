@@ -30,8 +30,11 @@
                             </a>
 
                             <ul class="submenu">
-                                <li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}"
-                                        href="/user">Daftar Karyawan</a></li>
+                                @if (!empty(session('dataUser')->read_list_employee))
+                                    <li><a class="{{ $layout['active'] == 'employees-index' ? 'active' : '' }}"
+                                            href="/user">Daftar Karyawan</a></li>
+                                @endif
+
                                 @if (!empty(session('recruitment-user')))
                                     <li class="dropdown">
 
@@ -75,34 +78,41 @@
                                         </ul>
                                     </li>
                                 @endif
-                                <li><a class="{{ $layout['active'] == 'employees-contract' ? 'active' : '' }}"
-                                        href="/employee-contract">Kontrak Karyawan</a></li>
-                                <li><a href="/employee-out"
-                                        class="{{ $layout['active'] == 'employee-out' ? 'active' : '' }}"
-                                        data-toggle="tooltip" data-placement="right" title="Hour Meter">Karyawan
-                                        Keluar</a></li>
-                                <li><a href="/employee-cuti"
-                                        class="{{ $layout['active'] == 'employee-cuti' ? 'active' : '' }}"
-                                        data-toggle="tooltip" data-placement="right" title="Manajemen Cuti">Cuti</a>
-                                </li>
+
+                                @if (!empty(session('dataUser')->read_employee_contract))
+                                    <li><a class="{{ $layout['active'] == 'employees-contract' ? 'active' : '' }}"
+                                            href="/employee-contract">Kontrak Karyawan</a></li>
+                                @endif
+                                @if (!empty(session('dataUser')->read_list_change_employee))
+                                    <li><a href="/employee-out"
+                                            class="{{ $layout['active'] == 'employee-out' ? 'active' : '' }}"
+                                            data-toggle="tooltip" data-placement="right" title="Hour Meter">Karyawan
+                                            Keluar</a></li>
+                                    <li><a href="/employee-cuti"
+                                            class="{{ $layout['active'] == 'employee-cuti' ? 'active' : '' }}"
+                                            data-toggle="tooltip" data-placement="right" title="Manajemen Cuti">Cuti</a>
+                                    </li>
+                                @endif
                                 @if (!empty(session('dataUser')->read_list_absensi_employee))
                                     <li><a class="{{ $layout['active'] == 'list-employees-absensi' ? 'active' : '' }}"
                                             href="/user/absensi">Absensi Karyawan</a></li>
                                 @endif
-                                <li><a href="/employee-changge"
-                                        class="{{ $layout['active'] == 'employee-changge' ? 'active' : '' }}"
-                                        data-toggle="tooltip" data-placement="right"
-                                        title="Rotasi, Mutasi, Promosi. Demosi, Pemberhentian dan Pengajuan">Perubahan</a>
-                                </li>
-                                <li><a href="/form-recruitment"
-                                        class="{{ $layout['active'] == 'form-recruitment' ? 'active' : '' }}"
-                                        data-toggle="tooltip" data-placement="right"
-                                        title="Kelola Perekrutan Karyawan">PPK</a>
-                                <li><a href="/applicant"
-                                        class="{{ $layout['active'] == 'applicant-index' ? 'active' : '' }}"
-                                        data-toggle="tooltip" data-placement="right"
-                                        title="Kelola Perekrutan Karyawan">Pelamar</a>
-                                </li>
+                                @if (!empty(session('dataUser')->read_list_change_employee))
+                                    <li><a href="/employee-changge"
+                                            class="{{ $layout['active'] == 'employee-changge' ? 'active' : '' }}"
+                                            data-toggle="tooltip" data-placement="right"
+                                            title="Rotasi, Mutasi, Promosi. Demosi, Pemberhentian dan Pengajuan">Perubahan</a>
+                                    </li>
+                                    <li><a href="/form-recruitment"
+                                            class="{{ $layout['active'] == 'form-recruitment' ? 'active' : '' }}"
+                                            data-toggle="tooltip" data-placement="right"
+                                            title="Kelola Perekrutan Karyawan">PPK</a>
+                                    <li><a href="/applicant"
+                                            class="{{ $layout['active'] == 'applicant-index' ? 'active' : '' }}"
+                                            data-toggle="tooltip" data-placement="right"
+                                            title="Kelola Perekrutan Karyawan">Pelamar</a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
                     @endif
@@ -130,7 +140,7 @@
                                             data-toggle="tooltip" data-placement="right" title="Hour Meter"
                                             href="/production">Produksi</a></li>
                                 @endif
-                                
+
                                 <li><a class="{{ $layout['active'] == 'employee-allowance' ? 'active' : '' }}"
                                         href="/allowance">Total</a></li>
                             </ul>
@@ -173,21 +183,20 @@
 
                         </li>
                     @endif
-                    <li class="dropdown">
-                        <a href="javascript:;" class="dropdown-toggle">
-                            <span class="micon bi bi-file-earmark-text"></span><span class="mtext">Logistik</span>
-                        </a>
-
-
-                        <ul class="submenu">
-                            @if (!empty(session('dataUser')->read_list_employee))
+                    @if (!empty(session('dataUser')->read_list_employee))
+                        <li class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle">
+                                <span class="micon bi bi-file-earmark-text"></span><span
+                                    class="mtext">Logistik</span>
+                            </a>
+                            <ul class="submenu">
                                 <li><a class="{{ $layout['active'] == 'logistic-store' ? 'active' : '' }}"
                                         data-toggle="tooltip" data-placement="right"
                                         title="daftar karyawan dan apd yang didapat" href="/logistic">Gudang</a></li>
-                            @endif
-                        </ul>
 
-                    </li>
+                            </ul>
+                        </li>
+                    @endif
                     @if (!empty(session('dataUser')->superadmin))
                         <li class="dropdown">
                             <a href="javascript:;" class="dropdown-toggle">
@@ -202,9 +211,9 @@
                                             href="/database/position">Jabatan</a></li>
                                     <li><a class="{{ $layout['active'] == 'Location' ? 'active' : '' }}"
                                             href="/database/location">Lokasi</a></li>
-                                            
+
                                     <li><a class="{{ $layout['active'] == 'hm-bonus' ? 'active' : '' }}"
-                                        href="/database/hm-bonus">Bonus HM</a></li>
+                                            href="/database/hm-bonus">Bonus HM</a></li>
                                     {{-- <li><a class="{{ $layout['active'] == 'religion' ? 'active' : '' }}"
                                             href="/database/religion">Agama</a></li> --}}
                                     {{-- <li><a class="{{ $layout['active'] == 'poh' ? 'active' : '' }}"

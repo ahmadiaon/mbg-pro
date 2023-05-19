@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Employee;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeCuti;
 use App\Models\Employee\EmployeeCutiGroup;
 use App\Models\Employee\EmployeeCutiSetup;
@@ -30,6 +31,8 @@ class EmployeeCutiSetupController extends Controller
             'date_start'    => $request->date_start,
             'date_end'    => $request->date_end,
         ]);
+
+        Employee::updateOrCreate(['nik_employee' => $strore->employee_uuid, 'date_end' => null],['roaster_uuid' => $strore->roaster_uuid]);
 
 
        

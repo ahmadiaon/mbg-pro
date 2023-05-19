@@ -22,6 +22,12 @@
         @include('template.admin.javascript.form')
     @endif
     <script>
+        let color_button = {
+            alpa: 'danger',
+            pay: 'primary',
+            unpay: 'secondary',
+            cut: 'warning'
+        };
         let data_database = @json(session('data_database'));
         let dataUser = @json(session('dataUser'));
 
@@ -94,6 +100,21 @@
             }
         }
 
+
+        function getEndDate(val_year, val_month){
+            var date = new Date(),
+                y = val_year,
+                m = val_month - 1;
+            var lastDay = new Date(y, m + 1, 0);
+            return lastDay;
+        }
+        function getFirstDate(val_year, val_month){
+            var date = new Date(),
+                y = val_year,
+                m = val_month - 1;
+            var firstDay = new Date(y, m, 1);
+            return firstDay;
+        }
 
 
 

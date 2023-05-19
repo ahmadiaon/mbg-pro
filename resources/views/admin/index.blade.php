@@ -148,8 +148,11 @@
 
         var options3 = {
             series: [{
-                name: 'Karyawan',
+                name: 'Total',
                 data: data_for_grafik_flow_employee['data_total']
+            }, {
+                name: 'Karywan Aktif',
+                data: data_for_grafik_flow_employee['data_aktif']
             }, {
                 name: 'Masuk',
                 data: data_for_grafik_flow_employee['data_in']

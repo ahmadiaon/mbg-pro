@@ -21,6 +21,7 @@ class CreateEmployeeAbsensTable extends Migration
             $table->string('status_absen_uuid')->nullable();
             $table->string('cek_log')->nullable();
             $table->string('edited')->nullable();
+            $table->string('color')->nullable();
             $table->string('pay_uuid')->nullable();
 
             

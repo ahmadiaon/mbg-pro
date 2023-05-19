@@ -213,7 +213,7 @@
     <div class="card-box mb-30">
         <div class="row justify-content-md-center pd-20">
             <div class="col-md-2">
-                <h4 class="text-blue h4">Tonase</h4>
+                <h4 class="text-blue h4">HM</h4>
             </div>
             <div class="col-10 text-right">
                 <div class="btn-group">

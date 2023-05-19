@@ -49,6 +49,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class EmployeeController extends Controller
 {
@@ -144,6 +146,88 @@ class EmployeeController extends Controller
         // dd($data);
         return view('datatableshow', ['data'         => $data]);
         return 'delete';
+    }
+
+    public function export(Request $request){
+        $validatedData = $request->all();
+        $validatedData['data_export'] = json_decode($request->data_export);        
+        $data_session = session('data_database');
+
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        
+        
+
+        $createSheet->setCellValue('A19', 'NO.');
+        $createSheet->setCellValue('B19', 'NAMA');
+        $createSheet->setCellValue('C19', 'NIK');
+        $createSheet->setCellValue('D19', 'POSISI');
+        $createSheet->setCellValue('E19', 'DEPARTEMEN');
+        $createSheet->setCellValue('F19', 'SITE');
+        $createSheet->setCellValue('G19', 'PERUSAHAAN');
+
+        $validatedData['data_export'] = (array)$validatedData['data_export'];
+
+        $row_employees = 21;
+
+        foreach ($validatedData['data_export'] as $item_data_export) {
+            $createSheet->setCellValue('B' . $row_employees, $data_session['data_employees'][$item_data_export->nik_employee]['name']);
+            $createSheet->setCellValue('C' . $row_employees, $item_data_export->nik_employee_with_space);
+            $createSheet->setCellValue('D' . $row_employees, $data_session['data_employees'][$item_data_export->nik_employee]['position']);
+            $createSheet->setCellValue('E' . $row_employees, $data_session['data_employees'][$item_data_export->nik_employee]['department']);
+            $createSheet->setCellValue('F' . $row_employees, $item_data_export->site_uuid);
+            $createSheet->setCellValue('G' . $row_employees, $item_data_export->company_uuid);
+            
+            $row_employees++;
+        }   
+
+        $createSheet->mergeCells('A19:A20');
+        $createSheet->mergeCells('B19:B20');
+        $createSheet->mergeCells('C19:C20');
+        $createSheet->mergeCells('D19:D20');
+        $createSheet->mergeCells('E19:E20');
+        $createSheet->mergeCells('F19:F20');
+        $createSheet->mergeCells('G19:G20');
+
+        $styleArray_header = array(
+            'font' => [
+                'bold' => true,
+            ],
+            'borders' => array(
+                'outline' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('argb' => '000000'),
+                ),
+                'inside' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('argb' => '000000'),
+                ),
+            ),
+            'fill' => [
+                'fillType' =>  fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => '4c4ce9'
+                ]
+            ],
+        );
+        //header
+        $createSheet->getStyle('A19:G20')->applyFromArray($styleArray_header);
+        $createSheet->getColumnDimension('B')->setAutoSize(true);
+        $createSheet->getColumnDimension('C')->setAutoSize(true);
+        $createSheet->getColumnDimension('D')->setAutoSize(true);
+        $createSheet->getColumnDimension('E')->setAutoSize(true);
+        $createSheet->getColumnDimension('F')->setAutoSize(true);
+        $createSheet->getColumnDimension('G')->setAutoSize(true);
+
+
+
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/export-karyawan-' . rand(99, 9999) . 'file.xls';
+        $crateWriter->save($name);
+
+        return ResponseFormatter::toJson($name, $validatedData);
+
+        return ResponseFormatter::toJson($request->filter, 'hi i am from function export on employees');
     }
 
     public function test()
@@ -303,7 +387,6 @@ class EmployeeController extends Controller
 
             $arr_index = [];
 
-
             while ($sheet->getCell($rows[$no_row] . '2')->getValue() != null) {
                 $arr_index[$dictionaries[$sheet->getCell($rows[$no_row] . '2')->getValue()]->database] = [
                     'index' => $rows[$no_row],
@@ -313,8 +396,6 @@ class EmployeeController extends Controller
                 ];
                 $no_row++;
             }
-
-
 
             $no_employee = 3;
             $employees = [];
@@ -423,6 +504,7 @@ class EmployeeController extends Controller
                                     $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
                                 }
                                 $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
+                                $employee_data_one[$item_index['database'] . '_real'] =$sheet->getCell($item_index['index'] . $no_employee)->getValue();
                                 break;
                             case 'string':
                                 // $employee_data_one[$item_index['database'].'_uuid'] = ResponseFormatter::toUUID($sheet->getCell( $item_index['index'].$no_employee)->getValue());
@@ -441,6 +523,9 @@ class EmployeeController extends Controller
                 // if($employee_data_one['nik_employee'] == 'MB-PL-220824'){
                 //     dd($employee_data_one);
                 // }
+
+                $employee_data_one['name'] = $employee_data_one['name_real'];
+                $employee_data_one['nik_employee_with_space'] = $employee_data_one['nik_employee_real'];
                 if (!empty($employee_data_one['department_uuid'])) {
                     if (empty($get_all_department[$employee_data_one['department_uuid']])) {
                         Department::updateOrCreate(['uuid' => $employee_data_one['department_uuid']], ['department' => $employee_data_one['department_with_space']]);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Safety;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Privilege\Privilege;
 use App\Models\Safety\AtributSize;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -25,6 +26,11 @@ class AtributSizeController extends Controller
             'javascript_form'       => true,
             'active'                        => 'atribut-size'
         ];
+        // $data_site = AtributSize::where('size', 'site_uuid')->get();
+        // foreach($data_site as $item_companies){
+        //     Privilege::updateOrCreate(['uuid' => 'site_privilege_'.$item_companies->uuid ], ['privilege' =>'site_privilege_'.$item_companies->uuid  ]);
+        // }
+        
 
         AtributSize::updateOrCreate(['uuid' => 'group'],['name_atribut' => 'GROUP', 'size'=>'group'] );
 
@@ -100,6 +106,9 @@ class AtributSizeController extends Controller
                 $data['date_start'] = '2000-01-01';    
                 if(!empty($data)){
                     $store = AtributSize::updateOrCreate(['uuid' => $data['uuid']], $data);
+                    if($store->size == 'site_uuid'){
+                        Privilege::updateOrCreate(['uuid' => 'site_privilege_'.$store->uuid ], ['privilege' =>'site_privilege_'.$store->uuid  ]);
+                    }
                 }
                 $no_employee++;
             }
@@ -120,6 +129,11 @@ class AtributSizeController extends Controller
         }
        
         $strore = AtributSize::updateOrCreate(['uuid' => $request->uuid], $validateData);
+        if($strore->size == 'site_uuid'){
+            Privilege::updateOrCreate(['uuid' => 'site_privilege_'.$strore->uuid ], ['privilege' =>'site_privilege_'.$strore->uuid  ]);
+        }
+
+
 
         ResponseFormatter::setAllSession();
         return ResponseFormatter::toJson($strore, 'Data Stored');

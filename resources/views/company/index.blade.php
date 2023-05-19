@@ -4,7 +4,7 @@ createCompany
     <div class="card-box mb-30 " >
         <div class="row pd-20">
             <div class="col-auto">
-                <h4 class="text-blue h4">Departement </h4>
+                <h4 class="text-blue h4">PERUSAHAAN </h4>
             </div>
             <div class="col text-right">
                 <div class="btn-group">  

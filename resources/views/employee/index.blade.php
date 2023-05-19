@@ -96,7 +96,8 @@
                                 <div class="form-group row mb-20">
                                     <label class="col-md-5" for="">rentang waktu </label>
                                     <input class="col-6 form-control datetimepicker-range" placeholder="Select Month"
-                                        name="date_range_this_time_in_out" id="date_range_this_time_in_out" type="text" />
+                                        name="date_range_this_time_in_out" id="date_range_this_time_in_out"
+                                        type="text" />
                                 </div>
 
 
@@ -125,11 +126,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                 {{-- status  --}}
-                                 <div class="form-group row mb-20">
+                                {{-- status  --}}
+                                <div class="form-group row mb-20">
                                     <label class="col-md-5" for="">rentang waktu</label>
-                                    <input class="col-6 form-control" placeholder="Select Month" 
-                                        name="date_range_in_out" id="date_range_in_out" type="date" />
+                                    <input class="col-6 form-control" placeholder="Select Month" name="date_range_in_out"
+                                        id="date_range_in_out" type="date" />
                                 </div>
 
                                 {{-- jabatan --}}
@@ -272,8 +273,7 @@
                     </div>
                     <div class="col text-right" <div class="btn-group">
                         <div class="btn-group dropdown">
-                            <button onclick="exportData()" type="date" class="btn btn-danger" data-toggle="dropdown"
-                                aria-expanded="false">
+                            <button onclick="exportData()" type="date" class="btn btn-danger">
                                 Export Data <span class="caret"></span>
                             </button>
                         </div>
@@ -328,9 +328,9 @@
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                                 ×
                             </button>
-                            
 
-                          
+
+
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
@@ -384,6 +384,7 @@
 
 @section('js')
     <script>
+        let data_export = null;
         var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
         var end = new Date(arr_date_today.year, arr_date_today.month, 0);
         $('#date_range_in_out').val(`${formatDate(end)}`);
@@ -479,7 +480,7 @@
             let data_table_schema = data_database.table_schema;
             let dictionary = data_database.data_dictionaries;
             let element_header_table_employees = ``;
-
+            filter.show_type = 'simple';
             if (filter.show_type != 'simple') {
                 data_table_schema['employees'].forEach(element_employee_schema => {
                     if (dictionary[element_employee_schema]) {
@@ -490,7 +491,7 @@
                 });
             }
             $('#table-user').empty();
-            
+
             // ${element_header_table_employees}
 
             let element_table = `
@@ -555,9 +556,10 @@
                 success: function(response) {
                     // let data_datable = [];
 
-                    cg('response data-x',response );
+                    cg('response data-x', response);
                     datax = response.data;
                     let data_datable_obj = datax.employee_filter_company_x_site;
+                    data_export = data_datable_obj;
                     let data_datable = [];
                     if (data_datable_obj) {
                         Object.values(data_datable_obj).forEach(element_data_datable_obj => {
@@ -567,13 +569,13 @@
                     cg('response', response);
                     $('#table-user-employees').DataTable({
                         scrollX: true,
-                        scrollY: "600px",
-                        paging:false,
+                        scrollY: "700px",
+                        paging: false,
                         serverSide: false,
                         data: data_datable,
                         columns: data
                     });
-                  
+
                 },
 
                 error: function(response) {
@@ -677,5 +679,35 @@
 
         // JS RUN
         firstIndexEmployee();
+
+        function exportData() {
+            cg('data_export', data_export);            
+            let data_ex = JSON.stringify(data_export);
+            let filter = {
+                date_start_filter:'2023-05-01',
+                date_end_filter:'2023-05-31',
+            };
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/user/export-data',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data_export: data_ex,
+                    filter: filter
+                },
+                success: function(response) {
+                   cg('export', response);     
+                   var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();              
+                },
+
+                error: function(response) {
+                    console.log(response)
+                }
+            });
+        }
     </script>
 @endsection
