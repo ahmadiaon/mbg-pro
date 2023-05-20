@@ -398,6 +398,7 @@ Route::middleware(['islogin'])->group(function () {
     Route::prefix('/database')->group(function () {
 
         Route::get('/absen', [StatusAbsenController::class, 'indexPayrol']);
+        Route::get('/export-db', [StatusAbsenController::class, 'exportDB']);
         Route::post('/status-absen', [StatusAbsenController::class, 'storePayrol']); ///payrol/database/status-absen
         Route::get('/absen/{uuid}/edit', [StatusAbsenController::class, 'showPayrol']);
         Route::post('/absen/delete', [StatusAbsenController::class, 'delete']);

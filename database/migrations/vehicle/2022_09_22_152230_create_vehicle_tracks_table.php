@@ -13,7 +13,7 @@ class CreateVehicleTracksTable extends Migration
      */
     public function up()
     {
-        Schema::create(' ', function (Blueprint $table) {
+        Schema::create('vehicle_tracks', function (Blueprint $table) {
             $table->id();
             
             $table->string('uuid')->nullable();

@@ -248,6 +248,8 @@
                                             href="/database/variable">Variable</a></li>
                                     <li><a class="{{ $layout['active'] == 'formula' ? 'active' : '' }}"
                                             href="/database/formula">Formula Potongan</a></li>
+                                    <li><a class="{{ $layout['active'] == 'formula' ? 'active' : '' }}"
+                                        href="/database/export-db">Export DB</a></li>
                                 </ul>
                             @endif
 
