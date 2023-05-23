@@ -470,6 +470,33 @@
             showDataTableUser();
         }
 
+        function exportData() {
+            startLoading();
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            // cg('data_datatable', data_datatable);
+            let data_ex = JSON.stringify(data_datatable);
+            $.ajax({
+                url: '/hour-meter/export',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data_export: data_ex,
+                    filter: filter
+                },
+                success: function(response) {
+                    cg('response', response);
+                    var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();
+                    stopLoading();
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+        }
+
         function showDataTableUser() {
             let data = [];
             let dataTable = [
@@ -480,7 +507,7 @@
             let data_table_schema = data_database.table_schema;
             let dictionary = data_database.data_dictionaries;
             let element_header_table_employees = ``;
-            filter.show_type = 'simple';
+            // filter.show_type = 'simple';
             if (filter.show_type != 'simple') {
                 data_table_schema['employees'].forEach(element_employee_schema => {
                     if (dictionary[element_employee_schema]) {

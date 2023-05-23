@@ -287,7 +287,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/', [EmployeeHourMeterDayController::class, 'index']);
         Route::post('/data', [EmployeeHourMeterDayController::class, 'moreAnyData']);
         Route::get('/template', [EmployeeHourMeterDayController::class, 'template']);
-        Route::get('/export/{year_month}', [EmployeeHourMeterDayController::class, 'export']);
+        Route::post('/export', [EmployeeHourMeterDayController::class, 'export']);
         Route::post('/store', [EmployeeHourMeterDayController::class, 'store']);
         Route::post('/import', [EmployeeHourMeterDayController::class, 'import']);
     });

@@ -304,8 +304,8 @@
                         {{-- status absen --}}
                     </div>
                 </div>
-                <input type="text" name="" id="employee_uuid-edit-live">
-                <input type="text" name="" id="date-edit-live">
+                <input type="hidden" name="" id="employee_uuid-edit-live">
+                <input type="hidden" name="" id="date-edit-live">
 
                 <div class="row justify-content-md-center" id="button-status_absen_uuid">
                     <div class="col-auto">
@@ -495,11 +495,11 @@
                 },
                 success: function(response) {
                     cg('response', response);
-                    stopLoading;
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
                     dlink.click();
+                    stopLoading();
                 },
                 error: function(response) {
                     alertModal()
@@ -584,7 +584,6 @@
                                                         <th>Dibayar</th>
                                                         <th>Potongan</th>                                                        
                                                         <th>Alpa</th>     
-                                                         <th>Action</th>
                                                          ${el_date_month_header}
                                                     </tr>
                                                 </thead>
@@ -636,19 +635,19 @@
 
                     data.push(element_alpa);
 
-                    var elements = {
-                        mRender: function(data, type, row) {
-                            return `
-									<div class="form-inline"> 
-                                        <a href="/user/absensi/detail/${ arr_date_today.year}-${arr_date_today.month}/${row.nik_employee}">
-										<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
-											<i class="dw dw-edit2"></i>
-										</button>
-                                        </a>
-									</div>`
-                        }
-                    };
-                    data.push(elements);
+                    // var elements = {
+                    //     mRender: function(data, type, row) {
+                    //         return `
+					// 				<div class="form-inline"> 
+                    //                     <a href="/user/absensi/detail/${ arr_date_today.year}-${arr_date_today.month}/${row.nik_employee}">
+					// 					<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
+					// 						<i class="dw dw-edit2"></i>
+					// 					</button>
+                    //                     </a>
+					// 				</div>`
+                    //     }
+                    // };
+                    // data.push(elements);
 
                     arr_date.forEach(element_data => {
                         var element_date = {
@@ -666,7 +665,10 @@
                                         status_absen_el = row.data[element_data][
                                             'status_absen_code'
                                         ];
-                                        cek_log = row.data[element_data]['cek_log'];
+                                        
+                                        if(row.data[element_data]['cek_log']){
+                                            cek_log = row.data[element_data]['cek_log'];
+                                        }
                                     }
                                 }
 
@@ -705,7 +707,11 @@
             $('#name-date').text(`${data_emp.name} - ${date_value}`);
             $('#employee_uuid-edit-live').val(`${machine_id}`);
             $('#date-edit-live').val(`${date_value}`);
-            $('#cek_log-live').val(`${data_datatable[employee_uuid]['data'][date_value]['cek_log']}`);
+            let cek_log = '-';
+            if(typeof(data_datatable[employee_uuid]['data'][date_value]) != 'undefined'){
+                cek_log = data_datatable[employee_uuid]['data'][date_value]['cek_log'];
+            }
+            $('#cek_log-live').val(`${cek_log}`);
             $('#button-status_absen_uuid').empty();
 
             Object.values(data_database.data_status_absens).forEach(element_status_absen => {
@@ -713,7 +719,6 @@
                         <button onclick="editStoreLive('${element_status_absen.uuid}')" class="col-2 btn btn-${color_button[element_status_absen.math]} mr-2 mb-1">${element_status_absen.uuid}</button>
                     `);
             });
-            cg('xx', `${data_datatable[employee_uuid]['data'][date_value]['cek_log']}`)
             $('#modal-edit-live').modal('show');
         }
 

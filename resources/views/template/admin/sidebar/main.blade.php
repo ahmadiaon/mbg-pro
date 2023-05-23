@@ -79,10 +79,10 @@
                                     </li>
                                 @endif
 
-                                @if (!empty(session('dataUser')->read_employee_contract))
+                                {{-- @if (!empty(session('dataUser')->read_employee_contract))
                                     <li><a class="{{ $layout['active'] == 'employees-contract' ? 'active' : '' }}"
                                             href="/employee-contract">Kontrak Karyawan</a></li>
-                                @endif
+                                @endif --}}
                                 @if (!empty(session('dataUser')->read_list_change_employee))
                                     <li><a href="/employee-out"
                                             class="{{ $layout['active'] == 'employee-out' ? 'active' : '' }}"
@@ -98,12 +98,12 @@
                                             href="/user/absensi">Absensi Karyawan</a></li>
                                 @endif
                                 @if (!empty(session('dataUser')->read_list_change_employee))
-                                    <li><a href="/employee-changge"
+                                    {{-- <li><a href="/employee-changge"
                                             class="{{ $layout['active'] == 'employee-changge' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right"
                                             title="Rotasi, Mutasi, Promosi. Demosi, Pemberhentian dan Pengajuan">Perubahan</a>
-                                    </li>
-                                    <li><a href="/form-recruitment"
+                                    </li> --}}
+                                    {{-- <li><a href="/form-recruitment"
                                             class="{{ $layout['active'] == 'form-recruitment' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right"
                                             title="Kelola Perekrutan Karyawan">PPK</a>
@@ -111,7 +111,7 @@
                                             class="{{ $layout['active'] == 'applicant-index' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right"
                                             title="Kelola Perekrutan Karyawan">Pelamar</a>
-                                    </li>
+                                    </li> --}}
                                 @endif
                             </ul>
                         </li>
@@ -291,14 +291,14 @@
                     </li>
                     <li class="dropdown">
                         <a href="javascript:;" class="dropdown-toggle">
-                            <span class="micon bi bi-bug"></span><span class="mtext">My Allowance</span>
+                            <span class="micon bi bi-bug"></span><span class="mtext">Pendapatan saya</span>
                         </a>
                         <ul class="submenu">
                             <li><a class="{{ $layout['active'] == 'hour-meter-price-me' ? 'active' : '' }}"
-                                    href="/me/{{ session('dataUser')->nik_employee }}/hour-meter">Hour Meter</a>
+                                    href="/me/{{ session('dataUser')->nik_employee }}/hour-meter">HM</a>
                             </li>
                             <li><a class="{{ $layout['active'] == 'tonase-employee-me' ? 'active' : '' }}"
-                                    href="/me/{{ session('dataUser')->nik_employee }}/tonase">Tonase</a>
+                                    href="/me/{{ session('dataUser')->nik_employee }}/tonase">Hauling</a>
                             </li>
                         </ul>
                     </li>

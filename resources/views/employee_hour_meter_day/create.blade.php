@@ -24,110 +24,108 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="pd-20">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="employee_checker_uuid">Pilih Checker</label>
-                                        <select name="employee_checker_uuid" id="employee_checker_uuid"
-                                            class="custom-select2 form-control employees">
-                                            <option value="">karyawan</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="employee_foreman_uuid">Pilih Foreman</label>
-                                        <select name="employee_foreman_uuid" id="employee_foreman_uuid"
-                                            class="custom-select2 form-control employees">
-                                            <option value="">karyawan</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="employee_supervisor_uuid">Pilih Supervisor</label>
-                                        <select name="employee_supervisor_uuid" id="employee_supervisor_uuid"
-                                            class="custom-select2 form-control employees">
-                                            <option value="">karyawan</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="employee_uuid">Pilih Karyawan</label>
-                                        <select onchange="employeeChosee()" name="employee_uuid" id="employee_uuid"
-                                            class="custom-select2 form-control employees">
-                                            <option value="">karyawan</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="date">Tanggal</label>
-                                        <input type="date" name="date" id="date" value=""
-                                            class="form-control">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="row justify-content-md-center">
-                                        <div class="col-auto">
-                                            <div class="form-group">
-                                                <label for="">Shift</label>
-                                                <div>
-                                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                        <label id="lbl-Siang" class="btn btn-outline-primary">
-                                                            <input type="radio" name="shift" id="Siang"
-                                                                value="Siang" checked="checked" autocomplete="off">
-                                                            Siang
-                                                        </label>
-
-                                                        <label id="lbl-Malam" class="btn btn-outline-primary">
-                                                            <input type="radio" name="shift" id="Malam"
-                                                                value="Malam" autocomplete="off">
-                                                            Malam
-                                                        </label>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-                                        <div class="col-auto text-center">
-                                            <div class="form-group">
-                                                <label for="value">Nilai HM</label>
-                                                <input onkeyup="fullValue()" type="text" name="value" id="value"
-                                                    value="" class="form-control">
-
-                                            </div>
-                                        </div>
-                                        <div class="col-auto text-center">
-                                            <div class="form-group">
-                                                <label class="">Aktifkan bonus ?</label>
-                                                <div class="custom-control custom-checkbox mb-5">
-                                                    <input type="checkbox" checked name="is_bonus"
-                                                        class="custom-control-input" id="is_bonus" />
-                                                    <label class="custom-control-label" for="is_bonus">bonus</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
+                        <div class="row pd-20">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <div class="row justify-content-md-center" id="hour-meter-prices">
-                                        <div class="col-12 text-center"><label class="weight-600 ">Harga HM</label>
+                                    <label for="employee_checker_uuid">Pilih Checker</label>
+                                    <select name="employee_checker_uuid" id="employee_checker_uuid"
+                                        class="custom-select2 form-control employees">
+                                        <option value="">karyawan</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="employee_foreman_uuid">Pilih Foreman</label>
+                                    <select name="employee_foreman_uuid" id="employee_foreman_uuid"
+                                        class="custom-select2 form-control employees">
+                                        <option value="">karyawan</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="employee_supervisor_uuid">Pilih Supervisor</label>
+                                    <select name="employee_supervisor_uuid" id="employee_supervisor_uuid"
+                                        class="custom-select2 form-control employees">
+                                        <option value="">karyawan</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row pd-20">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="employee_uuid">Pilih Karyawan</label>
+                                    <select onchange="employeeChosee()" name="employee_uuid" id="employee_uuid"
+                                        class="custom-select2 form-control employees">
+                                        <option value="">karyawan</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date">Tanggal</label>
+                                    <input type="date" name="date" id="date" value="" class="form-control">
+
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row justify-content-md-center">
+                                    <div class="col-auto">
+                                        <div class="form-group">
+                                            <label for="">Shift</label>
+                                            <div>
+                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                    <label id="lbl-Siang" class="btn btn-outline-primary">
+                                                        <input type="radio" name="shift" id="Siang" value="Siang"
+                                                            checked="checked" autocomplete="off">
+                                                        Siang
+                                                    </label>
+
+                                                    <label id="lbl-Malam" class="btn btn-outline-primary">
+                                                        <input type="radio" name="shift" id="Malam" value="Malam"
+                                                            autocomplete="off">
+                                                        Malam
+                                                    </label>
+                                                </div>
+                                            </div>
+
                                         </div>
-                                        <input type="hidden" id="hour_meter_price_uuid">
+
                                     </div>
+                                    <div class="col-auto text-center">
+                                        <div class="form-group">
+                                            <label for="value">Nilai HM</label>
+                                            <input onkeyup="fullValue()" type="text" name="value" id="value"
+                                                value="" class="form-control">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-auto text-center">
+                                        <div class="form-group">
+                                            <label class="">Aktifkan bonus ?</label>
+                                            <div class="custom-control custom-checkbox mb-5">
+                                                <input type="checkbox" checked name="is_bonus" class="custom-control-input"
+                                                    id="is_bonus" />
+                                                <label class="custom-control-label" for="is_bonus">bonus</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="row justify-content-md-center" id="hour-meter-prices">
+                                    <div class="col-12 text-center"><label class="weight-600 ">Harga HM</label>
+                                    </div>
+                                    <input type="hidden" id="hour_meter_price_uuid">
                                 </div>
                             </div>
                         </div>
@@ -290,7 +288,7 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="/tonase/create">Tambah</a>
                             <a class="dropdown-item" id="btn-template"disabled href="/hour-meter/template">Template</a>
-                            <a class="dropdown-item" id="btn-template"disabled href="/hour-meter/export">Export</a>
+                            <a class="dropdown-item" id="btn-template"disabled onclick="exportData()" href="#">Export</a>
                             <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                 href="">Import</a>
                         </div>
@@ -717,7 +715,9 @@
                     if (data_datable_obj) {
                         Object.values(data_datable_obj).forEach(element_data_datable_obj => {
                             data_datable.push(element_data_datable_obj);
-                            arr_data_nik.push(`${element_data_datable_obj['employee_uuid']}-"${element_data_datable_obj['hour_meter_price_uuid']}`);
+                            arr_data_nik.push(
+                                `${element_data_datable_obj['employee_uuid']}-"${element_data_datable_obj['hour_meter_price_uuid']}`
+                                );
                         });
                     }
                     cg('datatable', arr_data_nik);
@@ -802,7 +802,8 @@
                 }
             });
         }
-        function resetData(){
+
+        function resetData() {
             console.log('resetData')
             $('#employee_uuid').val('').trigger('change');
         }
@@ -923,6 +924,36 @@
                     `<button onclick="refreshTable(null, null, ${c})" type="button" class="btn btn-sm btn-primary">${c}</button>`
                 );
             }
+        }
+
+        function exportData() {
+            // cg('data_export', data_export);            
+            let data_ex = JSON.stringify(data_datable);
+            
+            cg('data_ex', filter);
+            // return false;
+
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/hour-meter/export',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data_export: data_ex,
+                    filter: filter
+                },
+                success: function(response) {
+                   cg('export', response);    
+                   var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();              
+                },
+
+                error: function(response) {
+                    console.log(response)
+                }
+            });
         }
 
         $(document).ready(function() {

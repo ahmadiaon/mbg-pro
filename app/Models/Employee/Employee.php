@@ -93,6 +93,7 @@ class Employee extends Model
             ]);
     }
 
+    
     public static function data_employee_detail()
     {
         $arr_employee = Employee::join('user_details', 'user_details.uuid', 'employees.user_detail_uuid')

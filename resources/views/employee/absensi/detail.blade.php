@@ -121,10 +121,41 @@
         </div>
     </div>
     <button type="hidden" id="sa-custom-position"></button>
+
+    <!-- Modal edit live-->
+    <div class="modal fade" id="modal-edit-live" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="name-date">
+                        xx
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{-- karyawan --}}
+                    <input class="form-control" name="" disabled id="cek_log-live" cols="10" rows="3">
+                    <div id="button-status_absen">
+                        {{-- status absen --}}
+                    </div>
+                </div>
+
+
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js')
     <script>
+        let data_absensi=null;
         let nik_employee = @json(session('dataUser')->nik_employee);
         var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
         var end = new Date(arr_date_today.year, arr_date_today.month, 0);
@@ -184,6 +215,17 @@
 
             showDataTable();
         }
+        function showCeklog(date_absen){
+            cg('a', data_absensi[date_absen]);
+            $('#name-date').text(`${date_absen}`);
+            if(data_absensi[date_absen]){
+                $('#cek_log-live').val(`${data_absensi[date_absen]['cek_log']}`);
+            }else{
+                
+            $('#cek_log-live').val(`tidak ada data ceklog`);
+            }
+            $('#modal-edit-live').modal('show');
+        }
 
         function showDataTable() {
 
@@ -199,8 +241,16 @@
                     filter: filter
                 },
                 success: function(response) {
+                    var weekdays = new Array(7);
+                    weekdays[0] = "Mig";
+                    weekdays[1] = "Sen";
+                    weekdays[2] = "Sel";
+                    weekdays[3] = "Rab";
+                    weekdays[4] = "Kam";
+                    weekdays[5] = "Jum";
+                    weekdays[6] = "Sab";
                     data_datatable = response.data.data_filter_math;
-                    let data_absensi = data_datatable[nik_employee]['data'];
+                    data_absensi = data_datatable[nik_employee]['data'];
                     cg('data_absensi', data_absensi);
                     
                     let for_data_datatable = [];
@@ -224,14 +274,18 @@
 
                         // cg('date', formatDate(loop));
                         if(data_absensi[formatDate(loop)]){
+                            var r = weekdays[loop.getDay()];
                             status_absen_code = data_absensi[formatDate(loop)]['status_absen_code'];
                             color_button_status_absen = color_button[data_absensi[formatDate(loop)]['math']]
                         }
+                        cg('year :', formatDate(loop));
+                        
+        
                         $('#row-absen').append(`
-                         <div class="col-auto  md-2 card-box pd-2 mr-3">
+                         <div class="col-auto  md-2 mb-2 card-box pd-2 mr-3">
                             <div class="form-group">
-                                <label for="">${loop.getDate()} sen</label>
-                                <div class=""><button class="btn btn-${color_button_status_absen}">${status_absen_code}</button></div>
+                                <label for="">${loop.getDate()} ${r}</label>
+                                <div class=""><button onclick="showCeklog('${formatDate(loop)}')" class="btn btn-${color_button_status_absen}">${status_absen_code}</button></div>
                             </div>
                         </div>`);
                         //don't remove it

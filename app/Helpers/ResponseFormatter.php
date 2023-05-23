@@ -207,6 +207,13 @@ class ResponseFormatter
   }
 
 
+  public static function toValueRupiah($value_rupiah)
+  {
+     $integer_value = ResponseFormatter::toNumber($value_rupiah);
+     $hasil_rupiah = "Rp " . number_format($integer_value,0,',','.');
+	    return $hasil_rupiah;
+  }
+
 
   public static function setAllSession()
   {

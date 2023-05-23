@@ -20,9 +20,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Illuminate\Support\Facades\Storage;
-use File;
-use Response;
 
 
 class EmployeeAbsenController extends Controller
@@ -182,6 +179,8 @@ class EmployeeAbsenController extends Controller
         $unpay = [];
 
         $employees = Employee::data_employee();
+
+        // dd($employees->where('employees.site_uuid', 'PL')->get());
         $employee_row = 21;
         $status_absens_col_employee = $date_row;
         $arr_status_absens = [];
@@ -198,6 +197,7 @@ class EmployeeAbsenController extends Controller
             $arr_status_absens[$item->status_absen_code] = $date_row;
             $date_row++;
         }
+
         $createSheet->setCellValue($abjads[$date_row] . '19',  'Dibayar');
         $createSheet->setCellValue($abjads[$date_row + 1] . '19',  'Potongan');
         $createSheet->mergeCells($abjads[$date_row] . '19:' . $abjads[$date_row] . '20');
@@ -455,10 +455,10 @@ class EmployeeAbsenController extends Controller
 
       
         foreach ($status_absens as $item) {
-            $createSheet->setCellValue($abjads[0] . $status_absens_col,  $item->status_absen_code);
-            $createSheet->setCellValue($abjads[0+1] . $status_absens_col,  $item->status_absen_description);                
+            $createSheet->setCellValue($abjads[2] . $status_absens_col,  $item->status_absen_code);
+            $createSheet->setCellValue($abjads[2+1] . $status_absens_col,  $item->status_absen_description);                
             $styleArray_employee['fill']['startColor']['rgb'] = $item->color;
-            $createSheet->getStyle($abjads[0] . $status_absens_col )->applyFromArray($styleArray_employee);
+            $createSheet->getStyle($abjads[2] . $status_absens_col )->applyFromArray($styleArray_employee);
             $status_absens_col++;
         }
         
@@ -591,6 +591,12 @@ class EmployeeAbsenController extends Controller
         $crateWriter->save($name);
 
         return ResponseFormatter::toJson($name, $validatedData);
+
+
+
+
+
+
         $no_emp = 1; 
         $data_dialy_absen = [];
 
@@ -1036,7 +1042,7 @@ class EmployeeAbsenController extends Controller
         $row_ex = 4;
         for ($i = (int)$date_day_start; $i <= (int)$date_day_end; $i++) {
             $createSheet->setCellValue($abjads[$row_ex] . '20', $i);
-            $createSheet->getColumnDimension($abjads[$row_ex])->setWidth(4);
+            $createSheet->getColumnDimension($abjads[$row_ex])->setWidth(6);
             
             $row_ex++;
             $date_row++;
@@ -1412,8 +1418,7 @@ class EmployeeAbsenController extends Controller
                 foreach ($employees as $item_employees) {
                     $data_employees[$item_employees->nik_employee] = $item_employees;
                 }
-
-
+                
 
                 $year = $sheet->getCell('C' . 4)->getValue();
                 $month = $sheet->getCell('C' . 3)->getValue();
@@ -1422,26 +1427,31 @@ class EmployeeAbsenController extends Controller
                 $last_day = ResponseFormatter::getEndDay($year . '-' . $month);
                 $isCount = 0;
                 $row_a = 0;
+                
+                
 
-
-                while ($isCount <= 1) {
-                    if ($sheet->getCell($rows[$row_a] . '20')->getValue() == 'pay') {
-                        $sheet->getCell($rows[$row_a] . '20')->getValue();
-                        $isCount++;
-                        $pay = $rows[$row_a];
-                    }
-                    if ($sheet->getCell($rows[$row_a] . '20')->getValue() == 'cut') {
-                        $cut = $rows[$row_a];
-                        $isCount++;
-                    }
-                    $row_a++;
-                }
-
+                
+            
+                // while ($isCount <= 1) {
+                //     if ($sheet->getCell($rows[$row_a] . '20')->getValue() == 'pay') {
+                //         $sheet->getCell($rows[$row_a] . '20')->getValue();
+                //         $isCount++;
+                //         $pay = $rows[$row_a];
+                //     }
+                //     if ($sheet->getCell($rows[$row_a] . '20')->getValue() == 'cut') {
+                //         $cut = $rows[$row_a];
+                //         $isCount++;
+                //     }
+                //     $row_a++;
+                // }
+                
 
 
                 $no_employee = 21;
                 // $employees = [];
                 while ($sheet->getCell('A' . $no_employee)->getValue() != null) {
+                   
+
                     $column_date = 4;
                     $nik_employee = ResponseFormatter::toUUID($sheet->getCell('C' . $no_employee)->getValue());
 
@@ -1464,13 +1474,14 @@ class EmployeeAbsenController extends Controller
                                 'cek_log'       =>  null,
                             ]
                         );
+                        return ResponseFormatter::toJson($store_employee_absen, 'a');
                         $column_date++;
                     }
 
                     $column_date = 4 + $last_day;
                     $no_employee++;
                 }
-
+                // return ResponseFormatter::toJson($sheet->getCell('A' . $no_employee)->getValue(), 'a');
                 return ResponseFormatter::toJson($no_employee, 'excel');
                 return back();
             } else { //dari mesin fingger
@@ -1604,6 +1615,7 @@ class EmployeeAbsenController extends Controller
                                 $statusAbsen = EmployeeAbsenController::ekstrackAbsen($absensi, $old_cek_log);
                                 if (!empty($statusAbsen)) {
                                     $absensies = [
+                                        'uuid'  => $employeeName.'-'.ResponseFormatter::excelToDate($abjad),
                                         'employee_uuid'  => $employeeName,
                                         'date' => ResponseFormatter::excelToDate($abjad),
                                         'status_absen_uuid'     => $statusAbsen['status_absen'],
@@ -1785,7 +1797,6 @@ class EmployeeAbsenController extends Controller
 
         foreach ($employee_get as $item_employee_get) {
             if (!empty($data_filter[$item_employee_get->company_uuid . '-' . $item_employee_get->site_uuid])) {
-
                 if (empty($data_database['data_employee_out'][$item_employee_get->nik_employee])) {
                     $employee_data_machine_id[$item_employee_get->machine_id] = $item_employee_get->nik_employee;
                     $employee_data_uuid[$item_employee_get->nik_employee] = $item_employee_get;
@@ -1867,6 +1878,7 @@ class EmployeeAbsenController extends Controller
             // 'employee_get'  => $employee_get,
             'data_employee_absen_detail'    => $data_employee_absen_detail,
             'validateData'    => $validateData,
+            'count_date_day'    => $count_date_day,
             // 'data_filter'    => $data_filter,
             // 'math_filter'    => $math_filter,
             'employee_data_uuid'    => $employee_data_uuid,

@@ -55,8 +55,13 @@
 
 
         let arr_date_today = @json(session('year_month'));
+        
         if (!arr_date_today) {
-            arr_date_today = getDateTodayArr();
+            // arr_date_today = getDateTodayArr();
+            
+            // cg('kosong', arr_date_today);
+            setDateSession(getDateTodayArr()['year'], getDateTodayArr()['month']) ;
+            cg('kosong',  @json(session('year_month')));
         }
 
 
@@ -71,6 +76,26 @@
             cg('set-date-session', arr_date_today);
             if (!arr_date_today) {
                 arr_date_today = getDateTodayArr();
+                $.ajax({
+                        url: '/support/set-date',
+                        type: "POST",
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            year: arr_date_today.year,
+                            month: arr_date_today.month,
+                        },
+                        success: function(response) {
+                            // $('#success-modal').modal('show')
+                            cg('/support/set-date', response);
+                            arr_date_today.day = response.data.day;
+                            arr_date_today.month = response.data.month;
+                            arr_date_today.year = response.data.year;
+                            // cg('arr_data', arr_date_today);
+                        },
+                        error: function(response) {
+                            alertModal()
+                        }
+                    });
                 cg('when not', arr_date_today);
             } else {
                 if (year == arr_date_today.year && parseInt(month) == parseInt(arr_date_today.month)) {
@@ -86,7 +111,7 @@
                         },
                         success: function(response) {
                             // $('#success-modal').modal('show')
-                            // cg('responsese', response);
+                            cg('/support/set-date', response);
                             arr_date_today.day = response.data.day;
                             arr_date_today.month = response.data.month;
                             arr_date_today.year = response.data.year;
