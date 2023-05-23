@@ -293,14 +293,14 @@
                         <a href="javascript:;" class="dropdown-toggle">
                             <span class="micon bi bi-bug"></span><span class="mtext">Pendapatan saya</span>
                         </a>
-                        <ul class="submenu">
+                        {{-- <ul class="submenu">
                             <li><a class="{{ $layout['active'] == 'hour-meter-price-me' ? 'active' : '' }}"
                                     href="/me/{{ session('dataUser')->nik_employee }}/hour-meter">HM</a>
                             </li>
                             <li><a class="{{ $layout['active'] == 'tonase-employee-me' ? 'active' : '' }}"
                                     href="/me/{{ session('dataUser')->nik_employee }}/tonase">Hauling</a>
                             </li>
-                        </ul>
+                        </ul> --}}
                     </li>
                 @else
                     <li>
