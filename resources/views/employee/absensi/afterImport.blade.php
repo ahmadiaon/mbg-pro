@@ -14,14 +14,9 @@
                             Menu <span class="caret"></span>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" id="btn-export" href="/user/absensi/export/">Export + Data</a>
-                            <a class="dropdown-item" id="btn-export-template" href="/user/absensi/export-template/">Export
-                                Template</a>
-                            <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
-                                href="">Import</a>
+                            <a class="dropdown-item" id="btn-export" onclick="exportEmployee()"  href="#">Export Karyawan</a>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -104,10 +99,10 @@
     </div>
 
     <!-- Update FIngger -->
-    <div class="modal fade" id="update-fingger-modal"  role="dialog" aria-labelledby="import-modalTitle"
-        aria-hidden="true">
+    <div class="modal fade" id="update-fingger-modal" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-update-fingger" action="/user/absensi/store-fingger" method="post" enctype="multipart/form-data">
+            <form id="form-update-fingger" action="/user/absensi/store-fingger" method="post"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
@@ -132,7 +127,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="button" onclick="storeFingger('update-fingger')" class="btn btn-primary">Upload</button>
+                        <button type="button" onclick="storeFingger('update-fingger')"
+                            class="btn btn-primary">Upload</button>
                     </div>
                 </div>
             </form>
@@ -143,6 +139,7 @@
 @section('js')
     <script>
         let data_absen = @json(session('after-import'));
+        cg('data_absen', data_absen);
         let have_employees = data_absen['have_employees']['data'];
 
         let null_employees = data_absen['null_employees'];
@@ -152,11 +149,7 @@
             data_null_employees.push(null_employee);
         });
 
-        Object.values(data_database.data_employees).forEach(employee_element => {
-            $('.employees').append(
-                `<option value="${employee_element.nik_employee}">${employee_element.name} - ${employee_element.position}</option>`
-            );
-        });
+        
 
 
         function storeFingger(idForm) {
@@ -299,6 +292,8 @@
 
 
 
+
+
         $(document).ready(function() {
             $(`#table-have-employees`).DataTable({
                 scrollX: true,
@@ -314,6 +309,33 @@
                 columns: data_null_employees_column,
             });
         });
+
+        function exportEmployee() {
+            cg('data_absen', data_absen);
+            
+            let data_ex = JSON.stringify(data_absen);
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/user/absensi/export-after-import',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data_ex: data_ex,
+
+                },
+                success: function(response) {
+                    cg('responses', response);
+                    var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();
+                    cg('a','b');
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+        }
 
 
         function updateFingger(employee_uuid, nik_employee) {

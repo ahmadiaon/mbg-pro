@@ -41,42 +41,44 @@ class StatusAbsenController extends Controller
     {
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
-        
+
         $tables = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
         $row_ = 1;
-        foreach($tables as $name_table){
-            $columns = DB::getSchemaBuilder()->getColumnListing($name_table);
-            $data_table = DB::table($name_table)->get();
-            // dd($data_table);
-            $header = 'INSERT INTO '.$name_table. '(';
-            if(!empty(count($data_table))){
-                foreach($columns as $name_columns){
-                    $header = $header."`".$name_columns."`,";
+        foreach ($tables as $name_table) {
+            if ($name_table != 'migrations') {
+
+                $columns = DB::getSchemaBuilder()->getColumnListing($name_table);
+                $data_table = DB::table($name_table)->get();
+                // dd($data_table);
+                $header = 'INSERT INTO ' . $name_table . '(';
+                if (!empty(count($data_table))) {
+                    foreach ($columns as $name_columns) {
+                        $header = $header . "`" . $name_columns . "`,";
+                    }
+                    $header = substr_replace($header, "", -1);
+                    $header =  $header . ') VALUES ';
+                    $createSheet->setCellValue('B' . $row_, $header);
                 }
-                $header = substr_replace($header ,"", -1);
-                $header =  $header.') VALUES ';
-                $createSheet->setCellValue('B'.$row_, $header);
-            }
-            
-            $row_++;
-            $content = "";
-            foreach($data_table as $item_data_table){
-                $item_data_table = (array)$item_data_table;
-                $content = "(";
-                foreach($columns as $name_columns){
-                    $content =  $content.'"'.$item_data_table[$name_columns].'",';
-                }
-                $content = substr_replace($content ,"", -1);
-                $content = $content.'),';
-                $createSheet->setCellValue('B'.$row_, $content);
+
                 $row_++;
+                $content = "";
+                foreach ($data_table as $item_data_table) {
+                    $item_data_table = (array)$item_data_table;
+                    $content = "(";
+                    foreach ($columns as $name_columns) {
+                        $content =  $content . '"' . $item_data_table[$name_columns] . '",';
+                    }
+                    $content = substr_replace($content, "", -1);
+                    $content = $content . '),';
+                    $createSheet->setCellValue('B' . $row_, $content);
+                    $row_++;
+                }
+                if (!empty(count($data_table))) {
+                    $content = substr_replace($content, "", -1);
+                    $content = $content . ';';
+                    $createSheet->setCellValue('B' . ($row_ - 1), $content);
+                }
             }
-            if(!empty(count($data_table))){
-                $content = substr_replace($content ,"", -1);
-                $content = $content.';';
-                $createSheet->setCellValue('B'.($row_-1), $content);
-            }
-            
 
             $row_++;
         }

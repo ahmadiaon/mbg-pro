@@ -136,8 +136,11 @@
                                 onclick="openModalAbsen()">Ketidakhadiran</a>
                             <a class="dropdown-item" onclick="exportAbsen()" id="btn-export" href="#">Export +
                                 Data</a>
-                            <a class="dropdown-item"  id="btn-export-dialy"
-                                href="/user/absensi/dialy-report">Dialy Report</a>
+                            <a class="dropdown-item" onclick="openModalExportDialy()" id="btn-export-dialy"
+                                href="#">Dialy
+                                Report</a>
+                            {{-- <a class="dropdown-item" id="btn-export-dialy" href="/user/absensi/dialy-report">Dialy
+                                Report</a> --}}
                             <a class="dropdown-item" id="btn-export-template"
                                 href="/user/absensi/export-template/">Export
                                 Template</a>
@@ -188,7 +191,7 @@
                         <div class="form-group row date-setup">
                             <div class="col-6">
                                 <label for="">Mulai tanggal</label>
-                                <select onchange="loopDate()" name="date_absen_start" style="width: 100%"
+                                <select  onchange="loopDate()" name="date_absen_start" style="width: 100%"
                                     id="date_absen_start" class="custom-select2 form-control">
 
                                 </select>
@@ -344,12 +347,16 @@
                             <label for="">Pilih Tanggal</label>
                             <input type="date" class="form-control" name="date_dialy" id="date_dialy">
                         </div>
+                        <div class="form-group row mb-20 justify-content-md-center site-radio" id="">
+                            <label class="col-md-12" for="">SITE</label>
+                            
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             Close
                         </button>
-                        <button onclick="storeAbsenModal('absen')" type="button" class="btn btn-primary">
+                        <button onclick="storeDialyExport()" type="button" class="btn btn-primary">
                             Save changes
                         </button>
                     </div>
@@ -395,9 +402,6 @@
 
         let year;
         let month;
-        let v_year;
-        let v_month;
-        let _url;
         let dt_end;
         let dt_start;
         let data_datatable;
@@ -407,6 +411,35 @@
         let arr_site_uuid = [];
         let arr_status_absen = [];
 
+        function storeDialyExport(){
+            let site_uuid_dialy = $("input[type='radio'][name='site_uuid_dialy']:checked").val();
+            let date_dialy = $('#date_dialy').val();
+
+            cg(site_uuid_dialy, date_dialy);
+            
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/user/absensi/dialy-report',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    site_uuid_dialy: site_uuid_dialy,
+                    date_dialy: date_dialy,
+                },
+                success: function(response) {
+                    cg('responses', response);
+                    var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();
+                    cg('a','b');
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+
+        }
         function loopDateFilter() {
             cg('loopDateFilter', arr_date_today);
             var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
@@ -476,6 +509,10 @@
 
         function openModalExportDialy() {
             let dt_today = getDateTodayArr();
+
+           
+
+
             $('#date_dialy').val(`${dt_today.year}-${dt_today.month}-${dt_today.day}`);
             $('#export-dialy').modal('show');
         }
@@ -638,13 +675,13 @@
                     // var elements = {
                     //     mRender: function(data, type, row) {
                     //         return `
-					// 				<div class="form-inline"> 
-                    //                     <a href="/user/absensi/detail/${ arr_date_today.year}-${arr_date_today.month}/${row.nik_employee}">
-					// 					<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
-					// 						<i class="dw dw-edit2"></i>
-					// 					</button>
-                    //                     </a>
-					// 				</div>`
+                // 				<div class="form-inline"> 
+                //                     <a href="/user/absensi/detail/${ arr_date_today.year}-${arr_date_today.month}/${row.nik_employee}">
+                // 					<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
+                // 						<i class="dw dw-edit2"></i>
+                // 					</button>
+                //                     </a>
+                // 				</div>`
                     //     }
                     // };
                     // data.push(elements);
@@ -665,8 +702,8 @@
                                         status_absen_el = row.data[element_data][
                                             'status_absen_code'
                                         ];
-                                        
-                                        if(row.data[element_data]['cek_log']){
+
+                                        if (row.data[element_data]['cek_log']) {
                                             cek_log = row.data[element_data]['cek_log'];
                                         }
                                     }
@@ -708,7 +745,7 @@
             $('#employee_uuid-edit-live').val(`${machine_id}`);
             $('#date-edit-live').val(`${date_value}`);
             let cek_log = '-';
-            if(typeof(data_datatable[employee_uuid]['data'][date_value]) != 'undefined'){
+            if (typeof(data_datatable[employee_uuid]['data'][date_value]) != 'undefined') {
                 cek_log = data_datatable[employee_uuid]['data'][date_value]['cek_log'];
             }
             $('#cek_log-live').val(`${cek_log}`);
@@ -767,6 +804,8 @@
                         </div>
                     </div>
                 `);
+
+                
                 }
 
             });
@@ -784,6 +823,17 @@
                             </div>
                         </div>
                     `);
+
+                    $('.site-radio').append(`
+                        <div class="col-auto">
+                            <div class="custom-control custom-radio mb-5">
+                                <input type="radio" id="site-radio-${site_uuid_element.uuid}" name="site_uuid_dialy"
+                                    class="custom-control-input" value="${site_uuid_element.uuid}" />
+                                <label class="custom-control-label" for="site-radio-${site_uuid_element.uuid}">${site_uuid_element.name_atribut}</label>
+                            </div>
+                        </div>
+                    `);
+                    
                     arrrr.push(site_uuid_element.uuid);
                 }
             });
@@ -825,9 +875,6 @@
 
             year = arr_date_today.year;
             month = arr_date_today.month;
-            v_year = arr_date_today.year;
-            v_month = arr_date_today.month;
-            _url = 'user/absensi/data/' + arr_date_today.year + '-' + arr_date_today.month;
 
             $('.date-setup').attr('hidden', false);
             $('#btn-year').html(arr_date_today.year);
@@ -877,6 +924,7 @@
         }
 
         function storeUserDocument(idForm) {
+            startLoading();
             let date_absen_start = $('#date_absen_start').val();
             let _url = $('#form-' + idForm).attr('action');
             var form = $('#form-' + idForm)[0];
@@ -888,6 +936,7 @@
                 processData: false,
                 data: form_data,
                 success: function(response) {
+                    $('#loading-modal').modal('hide');
                     cg('response', response);
                     if (response.message == 'excel') {
                         showModalMessage('import success');

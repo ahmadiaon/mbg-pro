@@ -47,6 +47,7 @@ class EmployeeCutiController extends Controller
         $employee_setup_cutis = EmployeeCutiSetup::join('employees', 'employees.uuid', 'employee_cuti_setups.employee_uuid')
             ->join('user_details', 'user_details.uuid', 'employees.user_detail_uuid')
             ->whereNull('employees.date_end')
+            ->whereNull('employee_cuti_setups.date_end')
             ->whereNull('user_details.date_end')
             ->get([
                 'user_details.name',
@@ -127,6 +128,7 @@ class EmployeeCutiController extends Controller
         $employee_setup_cutis = EmployeeCutiSetup::join('employees', 'employees.uuid', 'employee_cuti_setups.employee_uuid')
             ->join('user_details', 'user_details.uuid', 'employees.user_detail_uuid')
             ->whereNull('employees.date_end')
+            ->whereNull('employee_cuti_setups.date_end')
             ->whereNull('user_details.date_end')
             ->get([
                 'user_details.name',
@@ -155,6 +157,7 @@ class EmployeeCutiController extends Controller
         $employee_setup_cutis = EmployeeCutiSetup::join('employees', 'employees.uuid', 'employee_cuti_setups.employee_uuid')
             ->join('user_details', 'user_details.uuid', 'employees.user_detail_uuid')
             ->whereNull('employees.date_end')
+            ->whereNull('employee_cuti_setups.date_end')
             ->whereNull('user_details.date_end')
             //   ->where('employee_cuti_setups.group_cuti_uuid', $request->filter['group_cuti_uuid'])
             ->get([
@@ -313,6 +316,7 @@ class EmployeeCutiController extends Controller
             ->join('user_details', 'user_details.uuid', 'employees.user_detail_uuid')
             ->whereNull('employees.date_end')
             ->whereNull('user_details.date_end')
+            ->whereNull('employee_cuti_setups.date_end')
             ->get([
                 'user_details.name',
                 'employee_cuti_setups.*'
@@ -341,6 +345,7 @@ class EmployeeCutiController extends Controller
                 ->join('user_details', 'user_details.uuid', 'employees.user_detail_uuid')
                 ->whereNull('employees.date_end')
                 ->whereNull('user_details.date_end')
+                ->whereNull('employee_cuti_setups.date_end')
                 ->where('employee_cuti_setups.group_cuti_uuid', $request->filter['group_cuti_uuid'])
                 ->get([
                     'user_details.name',

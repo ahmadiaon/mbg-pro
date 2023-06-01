@@ -331,10 +331,11 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/', [EmployeeAbsenController::class, 'index']);
         Route::get('/detail/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'showEmployee']);
         Route::post('/export+data', [EmployeeAbsenController::class, 'exportWithData']);
+        Route::post('/export-after-import', [EmployeeAbsenController::class, 'exportAfterImport']);
         Route::get('/export-template/{year_month}', [EmployeeAbsenController::class, 'exportTemplate']);
         Route::post('/import', [EmployeeAbsenController::class, 'import']);
 
-        Route::get('/dialy-report', [EmployeeAbsenController::class, 'dialyReport']);
+        Route::post('/dialy-report', [EmployeeAbsenController::class, 'dialyReport']);
 
         // Route::post('/data', [EmployeeAbsenController::class, 'anyDataPost']);
         Route::post('/data-x', [EmployeeAbsenController::class, 'anyDataPost_X']);
@@ -392,6 +393,12 @@ Route::middleware(['islogin'])->group(function () {
 
 
     //  =============== end a l l o w a n c e
+
+
+    Route::prefix('/activity')->group(function () {
+        Route::get('/', [AdminController::class, 'indexActivity']);
+
+    });
 
 
     // ===================== d a t a b a s e 

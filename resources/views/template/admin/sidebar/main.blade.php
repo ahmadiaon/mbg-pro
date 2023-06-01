@@ -11,6 +11,12 @@
                             <span class="micon bi bi-person-square"></span><span class="mtext">Beranda</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/activity"
+                            class="dropdown-toggle no-arrow {{ $layout['active'] == 'activity' ? 'active' : '' }}">
+                            <span class="micon bi bi-person-square"></span><span class="mtext">Kegiatan</span>
+                        </a>
+                    </li>
                     @if (!empty(session('dataUser')->list_purchase_order))
                         <li class="dropdown">
                             <a href="javascript:;" class="dropdown-toggle">

@@ -32,6 +32,21 @@ class AdminController extends Controller
         return ResponseFormatter::setAllSession();
     }
 
+    public function indexActivity(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'activity'
+        ];
+
+        return view('admin.indexActivity', [
+            'title'         => 'Aktivitas',
+            'layout'    => $layout
+        ]);
+    }
+
     public function setDate(Request $request){
         $data = [
             'year'  => $request->year,
@@ -328,6 +343,7 @@ class AdminController extends Controller
             'javascript_form'       => true,
             'active'                        => 'index'
         ];
+        
 
         // ====VARIABLE===
         $date_today = ResponseFormatter::getDateToday();
@@ -350,16 +366,28 @@ class AdminController extends Controller
         
         $date_today = new Carbon($date_today);
         $date_today->subMonths(1);
-        while($date_start_this_month < $date_today){
-            
+        // dd('active');
+        
+        while($date_start_this_month < $date_today){            
             $date_eigth_before = new Carbon($date_start_this_month);
-            $date_eigth_before->addMonths(1);
+            $date_eigth_before = $date_eigth_before->addMonths(1);
             $date_eigth_before_date = $date_eigth_before->format("Y-m-d");
             $explode_date_eigth_before_date = explode('-', $date_eigth_before_date); 
 
+           
             $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1]);
+            // $date_end_this_month_day = ResponseFormatter::getEndDay('2023-04');
+            // $datetime = Carbon::createFromFormat('Y-m-d', $explode_date_eigth_before_date[0].'-'.($explode_date_eigth_before_date[1] ).'-01');
+            // $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+                // dd($date_end_this_month_day);
+            if($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-'.$date_end_this_month_day == '2023-02-31'){
+                $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_eigth_before_date[0].'-'.($explode_date_eigth_before_date[1] ));
+                dd($explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].$date_end_this_month_day);
+            }
+
             $date_end_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-'.$date_end_this_month_day;
             $date_start_this_month = $explode_date_eigth_before_date[0].'-'.$explode_date_eigth_before_date[1].'-01';
+            
 
             $get_employee_total_this_month = Employee::whereNull('date_end')
             ->where('date_document_contract', '<=', $date_end_this_month)
@@ -376,6 +404,7 @@ class AdminController extends Controller
             ->where('date_document_contract', '<=', $date_end_this_month)
             ->where('date_document_contract', '>=', $date_start_this_month)
             ->count();
+            
 
             $data_for_grafik_flow_employee['month'][] = ResponseFormatter::getMonthName((int)$explode_date_eigth_before_date[1]);
             $data_for_grafik_flow_employee['data_aktif'][] = $get_employee_total_this_month - $get_employee_out_total_before_this_month;
@@ -383,9 +412,8 @@ class AdminController extends Controller
             $data_for_grafik_flow_employee['data_out'][] = $get_employee_out_total_this_month;
             $data_for_grafik_flow_employee['data_total'][] = $get_employee_total_this_month ;
 
-
-
         }
+
         // dd($data_date);
         // $date_end_this_month_day = ResponseFormatter::getEndDay($explode_date_today[0].'-'.$explode_date_today[1]);
         // $date_end_this_month = $explode_date_today[0].'-'.$explode_date_today[1].'-'.$date_end_this_month_day;
@@ -406,6 +434,7 @@ class AdminController extends Controller
 
         // dd($get_employee_in_total_this_month);
 
+        // dd($date_end_this_month);
 
         $data_flow_employee = [
                     'month' => [

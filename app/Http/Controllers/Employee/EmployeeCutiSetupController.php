@@ -79,8 +79,6 @@ class EmployeeCutiSetupController extends Controller
     
 
     public function anyData(Request $request){
-       
-
         if(!empty($request->filter['group_cuti_uuid'])){
             $data = EmployeeCutiSetup::join('employees','employees.uuid','employee_cuti_setups.employee_uuid')
             ->join('user_details','user_details.uuid', 'employees.user_detail_uuid')
@@ -88,6 +86,7 @@ class EmployeeCutiSetupController extends Controller
             ->join('employee_cuti_groups', 'employee_cuti_groups.uuid', 'employee_cuti_setups.group_cuti_uuid')
             ->whereNull('employees.date_end')
             ->whereNull('user_details.date_end')
+            ->whereNull('employee_cuti_setups.date_end')
             ->where('employee_cuti_setups.group_cuti_uuid', $request->filter['group_cuti_uuid'])
             ->get([
                 'employee_cuti_groups.name_group_cuti',
@@ -103,6 +102,7 @@ class EmployeeCutiSetupController extends Controller
             ->join('positions', 'positions.uuid', 'employees.position_uuid')
             ->join('employee_cuti_groups', 'employee_cuti_groups.uuid', 'employee_cuti_setups.group_cuti_uuid')
             ->whereNull('employees.date_end')
+            ->whereNull('employee_cuti_setups.date_end')
             ->whereNull('user_details.date_end')
             ->get([
                 'employee_cuti_groups.name_group_cuti',

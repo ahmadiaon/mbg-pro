@@ -55,13 +55,13 @@
 
 
         let arr_date_today = @json(session('year_month'));
-        
+
         if (!arr_date_today) {
             // arr_date_today = getDateTodayArr();
-            
+
             // cg('kosong', arr_date_today);
-            setDateSession(getDateTodayArr()['year'], getDateTodayArr()['month']) ;
-            cg('kosong',  @json(session('year_month')));
+            setDateSession(getDateTodayArr()['year'], getDateTodayArr()['month']);
+            cg('kosong', @json(session('year_month')));
         }
 
 
@@ -77,25 +77,25 @@
             if (!arr_date_today) {
                 arr_date_today = getDateTodayArr();
                 $.ajax({
-                        url: '/support/set-date',
-                        type: "POST",
-                        data: {
-                            _token: $('meta[name="csrf-token"]').attr('content'),
-                            year: arr_date_today.year,
-                            month: arr_date_today.month,
-                        },
-                        success: function(response) {
-                            // $('#success-modal').modal('show')
-                            cg('/support/set-date', response);
-                            arr_date_today.day = response.data.day;
-                            arr_date_today.month = response.data.month;
-                            arr_date_today.year = response.data.year;
-                            // cg('arr_data', arr_date_today);
-                        },
-                        error: function(response) {
-                            alertModal()
-                        }
-                    });
+                    url: '/support/set-date',
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        year: arr_date_today.year,
+                        month: arr_date_today.month,
+                    },
+                    success: function(response) {
+                        // $('#success-modal').modal('show')
+                        cg('/support/set-date', response);
+                        arr_date_today.day = response.data.day;
+                        arr_date_today.month = response.data.month;
+                        arr_date_today.year = response.data.year;
+                        // cg('arr_data', arr_date_today);
+                    },
+                    error: function(response) {
+                        alertModal()
+                    }
+                });
                 cg('when not', arr_date_today);
             } else {
                 if (year == arr_date_today.year && parseInt(month) == parseInt(arr_date_today.month)) {
@@ -126,14 +126,15 @@
         }
 
 
-        function getEndDate(val_year, val_month){
+        function getEndDate(val_year, val_month) {
             var date = new Date(),
                 y = val_year,
                 m = val_month - 1;
             var lastDay = new Date(y, m + 1, 0);
             return lastDay;
         }
-        function getFirstDate(val_year, val_month){
+
+        function getFirstDate(val_year, val_month) {
             var date = new Date(),
                 y = val_year,
                 m = val_month - 1;
@@ -165,6 +166,7 @@
             id.forEach(element => {
                 if ($('#' + element).val() == "") {
                     console.log(element)
+                    $('#req-' + element).remove();
                     $('#' + element).after(` <code id="req-${element}">Data tidak boleh kosong</code>`);
                     err++
                 } else {
@@ -186,7 +188,7 @@
                     row.photo_path = '/vendors/images/photo4.jpg';
                 }
                 let bg = '';
-                if(data_database['data_employee_out'][row.nik_employee]){
+                if (data_database['data_employee_out'][row.nik_employee]) {
                     bg = 'bg-warning';
                 }
                 return `    <div class="card-box ${bg} pd-10">
@@ -209,7 +211,7 @@
 
             mRender: function(data, type, row) {
                 let bg = '';
-                if(data_database['data_employee_out'][row.employee_recruiter]){
+                if (data_database['data_employee_out'][row.employee_recruiter]) {
                     bg = 'bg-warning';
                 }
                 if (row.photo_path == null) {
@@ -245,7 +247,7 @@
                     row.photo_path = '/vendors/images/photo4.jpg';
                 }
                 let bg = '';
-                if(data_database['data_employee_out'][row.nik_employee]){
+                if (data_database['data_employee_out'][row.nik_employee]) {
                     bg = 'bg-warning';
                 }
                 return `
@@ -257,13 +259,15 @@
                             </div>
                             <div class="txt">
                                 <div class="weight-600">${data_database.data_employees[row.nik_employee]['name']}</div>
-                                <small>${data_database.data_employees[row.nik_employee]['nik_employee']}</small></br>
+                                <small>${data_database.data_employees[row.nik_employee]['nik_employee']} | ${data_database.data_employees[row.nik_employee]['company_uuid']} | ${data_database.data_employees[row.nik_employee]['site_uuid']}</small></br>
                                 <small>${data_database.data_employees[row.nik_employee]['position']}</small>
                             </div>
                         </div>
                     </div>`
             }
         };
+
+
 
         var element_profile_employee_session = {
             mRender: function(data, type, row) {
@@ -285,7 +289,7 @@
                             </div>
                             <div class="txt">
                                 <div class="weight-600">${date_employee_element_profile_employee_session.name}</div>
-                                <small>${date_employee_element_profile_employee_session.nik_employee}</small></br>
+                                <small>${date_employee_element_profile_employee_session.nik_employee} | ${date_employee_element_profile_employee_session.company_uuid} | ${date_employee_element_profile_employee_session.site_uuid}</small></br>
                                 <small>${date_employee_element_profile_employee_session.position}</small>
                             </div>
                         </div>`
@@ -786,7 +790,7 @@
         }
 
         function toValueRupiah(numberValue) {
-            let float_number = parseFloat(numberValue); 
+            let float_number = parseFloat(numberValue);
             let _numberValue = parseFloat(float_number.toFixed(0));
             let rupiahFormat = _numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             rupiahFormat = 'Rp. ' + rupiahFormat;
@@ -905,6 +909,11 @@
         $(document).ready(function() {
             @yield('js_ready')
             cg('dataUser', @json(session('dataUser')));
+            Object.values(data_database.data_employees).forEach(employee_element => {
+                $('.employees').append(
+                    `<option value="${employee_element.nik_employee}">${employee_element.name} - ${employee_element.position} | ${employee_element.company_uuid}-${employee_element.site_uuid}</option>`
+                );
+            });
 
         });
     </script>

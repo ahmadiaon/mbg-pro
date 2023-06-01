@@ -89,7 +89,7 @@ class ResponseFormatter
   public static function excelToDateArray($date = null)
   {
 
-    
+
     if ($date != null) {
       if ($date == '') {
         return null;
@@ -104,13 +104,11 @@ class ResponseFormatter
       }
       $result = Carbon::createFromFormat('Y-m-d',  $return);
       $date = [
-        'year'=> $result->isoFormat('Y'),
-        'month'=> $result->isoFormat('MM'),
-        'day'=> $result->isoFormat('DD'),
+        'year' => $result->isoFormat('Y'),
+        'month' => $result->isoFormat('MM'),
+        'day' => $result->isoFormat('DD'),
       ];
       return $date;
-
-
     } else {
       return null;
     }
@@ -131,7 +129,7 @@ class ResponseFormatter
 
   public static function toFloat($data)
   {
-    
+
     $data = str_replace(',', '.', $data);
     $data = (float)$data;
     return $data;
@@ -139,7 +137,7 @@ class ResponseFormatter
 
   public static function toNumber($data)
   {
-    
+
     $data = preg_replace("/[^0-9]/", "", $data);
     $data = (int)$data;
     return $data;
@@ -154,10 +152,11 @@ class ResponseFormatter
 
   public static function getEndDay($year_month)
   {
-    $datetime = Carbon::createFromFormat('Y-m', $year_month);
+    $datetime = Carbon::createFromFormat('Y-m-d', $year_month.'-01');
     $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
     return $day_month;
   }
+  
   public static function toUUID($uuid)
   {
     $uuid = ResponseFormatter::isString($uuid);
@@ -209,9 +208,9 @@ class ResponseFormatter
 
   public static function toValueRupiah($value_rupiah)
   {
-     $integer_value = ResponseFormatter::toNumber($value_rupiah);
-     $hasil_rupiah = "Rp " . number_format($integer_value,0,',','.');
-	    return $hasil_rupiah;
+    $integer_value = ResponseFormatter::toNumber($value_rupiah);
+    $hasil_rupiah = "Rp " . number_format($integer_value, 0, ',', '.');
+    return $hasil_rupiah;
   }
 
 
@@ -322,7 +321,7 @@ class ResponseFormatter
         'employees' => $employees,
         'user_details' => $user_details,
       ],
-      'data_employees' => $arr_employees,      
+      'data_employees' => $arr_employees,
       'data_employee_out' => $data_employee_out,
       'data_employee_talents' => $data_employee_talents,
       'data_departments' => $arr_departments,
@@ -389,7 +388,43 @@ class ResponseFormatter
     }
   }
 
-  public static function to2Digit($num){
+  public static function to2Digit($num)
+  {
+    $loading_tongkang_first = [
+      'main-table' => [
+        'DIBUAT-OLEH' => [
+          'SOURCE_TYPE' => 'tables',
+          'SOURCE' => 'employees',
+          'VALUE' =>  'MBLE-005',
+        ],
+        'UNIT' => [
+          [
+            'UNIT' => [
+              'SOURCE_TYPE' => 'tables',
+              'SOURCE' => 'vehicles',
+              'VALUE' =>  'DZ-005',
+            ],
+            'CONTROLLER' => [
+              'SOURCE_TYPE' => 'tables',
+              'SOURCE' => 'employees',
+              'VALUE' =>  'MBLE-006',
+            ]
+          ],
+          [
+            'UNIT' => [
+              'SOURCE_TYPE' => 'tables',
+              'SOURCE' => 'vehicles',
+              'VALUE' =>  'EX-001',
+            ],
+            'CONTROLLER' => [
+              'SOURCE_TYPE' => 'tables',
+              'SOURCE' => 'employees',
+              'VALUE' =>  'MBLE-007',
+            ]
+          ],
+        ]
+      ]
+    ];
     return str_pad($num, 2, "0", STR_PAD_LEFT);
   }
 }
@@ -410,5 +445,12 @@ Border::BORDER_NONE
 Border::BORDER_SLANTDASHDOT
 Border::BORDER_THICK
 Border::BORDER_THIN
+
+
+example_xxx = {
+  'LOADING-TONGKANG-FIRST':{
+
+  }
+}
 
 */
