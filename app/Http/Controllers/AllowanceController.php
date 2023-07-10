@@ -451,8 +451,7 @@ class AllowanceController extends Controller
                             if(!empty($item_premi_employee_this_month_uuid['premies'][$item_premis['uuid']])){
                                 $pay_this_premi =round( (float)$item_premi_employee_this_month_uuid['premies'][$item_premis['uuid']]['premi_value'] * (float)$premi[$item_premis['uuid']]['value_production']/1000,3);
                             }                            
-                        }
-                       
+                        }                       
 
                         $allowance['premi']['value'] = (float)$allowance['premi']['value'] +  $pay_this_premi;
                         $allowance['premi']['detail'][$item_premis['uuid']] = $pay_this_premi;

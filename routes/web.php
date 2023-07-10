@@ -1,8 +1,10 @@
 <?php
 
+use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Aktivity\AktivityController;
 use App\Http\Controllers\AllowanceController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\OverBurden\HourMeterController;
@@ -76,9 +78,11 @@ Route::prefix('/support')->group(function () {
     Route::get('/get-session/{name_session}', [AdminController::class, 'getSession']);
     Route::get('/setSessionDatabase', [AdminController::class, 'setSessionDatabase']);
     Route::get('/data/{nik_employee}', [UserDetailController::class, 'show']);
+    Route::get('/all-db', [ResponseFormatter::class, 'tableList']);
+
 });
 
-Route::get('/test-udin', [EmployeeController::class, 'testUdin']);
+Route::get('/test-udin', [EmployeeController::class, 'allEmployeeData']);
 
 //his data his only
 Route::get('/get/data/{nik_employee}', [UserDetailController::class, 'show']);
@@ -327,10 +331,13 @@ Route::middleware(['islogin'])->group(function () {
             edit absen
             show every month
         */
+        
+        Route::post('/report-absensi', [EmployeeAbsenController::class, 'exportAbsensiX']);
         Route::post('/store-fingger', [EmployeeAbsenController::class, 'storeFingger']);
         Route::get('/', [EmployeeAbsenController::class, 'index']);
         Route::get('/detail/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'showEmployee']);
         Route::post('/export+data', [EmployeeAbsenController::class, 'exportWithData']);
+        Route::post('/reportUnAbsen', [EmployeeAbsenController::class, 'reportUnAbsen']);
         Route::post('/export-after-import', [EmployeeAbsenController::class, 'exportAfterImport']);
         Route::get('/export-template/{year_month}', [EmployeeAbsenController::class, 'exportTemplate']);
         Route::post('/import', [EmployeeAbsenController::class, 'import']);
@@ -397,20 +404,20 @@ Route::middleware(['islogin'])->group(function () {
 
     Route::prefix('/activity')->group(function () {
         Route::get('/', [AdminController::class, 'indexActivity']);
+        Route::post('/store-form', [AktivityController::class, 'storeForm']);
+        Route::post('/all-table', [AktivityController::class, 'allTable']);
 
     });
 
 
     // ===================== d a t a b a s e 
     Route::prefix('/database')->group(function () {
-
         Route::get('/absen', [StatusAbsenController::class, 'indexPayrol']);
         Route::get('/export-db', [StatusAbsenController::class, 'exportDB']);
         Route::post('/status-absen', [StatusAbsenController::class, 'storePayrol']); ///payrol/database/status-absen
         Route::get('/absen/{uuid}/edit', [StatusAbsenController::class, 'showPayrol']);
         Route::post('/absen/delete', [StatusAbsenController::class, 'delete']);
         Route::get('/absen-data', [StatusAbsenController::class, 'anyData']);
-
 
         Route::prefix('/status-absen')->group(function () {
             Route::get('/export', [StatusAbsenController::class, 'export']);
@@ -788,7 +795,9 @@ Route::middleware(['islogin'])->group(function () {
 
     // user
     Route::prefix('/user')->group(function () {
+        Route::get('/data-session', [EmployeeController::class, 'dataSession']);
         Route::get('/', [EmployeeController::class, 'index']);
+        Route::get('/history', [EmployeeController::class, 'index']);
         Route::post('/export-data', [EmployeeController::class, 'export']);
 
         Route::get('/delete', [EmployeeController::class, 'deleteAll']); //on index menu delete all

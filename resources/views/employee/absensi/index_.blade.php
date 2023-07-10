@@ -88,7 +88,6 @@
         <div class="row pd-20">
             <div class="col-auto">
                 <h4 class="text-blue h4">Absensi Karyawans</h4>
-
             </div>
             <div class="col text-right">
                 <div class="btn-group">
@@ -109,7 +108,6 @@
                             aria-expanded="false" id="btn-month" value="">
                             <span class="caret"></span>
                         </button>
-
                         <div class="dropdown-menu">
                             <a class="dropdown-item" onclick="refreshTable(null, 01 )" href="#">Januari</a>
                             <a class="dropdown-item" onclick="refreshTable(null, 02 )" href="#">Februari</a>
@@ -126,19 +124,21 @@
                         </div>
                     </div>
                     <div class="btn-group dropdown">
+
                         <button type="button" class="btn btn-primary dropdown-toggle waves-effect"
                             data-toggle="dropdown" aria-expanded="false">
                             Menu <span class="caret"></span>
                         </button>
-
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" id="btn-absen" href="#"
+                            <a  class="dropdown-item" id="btn-absen" href="#"
                                 onclick="openModalAbsen()">Ketidakhadiran</a>
                             <a class="dropdown-item" onclick="exportAbsen()" id="btn-export" href="#">Export +
                                 Data</a>
                             <a class="dropdown-item" onclick="openModalExportDialy()" id="btn-export-dialy"
                                 href="#">Dialy
                                 Report</a>
+                            <a class="dropdown-item" onclick="reportOpenModalReportStatusAbsen()" id="btn-export-dialy"
+                                href="#">Lap. Tidak Hadir</a>
                             {{-- <a class="dropdown-item" id="btn-export-dialy" href="/user/absensi/dialy-report">Dialy
                                 Report</a> --}}
                             <a class="dropdown-item" id="btn-export-template"
@@ -185,7 +185,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Pilih Absensi</label>
-                            <input name="uploaded_file" type="file"
+                            <input autofocus name="uploaded_file" type="file"
                                 class="form-control-file form-control height-auto" />
                         </div>
                         <div class="form-group row date-setup">
@@ -364,6 +364,47 @@
             </div>
         </div>
     </div>
+
+     <!-- Modal laporan sesuai status absen-->
+     <div class="modal fade" id="modal-report-status-absen" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                            PILIH STATUS ABSEN
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <form autocomplete="off" id="form-absen" action="/user/absensi/store-dialy" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih status absen</label>
+                            <select id="status-absen-filter" class="selectpicker form-control multiple-select-status-absen" data-size="5"
+                                data-style="btn-outline-primary" multiple data-actions-box="true"
+                                data-selected-text-format="count">
+                              
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button onclick="reportAbsensi_x()" type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    
 @endsection
 
 @section('js')
@@ -428,6 +469,8 @@
                 },
                 success: function(response) {
                     cg('responses', response);
+
+                    // return false;
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
@@ -438,8 +481,46 @@
                     alertModal()
                 }
             });
-
         }
+        
+
+        function reportOpenModalReportStatusAbsen(){
+            $('#modal-report-status-absen').modal('show');
+        }
+
+        function reportAbsensi_x(){
+            let status_absen_filter = $('#status-absen-filter').val();
+            
+            cg('status_absen_filter', status_absen_filter);
+            filter.status_absen_filter = status_absen_filter;
+            cg('fiiolter', filter);
+            // return false;
+            startLoading();
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            cg('data_datatable', data_datatable);
+            let data_ex = JSON.stringify(data_datatable);
+            $.ajax({
+                url: '/user/absensi/reportUnAbsen',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data_export: data_ex,
+                    filter: filter
+                },
+                success: function(response) {
+                    cg('response', response);
+                    var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();
+                    stopLoading();
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+        }
+
         function loopDateFilter() {
             cg('loopDateFilter', arr_date_today);
             var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
@@ -602,7 +683,7 @@
             $('#tableabsen').remove();
             var loop = new Date(start);
             let el_date_month_header = [];
-
+            startLoading();
             let arr_date = [];
             while (loop <= end) {
                 el_date_month_header = `${el_date_month_header}<th>${formatDateArr(loop).day}</th>`;
@@ -732,11 +813,13 @@
                         data: for_data_datatable,
                         columns: data
                     });
+                    stopLoading();
                 },
                 error: function(response) {
                     alertModal()
                 }
             });
+
         }
 
         function editAbsenLive(id_element, employee_uuid, date_value, machine_id) {
@@ -847,6 +930,15 @@
                                                         <label class="custom-control-label" for="filter-math-${math_element.math}">${math_element.math}</label>
                                                     </div>
                                                 </div>`);
+
+                $('.multiple-select-status-absen').append(`
+                    <optgroup label="${math_element.math}" id="${math_element.math}">
+                     
+                    </optgroup>`);
+                
+                                                
+
+
                 arrrr.push(math_element.math);
             });
             arrrr.push('unknown_absen');
@@ -856,10 +948,19 @@
 
 
             $('#date_start_absen').val(getDateToday());
+            $(`#unpay`).append(
+                    `<option value="unknown_absen">? - Tidak diketahui</option>`
+                );
             Object.values(data_database.data_status_absens).forEach(data_status_absen_element => {
                 $(`#status_absen_uuid`).append(
                     `<option value="${data_status_absen_element.uuid}">${data_status_absen_element.uuid} - ${data_status_absen_element.status_absen_description}</option>`
                 );
+
+                $(`#${data_status_absen_element.math}`).append(
+                    `<option value="${data_status_absen_element.uuid}">${data_status_absen_element.uuid} - ${data_status_absen_element.status_absen_description}</option>`
+                );
+
+                // $().append();
             });
             Object.values(data_database.data_employees).forEach(data_employee_element => {
                 $(`.employees`).append(
@@ -869,7 +970,7 @@
             loopDateFilter();
             showDataTable();
 
-
+           
 
 
 

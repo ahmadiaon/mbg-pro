@@ -51,12 +51,9 @@ class AuthenticationController extends Controller
                     ->first();
                     $dataUser = $col_dataUser;
 
-                    // $col_dataUser = (array)$col_dataUser;
-
-                    // dd($col_dataUser);
-
                     $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($col_dataUser['nik_employee']);
                     $dataUser->is_login  = true;
+                   
                     
                     if(!empty(count($user_privileges))){
                         foreach ($user_privileges as $user_privilege => $value) {

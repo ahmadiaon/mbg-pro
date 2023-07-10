@@ -14,7 +14,7 @@
                     <li>
                         <a href="/activity"
                             class="dropdown-toggle no-arrow {{ $layout['active'] == 'activity' ? 'active' : '' }}">
-                            <span class="micon bi bi-person-square"></span><span class="mtext">Kegiatan</span>
+                            <span class="micon bi bi-calendar3"></span><span class="mtext">Kegiatan</span>
                         </a>
                     </li>
                     @if (!empty(session('dataUser')->list_purchase_order))
@@ -109,7 +109,7 @@
                                             data-toggle="tooltip" data-placement="right"
                                             title="Rotasi, Mutasi, Promosi. Demosi, Pemberhentian dan Pengajuan">Perubahan</a>
                                     </li> --}}
-                                    {{-- <li><a href="/form-recruitment"
+                                    <li><a href="/form-recruitment"
                                             class="{{ $layout['active'] == 'form-recruitment' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right"
                                             title="Kelola Perekrutan Karyawan">PPK</a>
@@ -117,7 +117,7 @@
                                             class="{{ $layout['active'] == 'applicant-index' ? 'active' : '' }}"
                                             data-toggle="tooltip" data-placement="right"
                                             title="Kelola Perekrutan Karyawan">Pelamar</a>
-                                    </li> --}}
+                                    </li>
                                 @endif
                             </ul>
                         </li>

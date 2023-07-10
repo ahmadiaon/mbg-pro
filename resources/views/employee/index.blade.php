@@ -581,9 +581,7 @@
                     filter: filter
                 },
                 success: function(response) {
-                    // let data_datable = [];
-
-                    cg('response data-x', response);
+                    // cg('response data-x', response);
                     datax = response.data;
                     let data_datable_obj = datax.employee_filter_company_x_site;
                     data_export = data_datable_obj;
@@ -593,7 +591,8 @@
                             data_datable.push(element_data_datable_obj);
                         });
                     }
-                    cg('response', response);
+                    
+                    cg('response', data_datable);
                     $('#table-user-employees').DataTable({
                         scrollX: true,
                         scrollY: "700px",

@@ -70,7 +70,30 @@ class EmployeeController extends Controller
         ]);
     }
 
+    public function dataSession(){
+        $table_employees = Employee::whereNull('date_end')->get();
+        dd(ResponseFormatter::foreachData($table_employees));
+
+
+    }
+
     public function index()
+    { //use
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employees-index'
+        ];
+        ResponseFormatter::setAllSession();
+        return view('employee.index', [
+            'title'         => 'Daftar Karyawan',
+            'layout'    => $layout
+        ]);
+    }
+
+    public function History()
     { //use
         $layout = [
             'head_datatable'        => true,
@@ -1314,7 +1337,6 @@ class EmployeeController extends Controller
             $employee_filter_company_x_site = [];
             foreach ($for_loop as $item_filtered_employee) {
                 if (count($date_validateData_arr) > 1) {
-
                     if (($item_filtered_employee->date_end_contract >= $start) &&  ($item_filtered_employee->date_end_contract <= $end)) {
                         // return ResponseFormatter::toJson($validateData['filter']['status_join'], $item_filtered_employee);
                         if ($validateData['filter']['status_join'] == '==') { //akan tidak luarsa dalam range ini
@@ -1336,6 +1358,80 @@ class EmployeeController extends Controller
         ];
 
         return ResponseFormatter::toJson($data, 'query');
+    }
+
+    public function allEmployeeData(){
+        $employees_table = Employee::all();
+        $user_details_table = UserDetail::all();
+        $user_address_table = UserAddress::all();
+
+
+        $user_health_table = UserHealth::all();
+        $user_health_table_data = [];
+        foreach($user_health_table as $item){            
+            $user_health_table_data[$item->uuid][$item->date_start] = $item->toArray();
+        }
+
+        $user_dependent_table = UserDependent::all();
+        $user_dependent_table_data = [];
+        foreach($user_dependent_table as $item){            
+            $user_dependent_table_data[$item->uuid][$item->date_start] = $item->toArray();
+        }
+
+        $user_license_table = UserLicense::all();        
+        $user_license_table_data = [];
+        foreach($user_license_table as $item){            
+            $user_license_table_data[$item->uuid][$item->date_start] = $item->toArray();
+        }
+
+        $user_health_table = UserHealth::all();        
+        $user_health_table_data = [];
+        foreach($user_health_table as $item){            
+            $user_health_table_data[$item->uuid][$item->date_start] = $item->toArray();
+        }
+
+        $user_education_table = UserEducation::all();        
+        $user_education_table_data = [];
+        foreach($user_education_table as $item){            
+            $user_education_table_data[$item->uuid][$item->date_start] = $item->toArray();
+        }
+
+        $employee_table = Employee::all();        
+        $employee_table_data = [];
+        foreach($employee_table as $item){            
+            $employee_table_data[$item->uuid][$item->date_start] = $item->toArray();
+        }
+
+        dd($employee_table_data['MBLE-0422003']);
+        /*
+            user detail
+            user address
+            user license
+            user health
+            user education
+            user dependent
+        */
+        $data_user_details = [];
+
+        foreach($user_details_table as $item_user_details){
+            $data_user_details[$item_user_details->uuid][$item_user_details->date_start] = $item_user_details->toArray();
+        }
+
+        foreach($user_address_table as $item_user_address){
+            $data_user_address[$item_user_address->uuid][$item_user_address->date_start] = $item_user_address->toArray();
+        }
+
+        dd($data_user_address);
+
+        $data_finish = [];
+        foreach($employees_table as $item_employees_table){
+            if(!empty($data_user_details[$item_employees_table->nik_employee][$item_employees_table->date_start])){      
+                $data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] = $item_employees_table->toArray();
+                $data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] = array_merge($data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] , $data_user_details[$item_employees_table->nik_employee][$item_employees_table->date_start]);
+            }
+        }
+
+        dd($data_finish['MBLE-0422003']);
     }
 
 

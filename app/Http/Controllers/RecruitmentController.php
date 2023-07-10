@@ -34,7 +34,7 @@ class RecruitmentController extends Controller
         ];
 
         return view('recruitment.indexRecruitment', [
-            'title'         => 'Form Recruitment',
+            'title'         => 'Recruitment',
             'layout'    => $layout
         ]);
     }
@@ -56,7 +56,7 @@ class RecruitmentController extends Controller
         // return DataTables::of($employeeee)    
         // ->make(true);
 
-        return ResponseFormatter::toJson($employeeee, 'bbb');
+        return ResponseFormatter::toJson($employeeee, 'Data PPK');
     }
 
     public function store(Request $request){

@@ -19,6 +19,7 @@ use App\Models\UserDetail\UserDetail;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ResponseFormatter
 {
@@ -152,11 +153,11 @@ class ResponseFormatter
 
   public static function getEndDay($year_month)
   {
-    $datetime = Carbon::createFromFormat('Y-m-d', $year_month.'-01');
+    $datetime = Carbon::createFromFormat('Y-m-d', $year_month . '-01');
     $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
     return $day_month;
   }
-  
+
   public static function toUUID($uuid)
   {
     $uuid = ResponseFormatter::isString($uuid);
@@ -178,6 +179,7 @@ class ResponseFormatter
       ->leftJoin('user_licenses', 'user_licenses.user_detail_uuid', 'user_details.uuid')
       ->leftJoin('user_dependents', 'user_dependents.user_detail_uuid', 'user_details.uuid')
       ->where('employees.employee_status', 'talent')
+      ->whereNotNull('user_details.name')
       ->get();
 
     $arr_employee_talent = [];
@@ -341,6 +343,35 @@ class ResponseFormatter
     session()->put('data_database', $data_database);
     return $data_database;
     // return ResponseFormatter::toJson($data_database, 'data_database');
+  }
+
+  public static function foreachData($obj_data){
+    $data = [];
+    if(!empty($obj_data)){
+      foreach($obj_data as $item_data){
+        $data[$item_data->uuid] = $item_data->toArray();
+      }
+    }
+    
+    return $data;
+  }
+
+  public static function tableList()
+  {
+    $tables = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
+
+    $table_field = [];
+    foreach ($tables as $name_table) {
+      if ($name_table != 'migrations') {
+        $columns = DB::getSchemaBuilder()->getColumnListing($name_table);
+        $table_field[$name_table] = $columns;
+      }
+    }
+    
+    session()->put('table_field', $table_field);
+    return $table_field;
+    dd(session('table_field'));
+    dd($table_field);
   }
 
   public static function countMonthLongWork($date1, $date2)

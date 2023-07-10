@@ -9,7 +9,6 @@
                 </div>
                 <div class="col text-right">
                     <div class="btn-group">
-                        <button onclick="createRecruitment()" class="btn btn-secondary">Tambah</button>
 
                         <div class="btn-group dropdown">
                             <button type="button" class="btn btn-primary dropdown-toggle waves-effect"
@@ -703,35 +702,33 @@
         }
 
         function firstFormRecruitment() {
-            cg('database', @json(session('data_database')));
+          
             data_employees = data_database.data_employees;
+            // Object.values(data_employees).forEach(employees_element => {
+            //     $('.data_employees').append(
+            //         `<option value="${employees_element.nik_employee}">${employees_element.name}-${employees_element.position}</option>`
+            //     );
+            // });
 
+            // let data_positions = Object.values(data_database.data_positions);
+            // data_positions.forEach(position_element => {
+            //     $('.data_positions').append(
+            //         `<option value="${position_element.uuid}">${position_element.position}</option>`);
+            // });
 
-            Object.values(data_employees).forEach(employees_element => {
-                $('.data_employees').append(
-                    `<option value="${employees_element.nik_employee}">${employees_element.name}-${employees_element.position}</option>`
-                );
-            });
+            // let status_recruitment = Object.values(data_database.data_atribut_sizes['status_recruitment']);
+            // cg('status recruitment', status_recruitment);
+            // status_recruitment.forEach(status_recruitment_element => {
+            //     $('.status_recruitment').append(
+            //         `<option value="${status_recruitment_element.uuid}">${status_recruitment_element.name_atribut}</option>`
+            //     );
+            // });
 
-            let data_positions = Object.values(data_database.data_positions);
-            data_positions.forEach(position_element => {
-                $('.data_positions').append(
-                    `<option value="${position_element.uuid}">${position_element.position}</option>`);
-            });
-
-            let status_recruitment = Object.values(data_database.data_atribut_sizes['status_recruitment']);
-            cg('status recruitment', status_recruitment);
-            status_recruitment.forEach(status_recruitment_element => {
-                $('.status_recruitment').append(
-                    `<option value="${status_recruitment_element.uuid}">${status_recruitment_element.name_atribut}</option>`
-                );
-            });
-
-            let data_companies = @json(session('data_companies'));
-            data_companies.forEach(company_element => {
-                $('.data_companies').append(
-                    `<option value="${company_element.uuid}">${company_element.company}</option>`);
-            });
+            // let data_companies = @json(session('data_companies'));
+            // data_companies.forEach(company_element => {
+            //     $('.data_companies').append(
+            //         `<option value="${company_element.uuid}">${company_element.company}</option>`);
+            // });
             showDataTableRecruitment('applicant/data', ['much_recruitment', 'company_uuid'],
                 'recruitment')
         }
@@ -833,8 +830,6 @@
             data.push(element_action);
 
 
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
             $('#table-' + id).DataTable({
                 processing: true,
                 serverSide: false,
@@ -853,24 +848,6 @@
                 columns: data
             });
         }
-
-        $.ajax({
-            url: '/applicant/data',
-            type: "POST",
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content'),
-                        employee_uuid: null,
-            },
-            success: function(response) {
-                $('#success-modal').modal('show')
-                console.log(response)
-                // $('#table-'+idForm).DataTable().ajax.reload();
-            },
-            error: function(response) {
-                alertModal()
-            }
-        });
-
 
         firstFormRecruitment();
 

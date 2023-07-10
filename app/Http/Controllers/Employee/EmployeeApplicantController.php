@@ -49,7 +49,8 @@ class EmployeeApplicantController extends Controller
     }
 
     public function anyData(Request $request){
-        $employeeee = EmployeeApplicant::whereNull('recruitment_uuid')->get();
+        $employeeee = EmployeeApplicant::join('user_details','user_details.uuid', 'employee_applicants.employee_uuid')
+        ->whereNull('recruitment_uuid')->get();
 
         $employee_talent = UserDetail::join('employees', 'employees.user_detail_uuid', 'user_details.uuid')
         ->leftJoin('user_healths', 'user_healths.user_detail_uuid', 'user_details.uuid')
@@ -58,6 +59,7 @@ class EmployeeApplicantController extends Controller
         ->leftJoin('user_licenses', 'user_licenses.user_detail_uuid', 'user_details.uuid')
         ->leftJoin('user_dependents', 'user_dependents.user_detail_uuid', 'user_details.uuid')
         ->where('employees.employee_status', 'talent')
+        ->whereNotNull('user_details.name')
         ->get();
         
 

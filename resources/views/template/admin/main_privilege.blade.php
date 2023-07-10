@@ -22,6 +22,11 @@
         @include('template.admin.javascript.form')
     @endif
     <script>
+        let COLOR_BOOTSTRAP = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+
+        function random_item(items) {
+            return items[Math.floor(Math.random() * items.length)];
+        }
         let color_button = {
             alpa: 'danger',
             pay: 'primary',
@@ -158,6 +163,10 @@
                 }
             });
             return err;
+        }
+
+        function toUUID(the_text) {
+            return the_text.replace(/\s+/g, '-').toUpperCase();
         }
 
         function isRequiredCreate(id) {

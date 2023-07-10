@@ -11,6 +11,9 @@
                             <h4 class="text-blue h4">Validasi Data</h4>
                         </div>
                     </div>
+                    
+
+                   
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-30">
@@ -51,17 +54,17 @@
             if (isRequiredCreate(['nik_number', 'kk_number']) > 0) {
                 return false;
             }
+
             globalStoreNoTable(idForm).then((data) => {           
                 user_data = data.data;
                 cg('user-data', user_data);
+                // return false;
                 if(user_data['user-role'] == 'employee'){
                     goToHere('/login')
                 }else{
                     goToHere('/recruitment/me/detail')
                 }
                 
-
-                // if()
                 stopLoading();
             })
 

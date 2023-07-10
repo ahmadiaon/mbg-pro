@@ -256,6 +256,7 @@ return array(
     'App\\Models\\Shift' => $baseDir . '/app/Models/Shift.php',
     'App\\Models\\ShiftList' => $baseDir . '/app/Models/ShiftList.php',
     'App\\Models\\StatusAbsen' => $baseDir . '/app/Models/StatusAbsen.php',
+    'App\\Models\\Support\\DataSource' => $baseDir . '/app/Models/Support/DataSource.php',
     'App\\Models\\TaxStatus' => $baseDir . '/app/Models/TaxStatus.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Models\\UserDetail\\Recruitment' => $baseDir . '/app/Models/UserDetail/Recruitment.php',

@@ -47,8 +47,7 @@ class UserDetailController extends Controller
             $validateData['nik_employee'] = $validateData['uuid'];
         }
         if(empty($validateData['employee_status'])){
-            $validateData['employee_status'] = 'Training';
-
+            $validateData['employee_status'] = 'talent';
         }
 
         $storeUserDetail = UserDetail::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
@@ -367,15 +366,16 @@ class UserDetailController extends Controller
             'javascript_form'       => true,
             'active'                        => 'employees-index',
         ];
-
+        session()->put('recruitment-user', null);
         return view('user_detail.up', [
-            'title'         => 'Validasi',
+            'title'         => 'Recruitment',
             'layout'    => $layout
         ]);
     }
 
     public function storeUp(Request $request)
     {
+
         $validateData = $request->all();
 
         $data_user = UserDetail::whereNull('date_end')
@@ -392,21 +392,6 @@ class UserDetailController extends Controller
             ];
             return ResponseFormatter::toJson($data, 'Ini Adalah Karyawan');
         }
-
-        // return ResponseFormatter::toJson($data, 'data recrutment have data user detail');
-        /*
-        user-role
-        1. new-talent, !data
-        2. old-talent, data
-
-        new talent store => goto empty profile.
-        old-talent store => have data profile
-
-        to 
-        1. show profile
-        */
-
-
 
         if (empty($data_user)) {
             $data = [

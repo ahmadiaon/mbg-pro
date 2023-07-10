@@ -271,10 +271,9 @@
                     while (loop <= date_end) {
                         let status_absen_code = '?';
                         let color_button_status_absen = 'ligth'
-
+                        var r = weekdays[loop.getDay()];
                         // cg('date', formatDate(loop));
-                        if(data_absensi[formatDate(loop)]){
-                            var r = weekdays[loop.getDay()];
+                        if(data_absensi[formatDate(loop)]){                            
                             status_absen_code = data_absensi[formatDate(loop)]['status_absen_code'];
                             color_button_status_absen = color_button[data_absensi[formatDate(loop)]['math']]
                         }

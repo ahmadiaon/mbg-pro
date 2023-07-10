@@ -866,6 +866,7 @@ class ComposerStaticInit06f75ac418af319c81f547dc936acf55
         'App\\Models\\Shift' => __DIR__ . '/../..' . '/app/Models/Shift.php',
         'App\\Models\\ShiftList' => __DIR__ . '/../..' . '/app/Models/ShiftList.php',
         'App\\Models\\StatusAbsen' => __DIR__ . '/../..' . '/app/Models/StatusAbsen.php',
+        'App\\Models\\Support\\DataSource' => __DIR__ . '/../..' . '/app/Models/Support/DataSource.php',
         'App\\Models\\TaxStatus' => __DIR__ . '/../..' . '/app/Models/TaxStatus.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\UserDetail\\Recruitment' => __DIR__ . '/../..' . '/app/Models/UserDetail/Recruitment.php',
