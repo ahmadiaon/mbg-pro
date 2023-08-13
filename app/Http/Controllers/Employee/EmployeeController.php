@@ -12,6 +12,7 @@ use App\Models\Position;
 use App\Models\Company;
 use App\Models\Dictionary;
 use App\Models\Employee\EmployeeAbsen;
+use App\Models\Employee\EmployeeApplicant;
 use App\Models\Employee\EmployeeCompany;
 use App\Models\Employee\EmployeeCuti;
 use App\Models\Employee\EmployeeCutiGroup;
@@ -70,11 +71,10 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function dataSession(){
+    public function dataSession()
+    {
         $table_employees = Employee::whereNull('date_end')->get();
         dd(ResponseFormatter::foreachData($table_employees));
-
-
     }
 
     public function index()
@@ -171,15 +171,16 @@ class EmployeeController extends Controller
         return 'delete';
     }
 
-    public function export(Request $request){
+    public function export(Request $request)
+    {
         $validatedData = $request->all();
-        $validatedData['data_export'] = json_decode($request->data_export);        
+        $validatedData['data_export'] = json_decode($request->data_export);
         $data_session = session('data_database');
 
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
-        
-        
+
+
 
         $createSheet->setCellValue('A19', 'NO.');
         $createSheet->setCellValue('B19', 'NAMA');
@@ -200,9 +201,9 @@ class EmployeeController extends Controller
             $createSheet->setCellValue('E' . $row_employees, $data_session['data_employees'][$item_data_export->nik_employee]['department']);
             $createSheet->setCellValue('F' . $row_employees, $item_data_export->site_uuid);
             $createSheet->setCellValue('G' . $row_employees, $item_data_export->company_uuid);
-            
+
             $row_employees++;
-        }   
+        }
 
         $createSheet->mergeCells('A19:A20');
         $createSheet->mergeCells('B19:B20');
@@ -527,7 +528,7 @@ class EmployeeController extends Controller
                                     $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
                                 }
                                 $employee_data_one[$item_index['database'] . '_with_space'] = str_replace('-', ' ', $employee_data_one[$item_index['database']]);
-                                $employee_data_one[$item_index['database'] . '_real'] =$sheet->getCell($item_index['index'] . $no_employee)->getValue();
+                                $employee_data_one[$item_index['database'] . '_real'] = $sheet->getCell($item_index['index'] . $no_employee)->getValue();
                                 break;
                             case 'string':
                                 // $employee_data_one[$item_index['database'].'_uuid'] = ResponseFormatter::toUUID($sheet->getCell( $item_index['index'].$no_employee)->getValue());
@@ -1068,6 +1069,27 @@ class EmployeeController extends Controller
         $validateData = $request->all();
         $data = session('recruitment-user');
 
+        if ($validateData['nik_employee'] != $data['detail']['nik_employee']) {
+            //document
+            //
+            EmployeeApplicant::updateOrCreate(
+                [
+                    'employee_uuid' =>  $data['detail']['nik_employee']
+                ],
+                [
+                    'status_applicant' => 'done'
+                ]
+            );
+    
+            EmployeeDocument::updateOrCreate(
+                [
+                    'employee_uuid' =>  $data['detail']['nik_employee']
+                ],
+                [
+                    'employee_uuid' => $validateData['nik_employee']
+                ]
+            );
+        }
 
 
         $user_detail_uuid = $validateData['uuid'];
@@ -1076,6 +1098,8 @@ class EmployeeController extends Controller
         $validateData['uuid'] = $validateData['nik_employee'];
         $validateData['user_detail_uuid'] = $validateData['nik_employee'];
         // }
+
+        // jika awalnya ada di employee_applicant dan sekarang sudah berubah jadi employee, ubah yang di employee applicant
 
         if (empty($validateData['date_start'])) {
             $validateData['date_start'] = $data['detail']['date_start'];
@@ -1090,7 +1114,6 @@ class EmployeeController extends Controller
         $number_contract = explode('/', $validateData['contract_number_full']);
 
         $validateData['contract_number'] = $number_contract[0];
-        // return ResponseFormatter::toJson($validateData, 'data store employee');
 
         $storeEmployee = Employee::updateOrCreate(['uuid' => $validateData['uuid']], $validateData);
         $updateUserDetail = UserDetail::updateOrCreate(['uuid' => $user_detail_uuid], ['date_start' => $validateData['date_start'], 'uuid' => $validateData['uuid']]);
@@ -1145,6 +1168,8 @@ class EmployeeController extends Controller
             'user-role'   => 'employee',
             'detail'    => $data_employee,
         ];
+
+
 
         session()->put('recruitment-user', $data);
         return redirect('/user/detail');
@@ -1360,7 +1385,8 @@ class EmployeeController extends Controller
         return ResponseFormatter::toJson($data, 'query');
     }
 
-    public function allEmployeeData(){
+    public function allEmployeeData()
+    {
         $employees_table = Employee::all();
         $user_details_table = UserDetail::all();
         $user_address_table = UserAddress::all();
@@ -1368,37 +1394,37 @@ class EmployeeController extends Controller
 
         $user_health_table = UserHealth::all();
         $user_health_table_data = [];
-        foreach($user_health_table as $item){            
+        foreach ($user_health_table as $item) {
             $user_health_table_data[$item->uuid][$item->date_start] = $item->toArray();
         }
 
         $user_dependent_table = UserDependent::all();
         $user_dependent_table_data = [];
-        foreach($user_dependent_table as $item){            
+        foreach ($user_dependent_table as $item) {
             $user_dependent_table_data[$item->uuid][$item->date_start] = $item->toArray();
         }
 
-        $user_license_table = UserLicense::all();        
+        $user_license_table = UserLicense::all();
         $user_license_table_data = [];
-        foreach($user_license_table as $item){            
+        foreach ($user_license_table as $item) {
             $user_license_table_data[$item->uuid][$item->date_start] = $item->toArray();
         }
 
-        $user_health_table = UserHealth::all();        
+        $user_health_table = UserHealth::all();
         $user_health_table_data = [];
-        foreach($user_health_table as $item){            
+        foreach ($user_health_table as $item) {
             $user_health_table_data[$item->uuid][$item->date_start] = $item->toArray();
         }
 
-        $user_education_table = UserEducation::all();        
+        $user_education_table = UserEducation::all();
         $user_education_table_data = [];
-        foreach($user_education_table as $item){            
+        foreach ($user_education_table as $item) {
             $user_education_table_data[$item->uuid][$item->date_start] = $item->toArray();
         }
 
-        $employee_table = Employee::all();        
+        $employee_table = Employee::all();
         $employee_table_data = [];
-        foreach($employee_table as $item){            
+        foreach ($employee_table as $item) {
             $employee_table_data[$item->uuid][$item->date_start] = $item->toArray();
         }
 
@@ -1413,21 +1439,21 @@ class EmployeeController extends Controller
         */
         $data_user_details = [];
 
-        foreach($user_details_table as $item_user_details){
+        foreach ($user_details_table as $item_user_details) {
             $data_user_details[$item_user_details->uuid][$item_user_details->date_start] = $item_user_details->toArray();
         }
 
-        foreach($user_address_table as $item_user_address){
+        foreach ($user_address_table as $item_user_address) {
             $data_user_address[$item_user_address->uuid][$item_user_address->date_start] = $item_user_address->toArray();
         }
 
         dd($data_user_address);
 
         $data_finish = [];
-        foreach($employees_table as $item_employees_table){
-            if(!empty($data_user_details[$item_employees_table->nik_employee][$item_employees_table->date_start])){      
+        foreach ($employees_table as $item_employees_table) {
+            if (!empty($data_user_details[$item_employees_table->nik_employee][$item_employees_table->date_start])) {
                 $data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] = $item_employees_table->toArray();
-                $data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] = array_merge($data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] , $data_user_details[$item_employees_table->nik_employee][$item_employees_table->date_start]);
+                $data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start] = array_merge($data_finish[$item_employees_table->nik_employee][$item_employees_table->date_start], $data_user_details[$item_employees_table->nik_employee][$item_employees_table->date_start]);
             }
         }
 

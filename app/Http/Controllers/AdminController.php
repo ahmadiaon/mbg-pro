@@ -40,8 +40,25 @@ class AdminController extends Controller
             'javascript_form'       => true,
             'active'                        => 'activity'
         ];
+        ResponseFormatter::setAllSession();
 
         return view('admin.indexActivity', [
+            'title'         => 'Aktivitas',
+            'layout'    => $layout
+        ]);
+    }
+
+    public function indexSimple(){
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'activity'
+        ];
+        // ResponseFormatter::setAllSession();
+
+        return view('activity.indexSimple', [
             'title'         => 'Aktivitas',
             'layout'    => $layout
         ]);

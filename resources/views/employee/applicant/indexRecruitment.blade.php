@@ -154,9 +154,9 @@
             };
             data.push(element_action);
 
+            
 
-            let urls = '{{ env('APP_URL') }}' + url
-            console.log(urls)
+            console.log(uuid)
             $('#table-' + id).DataTable({
                 processing: true,
                 serverSide: false,

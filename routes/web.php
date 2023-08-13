@@ -285,6 +285,8 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/', [EmployeeApplicantController::class, 'index']);
         Route::get('/test', [AllowanceController::class, 'anyData']);
         Route::post('/data', [EmployeeApplicantController::class, 'anyData']);
+        
+        Route::post('/pending', [EmployeeApplicantController::class, 'pendingProposal']);
     });
 
     Route::prefix('/hour-meter')->group(function () {
@@ -404,8 +406,15 @@ Route::middleware(['islogin'])->group(function () {
 
     Route::prefix('/activity')->group(function () {
         Route::get('/', [AdminController::class, 'indexActivity']);
+        Route::get('/simple', [AdminController::class, 'indexSimple']);
         Route::post('/store-form', [AktivityController::class, 'storeForm']);
+        Route::post('/store-data', [AktivityController::class, 'storeData']);
         Route::post('/all-table', [AktivityController::class, 'allTable']);
+        Route::post('/get-data-table', [AktivityController::class, 'getDataTable']);
+        Route::post('/delete-data-table', [AktivityController::class, 'deleteDataTable']);
+    });
+    Route::prefix('/form')->group(function () {
+        Route::get('/', [AktivityController::class, 'indexForm']);
 
     });
 

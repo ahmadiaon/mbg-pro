@@ -73,8 +73,8 @@
 
 
         function cg(message, data) {
-            console.log(message + ':');
-            console.log(data);
+            // console.log(message + ':');
+            // console.log(data);
         }
 
         function setDateSession(year, month) {
@@ -166,7 +166,10 @@
         }
 
         function toUUID(the_text) {
-            return the_text.replace(/\s+/g, '-').toUpperCase();
+            const regex = /[^a-zA-Z0-9]/g;
+            // Ganti semua simbol dengan tanda dash ("-")
+            const resultString = the_text.replace(regex, "-");
+            return resultString.toUpperCase();
         }
 
         function isRequiredCreate(id) {
@@ -304,6 +307,33 @@
                         </div>`
             }
         };
+
+        async function deleteThisData(){
+            let code_data  = $('#code_data_delete').val();
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: '/activity/delete-data-table',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data: {
+                        code_data: code_data
+                    }
+                },
+                success: function(response) {
+                    cg('xxx', response);
+                    if(response){                        
+                        $('#confirm-modal-async').modal('hide');
+                        $(`#${code_data}`).parent().parent().remove();
+                    }
+                },
+                error: function(response) {
+                    console.log(response)
+                }
+            });
+
+            cg('code_data', code_data);
+        }
 
 
 
@@ -616,6 +646,15 @@
             $('#modal-create-' + id).modal('show')
             $('#form-' + id)[0].reset();
         }
+        //new
+        function showModalSuccess(data){
+            $('#success-modal').modal('show');
+        }
+
+        async function deleteForm(id_form){  
+            $('#code_data_delete').val(id_form);
+            $('#confirm-modal-async').modal('show');
+        }
 
         function globalStore(idForm) {
             let _url = $('#form-' + idForm).attr('action');
@@ -921,6 +960,18 @@
             Object.values(data_database.data_employees).forEach(employee_element => {
                 $('.employees').append(
                     `<option value="${employee_element.nik_employee}">${employee_element.name} - ${employee_element.position} | ${employee_element.company_uuid}-${employee_element.site_uuid}</option>`
+                );
+            });
+
+            Object.values(data_database.data_companies).forEach(item_company => {
+                $('.company_uuid-select2').append(
+                    `<option value="${item_company.uuid}">${item_company.long_company}</option>`
+                );
+            });
+
+            Object.values(data_database.data_atribut_sizes.site_uuid).forEach(item_site => {
+                $('.site_uuid-select2').append(
+                    `<option value="${item_site.uuid}">${item_site.name_atribut}</option>`
                 );
             });
 

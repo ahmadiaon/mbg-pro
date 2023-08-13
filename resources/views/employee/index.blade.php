@@ -230,14 +230,14 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="custom-control custom-radio mb-5">
-                                            <input type="radio" id="simple" name="show_type"
+                                            <input checked type="radio" id="simple" name="show_type"
                                                 class="custom-control-input" value="simple" />
                                             <label class="custom-control-label" for="simple">Simpel</label>
                                         </div>
                                     </div>
                                     <div class="col-auto">
                                         <div class="custom-control custom-radio mb-5">
-                                            <input checked type="radio" id="show_type_off" name="show_type"
+                                            <input  type="radio" id="show_type_off" name="show_type"
                                                 class="custom-control-input" value="off" />
                                             <label class="custom-control-label" for="show_type_off">Off</label>
                                         </div>
@@ -380,6 +380,8 @@
             </div>
         </div>
     </div>
+
+    
 @endsection
 
 @section('js')
@@ -484,7 +486,7 @@
                     filter: filter
                 },
                 success: function(response) {
-                    cg('response', response);
+                    // cg('response', response);
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
@@ -591,8 +593,8 @@
                             data_datable.push(element_data_datable_obj);
                         });
                     }
-                    
-                    cg('response', data_datable);
+
+                    // cg('response', data_datable);
                     $('#table-user-employees').DataTable({
                         scrollX: true,
                         scrollY: "700px",
@@ -640,6 +642,10 @@
             //     }
             // });
             return false;
+        }
+
+        function acceptProposalShow(){
+            $('#accept-proposal').modal('show');
         }
 
         function deleteData(uuid) {
@@ -707,11 +713,11 @@
         firstIndexEmployee();
 
         function exportData() {
-            cg('data_export', data_export);            
+            cg('data_export', data_export);
             let data_ex = JSON.stringify(data_export);
             let filter = {
-                date_start_filter:'2023-05-01',
-                date_end_filter:'2023-05-31',
+                date_start_filter: '2023-05-01',
+                date_end_filter: '2023-05-31',
             };
             let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
@@ -723,11 +729,11 @@
                     filter: filter
                 },
                 success: function(response) {
-                   cg('export', response);     
-                   var dlink = document.createElement("a");
+                    cg('export', response);
+                    var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
-                    dlink.click();              
+                    dlink.click();
                 },
 
                 error: function(response) {

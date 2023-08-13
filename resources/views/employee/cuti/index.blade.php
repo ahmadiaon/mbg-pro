@@ -1009,13 +1009,22 @@
             var dateEnd = new Date(date2);
             var Difference_In_Time = dateEnd.getTime() - dateStart.getTime();
 
-            // To calculate the no. of days between two dates
+            // To calculate the no. of days between two aaadates
             var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
             $('#long_cuti').val(Difference_In_Days + 1);
 
         }
 
+        {
+            'form-code-data': 'code-data':{
+                'field-name':'value-field'
+            },
+            'FORM-STATUS-UNIT' : 'xxxyyyzzz':{
+                'TANGGAL':'10/10/2023',
+
+            }
+        }
 
 
 

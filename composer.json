@@ -10,12 +10,15 @@
         "barryvdh/laravel-dompdf": "^1.0",
         "doctrine/dbal": "^3.6",
         "fruitcake/laravel-cors": "^2.0",
+        "grofgraf/laravel-pdf-merger": "^1.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "phpoffice/phpspreadsheet": "^1.24",
+        "setasign/fpdi": "^2.3",
         "tymon/jwt-auth": "dev-develop",
+        "webklex/laravel-pdfmerger": "^1.3",
         "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {

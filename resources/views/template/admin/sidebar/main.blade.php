@@ -12,10 +12,20 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/form"
+                            class="dropdown-toggle no-arrow {{ $layout['active'] == 'formIndex' ? 'active' : '' }}">
+                            <span class="micon bi bi-calendar3"></span><span class="mtext">Form</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/activity"
                             class="dropdown-toggle no-arrow {{ $layout['active'] == 'activity' ? 'active' : '' }}">
-                            <span class="micon bi bi-calendar3"></span><span class="mtext">Kegiatan</span>
+                            <span class="micon bi bi-calendar3"></span><span class="mtext">Kelola Form</span>
                         </a>
+                        <a href="/activity/simple"
+                        class="dropdown-toggle no-arrow {{ $layout['active'] == 'activity' ? 'active' : '' }}">
+                        <span class="micon bi bi-calendar3"></span><span class="mtext">Simple</span>
+                    </a>
                     </li>
                     @if (!empty(session('dataUser')->list_purchase_order))
                         <li class="dropdown">

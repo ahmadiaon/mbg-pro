@@ -77,6 +77,5 @@
 		}
 		
 	}
-	cg('on header', @json(session('recruitment-user')));
 </script>
 {{-- @dd() --}}

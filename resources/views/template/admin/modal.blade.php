@@ -104,6 +104,7 @@
                 
                 <h4 class="modal-title w-100">Hapus Data?</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
             </div>
             <div class="modal-body">
                 <p>Apakah Anda Yakin Untuk Mengahapus data ini?</p>
@@ -111,6 +112,28 @@
             <div class="modal-footer justify-content-center row">
                 <button type="button" class="col btn btn-secondary" data-dismiss="modal">Batal</button>
                 <button onclick="deleteConfirmed()" type="button" class="col btn btn-danger">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="confirm-modal-async" class="modal fade">
+    <div class="modal-dialog  modal-sm modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header flex-column">
+                <div class="icon-box">
+                    <i class="icon-copy ion-android-delete"></i>
+                </div>
+                <input type="hidden" name="code_data_delete" id="code_data_delete" >
+                <h4 class="modal-title w-100">Hapus Data?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda Yakin Untuk Mengahapus data ini?</p>
+            </div>
+            <div class="modal-footer justify-content-center row">
+                <button type="button" class="col btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button onclick="deleteThisData()" type="button" class="col btn btn-danger">Hapus</button>
             </div>
         </div>
     </div>

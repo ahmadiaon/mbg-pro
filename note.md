@@ -44,6 +44,75 @@ git status
 git addhjgghgh
 git commit
 ```
+> Merge PDF
+```
+$pdf = new Fpdi();
+        // File pertama
+   // File pertama
+   $file1 = public_path('file/document/employee/11113_ktp_file.pdf');
+   $pageCount1 = $pdf->setSourceFile($file1);
+   for ($pageNum = 1; $pageNum <= $pageCount1; $pageNum++) {
+       $templateId = $pdf->importPage($pageNum);
+
+       // Set format halaman yang sesuai
+       $size = $pdf->getTemplateSize($templateId);
+       $orientation = $size['width'] > $size['height'] ? 'L' : 'P'; // Menyesuaikan orientasi
+
+       $pdf->AddPage($orientation, [$size['width'], $size['height']]);
+       $pdf->useTemplate($templateId);
+   }
+
+   // File kedua
+   $file2 = public_path('file/document/employee/11113_file_kk.pdf');
+   $pageCount2 = $pdf->setSourceFile($file2);
+   for ($pageNum = 1; $pageNum <= $pageCount2; $pageNum++) {
+       $templateId = $pdf->importPage($pageNum);
+
+       // Set format halaman yang sesuai
+       $size = $pdf->getTemplateSize($templateId);
+       $orientation = $size['width'] > $size['height'] ? 'L' : 'P'; // Menyesuaikan orientasi
+
+       $pdf->AddPage($orientation, [$size['width'], $size['height']]);
+       $pdf->useTemplate($templateId);
+   }
+
+   // Simpan file PDF hasil penggabungan
+   $outputPath = public_path('merged_1.pdf');
+   $pdf->Output($outputPath, 'F');
+
+        $oMerger = PDFMerger::init();
+            // foreach($item_employee as $item_document){                
+            //     $oMerger->addPDF('file/document/employee/'.$item_document, 'all');                
+            // }
+            // $oMerger->addPDF('file/document/employee/11113_file_kk.pdf', 'all');
+            $oMerger->addPDF('file/document/employee/11113_ktp_file.pdf', 'all');
+            // $oMerger->stream();
+            $oMerger->merge();
+            $oMerger->save($employee_uuid.'_all_4.pdf');
+            // return ResponseFormatter::toJson($oMerger, 'aaa');
+            // $oMerger->merge('file', $employee_uuid.'_all.pdf');
+            return ResponseFormatter::toJson(env('APP_URL').'file/document/employee/2953711113_ktp_file.pdf', 'aaa');
+            // $oMerger->save($employee_uuid.'_all.pdf');
+```
+
+> POST Template JQuery
+```
+                $.ajax({
+                url: '/app/data/applicant',
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),                       
+                    employee_uuid: uuid
+                },
+                success: function(response) {
+                    data = response.data
+                    console.log(response);
+                },
+                error: function(response) {
+                    console.log(response)
+                }
+            });
+```
 
 > choose month
 
@@ -207,4 +276,23 @@ INSERT INTO safety_employees (`uuid`, `employee_contract_uuid`) VALUES
 ('safety-employee-7', 'EmployeeContract-a9c07f48-3135-4b0f-82f9-769702665b1a'),
 ('safety-employee-8', 'EmployeeContract-9867603a-f063-4f7a-9718-08895a388fcc'),
 ('safety-employee-9', 'EmployeeContract-c22759b0-a69b-4e2d-9eb5-b0903e701e4f');
+```
+
+```
+{
+    'table-name' : {
+        'code-data-n-on-this-table':{
+            'field-n' : 'value_field',
+            'field-n' : 'value_field',
+        }
+    },
+    'table_activity_port' : {
+        'code-data-n-on-this-table':{
+            'field-n' : 'value_field',
+            'field-n' : 'value_field',
+        }
+    }
+
+}
+
 ```

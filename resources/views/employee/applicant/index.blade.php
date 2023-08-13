@@ -11,8 +11,8 @@
                     <div class="btn-group">
 
                         <div class="btn-group dropdown">
-                            <button type="button" class="btn btn-primary dropdown-toggle waves-effect"
-                                data-toggle="dropdown" aria-expanded="false">
+                            <button type="button" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
+                                aria-expanded="false">
                                 Menu <span class="caret"></span>
                             </button>
 
@@ -85,14 +85,14 @@
                                             role="tab">Identitas</a>
                                     </li>
                                     <!--
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-toggle="tab" href="#tasks" role="tab">Latar Belakang</a>
-                                        </li>
-                                        
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-toggle="tab" href="#setting" role="tab">Dokumen</a>
-                                        </li>
-                                        -->
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#tasks" role="tab">Latar Belakang</a>
+                                            </li>
+                                            
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#setting" role="tab">Dokumen</a>
+                                            </li>
+                                            -->
                                 </ul>
                                 <div class="tab-content">
                                     <!-- Timeline Tab start -->
@@ -643,6 +643,46 @@
         </div>
     </div>
     <!-- Profil modal -->
+
+    <!-- Simple Datatable End -->
+    <div class="modal fade" id="accept-proposal"  role="dialog" aria-labelledby="import-modalTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-accept-proposal" action="/applicant/pending" method="post" enctype="multipart/form-data">
+                @csrf
+                <input name="uuid" type="text" id="employee_applicant_uuid" value="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Terima Karyawan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Perusahaan</label>
+                            <select name="company_uuid" id="company_uuid"
+                                class="custom-select2 form-control company_uuid-select2" style="width: 100%;" >
+                                <option value="">Penempatan Perusahaan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Site Penempatan Karyawan</label>
+                            <select name="site_uuid" id="site_uuid"
+                                class="custom-select2 form-control site_uuid-select2" style="width: 100%;" >
+                                <option value="">Penempatan Site</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" onclick="storeAcceptProposal()" class="btn btn-primary">Terima</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
 @endsection
 
 @section('js')
@@ -679,6 +719,12 @@
                 });
         });
 
+        function storeAcceptProposal(){
+            globalStoreNoTable('accept-proposal').then((data_value_element) => {
+                cg('data_value_element', data_value_element);
+            });
+        }
+
         function showdoc(path) {
             $('#path_doc').attr("src", "{{ env('APP_URL') }}file/document/employee/" + path)
             $('#doc').modal('show')
@@ -702,38 +748,32 @@
         }
 
         function firstFormRecruitment() {
-          
+
             data_employees = data_database.data_employees;
-            // Object.values(data_employees).forEach(employees_element => {
-            //     $('.data_employees').append(
-            //         `<option value="${employees_element.nik_employee}">${employees_element.name}-${employees_element.position}</option>`
-            //     );
-            // });
-
-            // let data_positions = Object.values(data_database.data_positions);
-            // data_positions.forEach(position_element => {
-            //     $('.data_positions').append(
-            //         `<option value="${position_element.uuid}">${position_element.position}</option>`);
-            // });
-
-            // let status_recruitment = Object.values(data_database.data_atribut_sizes['status_recruitment']);
-            // cg('status recruitment', status_recruitment);
-            // status_recruitment.forEach(status_recruitment_element => {
-            //     $('.status_recruitment').append(
-            //         `<option value="${status_recruitment_element.uuid}">${status_recruitment_element.name_atribut}</option>`
-            //     );
-            // });
-
-            // let data_companies = @json(session('data_companies'));
-            // data_companies.forEach(company_element => {
-            //     $('.data_companies').append(
-            //         `<option value="${company_element.uuid}">${company_element.company}</option>`);
-            // });
+        
             showDataTableRecruitment('applicant/data', ['much_recruitment', 'company_uuid'],
                 'recruitment')
         }
 
         function showDataTableRecruitment(url, dataTable, id) {
+            $.ajax({
+                url: '/applicant/data',
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),                       
+                    employee_uuid: null
+                },
+                success: function(response) {
+                    cg('data', response);
+                    console.log(response);
+                },
+                error: function(response) {
+                    console.log(response)
+                }
+            });
+
+            // return false;
+
             let data = [];
             var element_name = {
                 mRender: function(data, type, row) {
@@ -743,7 +783,6 @@
             data.push(element_name);
             var element_position = {
                 mRender: function(data, type, row) {
-                    cg('ahmadi', data_database.data_positions[row.position_uuid]['position']);
                     return data_database.data_positions[row.position_uuid]['position']
                 }
             };
@@ -819,7 +858,8 @@
 											</a>
 											<div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
 												<a class="dropdown-item" href="#"><i class="icon-copy ion-ios-telephone-outline"></i> Panggil</a>
-												<a class="dropdown-item" href="#"><i class="icon-copy ion-ios-bookmarks-outline"></i> Terima</a>
+												<a class="dropdown-item" onclick="acceptProposalShow('${row.employee_applicant_uuid}')" href="#"><i class="icon-copy ion-ios-bookmarks-outline"></i> Terima</a>
+                                                <a class="dropdown-item" href="/user/detail/${row.employee_uuid}"><i class="icon-copy fa fa-sun-o" aria-hidden="true"></i> Edit Data</a>
 												<a class="dropdown-item" href="#"><i class="dw dw-delete-3"></i>
 													Hapus</a>
 											</div>
@@ -828,6 +868,23 @@
                 }
             };
             data.push(element_action);
+            $.ajax({
+                url: '/applicant/data',
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    employee_uuid: null,
+                },
+                success: function(response) {                  
+                    console.log(response)
+                  
+                },
+                error: function(response) {
+                    alertModal()
+                }
+            });
+
+            // return false;
 
 
             $('#table-' + id).DataTable({
@@ -850,6 +907,12 @@
         }
 
         firstFormRecruitment();
+
+        function acceptProposalShow(employee_applicant_uuid){
+            cg('employee_applicant_uuid', employee_applicant_uuid);
+            $('#employee_applicant_uuid').val(employee_applicant_uuid);
+            $('#accept-proposal').modal('show');
+        }
 
         function createRecruitment() {
             $('#createRecruitment').modal('show');

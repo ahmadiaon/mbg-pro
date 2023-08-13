@@ -178,6 +178,8 @@ return [
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Webklex\PDFMerger\Providers\PDFMergerServiceProvider::class,
+        // GrofGraf\LaravelPDFMerger\Providers\PDFMergerServiceProvider::class
 
 
     ],
@@ -237,7 +239,9 @@ return [
 
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
-        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
+        'PDFMerger' => Webklex\PDFMerger\Facades\PDFMergerFacade::class,
+        // 'PDFMerger' => GrofGraf\LaravelPDFMerger\Facades\PDFMergerFacade::class
     ],
 
 ];

@@ -125,12 +125,12 @@
                 cg('data recruitment' ,data_value_element );
                 data_user.forEach(element => {
                     let data_status = 'disabled';
-                    if (element.status_recruitment == 'open_recruitment' && uuid != null) {
+                    if (element.status_recruitment == 'open_recruitment') {
                         data_status = ''
                     }
                     let button_porpos_this_ppk = '';
                     if(uuid){
-                        button_porpos_this_ppk = `<button type="button" onclick="store('recruitment-apply-${element.uuid}')"
+                        button_porpos_this_ppk = `<button ${data_status} type="button" onclick="store('recruitment-apply-${element.uuid}')"
                                         class="btn btn-primary btn-rounded btn-lg">Lamar Sekarang</button>`;
                     }else{
                         button_porpos_this_ppk = `
