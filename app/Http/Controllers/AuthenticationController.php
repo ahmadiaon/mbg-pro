@@ -37,12 +37,11 @@ class AuthenticationController extends Controller
         ]);
 
         $dataUser = User::where('nik_employee', $request->username)->get()->first();
+        
         if ($dataUser) {
             try {
                 if (Hash::check($request->password, $dataUser->password)) {
                     $dataUserOld = $dataUser;
-
-
 
                     $col_dataUser = Employee::join('user_details', 'user_details.uuid', 'employees.nik_employee')
                         ->where('employees.nik_employee', $dataUser->nik_employee)

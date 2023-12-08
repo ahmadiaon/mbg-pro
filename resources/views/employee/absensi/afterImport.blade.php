@@ -142,29 +142,22 @@
         cg('data_absen', data_absen);
         let have_employees = data_absen['have_employees']['data'];
 
+
+
         let null_employees = data_absen['null_employees'];
 
         let data_null_employees = [];
-        Object.values(null_employees).forEach(null_employee => {
-            data_null_employees.push(null_employee);
-        });
+        if(null_employees){
+            Object.values(null_employees).forEach(null_employee => {
+                data_null_employees.push(null_employee);
+            });
+        }
+        
 
         
 
 
-        function storeFingger(idForm) {
-            if (isRequiredCreate(['employee_uuid']) > 0) {
-                return false;
-            }
-            globalStoreNoTable(idForm).then((data) => {
-                console.log('data store employees')
-                let user = data.data;
-                console.log(data);
-
-                stopLoading();
-                $('#success-modal-id').modal('show')
-            })
-        }
+        
 
 
 
@@ -174,11 +167,12 @@
 
         var element_profile_employeess = {
             mRender: function(data, type, row) {
-                data_database.data_employees[row.nik_employee]['']
-                if (data_database.data_employees[row.nik_employee]['photo_path'] == null) {
-                    data_database.data_employees[row.nik_employee]['photo_path'] = '/vendors/images/photo4.jpg';
-                }
-                if (data_database.data_employees[row.nik_employee]['photo_path'] == null) {
+                cg('row',row)
+                // // data_database.data_employees[row.nik_employee]['']
+                // if (data_database.data_employees[row.nik_employee]['photo_path'] == null) {
+                //     data_database.data_employees[row.nik_employee]['photo_path'] = '/vendors/images/photo4.jpg';
+                // }
+                if (!data_database.data_employees[row.nik_employee]) {
                     data_database.data_employees[row.nik_employee]['photo_path'] = '/vendors/images/photo4.jpg';
                 }
                 return `<div class="name-avatar d-flex align-items-center">
@@ -194,13 +188,18 @@
 									</div>`
             }
         };
+
+
+
         data_column.push(element_profile_employeess);
         // data_column.push(element_profile_employeess);
 
         // nama fingger
         elements = {
             mRender: function(data, type, row) {
-                return row.employee_uuid
+                let emp = row.employee_uuid;
+                let mcd = row.machine_id;
+                return  emp+"-"+mcd
             }
         };
         data_column.push(elements)
@@ -227,6 +226,7 @@
             }
         };
         data_null_employees_column.push(elements)
+        
         //select2 employees
         elements = {
             mRender: function(data, type, row) {
@@ -309,6 +309,21 @@
                 columns: data_null_employees_column,
             });
         });
+
+
+        function storeFingger(idForm) {
+            if (isRequiredCreate(['employee_uuid']) > 0) {
+                return false;
+            }
+            globalStoreNoTable(idForm).then((data) => {
+                console.log('data store employees')
+                let user = data.data;
+                console.log(data);
+
+                stopLoading();
+                $('#success-modal-id').modal('show')
+            })
+        }
 
         function exportEmployee() {
             cg('data_absen', data_absen);

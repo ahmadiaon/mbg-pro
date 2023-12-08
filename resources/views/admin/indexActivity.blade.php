@@ -765,16 +765,23 @@
             table_field_source = data_database['data_datatable_database']['database']['data-schema'][table_source];
             $('#field_source').empty();
             $('#field_get').empty();
+            $('#field_source').append(`
+                        <option value="">Pilih Kolom</option>
+                    `);
+                    $('#field_get').append(`
+                        <option value="">Pilih Kolom</option>
+                    `);
             if (data_database['data_datatable_database']['database']['data-table']['table_field'][table_source]) {
                 let fields = data_database['data_datatable_database']['database']['data-table']['table_field'][
                     table_source
                 ];
+                // cg('fields', fields)
                 Object.values(fields).forEach(element => {
                     $('#field_source').append(`
-                        <option value="${element.code_data}">${element.description}</option>
+                        <option value="${element.field}">${element.description}</option>
                     `);
                     $('#field_get').append(`
-                        <option value="${element.code_data}">${element.description}</option>
+                        <option value="${element.field}">${element.description}</option>
                     `);
                 });
             } else {

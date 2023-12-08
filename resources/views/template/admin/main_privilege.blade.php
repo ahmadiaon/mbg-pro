@@ -69,12 +69,11 @@
             cg('kosong', @json(session('year_month')));
         }
 
-
-
+        cg('arr_date_today',arr_date_today)
 
         function cg(message, data) {
-            // console.log(message + ':');
-            // console.log(data);
+            console.log(message + ':');
+            console.log(data);
         }
 
         function setDateSession(year, month) {
@@ -203,7 +202,7 @@
                 if (data_database['data_employee_out'][row.nik_employee]) {
                     bg = 'bg-warning';
                 }
-                return `    <div class="card-box ${bg} pd-10">
+                return `    <div class="card-box ${bg} pd-10 " >
                                     <div class="name-avatar d-flex align-items-center">
 										<div class="avatar mr-2 flex-shrink-0">
 											<img src="${row.photo_path}" class="border-radius-100 shadow" width="40"

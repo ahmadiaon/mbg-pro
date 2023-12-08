@@ -34,6 +34,21 @@
 
                     </div>
                 </div>
+                <div class="form-group row mb-20">
+                    <label class="col-md-4" for="">Status Absen</label>
+                    <div class="col-md-7">
+
+                    </div>
+                </div>
+                <div class="form-group row mb-20">
+                    <label class="col-md-4" for="">Admin Absen</label>
+                    <div class="col-md-7" id="admin-fingger-filter">
+                        <select id="admin-fingger" class="selectpicker form-control admin-absen" data-size="5"
+                            data-style="btn-outline-primary" multiple data-actions-box="true"
+                            data-selected-text-format="count">
+                        </select>
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <label class="col-md-4">Status Pembayaran Absen</label>
@@ -59,24 +74,28 @@
                         </div>
                     </div>
                 </div>
+
+
+
                 {{-- rentang wAKTU --}}
                 <div class="form-group row">
                     <label class="col-md-12 text-center">Rentang Waktu</label>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <select onchange="loopDateFilter()" style="width: 100%;" name="date_start_filter_absen"
                             id="date_start_filter_absen" class="custom-select2 form-control">
                         </select>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4 text-center">
+                        <div class="alert alert-light" role="alert">
+                            sampai
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <select style="width: 100%;" name="date_end_filter_absen" id="date_end_filter_absen"
                             class="custom-select2 form-control">
                         </select>
                     </div>
                 </div>
-
-
-
-
                 <button onclick="onSaveFilter()" type="button" class="col-md-auto btn btn-primary text-rigth">
                     Simpan
                 </button>
@@ -104,8 +123,8 @@
                         </div>
                     </div>
                     <div class="btn-group dropdown">
-                        <button type="button" class="btn btn-secondary dropdown-toggle waves-effect" data-toggle="dropdown"
-                            aria-expanded="false" id="btn-month" value="">
+                        <button type="button" class="btn btn-secondary dropdown-toggle waves-effect"
+                            data-toggle="dropdown" aria-expanded="false" id="btn-month" value="">
                             <span class="caret"></span>
                         </button>
                         <div class="dropdown-menu">
@@ -130,7 +149,7 @@
                             Menu <span class="caret"></span>
                         </button>
                         <div class="dropdown-menu">
-                            <a  class="dropdown-item" id="btn-absen" href="#"
+                            <a class="dropdown-item" id="btn-absen" href="#"
                                 onclick="openModalAbsen()">Ketidakhadiran</a>
                             <a class="dropdown-item" onclick="exportAbsen()" id="btn-export" href="#">Export +
                                 Data</a>
@@ -139,6 +158,8 @@
                                 Report</a>
                             <a class="dropdown-item" onclick="reportOpenModalReportStatusAbsen()" id="btn-export-dialy"
                                 href="#">Lap. Tidak Hadir</a>
+                            <a class="dropdown-item" onclick="reportExportInOut()" id="btn-export-in-out"
+                                href="#">Lap. Tidak Hadir In Out</a>
                             {{-- <a class="dropdown-item" id="btn-export-dialy" href="/user/absensi/dialy-report">Dialy
                                 Report</a> --}}
                             <a class="dropdown-item" id="btn-export-template"
@@ -191,7 +212,7 @@
                         <div class="form-group row date-setup">
                             <div class="col-6">
                                 <label for="">Mulai tanggal</label>
-                                <select  onchange="loopDate()" name="date_absen_start" style="width: 100%"
+                                <select onchange="loopDate()" name="date_absen_start" style="width: 100%"
                                     id="date_absen_start" class="custom-select2 form-control">
 
                                 </select>
@@ -349,7 +370,7 @@
                         </div>
                         <div class="form-group row mb-20 justify-content-md-center site-radio" id="">
                             <label class="col-md-12" for="">SITE</label>
-                            
+
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -365,13 +386,14 @@
         </div>
     </div>
 
-     <!-- Modal laporan sesuai status absen-->
-     <div class="modal fade" id="modal-report-status-absen" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <!-- Modal laporan sesuai status absen-->
+    <div class="modal fade" id="modal-report-status-absen" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myLargeModalLabel">
-                            PILIH STATUS ABSEN
+                        PILIH STATUS ABSEN
                     </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
@@ -383,10 +405,11 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Pilih status absen</label>
-                            <select id="status-absen-filter" class="selectpicker form-control multiple-select-status-absen" data-size="5"
+                            <select id="status-absen-filter"
+                                class="selectpicker form-control multiple-select-status-absen" data-size="5"
                                 data-style="btn-outline-primary" multiple data-actions-box="true"
                                 data-selected-text-format="count">
-                              
+
                             </select>
                         </div>
                     </div>
@@ -402,9 +425,6 @@
             </div>
         </div>
     </div>
-
-
-    
 @endsection
 
 @section('js')
@@ -440,24 +460,27 @@
             nik_employee: nik_employee
         };
 
+        
+
 
         let year;
         let month;
         let dt_end;
         let dt_start;
         let data_datatable;
+        let data_response;
 
 
 
         let arr_site_uuid = [];
         let arr_status_absen = [];
 
-        function storeDialyExport(){
+        function storeDialyExport() {
             let site_uuid_dialy = $("input[type='radio'][name='site_uuid_dialy']:checked").val();
             let date_dialy = $('#date_dialy').val();
 
             cg(site_uuid_dialy, date_dialy);
-            
+
             let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
                 url: '/user/absensi/dialy-report',
@@ -475,22 +498,23 @@
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
                     dlink.click();
-                    cg('a','b');
+                    cg('a', 'b');
                 },
                 error: function(response) {
                     alertModal()
                 }
             });
         }
-        
 
-        function reportOpenModalReportStatusAbsen(){
+
+        function reportOpenModalReportStatusAbsen() {
             $('#modal-report-status-absen').modal('show');
         }
 
-        function reportAbsensi_x(){
+        function reportAbsensi_x() {
             let status_absen_filter = $('#status-absen-filter').val();
-            
+
+
             cg('status_absen_filter', status_absen_filter);
             filter.status_absen_filter = status_absen_filter;
             cg('fiiolter', filter);
@@ -516,6 +540,7 @@
                     stopLoading();
                 },
                 error: function(response) {
+                    cg('response', response)
                     alertModal()
                 }
             });
@@ -525,9 +550,12 @@
             cg('loopDateFilter', arr_date_today);
             var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
             var end = new Date(arr_date_today.year, arr_date_today.month, 0);
-            cg(start, end);
+
+            var date_today = new Date();
+
 
             var loop = new Date(start);
+
 
             let date_start_filter_absen = $('#date_start_filter_absen').val();
             $(`#date_end_filter_absen`).empty();
@@ -548,11 +576,17 @@
                     $(`#date_start_filter_absen`).append(` <option>${formatDate(loop)}</option>`);
                     $(`#date_end_filter_absen`).prepend(` <option>${formatDate(loop)}</option>`)
                 }
+
+
                 var newDate = loop.setDate(loop.getDate() + 1);
                 loop = new Date(newDate);
             }
             // $('#date_start_filter_absen').val(formatDate(start));
             $('#date_end_filter_absen').val(formatDate(end));
+            if (end > date_today) {
+                // end = date_today;
+                $(`#date_end_filter_absen`).val(formatDate(date_today));
+            }
         }
 
         function checkedAll(name) {
@@ -591,7 +625,7 @@
         function openModalExportDialy() {
             let dt_today = getDateTodayArr();
 
-           
+
 
 
             $('#date_dialy').val(`${dt_today.year}-${dt_today.month}-${dt_today.day}`);
@@ -601,18 +635,21 @@
         function exportAbsen() {
             startLoading();
             let _token = $('meta[name="csrf-token"]').attr('content');
-            cg('data_datatable', data_datatable);
+            // cg('data_datatable', data_datatable);
             let data_ex = JSON.stringify(data_datatable);
+            let data_other_response = JSON.stringify(data_response['data_response']['data_other_employee']);
             $.ajax({
                 url: '/user/absensi/export+data',
                 type: "POST",
                 data: {
                     _token: _token,
                     data_export: data_ex,
+                    data_other_response: data_other_response,
                     filter: filter
                 },
                 success: function(response) {
                     cg('response', response);
+                    // return false;
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
@@ -620,6 +657,7 @@
                     stopLoading();
                 },
                 error: function(response) {
+                    cg('err export', response)
                     alertModal()
                 }
             });
@@ -664,8 +702,11 @@
         }
 
 
-
         function onSaveFilter() {
+
+            let admin_fingger = $('#admin-fingger').val();
+            cg('admin_fingger', admin_fingger);
+
             filter.arr_filter = arr_filter;
             let date_filter = {
                 date_start_filter_absen: $('#date_start_filter_absen').val(),
@@ -674,6 +715,8 @@
             filter.date_filter = date_filter;
             cg('filter', filter);
             filter.nik_employee = null;
+            cg('data_database', data_database);
+
             showDataTable();
         }
 
@@ -686,7 +729,7 @@
             startLoading();
             let arr_date = [];
             while (loop <= end) {
-                el_date_month_header = `${el_date_month_header}<th>${formatDateArr(loop).day}</th>`;
+                el_date_month_header = `${el_date_month_header}<th class="no-sort">${formatDateArr(loop).day}</th>`;
                 arr_date.push(formatDate(loop));
                 //don't remove it
                 var newDate = loop.setDate(loop.getDate() + 1);
@@ -698,10 +741,9 @@
                                             <table id="table-absen" class="display nowrap stripe hover table" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th>Nama</th>
-                                                        <th>Dibayar</th>
-                                                        <th>Potongan</th>                                                        
-                                                        <th>Alpa</th>     
+                                                        <th><div class="" style="width:300px">
+                                                            <label for="">Nama</label>
+                                                        </div></th>  
                                                          ${el_date_month_header}
                                                     </tr>
                                                 </thead>
@@ -716,56 +758,27 @@
                 type: "POST",
                 data: {
                     _token: _token,
-                    filter: filter
+                    filter: filter,
+                    admin_absen:$('#admin-fingger').val()
+
                 },
                 success: function(response) {
+                    cg('response showDataTable', response);
+                    // return false;
+                    
+                    data_response = response.data;
                     data_datatable = response.data.data_filter_math;
 
                     let for_data_datatable = [];
                     Object.values(data_datatable).forEach(element => {
                         for_data_datatable.push(element);
                     });
-                    cg('response', response);
+
                     let data = [];
 
                     data.push(element_profile_employee);
-                    var element_date = {
-                        mRender: function(data, type, row) {
-                            return row.absensi.count_pay;
-                        }
-                    };
 
-                    data.push(element_date);
-
-                    var element_cut = {
-                        mRender: function(data, type, row) {
-                            return row.absensi.count_cut;
-                        }
-                    };
-
-                    data.push(element_cut);
-
-                    var element_alpa = {
-                        mRender: function(data, type, row) {
-                            return row.absensi.count_alpa;
-                        }
-                    };
-
-                    data.push(element_alpa);
-
-                    // var elements = {
-                    //     mRender: function(data, type, row) {
-                    //         return `
-                // 				<div class="form-inline"> 
-                //                     <a href="/user/absensi/detail/${ arr_date_today.year}-${arr_date_today.month}/${row.nik_employee}">
-                // 					<button type="button" class="btn btn-secondary mr-1  py-1 px-2">
-                // 						<i class="dw dw-edit2"></i>
-                // 					</button>
-                //                     </a>
-                // 				</div>`
-                    //     }
-                    // };
-                    // data.push(elements);
+                    
 
                     arr_date.forEach(element_data => {
                         var element_date = {
@@ -789,14 +802,21 @@
                                         }
                                     }
                                 }
+                                var date_this_data = new Date(element_data);
 
-                                return `                                
+                                return `     
+                                <div class="row justify-content-md-center">
+                                    <div class="col-12 justify-content-md-center"><sup>${formatDateArr(date_this_data).day}</sup></div>
+                                    <div class="col-12 justify-content-md-center">
                                         <button type="button" name="status_absen_uuid" 
                                             onclick="editAbsenLive('status_absen_uuid-text-${uuid}','${row.nik_employee}','${element_data}','${row.machine_id}')"
                                             class="btn btn-${color_button_el}"
                                             id="status_absen_uuid-text-${uuid}">
                                             ${status_absen_el}                                            
-                                        </button>                                       
+                                        </button>   
+                                    </div>
+                                </div>                           
+                                                                           
                                         `
                             }
                         };
@@ -808,14 +828,16 @@
                     $('#table-absen').DataTable({
                         scrollX: true,
                         scrollY: "600px",
-                        paging: false,
+                        paging: true,
                         serverSide: false,
                         data: for_data_datatable,
-                        columns: data
+                        columns: data,
+
                     });
                     stopLoading();
                 },
                 error: function(response) {
+                    cg('response', response)
                     alertModal()
                 }
             });
@@ -874,7 +896,35 @@
 
 
         function firstIndexEmployeeAbsen() {
+
+            $.ajax({
+                url: '/activity/get-data-table',
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    data: {
+                        table_name: "DATABASE-KELOMPOK-ABSEN"
+                    },
+                },
+                success: function(response) {
+                    // $('#success-modal').modal('show')
+                    let database_kelompok_absen = response.data;
+                    // isi pada filter admin
+                    Object.values(database_kelompok_absen).forEach(element => {
+
+                        $('#admin-fingger').append(`<option value="${element['NAMA-KELOMPOK']['code_data']}">${element['NAMA-KELOMPOK']['value_field']}</option>`);
+                    });
+                    
+                    
+                },
+                error: function(response) {
+                    cg('error', response);
+                    alertModal()
+                }
+            });
+
             let arrrr = [];
+            cg('aaa', dataUser);
             Object.values(data_database.data_companies).forEach(company_uuid_element => {
                 if (dataUser['user_privileges'][`company_privilege_${company_uuid_element.uuid}`]) {
                     arrrr.push(company_uuid_element.uuid);
@@ -887,8 +937,6 @@
                         </div>
                     </div>
                 `);
-
-                
                 }
 
             });
@@ -916,7 +964,7 @@
                             </div>
                         </div>
                     `);
-                    
+
                     arrrr.push(site_uuid_element.uuid);
                 }
             });
@@ -935,8 +983,8 @@
                     <optgroup label="${math_element.math}" id="${math_element.math}">
                      
                     </optgroup>`);
-                
-                                                
+
+
 
 
                 arrrr.push(math_element.math);
@@ -949,8 +997,8 @@
 
             $('#date_start_absen').val(getDateToday());
             $(`#unpay`).append(
-                    `<option value="unknown_absen">? - Tidak diketahui</option>`
-                );
+                `<option value="unknown_absen">? - Tidak diketahui</option>`
+            );
             Object.values(data_database.data_status_absens).forEach(data_status_absen_element => {
                 $(`#status_absen_uuid`).append(
                     `<option value="${data_status_absen_element.uuid}">${data_status_absen_element.uuid} - ${data_status_absen_element.status_absen_description}</option>`
@@ -970,7 +1018,7 @@
             loopDateFilter();
             showDataTable();
 
-           
+
 
 
 
@@ -1039,6 +1087,7 @@
                 success: function(response) {
                     $('#loading-modal').modal('hide');
                     cg('response', response);
+                    // return false;
                     if (response.message == 'excel') {
                         showModalMessage('import success');
                         return false;
@@ -1056,6 +1105,7 @@
                     }
                 },
                 error: function(response) {
+                    cg('errr', response);
                     alertModal()
                 }
             });

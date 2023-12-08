@@ -215,6 +215,7 @@
 
             showDataTable();
         }
+        
         function showCeklog(date_absen){
             cg('a', data_absensi[date_absen]);
             $('#name-date').text(`${date_absen}`);
@@ -228,8 +229,6 @@
         }
 
         function showDataTable() {
-
-
 
             cg('filter', filter);
             let _token = $('meta[name="csrf-token"]').attr('content');

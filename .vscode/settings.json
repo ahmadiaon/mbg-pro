@@ -1,3 +1,4 @@
 {
-    "editor.accessibilityPageSize": 11
+    "editor.accessibilityPageSize": 11,
+    "nuxt.isNuxtApp": false
 }

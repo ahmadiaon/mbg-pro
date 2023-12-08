@@ -39,8 +39,8 @@
         let arr_date_today = @json(session('year_month'));
 
         function cg(message, data) {
-            // console.log(message + ':');
-            // console.log(data);
+            console.log(message + ':');
+            console.log(data);
         }
     </script>
 
@@ -776,7 +776,7 @@
     //     getData('/support/setSessionDatabase');
     //     location.reload();
     // }
-    // cg('data_database', data_database);
+    cg('data_database', data_database);
 </script>
 
 </html>

@@ -113,8 +113,8 @@ class EmployeeController extends Controller
     {
         $data = Employee::where('employees.nik_employee', '!=', 'MBLE-0422003')->delete();
         $data = UserDetail::where('user_details.uuid', '!=', 'MBLE-0422003')->delete();
-        $data = Department::where('departments.uuid', '!=', 'IT')->delete();
-        $data = Position::where('positions.uuid', '!=', 'ETL-DEVELOPER')->delete();
+        // $data = Department::where('departments.uuid', '!=', 'IT')->delete();
+        // $data = Position::where('positions.uuid', '!=', 'ETL-DEVELOPER')->delete();
         $data = EmployeeCompany::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
         $data = EmployeeDebt::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
         $data = EmployeeHourMeterDay::where('employee_uuid', '!=', 'MBLE-0422003')->delete();
@@ -260,6 +260,8 @@ class EmployeeController extends Controller
         return view('datatableshow', ['data'         => $data]);
     }
 
+    
+
     public function indexContract()
     {
         $layout = [
@@ -370,6 +372,7 @@ class EmployeeController extends Controller
 
     public function indexResign()
     {
+
         // return Employee::getAll();
         $layout = [
             'head_datatable'        => true,
@@ -478,6 +481,12 @@ class EmployeeController extends Controller
             $date_prev = Carbon::createFromFormat('Y-m-d', $this_date);
             $this_date_end_prev = $date_prev->subDays(1);
 
+            $much_employee = 0;
+            $all_data_import = [];
+         
+            
+            // return $much_employee;
+
             while ((int)$sheet->getCell('A' . $no_employee)->getValue() != null) {
                 ob_start();
                 $date_row = 3;
@@ -512,8 +521,6 @@ class EmployeeController extends Controller
                     $employee_data_one = $data_old;
                 }
 
-
-
                 foreach ($arr_index as $item_index) {
                     if (!empty($sheet->getCell($item_index['index'] . $no_employee)->getValue())) {
                         switch ($item_index['data_type']) {
@@ -542,11 +549,7 @@ class EmployeeController extends Controller
                         }
                     }
                 }
-                // dd($data_old);
-                // dd($employee_data_one);
-                // if($employee_data_one['nik_employee'] == 'MB-PL-220824'){
-                //     dd($employee_data_one);
-                // }
+                
 
                 $employee_data_one['name'] = $employee_data_one['name_real'];
                 $employee_data_one['nik_employee_with_space'] = $employee_data_one['nik_employee_real'];
@@ -689,18 +692,19 @@ class EmployeeController extends Controller
                 }
 
                 if (!empty($employee_data_one['date_end'])) {
-                    dd($employee_data_one);
+                    dd("employee_data_one");
                 }
-                // dd($employee_data_one);
+                
                 echo $nik_employee . "-start employee</br>";
                 if (!empty($employee_data_one['date_out'])) {
                     $employee_data_one['employee_status'] = 'Keluar';
                     $storeEmployee = EmployeeOut::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                 }
 
-                // dd($employee_data_one);
+                
                 if (!empty($data_old)) {
-                    // dd($data_old);
+                    $all_data_import['data_old'][$nik_employee] =$nik_employee;
+                    // dd("data_old");
                     if ($data_old['date_start'] > $employee_data_one['date_start']) {
 
                         if (empty($employee_data_one['date_end_effective'])) {
@@ -751,6 +755,7 @@ class EmployeeController extends Controller
                         // dd('c');
                     }
                 } else {
+                    // dd('lll');
                     $storeEmployee = Employee::create($employee_data_one);
                     $storeEmployee = EmployeeSalary::create($employee_data_one);
                     $storeEmployee = UserDetail::create($employee_data_one);
@@ -759,10 +764,8 @@ class EmployeeController extends Controller
                     $storeEmployee = UserDependent::create($employee_data_one);
                     $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
                     // dd('d');
+                    $all_data_import['data_new'][$nik_employee] =$nik_employee;
                 }
-
-
-
 
                 echo $nik_employee . "-start user detail</br>";
 
@@ -814,14 +817,17 @@ class EmployeeController extends Controller
                         $data_old_arr[] = $get_all_employee_premis[$nik_employee . '-' . $premi->uuid];
                     }
                 }
-                // dd($data_old_arr);
-
+                
+                
                 echo $nik_employee . "-end</br>";
                 // dd('user detail will');
                 ob_end_clean();
                 $no_employee++;
             }
+            // dd($all_data_import);
+            // dd(Employee::data_employee());
             ResponseFormatter::setAllSession();
+            // dd($employee_data_one);
         } catch (Exception $e) {
             // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
@@ -1303,6 +1309,8 @@ class EmployeeController extends Controller
                 $employee_non_filter_company_x_site[] = $item_query;
             }
         }
+        
+        // return ResponseFormatter::toJson($employee_filter_company_x_site, 'aaaa');
 
         if ($validateData['filter']['join_status'] != 'off') {
             $for_loop = $employee_filter_company_x_site;
@@ -1342,7 +1350,6 @@ class EmployeeController extends Controller
         }
 
         if ($validateData['filter']['status_join'] != 'off') {
-
             if (!empty($validateData['filter']['date_range'])) {
                 $date_validateData_arr = explode(' - ', $validateData['filter']['date_range']);
                 if (count($date_validateData_arr) > 1) {
@@ -1382,11 +1389,13 @@ class EmployeeController extends Controller
             'request' => $validateData
         ];
 
-        return ResponseFormatter::toJson($data, 'query');
+        return ResponseFormatter::toJson($data, 'zzz');
     }
 
     public function allEmployeeData()
     {
+        // dd('ss');
+        dd(ResponseFormatter::setAllSession());
         $employees_table = Employee::all();
         $user_details_table = UserDetail::all();
         $user_address_table = UserAddress::all();

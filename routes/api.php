@@ -2,8 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+Route::prefix('mbg')->group(function () {
+    Route::post('employee', [UserController::class, 'getfull']);
+
+    Route::prefix('absensi')->group(function () {
+        Route::post('/', [ApiEmployeeAbsensiController::class, 'getAbsenEmployee']);
+    });
+    Route::prefix('slip')->group(function () {
+        Route::post('/data', [ApiSlipController::class, 'data']);
+    });
+
+});
+
 Route::prefix('v1')->group(function () {
     Route::post('login', [Api\Auth\AuthController::class, 'login']);
     Route::get('fail', [Api\Auth\AuthController::class, 'fail'])->name('fail');

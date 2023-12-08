@@ -1,4 +1,4 @@
-@extends('template.admin.main_privilege')
+@extends('template.admin.main_simple')
 @section('css')
     <style>
         /*the container must be positioned relative:*/
@@ -47,11 +47,12 @@
                             PILIH FORM
                         </button>
                     </div>
+                 
                     <div id="faq1" class="collapse show" data-parent="#accordion">
                         <div class="pd-10 row">
                             <div class="col-md-5 mb-5">
                                 <div class="card-box pd-10">
-                                    <h4  id="form-1" class="mb-20 h4 text-blue">Group Form </h4>
+                                    <h4 id="form-1" class="mb-20 h4 text-blue">Group Form </h4>
                                     <div class="row">
                                         <div class="col-9" id="head-form-title">
                                             <select onchange="fromTable('GROUP-FORM', 'table')" name="GROUP-FORM"
@@ -70,7 +71,7 @@
                                         <h4 class="mb-20 h4 text-blue" id="form-title-done">Pilih Form</h4>
                                     </div>
                                     <div class="card-body">
-                                        <div class="alert alert-warning" id="forms-group-form">
+                                        <div class="" id="forms-group-form">
 
                                         </div>
                                         <select name="select-forms-group-form" id="select-forms-group-form"
@@ -92,8 +93,8 @@
 
 
     <div class="row  pd-20">
-        <div class="col-md-6 pd-20 card-box pb-10 mb-20">
-            <div class="row">
+        <div class="col-md-5">
+            <div class="row card-box pd-20 mb-20 mr-20">
                 <div class="col-md-12">
                     <div class="title">
                         <h4 id="title-form" class="mb-20 h4 text-blue">Form Kegiatan</h4>
@@ -107,6 +108,20 @@
                 </form>
             </div>
         </div>
+        <div class="col-md-7">
+            <div class="row card-box pd-20 mb-20 mr-20">
+                <div class="col-md-12">
+                    <div class="title">
+                        <h4 id="column-field" class="mb-20 h4 text-blue">Tampilan Kolom</h4>
+                    </div>
+                </div>
+                <div class="col-md-12 card-box">
+                    <p>ajdkasdjka</p>
+
+                </div>
+
+            </div>
+        </div>
     </div>
 
 
@@ -116,6 +131,8 @@
         <div class="row pd-20">
             <div class="col-md-6 col-sm-12">
                 <div class="title">
+                    
+                    <input type="text" name="code_table" id="code_table-database">
                     <h4 id="header-table_name" class="mb-20 h4 text-blue">Deskripsi tb_activity</h4>
                 </div>
             </div>
@@ -126,8 +143,8 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" onclick="openNewActivity()" href="#">Tambah Kegiatan</a>
-                        <a class="dropdown-item" href="#">xxx</a>
-                        <a class="dropdown-item" href="#">yyyy</a>
+                        <a class="dropdown-item" onclick="ExportForm()"  href="#">Export</a>
+                        <a class="dropdown-item" href="#">Import</a>
                     </div>
                 </div>
             </div>
@@ -246,6 +263,8 @@
                     element
                 ]['activity_code'];
                 let collor_rand = random_item(COLOR_BOOTSTRAP);
+                cg('show Form',table_name['code_data']);
+
                 $(`#forms-group-form`).append(
                     `<span onclick="chooseForm('${table_name['code_data']}')" class="btn badge badge-${collor_rand} mb-1 mr-2">${table_name['description']}</span>`
                 );
@@ -348,9 +367,9 @@
             $(`#field-form-${id_form}`).remove();
         }
 
-        
 
-       
+
+
 
         function selectTableSource() {
             let table_source = $(`#table`).val();
@@ -457,40 +476,47 @@
 
 
         function chooseForm(form_code_choose) {
-            cg('choose form','choedrfo');
+            cg('choose form',form_code_choose);
             $(`#form-choose-place`).empty();
             $(`#title-form`).text(data_database['data_datatable_database']['database']['data-table']['tb_activity'][
                 form_code_choose
             ]['activity_code']['description']);
 
+
             let el_form = '';
             let item_field_form = data_database['data_datatable_database']['database']['data-table']['table_field'][
                 form_code_choose
             ];
+            $('#code_table-database').val(form_code_choose);
+            cg('item_field_form',item_field_form);
+
             $('#btn-group-form').click();
 
             Object.values(item_field_form).forEach(element_field_form => {
-                switch (element_field_form.value_field) {
+                cg('element_field_form.value_field',element_field_form.value_field)
+
+                switch (element_field_form.value_field) {                    
                     case 'from_table':
                         let data_source = data_database['data_datatable_database']['database']['data-table'][
                             'data_sources'
                         ][element_field_form.code_data][element_field_form.field];
 
+                       
+
 
                         let data_table_source = data_database['data_datatable_database']['database']['data-table'][
                             data_source.table_name
                         ];
-                        // cg('data_source', data_source);
-                        // cg(data_source.table_name, data_table_source);
-                        // return false;
-                        
+                       
+                      
+
                         let option_data_table_source = '';
                         Object.values(data_table_source).forEach(item_table_source => {
+                            // cg('item_table_source[data_source.field_source][',item_table_source[data_source.field_source]);
                             option_data_table_source =
                                 `${option_data_table_source} 
                                         <option value="${item_table_source[data_source.field_source]['code_data']}">${item_table_source[data_source.field_get]['value_field']}</option>`;
                         });
-                        cg('field get', data_source.field_get);
                         el_form = `                                
                                 <div class="col-md-12 col-sm-12 form-group">
                                     <label for="">${element_field_form.description}</label> 
@@ -548,10 +574,24 @@
             $('#datatable-element').empty();
 
             $('#header-table-datatable').empty();
+            let data_source_fields;
+            if (data_database['data_datatable_database']['database']['data-table']['data_sources'][form_code_choose]) {
+                data_source_fields = data_database['data_datatable_database']['database']['data-table']['data_sources'][
+                    form_code_choose
+                ];
+            }
+            cg('data_source_fields', data_source_fields);
             let header_table = '';
             Object.values(table_structure).forEach(element => {
                 cg('table_structure', element)
                 header_table = `${header_table}  <th>${element.description}</th>`;
+                switch (element.value_field) {
+                    case 'from_table':
+                        cg('from_tble_field', data_source_fields[element.field], );
+                        break;
+                    default:
+                        break;
+                }
             });
             header_table = `${header_table}  <th>ACTION</th>`;
             let element_table = `
@@ -564,6 +604,17 @@
             </table>`;
             $('#datatable-element').append(element_table);
 
+            cg('ahmadi', "ahmadi");
+
+            //ambil kolom-kolom table
+            //table apa saja
+            //kolom apa saja
+            //from table, table get,
+                //code_from_choose,
+
+            
+
+            
 
             let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
@@ -576,6 +627,7 @@
                     }
                 },
                 success: function(response) {
+                    cg('response',response);
                     let data = [];
                     let data_for_datatable = response.data;
                     let variable_code_data = '';
@@ -584,29 +636,26 @@
                         var element_date = {
                             mRender: function(data, type, row) {
                                 // cg('1', row)
-                                let value_return =  row[element.field]['value_field'];
+                                let value_return = row[element.field]['value_field'];
                                 variable_code_data = element.field;
-                                cg('variable_code_data', variable_code_data);
+                                // cg('variable_code_data', variable_code_data);
                                 switch (element.value_field) {
-                                    case 'from_table':                                        
+                                    case 'from_table':
                                         let data_source = data_database[
                                             'data_datatable_database']['database'][
                                             'data-table'
                                         ][
                                             'data_sources'
                                         ][form_code_choose][element.field];
-
-                                        value_return = data_database[
-                                            'data_datatable_database']['database'][
-                                            'data-table'
-                                        ][
-                                            data_source.table_name
-                                        ][row[element.field]['value_field']][data_source
-                                            .field_get
-                                        ]['value_field'];
+                                       
+                                        let table_get =  data_database['data_datatable_database']['database']['data-table'][data_source_fields[element.field]['table_name']];
+                                        if(table_get[row[element.field]['value_field']]){
+                                            let data_from_table_get = table_get[row[element.field]['value_field']][data_source_fields[element.field]['field_get']]['value_field'];
+                                            value_return =data_from_table_get;
+                                        }
                                         break;
                                     default:
-                                        value_return =  row[element.field]['value_field'];
+                                        value_return = row[element.field]['value_field'];
                                         break;
                                 }
                                 return value_return;
@@ -617,7 +666,7 @@
 
                     let element_action = {
                         mRender: function(data, type, row) {
-                            cg('row', row);
+                            // cg('row', row);
                             let btn = `
                                 <div class="table-actions" id="${row[variable_code_data]['code_data']}">
 									<a href="#" data-color="#265ed7">
@@ -628,15 +677,11 @@
                             return btn;
                         }
                     };
-
                     data.push(element_action)
-
-
-
                     $('#table-datatable-activity').DataTable({
                         paging: true,
                         serverSide: false,
-                        responsive:true,
+                        responsive: true,
                         data: data_for_datatable,
                         columns: data
                     });
@@ -654,6 +699,30 @@
         function storeData() {
             globalStoreNoTable('activity-data').then((data_value_element) => {
                 cg('data_value_element', data_value_element);
+            });
+        }
+
+        function ExportForm(){
+            let _token = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+                url: '/form/export-form',
+                type: "POST",
+                data: {
+                    _token: _token,
+                    data: $('#code_table-database').val()
+                },
+                success: function(response) {
+                    cg('response ExportForm', response);
+                    var dlink = document.createElement("a");
+                    dlink.href = `/${response.data}`;
+                    dlink.setAttribute("download", "");
+                    dlink.click();
+
+                },
+                error: function(response) {
+                    console.log(response)
+                }
             });
         }
     </script>

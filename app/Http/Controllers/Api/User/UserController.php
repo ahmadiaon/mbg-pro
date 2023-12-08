@@ -2,16 +2,30 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\User;
 use App\Models\People;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Employee\Employee;
 use Illuminate\Database\QueryException;
 
 class UserController extends Controller
 {
+    public function getfull(Request $request){
+        $token = $request->token;
+
+        $user = User::where('auth_login', $token)->first();
+        if($user){
+            $data = Employee::noGet_employeeAll_detail()->where('employees.uuid', $user->nik_employee)->first();
+            return ResponseFormatter::toJson($data, 'success');
+        }
+        return ResponseFormatter::toJson(null, 'Not Found');
+
+        
+    }
     // Show User Profile By Id
     public function showProfile($id)
     {
@@ -35,7 +49,7 @@ class UserController extends Controller
             'name'          => 'required',
             'phone_number'  => 'required',
             'email'         => 'required|email',
-            // 'avatar'    => 'required',
+            'avatar'    => '',
         ]);
 
         try {
@@ -52,7 +66,7 @@ class UserController extends Controller
                     $uploadAvatar = 'images/profile/';
                     $profileImage = date('YmdHis') . "." . $avatar->getClientOriginalExtension();
                     $avatar->move($uploadAvatar, $profileImage);
-                    $request->avatar = '/' . $uploadAvatar . $profileImage;
+                    // $request->avatar = '/' . $uploadAvatar . $profileImage;
                 } else {
                     return response()->json(422);
                 }

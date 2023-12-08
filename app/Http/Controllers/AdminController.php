@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
+use App\Models\Aktivity\Aktivity;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Dictionary;
 use App\Models\Employee\Employee;
@@ -14,6 +15,7 @@ use App\Models\UserDetail\UserDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
@@ -40,7 +42,43 @@ class AdminController extends Controller
             'javascript_form'       => true,
             'active'                        => 'activity'
         ];
+
+        
+
+
         ResponseFormatter::setAllSession();
+
+        $database = session('data_database');
+
+        foreach($database['data_employees'] as $employee){
+            $uuid =  Str::uuid();
+            $string = $employee->nik_employee;
+            $result = preg_replace("/[^0-9]/", "", $string) ;
+            $result = $result * 1;
+
+            $insert_data = [
+                'table_name' => 'ID-FINGGER-KARYAWAN',
+                'field'     => 'ID-KARYAWAN',
+                'value_field'   => $employee->nik_employee,                
+                'type_data' => 'EMPLOYEES',
+                'code_data' => $uuid,
+            ];
+
+            // $store_id_karyawan = Aktivity::insert($insert_data);
+
+            $insert_data['field'] = 'ID-FINGGER';
+            $insert_data['value_field'] = $employee->machine_id;            
+            // $insert_data['value_field'] = $result;
+            // $store_id_karyawan = Aktivity::insert($insert_data);
+
+            $insert_data['field'] = 'CREATED-BY';
+            $insert_data['value_field'] = 'MBLE-0422003';            
+            // $store_id_karyawan = Aktivity::insert($insert_data);
+            $isert[] = $insert_data;
+
+        }
+
+        // return $isert;
 
         return view('admin.indexActivity', [
             'title'         => 'Aktivitas',

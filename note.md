@@ -296,3 +296,22 @@ INSERT INTO safety_employees (`uuid`, `employee_contract_uuid`) VALUES
 }
 
 ```
+
+"
+    ="
+        "
+            OPLD/
+        "
+    "
+"
+
+
+"=""OPLD/""&"BG32"
+
+
+
+
+
+
+
+

@@ -9,7 +9,7 @@
                         <h4 class="text-blue h4">Filter</h4>
                     </button>
                 </div>
-                <div id="faq1" class="collapse show" data-parent="#accordion">
+                <div id="faq1" class="collapse show" data-parent="#accordion" >
                     <div class="row clearfix">
                         <div class="col-md-6 mb-10">
                             <div class="card-box pd-20" id="the-filter-employee-tonase">
@@ -270,6 +270,7 @@
                 <div class="row pd-20">
                     <div class="col-auto">
                         <h4 class="text-blue h4">Daftar Karyawan</h4>
+                        
                     </div>
                     <div class="col text-right" <div class="btn-group">
                         <div class="btn-group dropdown">
@@ -583,7 +584,8 @@
                     filter: filter
                 },
                 success: function(response) {
-                    // cg('response data-x', response);
+                    cg('response data-x', response);
+                    // return false;
                     datax = response.data;
                     let data_datable_obj = datax.employee_filter_company_x_site;
                     data_export = data_datable_obj;

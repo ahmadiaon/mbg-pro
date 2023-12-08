@@ -58,6 +58,7 @@ use App\Http\Controllers\Safety\AtributSizeController;
 use App\Http\Controllers\Safety\SafetyEmployeeController;
 use App\Http\Controllers\StatusAbsenController;
 use App\Http\Controllers\SuperadminController;
+use App\Http\Controllers\Support\DatabaseController;
 use App\Http\Controllers\TaxStatusController;
 use App\Http\Controllers\UserDetail\UserAddressController;
 use App\Http\Controllers\UserDetail\UserDependentController;
@@ -71,7 +72,10 @@ use App\Http\Controllers\Vehicle\BrandTypeController;
 use App\Http\Controllers\Vehicle\GroupVehicleController;
 use App\Http\Controllers\Vehicle\StatusController;
 use App\Http\Controllers\Vehicle\VehicleController;
+use App\Http\Controllers\WebAbsensiController;
+use App\Http\Controllers\WebUserController;
 use App\Models\Employee\EmployeeHourMeterBonus;
+use Illuminate\Queue\Connectors\DatabaseConnector;
 
 Route::prefix('/support')->group(function () {
     Route::post('/set-date', [AdminController::class, 'setDate']);
@@ -180,6 +184,9 @@ Route::prefix('/recruitment')->group(function () {
     });
 });
 
+Route::get('/abc', function () {
+    return view('abc');
+});
 
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
 Route::get('/logout', [AuthenticationController::class, 'logout']);
@@ -415,18 +422,25 @@ Route::middleware(['islogin'])->group(function () {
     });
     Route::prefix('/form')->group(function () {
         Route::get('/', [AktivityController::class, 'indexForm']);
-
+        Route::post('/export-form', [AktivityController::class, 'exportForm']);
+        
     });
 
 
     // ===================== d a t a b a s e 
     Route::prefix('/database')->group(function () {
+
+        Route::post('/get-data', [AktivityController::class, 'getData']);
+        
+
         Route::get('/absen', [StatusAbsenController::class, 'indexPayrol']);
         Route::get('/export-db', [StatusAbsenController::class, 'exportDB']);
         Route::post('/status-absen', [StatusAbsenController::class, 'storePayrol']); ///payrol/database/status-absen
         Route::get('/absen/{uuid}/edit', [StatusAbsenController::class, 'showPayrol']);
         Route::post('/absen/delete', [StatusAbsenController::class, 'delete']);
         Route::get('/absen-data', [StatusAbsenController::class, 'anyData']);
+
+
 
         Route::prefix('/status-absen')->group(function () {
             Route::get('/export', [StatusAbsenController::class, 'export']);
@@ -796,6 +810,10 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/show', [GaleryController::class, 'showAdmin']);
     });
 
+    Route::prefix('/application')->group(function () {
+        Route::get('/', [DatabaseController::class, 'index']);
+    });
+
 
 
 
@@ -949,3 +967,30 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/data', [StorageLogisticController::class, 'anyData']);
     });
 });
+
+Route::prefix('/web')->group(function () {
+    Route::get('/profile', [WebUserController::class, 'profile']);
+
+
+    Route::prefix('/pendapatan')->group(function () {
+        Route::get('/absensi', [WebAbsensiController::class, 'index']);
+        Route::get('/slip', [WebAbsensiController::class, 'slip']);
+    });
+
+
+
+    Route::get('/logout', function () {
+        return view('app.login');
+    });
+
+    Route::get('/login', function () {
+        return view('app.login');
+    });
+
+    Route::post('/login', [WebUserController::class, 'login']);
+});
+
+//9:00
+
+
+

@@ -4,6 +4,7 @@
     <div id="create-user-detail" class="children-content mb-20">
         <form action="/app/user/detail/store" id="form-user-detail" method="POST" enctype="multipart/form-data">
             @csrf
+            
             <input type="text" name="uuid" id="uuid-create-user-detail">
             <input type="text" name="date_start" id="date_start">
             <input type="text" name="date_end" id="date_end">
@@ -15,7 +16,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 card-box pd-20 ">
+                        <div class="col-md-6 card-box mb-20 mr-20">
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input name="name" class="form-control" value="" id="name"
@@ -113,8 +114,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="pd-20 card-box mb-30">
+
+                        <div class="col-md-5 card-box">
+                            <div class=" mt-20 mb-30 pd-20">
                                 {{-- norek --}}
                                 <div class="row">
                                     <div class="col-md-6">
@@ -171,8 +173,9 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <button type="button" onclick="storeUserDetail('user-detail')"
-                                    class="btn btn-primary mt-30 float-right">Simpan</button>
+                                    class="btn btn-primary mt-30 mb-20 float-right">Simpan</button>
 
                             </div>
                         </div>

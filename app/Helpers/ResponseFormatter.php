@@ -40,6 +40,15 @@ class ResponseFormatter
     return $string;
   }
 
+  public static function abjads(){
+    $abjads = [];
+    $char = range('A', 'ZZ');
+    for ($i = 'A'; $i !== 'ZZ'; $i++){
+      $abjads[]=$i;
+    }
+    return $abjads;
+  }
+
   public static function getDateToday()
   {
     return Carbon::today()->isoFormat('Y-MM-DD');
@@ -146,6 +155,13 @@ class ResponseFormatter
     return $data;
   }
 
+  public static function ResponseJson($data, $message, $code){
+    if(empty($data) ){
+      return response()->json(['code' => 204, 'message' => "data not found", 'data' => null], $code);
+    }
+    return response()->json(['code' => $code, 'message' => $message, 'data' => $data], $code);
+  } 
+
 
 
   public static function toJson($data, $message = "success")
@@ -163,7 +179,7 @@ class ResponseFormatter
   public static function toUUID($uuid)
   {
     $uuid = ResponseFormatter::isString($uuid);
-    return strtoupper(str_replace(' ', '-', str_replace('.', '-', str_replace('/', '-', $uuid))));
+    return strtoupper(str_replace(' ', '-', str_replace('.', '-', str_replace('/', '-',  $uuid))));
   }
 
   public static function toUuidLower($uuid)
@@ -232,6 +248,7 @@ class ResponseFormatter
 
 
     $arr_employees = Employee::data_employee();
+
     $arr_employees = $arr_employees->keyBy(function ($item) {
       return strval($item->nik_employee);
     });
@@ -483,6 +500,7 @@ class ResponseFormatter
         'data_table_field'=>$data_table_field
       ],
       'data_employees' => $arr_employees,
+      'count_employee' => $arr_employees->count(),
       'data_employee_out' => $data_employee_out,
       'data_employee_talents' => $data_employee_talents,
       'data_departments' => $arr_departments,
@@ -500,6 +518,7 @@ class ResponseFormatter
       'data_payment_groups' => $arr_payment_group,
       'data_datatable_database' => $data_datatable_database
     ];
+    // dd($data_database);
     session()->put('data_database', $data_database);
     return $data_database;
     // return ResponseFormatter::toJson($data_database, 'data_database');

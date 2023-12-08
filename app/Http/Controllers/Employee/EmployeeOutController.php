@@ -96,7 +96,7 @@ class EmployeeOutController extends Controller
                 $endDate = new \DateTime($arr_date[0].'-'.$arr_date[1].'-'.$endDateThisMonth);
 
                 $all_row_data_absen = [];
-                $machine_id = $data_employees[$employee_uuid]['machine_id'];
+                $machine_id = $employee_uuid;
 
                 $delete_absen = EmployeeAbsen::where('employee_uuid', $machine_id)
                 ->where('date', '>=' ,$startDate->format('Y-m-d'))
@@ -161,7 +161,8 @@ class EmployeeOutController extends Controller
         $startDate = new \DateTime($request->date_out);
         $endDate = new \DateTime($arr_date_out[0].'-'.$arr_date_out[1].'-'.$endDateThisMonth);
         $validatedData['status_absen_uuid']  = 'X';
-        $validatedData['employee_uuid'] = $data_employees['machine_id'];
+        $validatedData['employee_uuid'] = $employee_uuid;
+        $ddd = [];
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
             $validatedData['date'] = $date->format('Y-m-d');
             $validatedData['uuid']  = $validatedData['date'] . '-' .$validatedData['employee_uuid'];
@@ -169,9 +170,11 @@ class EmployeeOutController extends Controller
                 'employee_uuid' => $validatedData['employee_uuid'],
                 'date' => $validatedData['date'],
             ], $validatedData);
+            $ddd[] = $store ;
         }
+        
 
-        return ResponseFormatter::toJson($store, 'no file data request');        
+        return ResponseFormatter::toJson($ddd, 'no file data request');        
     }
 
     public function dataOut(Request $request){
