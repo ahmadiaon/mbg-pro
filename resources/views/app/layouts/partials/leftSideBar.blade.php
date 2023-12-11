@@ -32,8 +32,21 @@
                     </a>
                 </li>
                 @endif
+                
+                @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
+                <li class="dropdown">
+                    <a href="javascript:;" id="pengelolaan"  class="dropdown-toggle">
+                        <span class="micon fa fa-book"></span><span class="mtext">Pengelolaan</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a id="absensi"  class="" href="/web/pendapatan/absensi">Absensi</a></li>
+                        <li><a id="slip"  href="/web/manage/slip">Slip Gaji </a></li>
+                    </ul>
+                </li>
+                @endif
                 <li>
-                    <a href="/logout" class="dropdown-toggle no-arrow">
+                    <a href="/web/logout" class="dropdown-toggle no-arrow">
+                        
                         <span class="micon dw dw-logout"></span><span class="mtext">Keluar</span>
                     </a>
                 </li>

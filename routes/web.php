@@ -73,6 +73,7 @@ use App\Http\Controllers\Vehicle\GroupVehicleController;
 use App\Http\Controllers\Vehicle\StatusController;
 use App\Http\Controllers\Vehicle\VehicleController;
 use App\Http\Controllers\WebAbsensiController;
+use App\Http\Controllers\WebSlipController;
 use App\Http\Controllers\WebUserController;
 use App\Models\Employee\EmployeeHourMeterBonus;
 use Illuminate\Queue\Connectors\DatabaseConnector;
@@ -83,7 +84,6 @@ Route::prefix('/support')->group(function () {
     Route::get('/setSessionDatabase', [AdminController::class, 'setSessionDatabase']);
     Route::get('/data/{nik_employee}', [UserDetailController::class, 'show']);
     Route::get('/all-db', [ResponseFormatter::class, 'tableList']);
-
 });
 
 Route::get('/test-udin', [EmployeeController::class, 'allEmployeeData']);
@@ -142,16 +142,16 @@ Route::prefix('/recruitment')->group(function () {
     Route::get('/me', [UserDetailController::class, 'myRecruitmentProfile']);
     Route::get('/me/detail', [UserDetailController::class, 'showRecruitment']);
     Route::get('/me/identity', [UserDetailController::class, 'create']);
-    Route::get('/me/address', [UserAddressController::class, 'create']);    
-    Route::get('/me/dependent', [UserDependentController::class, 'create']); 
+    Route::get('/me/address', [UserAddressController::class, 'create']);
+    Route::get('/me/dependent', [UserDependentController::class, 'create']);
     Route::get('/me/education', [UserEducationController::class, 'create']);
     Route::get('/me/health', [UserHealthController::class, 'create']);
     Route::get('/me/license', [UserLicenseController::class, 'create']);
     Route::get('/me/document', [EmployeeDocumentController::class, 'create']);
 
-    
+
     Route::get('/me/apply', [EmployeeApplicantController::class, 'indexRecruitment']);
-    
+
     Route::get('/', [RecruitmentController::class, 'indexRecruitment']);
     Route::post('/data', [RecruitmentController::class, 'anyData']);
 
@@ -231,10 +231,10 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/data', [EmployeeCutiController::class, 'anyData']);
         Route::post('/import', [EmployeeCutiController::class, 'import']);
         Route::post('/store', [EmployeeCutiController::class, 'store']);
-        
+
         Route::get('/show/{uuid}', [EmployeeCutiController::class, 'show']);
         Route::post('/delete', [EmployeeCutiController::class, 'delete']);
-        
+
         Route::post('/data-timeline', [EmployeeCutiController::class, 'anyDataTimeLine']);
         Route::post('/data-warning', [EmployeeCutiController::class, 'anyDataWarning']);
     });
@@ -292,7 +292,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/', [EmployeeApplicantController::class, 'index']);
         Route::get('/test', [AllowanceController::class, 'anyData']);
         Route::post('/data', [EmployeeApplicantController::class, 'anyData']);
-        
+
         Route::post('/pending', [EmployeeApplicantController::class, 'pendingProposal']);
     });
 
@@ -340,7 +340,7 @@ Route::middleware(['islogin'])->group(function () {
             edit absen
             show every month
         */
-        
+
         Route::post('/report-absensi', [EmployeeAbsenController::class, 'exportAbsensiX']);
         Route::post('/store-fingger', [EmployeeAbsenController::class, 'storeFingger']);
         Route::get('/', [EmployeeAbsenController::class, 'index']);
@@ -359,7 +359,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/after-import', [EmployeeAbsenController::class, 'afterImport']);
 
         // Route::get('/data-employee/{year_month}/{employee_uuid}', [EmployeeAbsenController::class, 'anyDataEmployee']);
-        
+
         Route::post('/store', [EmployeeAbsenController::class, 'store']);
         Route::post('/store-absen', [EmployeeAbsenController::class, 'storeAbsen']);
     });
@@ -386,7 +386,7 @@ Route::middleware(['islogin'])->group(function () {
 
 
     Route::prefix('/employee-payment-debt')->group(function () {
-        
+
         Route::post('/store', [EmployeePaymentDebtController::class, 'store']);
         Route::post('/delete', [EmployeePaymentDebtController::class, 'delete']);
 
@@ -423,7 +423,6 @@ Route::middleware(['islogin'])->group(function () {
     Route::prefix('/form')->group(function () {
         Route::get('/', [AktivityController::class, 'indexForm']);
         Route::post('/export-form', [AktivityController::class, 'exportForm']);
-        
     });
 
 
@@ -431,7 +430,7 @@ Route::middleware(['islogin'])->group(function () {
     Route::prefix('/database')->group(function () {
 
         Route::post('/get-data', [AktivityController::class, 'getData']);
-        
+
 
         Route::get('/absen', [StatusAbsenController::class, 'indexPayrol']);
         Route::get('/export-db', [StatusAbsenController::class, 'exportDB']);
@@ -828,8 +827,8 @@ Route::middleware(['islogin'])->group(function () {
         Route::post('/export-data', [EmployeeController::class, 'export']);
 
         Route::get('/delete', [EmployeeController::class, 'deleteAll']); //on index menu delete all
-        Route::post('/data-x', [EmployeeController::class, 'anyMoreData_']);   
-        Route::post('/delete/employee', [EmployeeController::class, 'delete']);   
+        Route::post('/data-x', [EmployeeController::class, 'anyMoreData_']);
+        Route::post('/delete/employee', [EmployeeController::class, 'delete']);
 
         Route::get('/show/{nik_employee}', [EmployeeController::class, 'showEmployeeProfile']);
         Route::get('/get/{nik_employee}', [EmployeeController::class, 'getEmployee']);
@@ -968,29 +967,29 @@ Route::middleware(['islogin'])->group(function () {
     });
 });
 
+Route::middleware(['webIsLogin'])->group(function () {
+    Route::prefix('/web')->group(function () {
+        Route::get('/profile', [WebUserController::class, 'profile']);
+
+
+        Route::prefix('/pendapatan')->group(function () {
+            Route::get('/absensi', [WebAbsensiController::class, 'index']);
+            Route::get('/slip', [WebAbsensiController::class, 'slip']);
+        });
+
+        Route::prefix('/manage')->group(function () {
+            Route::get('/absensi', [WebAbsensiController::class, 'index']);
+            Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
+            Route::post('/slip', [WebSlipController::class, 'slipStore']);
+        });
+    });
+});
+
 Route::prefix('/web')->group(function () {
-    Route::get('/profile', [WebUserController::class, 'profile']);
-
-
-    Route::prefix('/pendapatan')->group(function () {
-        Route::get('/absensi', [WebAbsensiController::class, 'index']);
-        Route::get('/slip', [WebAbsensiController::class, 'slip']);
-    });
-
-
-
-    Route::get('/logout', function () {
-        return view('app.login');
-    });
-
+    Route::get('/logout', [WebUserController::class, 'logout']);
     Route::get('/login', function () {
         return view('app.login');
     });
-
     Route::post('/login', [WebUserController::class, 'login']);
 });
-
 //9:00
-
-
-

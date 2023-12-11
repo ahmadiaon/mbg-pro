@@ -17,4 +17,10 @@ class WebAbsensiController extends Controller
             'title'         => 'Slip'
         ]);
     }
+
+    public function slipManage(){
+        return view('app.manage.slip.index', [
+            'title'         => 'Slip'
+        ]);
+    }
 }

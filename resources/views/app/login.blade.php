@@ -5,6 +5,8 @@
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
     <title>Login | MBG</title>
+    
+    
 
     <!-- Site favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="vendors/images/apple-touch-icon.png" />
@@ -13,7 +15,7 @@
 
     <!-- Mobile Specific Metas -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" type="text/css" href="/vendors/styles/core.css" />
     <link rel="stylesheet" type="text/css" href="/vendors/styles/icon-font.min.css" />
     <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css" />
@@ -103,7 +105,10 @@
     <script src="/vendors/scripts/script.min.js"></script>
     <script src="/vendors/scripts/process.js"></script>
     <script src="/vendors/scripts/layout-settings.js"></script>
-  
+    <script>
+        console.log(localStorage.getItem('ui_dataset'));
+        console.log(@json(session('user_authentication')))
+    </script>  
 </body>
 
 </html>

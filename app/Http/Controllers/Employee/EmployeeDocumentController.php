@@ -44,7 +44,7 @@ class EmployeeDocumentController extends Controller
         }
 
         $data_requirment = AtributSize::where('size', 'requirment')->get();
-        foreach ($data_requirment as $item) {            
+        foreach ($data_requirment as $item) {          
             
             if ($request->file($item->uuid) ) {
                 $file_kind = $item->uuid;              

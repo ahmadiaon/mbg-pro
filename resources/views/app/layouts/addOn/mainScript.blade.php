@@ -98,8 +98,8 @@
 
     function conLog(identify, data) {
         //  console.log("============================================================");
-        //  console.log(identify);
-        //  console.log(data);
+        console.log(identify);
+        console.log(data);
         //  console.log("============================================================");
     }
 
@@ -152,5 +152,18 @@
         return str.replace(/\b\w/g, function(match) {
             return match.toUpperCase();
         });
+    }
+
+
+
+    // ================================= UI
+    function stopLoading() {
+            console.log('stop loading')
+            $('#loading-modal').modal('hide')
+            $('.modal').modal('hide')
+        }
+
+    function startLoading() {
+        $('#loading-modal').modal('show')
     }
 </script>

@@ -79,7 +79,8 @@ class Kernel extends HttpKernel
         'isEmployee' => \App\Http\Middleware\isEmployee::class,
         'isEngineer' => \App\Http\Middleware\isEngineer::class,
         'isPayrol' => \App\Http\Middleware\isPayrol::class,
-        'isPurchaseOrder' => \App\Http\Middleware\isPurchaseOrder::class,
+        'isPurchaseOrder' => \App\Http\Middleware\isPurchaseOrder::class,        
+        'webIsLogin' => \App\Http\Middleware\webIsLogin::class,
         
         'isPurchasePublic' => \App\Http\Middleware\isPurchasePublic::class,
         'assign.guard' => \App\Http\Middleware\AssignGuard::class

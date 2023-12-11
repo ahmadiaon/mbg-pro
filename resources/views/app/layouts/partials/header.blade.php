@@ -2,7 +2,7 @@
     <div class="header-left">
         <div class="menu-icon bi bi-list"></div>
     </div>
-    <div class="header-right">           
+    <div class="header-right">
         <div class="user-notification">
             <div class="dropdown">
                 <a class="dropdown-toggle no-arrow" href="#" role="button" data-toggle="dropdown">
@@ -15,10 +15,9 @@
                             <li>
                                 <a href="#">
                                     <img src="/vendors/images/photo4.jpg" alt="" />
-                                    <h3>Vicki M. Coleman</h3>
+                                    <h3>Selamat Datang</h3>
                                     <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                                        elit, sed...
+                                        pada sistem online MBG
                                     </p>
                                 </a>
                             </li>

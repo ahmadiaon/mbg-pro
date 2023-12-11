@@ -9,11 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use Illuminate\Support\Facades\Schema;
-
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class StatusAbsenController extends Controller
 {
@@ -66,7 +65,7 @@ class StatusAbsenController extends Controller
                     $item_data_table = (array)$item_data_table;
                     $content = "(";
                     foreach ($columns as $name_columns) {
-                        $content =  $content . '"' . $item_data_table[$name_columns] . '",';
+                        $content =  $content . "'" . $item_data_table[$name_columns] . "',";
                     }
                     $content = substr_replace($content, "", -1);
                     $content = $content . '),';
@@ -83,8 +82,8 @@ class StatusAbsenController extends Controller
             $row_++;
         }
         // dd($tables);
-        $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/absensi/export-karyawan-' . rand(99, 9999) . 'file.xls';
+        $crateWriter = new Xlsx($createSpreadsheet);
+        $name = 'file/absensi/export-karyawan-' . rand(99, 9999) . 'file.xlsx';
         $crateWriter->save($name);
         return response()->download($name);
     }
@@ -123,8 +122,8 @@ class StatusAbsenController extends Controller
         $createSheet->setCellValue('C5', 'Deskripsi');
         $createSheet->setCellValue('D5', 'Perhitungan');
 
-        $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/absensi/database-status-absen-' . rand(99, 9999) . 'file.xls';
+        $crateWriter = new Xlsx($createSpreadsheet);
+        $name = 'file/absensi/database-status-absen-' . rand(99, 9999) . 'file.xlsx';
         $row = 6;
         $each = 1;
         foreach ($arr_data as $item) {

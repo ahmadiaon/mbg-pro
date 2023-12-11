@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\User;
 use App\Models\UserDetail\UserDetail;
@@ -16,7 +17,7 @@ class WebUserController extends Controller
             'nik_employee'         => 'required',
             'password'          => ['required']
         ]);
-        $dataUser = User::where('nik_employee', $request->nik_employee)->first();
+        $dataUser = User::where('nik_employee', ResponseFormatter::toUUID($request->nik_employee))->first();
         if ($dataUser) {
             if (Hash::check($request->password, $dataUser->password)) {
                 $token = Str::random(60);
@@ -38,6 +39,18 @@ class WebUserController extends Controller
             }
         }
         return back()->with('isError', 'Login Failed!');
+    }
+
+
+    public function logout(){
+        if(!empty(session('user_authentication'))){
+            $storeEmployee = User::updateOrCreate(
+                ['id'   => session('user_authentication')->id], 
+                ['auth_login' => null]
+            );
+        }
+        return view('app.login');
+        
     }
 
     public function profile(){

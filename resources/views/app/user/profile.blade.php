@@ -41,6 +41,10 @@
                         <text class="index-employee-position">udin</text>
                     </li>
                     <li>
+                        <span>Departemen:</span>
+                        <text class="index-employee-department">udin</text>
+                    </li>
+                    <li>
                         <span>Phone Number:</span>
                         <text class="index-employee-phone_number">tidak ada</text>
                     </li>
@@ -67,89 +71,7 @@
             <div class="faq-wrap">
                 <h4 class="mb-20 h4 text-blue">Detail Lainnya</h4>
                 <div id="accordion">
-                    <div class="card">
-                        <div class="card-header">
-                            <button class="btn btn-block" data-toggle="collapse" data-target="#faq1">
-                                TimeLine Hari kerja
-                            </button>
-                        </div>
-
-                        <div id="faq1" class="collapse show" data-parent="#accordion">
-                            <div class="card-body">
-                                <div class="profile-timeline">
-                                    <div class="timeline-month">
-                                        <h5>Hari Kerja</h5>
-                                    </div>
-                                    <div class="profile-timeline-list">
-                                        <ul>
-                                            <li>
-                                                <div class="date">12 Aug</div>
-                                                <div class="task-name">
-                                                    <i class="ion-android-alarm-clock"></i> 56 Hari
-                                                    Berjalan
-                                                </div>
-                                                <p>
-                                                    Anda sudah bekerja selama 56 hari dari 70 hari kerja
-                                                </p>
-                                                <div class="task-time">14 hari menuju Cuti</div>
-                                            </li>
-                                            <li>
-                                                <div class="date">10 Aug</div>
-                                                <div class="task-name mb-30">
-                                                    <i class="ion-ios-chatboxes"></i> 14 hari
-                                                </div>
-                                            </li>
-
-                                        </ul>
-                                    </div>
-                                    <div class="timeline-month mt-20">
-                                        <h5>Jadwal Cuti Selanjutnya</h5>
-                                    </div>
-                                    <div class="profile-timeline-list mb-20">
-                                        <ul>
-                                            <li>
-                                                <div class="date">12 July</div>
-                                                <div class="task-name">
-                                                    <i class="ion-android-alarm-clock"></i> 12 okt - 26 okt
-                                                </div>
-                                                <p>
-                                                    Cuti anda selanjutnya mulai 12 okt sampai 26 okt
-                                                </p>
-                                            </li>
-                                            <li>
-                                                <div class="date">10 July</div>
-                                                <div class="task-name">
-                                                    <i class="ion-ios-chatboxes"></i> 26 Okt
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="timeline-month mt-20">
-                                        <h5>Masa Kontrak</h5>
-                                    </div>
-                                    <div class="profile-timeline-list mb-20">
-                                        <ul>
-                                            <li>
-                                                <div class="date">12 July</div>
-                                                <div class="task-name">
-                                                    <i class="ion-android-alarm-clock"></i> 12 okt - 26 okt
-                                                </div>
-                                                <p>
-                                                    Cuti anda selanjutnya mulai 12 okt sampai 26 okt
-                                                </p>
-                                            </li>
-                                            <li>
-                                                <div class="date">10 July</div>
-                                                <div class="task-name">
-                                                    <i class="ion-ios-chatboxes"></i> 26 Okt
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                     
                     <div class="card">
                         <div class="card-header">
@@ -158,7 +80,7 @@
                                 IDENTITAS DIRI
                             </button>
                         </div>
-                        <div id="faq2" class="collapse" data-parent="#accordion">
+                        <div id="faq2" class="collapse show" data-parent="#accordion">
                             <div class="card-body">
                                 <div class="profile-detail">
                                     <div class="profile-info">
@@ -516,6 +438,8 @@
 
 @section('script_javascript')
     <script>
+        console.log(localStorage.getItem('ui_dataset'));
+        console.log(@json(session('user_authentication')))
         let user_authentication = @json(session('user_authentication'));
         
         let _token = $('meta[name="csrf-token"]').attr('content');

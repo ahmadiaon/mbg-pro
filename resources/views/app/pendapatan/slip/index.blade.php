@@ -69,7 +69,7 @@
 
         function downloadSlip(url_slip) {
             var dlink = document.createElement("a");
-            dlink.href = `http://192.168.8.135:8000/file/slips/${url_slip}`;
+            dlink.href = `file/slips/${url_slip}`;
             dlink.setAttribute("download", "");
             dlink.click();
         }

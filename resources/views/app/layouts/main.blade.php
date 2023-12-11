@@ -21,14 +21,14 @@
     <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css" />
 
     @yield('src_css')
-	<script src="/vendors/scripts/core.js"></script>
+    <script src="/vendors/scripts/core.js"></script>
     <script src="/vendors/scripts/script.min.js"></script>
     <script src="/vendors/scripts/process.js"></script>
     <script src="/vendors/scripts/layout-settings.js"></script>
-   
+
     @yield('src_javascript')
     @include('app.layouts.addOn.mainScript')
-   
+
 
 </head>
 
@@ -55,8 +55,47 @@
         </div>
     </div>
 
+
+    <div class="modal fade" id="loading-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <br>
+                <br>
+                <div class="modal-body text-center">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
     <!-- js -->
-	@yield('script_javascript')
+    @yield('script_javascript')
+
     <script>
         let current_url = window.location.href;
         let header_active = 'profile';
@@ -65,12 +104,25 @@
         $('#title').text(`${capitalizeEachWord(header_active)} | MGB`);
         $(`#${header_active}`).addClass('active');
 
-        if(myArray.length == 6){
+        if (myArray.length == 6) {
             header_active = myArray[5];
-            header_active = header_active.replace('#' ,'');
-            $(`#${header_active}`).addClass('active');
+            header_active = header_active.replace('#', '');
+            // $(`#${header_active}`).addClass('active');
+
+
+            var element = document.querySelector(`a[href="/${myArray[3]}/${myArray[4]}/${myArray[5]}"]`);
+
+            // Check if the element was found
+            if (element) {
+                // Add a class to the element
+                element.classList.add('active');
+                console.log(element);
+            } else {
+                console.log("Element not found");
+            }
         }
-        
+
+        conLog('link', `a[href="/${myArray[3]}/${myArray[4]}/${myArray[5]}"]`)
     </script>
 </body>
 

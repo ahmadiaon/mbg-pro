@@ -151,7 +151,8 @@
 @section('script_javascript')
     <script>
         conLog('ui_dataset', ui_dataset)
-
+        let variable_local;
+        let data_absensi = null;
         function refreshTable(ui_year, ui_month, ui_day) {
             setUIdate(ui_year, ui_month, ui_day)
             let _token = $('meta[name="csrf-token"]').attr('content');
@@ -160,12 +161,12 @@
             let date_start = ui_dataset.ui_dataset.ui_date.year + '-' + ui_dataset.ui_dataset.ui_date.month + '-01';
             let date_end_day = ui_dataset.ui_dataset.ui_date.year + '-' + ui_dataset.ui_dataset.ui_date.month + '-' +
                 getEndDate(ui_dataset.ui_dataset.ui_date.year, ui_dataset.ui_dataset.ui_date.month).getDate();
-            
+
             let date_date_end_day = new Date(date_end_day);
 
 
             conLog('dates', date_date_end_day)
-            
+
             if (date_date_end_day > today) {
                 date_end_day = formatDate(today);
             }
@@ -189,7 +190,7 @@
                 }),
                 success: function(response) {
                     conLog('response', response)
-                    let data_absensi = null;
+                    data_absensi = null;
                     conLog('data_absensi', data_absensi)
                     $('#row-absen').append(`
                          <div class="col-12 py-1">
@@ -206,6 +207,7 @@
                         if (response['data'][ui_dataset.ui_dataset.user_authentication.nik_employee]) {
                             var loop = new Date(date_start);
                             var date_end = new Date(date_end_day);
+                            let cek_logs;
                             while (loop <= date_end) {
                                 let status_absen_code = '?';
                                 let color_button_status_absen = 'ligth'
@@ -217,6 +219,16 @@
                                         'math'
                                     ]]
                                 }
+                                console.log(formatDate(loop))
+                                
+                                
+                                if(!data_absensi[formatDate(loop)]){
+                                    cek_logs =  "kosong";
+                                }else{
+                                    cek_logs = data_absensi[formatDate(loop)]['cek_log'];
+                                }
+                                
+
                                 $('#row-absen').append(`
                                     <div class="col-auto py-1">
                                         <div class="card-box card-box px-2 mb-10">
@@ -242,14 +254,18 @@
         setUImonthYear()
         refreshTable(ui_dataset.ui_dataset.ui_date.year, ui_dataset.ui_dataset.ui_date.month, ui_dataset.ui_dataset.ui_date
             .day)
+
+
+        function showCeklog(date_absen) {
+           console.log(variable_local);
+            $('#name-date').text(`${date_absen}`);
+            if (data_absensi[date_absen]) {
+                $('#cek_log-live').val(`${data_absensi[date_absen]['cek_log']}`);
+            } else {
+
+                $('#cek_log-live').val(`tidak ada data ceklog`);
+            }
+            $('#modal-edit-live').modal('show');
+        }
     </script>
-
-
-
-
-
-
-
-
-
 @endsection()
