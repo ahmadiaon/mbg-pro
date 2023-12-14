@@ -669,12 +669,12 @@ Route::middleware(['islogin'])->group(function () {
 
 
         // Route::get('/foreman/manage-checker', [ShiftController::class, 'manageCheckerShift']);
-        Route::get('/foreman/shifts/create', [ShiftController::class, 'create']);
-        // Route::post('/foreman/manage-checker', [ShiftController::class, 'storeManageCheckerShift']);
-        Route::post('/foreman/shifts/', [ShiftController::class, 'store']);
-        Route::post('/foreman/manage-member-list', [ShiftListController::class, 'index']);
-        Route::post('/foreman/manage-member', [ShiftListController::class, 'store']);
-        Route::post('/foreman/over-burden', [OverBurdenController::class, 'forForemanOB']);
+        // Route::get('/foreman/shifts/create', [ShiftController::class, 'create']);
+        // // Route::post('/foreman/manage-checker', [ShiftController::class, 'storeManageCheckerShift']);
+        // Route::post('/foreman/shifts/', [ShiftController::class, 'store']);
+        // Route::post('/foreman/manage-member-list', [ShiftListController::class, 'index']);
+        // Route::post('/foreman/manage-member', [ShiftListController::class, 'store']);
+        // Route::post('/foreman/over-burden', [OverBurdenController::class, 'forForemanOB']);
         // Route::post('/foreman/over-burden', [OverBurdenListController::class, 'forForeman']);
         // Route::post('/foreman/hour-meter', [HourMeterController::class, 'listHMforForeman']);
         Route::get('/foreman-ob-data/{checkerId}', [OverBurdenController::class, 'dataOverBurdenForeman'])->name('dataOverBurdenForeman');
@@ -816,7 +816,7 @@ Route::middleware(['islogin'])->group(function () {
 
 
 
-    Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);
+    // Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);
     // hour-meter
 
     // user

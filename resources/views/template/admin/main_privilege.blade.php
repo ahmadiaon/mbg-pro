@@ -250,7 +250,7 @@
         var element_profile_employee_database_payrol = {
 
             mRender: function(data, type, row) {
-
+                cg('user', row.nik_employe);
                 if (row.photo_path == null) {
                     row.photo_path = '/vendors/images/photo4.jpg';
                 }

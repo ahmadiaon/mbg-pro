@@ -124,6 +124,9 @@
 
         conLog('link', `a[href="/${myArray[3]}/${myArray[4]}/${myArray[5]}"]`)
     </script>
+    <script>
+        $('.user-name').text(`${ui_dataset.ui_dataset.user_authentication.user_details.name}`);
+    </script>
 </body>
 
 </html>

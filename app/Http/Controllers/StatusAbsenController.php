@@ -52,7 +52,7 @@ class StatusAbsenController extends Controller
                 $header = 'INSERT INTO ' . $name_table . '(';
                 if (!empty(count($data_table))) {
                     foreach ($columns as $name_columns) {
-                        $header = $header . "`" . $name_columns . "`,";
+                        $header = $header . "`" . $name_columns . "`|";
                     }
                     $header = substr_replace($header, "", -1);
                     $header =  $header . ') VALUES ';
@@ -65,10 +65,16 @@ class StatusAbsenController extends Controller
                     $item_data_table = (array)$item_data_table;
                     $content = "(";
                     foreach ($columns as $name_columns) {
-                        $content =  $content . "'" . $item_data_table[$name_columns] . "',";
+                        if(!empty($item_data_table[$name_columns])){
+                            $content =  $content . "'" . $item_data_table[$name_columns] . "'|";
+                        }else{
+                            $content = $content . 'null'.'|';
+                        }
+
+                        
                     }
                     $content = substr_replace($content, "", -1);
-                    $content = $content . '),';
+                    $content = $content . ')|';
                     $createSheet->setCellValue('B' . $row_, $content);
                     $row_++;
                 }

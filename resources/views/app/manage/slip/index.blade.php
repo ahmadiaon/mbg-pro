@@ -8,54 +8,58 @@
             </div>
         </div>
         <div class="col-md-4 col-sm-12">
-            <form id="pdfUploadForm" class="card-box pd-20" action="/web/manage/slip" method="POST" enctype="multipart/form-data">
+            <form id="fileForm" class="card-box pd-20" action="/web/manage/slip" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <h5 class="h5">Bulan / Tahun </h5>
                     <p>
                         bulan dan tahun upah yang di bayar
                     </p>
-                    <input name="month-year" class="form-control month-picker" placeholder="Select Month" type="text">
+                    <input name="month-year" id="month-year" class="form-control month-picker" placeholder="Select Month"
+                        type="text">
                 </div>
                 <div class="form-group">
                     <label>File slip .pdf</label>
-                    <input class="form-control" type="file" name="pdf_files[]" accept=".pdf" multiple>
+                    <input class="form-control" type="file" id="fileInput" name="file[]" multiple>
                 </div>
                 <div id="successMessage" style="display: none;">
                     <p>PDF files uploaded successfully.</p>
                 </div>
-                <button type="button" class="btn btn-primary"  id="uploadBtn">Upload</button>
+                <button type="button" onclick="uploadFiles()" class="btn btn-primary" id="uploadBtn">Upload</button>
             </form>
         </div>
 
     </div>
-
-  
 @endsection()
 
 @section('script_javascript')
     <script>
-        $(document).ready(function() {
-            $('#uploadBtn').click(function() {
-                
-                var formData = new FormData($('#pdfUploadForm')[0]);
-                startLoading();
-                $.ajax({
+        async function uploadFiles() {
+            var fileInput = document.getElementById('fileInput');
+            var files = fileInput.files;
+            var maxSize = 4 * 1024 * 1024; // 20 MB
+            var currentSize = 0;
+            $('#successMessage').hide();
+            startLoading();
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var formData = new FormData();
+                var csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+                formData.append('_token', csrfToken);
+                formData.append('file[]', file);
+                // formData.append('file', file);
+                formData.append('month-year', $(`#month-year`).val());
+                await $.ajax({
                     url: '/web/manage/slip',
                     method: 'POST',
                     data: formData,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
-                        // console.log(response);
-                        stopLoading();
-                        $('#successMessage').show();
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
                 });
-            });
-        });
+                $('#successMessage').show();
+                stopLoading();
+            }
+        }
     </script>
 @endsection()

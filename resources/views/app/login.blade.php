@@ -98,8 +98,14 @@
 
     <!-- js -->
     <script>
-        sessionStorage.clear();
-        localStorage.clear();
+        if(localStorage.getItem('ui_dataset')){
+            localStorage.clear();
+        }
+        if(@json(session('user_authentication'))){
+            sessionStorage.clear();
+        }
+        
+        
     </script>
     <script src="/vendors/scripts/core.js"></script>
     <script src="/vendors/scripts/script.min.js"></script>

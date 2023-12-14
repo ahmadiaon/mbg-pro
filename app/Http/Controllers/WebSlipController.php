@@ -14,11 +14,11 @@ class WebSlipController extends Controller
     public function slipStore(Request $request){
 
         $request->validate([
-            'pdf_files.*' => '',
+            'file' => '',
         ]);
-        $files_file = $request->file('pdf_files');
+        // return ResponseFormatter::ResponseJson($request->all(),'success', 200);
+        $files_file = $request->file('file');
 
-        
         $files = [];
         $split_year_month = explode(" ",$request['month-year']);
         $month = ResponseFormatter::monthSort($split_year_month[0]);

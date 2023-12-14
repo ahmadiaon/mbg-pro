@@ -4,18 +4,11 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Helpers\ResponseFormatter;
 use App\Models\User;
-use App\Models\People;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\Company;
 use App\Models\Employee\Employee;
-use App\Models\UserDetail\UserAddress;
-use App\Models\UserDetail\UserDependent;
-use App\Models\UserDetail\UserDetail;
-use App\Models\UserDetail\UserHealth;
-use App\Models\UserDetail\UserReligion;
 use Illuminate\Database\QueryException;
 
 class UserController extends Controller
@@ -26,55 +19,7 @@ class UserController extends Controller
 
         $user = User::where('auth_login', $token)->first();
         if ($user) {
-
-            $data = Employee::join('user_details', 'user_details.uuid', '=', 'employees.user_detail_uuid')
-                // ->leftJoin('roasters','roasters.uuid','employees.roaster_uuid')
-                ->leftJoin('user_addresses', 'user_addresses.user_detail_uuid', 'user_details.uuid')
-                ->leftJoin('companies', 'companies.uuid', 'employees.company_uuid')
-                ->leftJoin('user_healths', 'user_healths.user_detail_uuid', 'user_details.uuid')
-                ->leftJoin('user_dependents', 'user_dependents.user_detail_uuid', 'user_details.uuid')
-                ->leftJoin('user_religions', 'user_religions.user_detail_uuid', 'user_details.uuid')
-                ->leftJoin('religions', 'religions.uuid', 'user_religions.religion_uuid')
-                ->leftJoin('user_education', 'user_education.user_detail_uuid', 'user_details.uuid')
-                ->leftJoin('user_licenses', 'user_licenses.user_detail_uuid', 'user_details.uuid')
-                ->leftJoin('employee_salaries', 'employee_salaries.employee_uuid', 'employees.uuid')
-                ->leftJoin('positions', 'positions.uuid', '=', 'employees.position_uuid')
-                ->leftJoin('departments', 'departments.uuid', '=', 'employees.department_uuid')
-                ->leftJoin('hour_meter_prices', 'hour_meter_prices.uuid', '=', 'employee_salaries.hour_meter_price_uuid');
-            
-            $user_details = UserDetail::where('nik_number', $user->nik_employee)
-            ->whereNull('date_end')
-            ->first();
-
-            $user_address = UserAddress::where('uuid', $user->nik_employee)
-            ->whereNull('date_end')
-            ->first();
-
-            $company = Company::where('uuid', $user->nik_employee)
-            ->whereNull('date_end')
-            ->first();
-
-            $user_health = UserHealth::where('user_detail_uuid', $user->nik_employee)
-            ->whereNull('date_end')
-            ->first();
-
-            $user_dependets = UserDependent::where('uuid', $user->nik_employee)
-            ->whereNull('date_end')
-            ->first();
-
-            $user_religions = UserReligion::where('uuid', $user->nik_employee)
-            ->leftJoin('religions', 'religions.uuid', 'user_religions.religion_uuid')
-            ->whereNull('user_religions.date_end')
-            ->first();
-
-            $user_details = UserHealth::where('user_detail_uuid', $user->nik_employee)
-            ->whereNull('date_end')
-            ->first();
-
-            
-            
-            
-                $data = Employee::noGet_employeeAll_detail()->where('employees.uuid', $user->nik_employee)->first();
+            $data = Employee::showWhereNik_employee($user->nik_employee);
             return ResponseFormatter::toJson($data, 'success');
         }
         return ResponseFormatter::toJson(null, 'Not Found');

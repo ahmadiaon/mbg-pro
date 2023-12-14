@@ -220,7 +220,18 @@ class Employee extends Model
             $data = $data->merge($data_address);
         }
 
-        $data_address = Employee::where('uuid', $nik_employee)->whereNull('date_end')->first();
+        $data_address = Employee::leftJoin('companies', 'companies.uuid', 'employees.company_uuid')
+        ->leftJoin('positions', 'positions.uuid', '=', 'employees.position_uuid')
+        ->leftJoin('departments', 'departments.uuid', '=', 'employees.department_uuid')
+        ->where('employees.uuid', $nik_employee)
+        ->whereNull('employees.date_end')
+        ->get([
+            'companies.company',
+            'positions.position',
+            'departments.department',
+            'employees.*'
+        ])
+        ->first();
         if ($data_address) {
             $data_address = collect($data_address);
             $data = $data->merge($data_address);
