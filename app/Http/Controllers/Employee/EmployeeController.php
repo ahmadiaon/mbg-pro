@@ -256,7 +256,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-190340', 'nik_ktp' => '6204034808950001'],
             ['nik_employee' => 'MB/PL-210386', 'nik_ktp' => '6204040504970001'],
             ['nik_employee' => 'MBLE-052211006', 'nik_ktp' => '6205020310030002'],
-            ['nik_employee' => 'MBLE-220548', 'nik_ktp' => '3301211605990005'],
+            ['nik_employee' => 'MBLE-220548', 'nik_ktp' => '3302241202000001'],
             ['nik_employee' => 'MB/F01-200252', 'nik_ktp' => '6205052210020007'],
             ['nik_employee' => 'MB/PL-220527', 'nik_ktp' => '6204040408980001'],
             ['nik_employee' => 'MBLE-210456', 'nik_ktp' => '6205051607900002'],
@@ -344,7 +344,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-220642', 'nik_ktp' => '6213082404940001'],
             ['nik_employee' => 'MBLE-140116', 'nik_ktp' => '6205052511790001'],
             ['nik_employee' => 'MBLE-05230385', 'nik_ktp' => '6205060406760002'],
-            ['nik_employee' => 'MBLE-140143', 'nik_ktp' => 'password'],
+            ['nik_employee' => 'MBLE-140143', 'nik_ktp' => '1205170604880004'],
             ['nik_employee' => 'MB/F01-1903080', 'nik_ktp' => '6212041208980002'],
             ['nik_employee' => 'MBLE-220802', 'nik_ktp' => '6205056603030006'],
             ['nik_employee' => 'MBLE-230934', 'nik_ktp' => '6203110110990003'],
@@ -480,12 +480,12 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-220573', 'nik_ktp' => '6205050501000003'],
             ['nik_employee' => 'MBLE-220633', 'nik_ktp' => '6205055112860002'],
             ['nik_employee' => 'MBLE-0422002', 'nik_ktp' => '6371052212930004'],
-            ['nik_employee' => 'MBLE-0422003', 'nik_ktp' => '6213082808000003'],
+            ['nik_employee' => 'MBLE-0422003', 'nik_ktp' => '62130828081234563'],
             ['nik_employee' => 'MBLE-220713', 'nik_ktp' => '6204040708010003'],
             ['nik_employee' => 'MBLE-220716', 'nik_ktp' => '6205010505030001'],
             ['nik_employee' => 'MBLE-220757', 'nik_ktp' => '6205025710040005'],
             ['nik_employee' => 'MBLE-220819', 'nik_ktp' => '6205020607010004'],
-            ['nik_employee' => 'MBLE-05230178', 'nik_ktp' => '31750642412990008'],
+            ['nik_employee' => 'MBLE-05230178', 'nik_ktp' => '3175064212990008'],
             ['nik_employee' => 'MBLE-230852', 'nik_ktp' => '6307040507930003'],
             ['nik_employee' => 'MBLE-230854', 'nik_ktp' => '3504101010950004'],
             ['nik_employee' => 'MBLE-230858', 'nik_ktp' => '6205024602740001'],
@@ -498,7 +498,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-062304024', 'nik_ktp' => '6204042807770004'],
             ['nik_employee' => 'MBLE-0321100002', 'nik_ktp' => '6304084804920002'],
             ['nik_employee' => 'MB/F01-200199', 'nik_ktp' => 'password'],
-            ['nik_employee' => 'MB/PL-100012', 'nik_ktp' => '6205050206030005'],
+            ['nik_employee' => 'MB/PL-100012', 'nik_ktp' => '6205050208700004'],
             ['nik_employee' => 'MB/F01-130045', 'nik_ktp' => '6205055612820003'],
             ['nik_employee' => 'MB/F01-170109', 'nik_ktp' => '6205054508760001'],
             ['nik_employee' => 'MBLE-230927', 'nik_ktp' => '6204044612040001'],
@@ -506,7 +506,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MB/F01-200236', 'nik_ktp' => '6213092911020001'],
             ['nik_employee' => 'MBLE-230916', 'nik_ktp' => '6205025706050002'],
             ['nik_employee' => 'MBLE-230917', 'nik_ktp' => '6205055102030005'],
-            ['nik_employee' => 'MBLE-230919', 'nik_ktp' => '6204045910990000'],
+            ['nik_employee' => 'MBLE-230919', 'nik_ktp' => '6204045910990002'],
             ['nik_employee' => 'MBLE-230920', 'nik_ktp' => '6204036712010000'],
             ['nik_employee' => 'MBLE-230921', 'nik_ktp' => '6205051405920004'],
             ['nik_employee' => 'MBLE-230924', 'nik_ktp' => '6204034412010002'],
@@ -543,7 +543,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-170249', 'nik_ktp' => '6205053003980004'],
             ['nik_employee' => 'MBLE-210396', 'nik_ktp' => '6204061406990001'],
             ['nik_employee' => 'MBLE-140130', 'nik_ktp' => '6213080705860001'],
-            ['nik_employee' => 'MBLE-0219080058', 'nik_ktp' => '6205061109880003'],
+            ['nik_employee' => 'MBLE-0219080058', 'nik_ktp' => '6205061109880003'],                                                                                                
             ['nik_employee' => 'MBLE-210394', 'nik_ktp' => '6301040102900001'],
             ['nik_employee' => 'MBLE-0322010065', 'nik_ktp' => '6205050801790003'],
             ['nik_employee' => 'MBLE-130075', 'nik_ktp' => '6204050207700003'],
@@ -1001,7 +1001,7 @@ class EmployeeController extends Controller
             $much_employee = 0;
             $all_data_import = [];
 
-
+            dd('xxx');
             // return $sheet->getCell('A' . $no_employee)->getValue();
 
             while ((int)$sheet->getCell('A' . $no_employee)->getValue() != null) {
