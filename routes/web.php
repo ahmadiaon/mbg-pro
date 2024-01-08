@@ -978,9 +978,10 @@ Route::middleware(['webIsLogin'])->group(function () {
         });
 
         Route::prefix('/manage')->group(function () {
-            Route::get('/absensi', [WebAbsensiController::class, 'index']);
+            Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
             Route::post('/slip', [WebSlipController::class, 'slipStore']);
+            // Route::get('/users', [UserController::class, 'indexManage']);
         });
     });
 });

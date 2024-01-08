@@ -23,4 +23,10 @@ class WebAbsensiController extends Controller
             'title'         => 'Slip'
         ]);
     }
+
+    public function manageIndex(){
+        return view('app.manage.absensi.index', [
+            'title'         => 'Slip'
+        ]);
+    }
 }

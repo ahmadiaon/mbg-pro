@@ -24,6 +24,12 @@ class UserController extends Controller
         }
         return ResponseFormatter::toJson(null, 'Not Found');
     }
+
+    public function indexManage(){
+
+    }
+
+    
     // Show User Profile By Id
     public function showProfile($id)
     {

@@ -56,9 +56,7 @@ class WebUserController extends Controller
 
     public function profile()
     {
-        echo 'post_max_size: ' . ini_get('post_max_size') . PHP_EOL;
-        echo 'upload_max_filesize: ' . ini_get('upload_max_filesize') . PHP_EOL;
-        // return 'true';
+       
         return view('app.user.profile', [
             'title'         => 'Login'
         ]);

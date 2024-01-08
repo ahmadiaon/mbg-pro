@@ -29,10 +29,19 @@
     @yield('src_javascript')
     @include('app.layouts.addOn.mainScript')
 
+    <link rel="stylesheet" type="text/css" href="/src/plugins/datatables/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" type="text/css" href="/src/plugins/datatables/css/responsive.bootstrap4.min.css" />
+    <script src="/src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+    <script src="/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+    <script src="/vendors/scripts/datatable-setting.js"></script>
+   
 
 </head>
 
 <body>
+
 
 
     {{-- HEADER --}}
@@ -43,7 +52,7 @@
     @include('app.layouts.partials.leftSideBar')
     <div class="mobile-menu-overlay"></div>
 
-    <div class="main-container">
+    <div class="main-container" id="main-content">
         <div class="pd-ltr-20 xs-pd-20-10">
             <div class="min-height-200px">
                 @yield('content')
@@ -95,8 +104,20 @@
 
     <!-- js -->
     @yield('script_javascript')
+    <script>
+        console.log('doc start');
+        $('#main-content').hide();
+        // startLoading();
+   </script>
 
     <script>
+        $(document).ready(function() {
+            console.log('doc ready');
+            $('#loading-modal').hide();      
+            $('#main-content').show();
+        });
+
+
         let current_url = window.location.href;
         let header_active = 'profile';
         let myArray = current_url.split("/");
@@ -108,8 +129,6 @@
             header_active = myArray[5];
             header_active = header_active.replace('#', '');
             // $(`#${header_active}`).addClass('active');
-
-
             var element = document.querySelector(`a[href="/${myArray[3]}/${myArray[4]}/${myArray[5]}"]`);
 
             // Check if the element was found

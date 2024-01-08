@@ -539,7 +539,7 @@
             $('#table-user').append(element_table);
 
             // datatable
-            data.push(element_profile_employee_database_payrol)
+            data.push(element_profile_employee)
 
             if (filter.show_type != 'simple') {
                 data_table_schema['employees'].forEach(element_employee_schema => {
@@ -584,7 +584,7 @@
                     filter: filter
                 },
                 success: function(response) {
-                    cg('response data-x', response);
+                    // cg('response data-x', response);
                     // return false;
                     datax = response.data;
                     let data_datable_obj = datax.employee_filter_company_x_site;
@@ -592,10 +592,15 @@
                     let data_datable = [];
                     if (data_datable_obj) {
                         Object.values(data_datable_obj).forEach(element_data_datable_obj => {
+                            // if(data_datable_obj.nik_employee == undefined){
+                                // cg('data_datable_obj',element_data_datable_obj);
+                            //     return false;
+                            // }
                             data_datable.push(element_data_datable_obj);
                         });
                     }
-
+                    cg('response data-x', data_export);
+                    // return false;
                     // cg('response', data_datable);
                     $('#table-user-employees').DataTable({
                         scrollX: true,

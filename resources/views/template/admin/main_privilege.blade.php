@@ -247,6 +247,8 @@
             }
         };
 
+        cg('data data', data_database);
+
         var element_profile_employee_database_payrol = {
 
             mRender: function(data, type, row) {
@@ -260,6 +262,11 @@
                 let bg = '';
                 if (data_database['data_employee_out'][row.nik_employee]) {
                     bg = 'bg-warning';
+                }
+                if(data_database.data_employees[row.nik_employee] == undefined){
+                    cg('udnf', 'udnf');
+                    data_database.data_employees[row.nik_employee]['name'] = '-';
+                    cg('row nik', row.nik_employee);
                 }
                 return `
                     <div class="card-box ${bg} pd-10">

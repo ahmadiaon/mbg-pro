@@ -92,7 +92,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-230922', 'nik_ktp' => '6203016705990002'],
             ['nik_employee' => 'MBLE-220727', 'nik_ktp' => '6371030401990008'],
             ['nik_employee' => 'BK/PL-200366', 'nik_ktp' => '6172023003940004'],
-            ['nik_employee' => 'BK/PL-130108', 'nik_ktp' => '6303050503870004'],
+            ['nik_employee' => 'BK/PL-130108', 'nik_ktp' => '6303050503870004'], 
             ['nik_employee' => 'MB/HO-180049', 'nik_ktp' => '3216071111670006'],
             ['nik_employee' => 'MBLE-0422006', 'nik_ktp' => '6205051710690003'],
             ['nik_employee' => 'MBLE-0422056', 'nik_ktp' => '6303030405540002'],
@@ -230,7 +230,7 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MB/F01-150058', 'nik_ktp' => '6212100107801001'],
             ['nik_employee' => 'MBLE-230887', 'nik_ktp' => '3517032111700002'],
             ['nik_employee' => 'MBLE-230890', 'nik_ktp' => '3214041511960005'],
-            ['nik_employee' => 'MB/PL-210420', 'nik_ktp' => '6210021404020001'],
+            ['nik_employee' => 'MB/PL-210420', 'nik_ktp' => '6271011504960006'],
             ['nik_employee' => 'MB/PL-230896', 'nik_ktp' => 'password'],
             ['nik_employee' => 'MBLE-0321120048', 'nik_ktp' => '3518022802690002'],
             ['nik_employee' => 'MB/PL-220823', 'nik_ktp' => '6204042910950001'],
@@ -392,12 +392,12 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MBLE-220697', 'nik_ktp' => '3304040105020001'],
             ['nik_employee' => 'MBLE-0422010', 'nik_ktp' => '6204041005030004'],
             ['nik_employee' => 'MBLE-220707', 'nik_ktp' => '3272020310020903'],
-            ['nik_employee' => 'MBLE-220711', 'nik_ktp' => '6204056906980001'],
+            ['nik_employee' => 'MBLE-220711', 'nik_ktp' => '6204060203980001'],
             ['nik_employee' => 'MBLE-220729', 'nik_ktp' => '1807211411000001'],
             ['nik_employee' => 'MBLE-220752', 'nik_ktp' => '6204060412960002'],
             ['nik_employee' => 'MBLE-220764', 'nik_ktp' => '6213091507820001'],
             ['nik_employee' => 'MBLE-220774', 'nik_ktp' => '6204061502040002'],
-            ['nik_employee' => 'MBLE-220775', 'nik_ktp' => '3275090310930010'],
+            ['nik_employee' => 'MBLE-220775', 'nik_ktp' => '3275090310930014'], 
             ['nik_employee' => 'MBLE-220776', 'nik_ktp' => '6302110301030004'],
             ['nik_employee' => 'MB/F01-200225', 'nik_ktp' => '6205050810990002'],
             ['nik_employee' => 'MBLE-220791', 'nik_ktp' => '6308041206990004'],
@@ -587,6 +587,13 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MB/FO-170342', 'nik_ktp' => '6205052609980002'],
             ['nik_employee' => 'MB/HO-200063', 'nik_ktp' => '6205052810680001'],
             ['nik_employee' => 'MB/PL-200361', 'nik_ktp' => '6304151810860002']
+        ];
+
+        $user_nik = [
+            ['nik_employee' => 'MBLE-231201', 'nik_ktp' => '3205162311790001'],
+            
+            ['nik_employee' => 'MBLE-220681', 'nik_ktp' => '6204040710950003'],
+            ['nik_employee' => 'MBLE-0422003', 'nik_ktp' => '62130828081234563'],
         ];
 
         foreach($user_nik as $item){
@@ -1001,7 +1008,7 @@ class EmployeeController extends Controller
             $much_employee = 0;
             $all_data_import = [];
 
-            dd('xxx');
+           
             // return $sheet->getCell('A' . $no_employee)->getValue();
 
             while ((int)$sheet->getCell('A' . $no_employee)->getValue() != null) {
@@ -1066,7 +1073,7 @@ class EmployeeController extends Controller
                         }
                     }
                 }
-
+                
 
                 $employee_data_one['name'] = $employee_data_one['name_real'];
                 $employee_data_one['nik_employee_with_space'] = $employee_data_one['nik_employee_real'];
@@ -1114,6 +1121,7 @@ class EmployeeController extends Controller
                     }
                 }
 
+                
 
                 if (!empty($employee_data_one['last_education'])) {
                     $employee_data_one[$employee_data_one['last_education'] . '_name'] = 'default';
@@ -1211,57 +1219,90 @@ class EmployeeController extends Controller
                 if (!empty($employee_data_one['date_end'])) {
                     dd("employee_data_one");
                 }
+               
 
                 echo $nik_employee . "-start employee</br>";
                 if (!empty($employee_data_one['date_out'])) {
                     $employee_data_one['employee_status'] = 'Keluar';
                     $storeEmployee = EmployeeOut::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                 }
+               
+                // dd($data_old);
 
 
-                if (!empty($data_old)) {
-                    $all_data_import['data_old'][$nik_employee] = $nik_employee;
-                    // dd("data_old");
-                    if ($data_old['date_start'] > $employee_data_one['date_start']) {
+                // $storeEmployee = Employee::updateOrCreate([''],$employee_data_one);
+                // $storeEmployee = EmployeeSalary::updateOrCreate([''],$employee_data_one);
+                // $storeEmployee = UserDetail::updateOrCreate([''],$employee_data_one);
+                // $storeEmployee = UserAddress::updateOrCreate([''],$employee_data_one);
+                // $storeEmployee = UserEducation::updateOrCreate([''],$employee_data_one);
+                // $storeEmployee = UserDependent::updateOrCreate([''],$employee_data_one);
+                // $storeEmployee = EmployeeCutiSetup::updateOrCreate([''],$employee_data_one);
 
-                        if (empty($employee_data_one['date_end_effective'])) {
-                            $employee_data_one['date_end'] = $data_old['date_start'];
-                        } else {
-                            if ($employee_data_one['date_end_effective'] < $data_old['date_start']) {
-                                $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
-                            } else {
+                $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                $storeEmployee = EmployeeSalary::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+              
+
+                /*
+                
+                    if (!empty($data_old)) {
+                        $all_data_import['data_old'][$nik_employee] = $nik_employee;
+                        // dd("data_old");
+                        if ($data_old['date_start'] > $employee_data_one['date_start']) {
+                            dd('a');
+                            if (empty($employee_data_one['date_end_effective'])) {
                                 $employee_data_one['date_end'] = $data_old['date_start'];
+                            } else {
+                                if ($employee_data_one['date_end_effective'] < $data_old['date_start']) {
+                                    $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                                } else {
+                                    $employee_data_one['date_end'] = $data_old['date_start'];
+                                }
                             }
+                            $storeEmployee = Employee::create($employee_data_one);
+                            $storeEmployee = EmployeeSalary::create($employee_data_one);
+                            $storeEmployee = UserDetail::create($employee_data_one);
+                            $storeEmployee = UserAddress::create($employee_data_one);
+                            $storeEmployee = UserEducation::create($employee_data_one);
+                            $storeEmployee = UserDependent::create($employee_data_one);
+                            $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
+
+                            // dd('a');
+                        } elseif ($data_old['date_start'] == $employee_data_one['date_start']) {
+
+                            $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            $storeEmployee = EmployeeSalary::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
+                            dd('b');
+                        } else {
+
+                            $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = EmployeeSalary::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+                            $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
+
+                            $storeEmployee = Employee::create($employee_data_one);
+                            $storeEmployee = EmployeeSalary::create($employee_data_one);
+                            $storeEmployee = UserDetail::create($employee_data_one);
+                            $storeEmployee = UserAddress::create($employee_data_one);
+                            $storeEmployee = UserEducation::create($employee_data_one);
+                            $storeEmployee = UserDependent::create($employee_data_one);
+                            $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
+                            dd('c');
                         }
-                        $storeEmployee = Employee::create($employee_data_one);
-                        $storeEmployee = EmployeeSalary::create($employee_data_one);
-                        $storeEmployee = UserDetail::create($employee_data_one);
-                        $storeEmployee = UserAddress::create($employee_data_one);
-                        $storeEmployee = UserEducation::create($employee_data_one);
-                        $storeEmployee = UserDependent::create($employee_data_one);
-                        $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
-
-                        // dd('a');
-                    } elseif ($data_old['date_start'] == $employee_data_one['date_start']) {
-
-                        $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        $storeEmployee = EmployeeSalary::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
-                        // dd('b');
                     } else {
-
-                        $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-                        $storeEmployee = EmployeeSalary::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-                        $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-                        $storeEmployee = UserAddress::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-                        $storeEmployee = UserEducation::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-                        $storeEmployee = UserDependent::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-                        $storeEmployee = EmployeeCutiSetup::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], ['date_end' => $employee_data_one['date_start']]);
-
+                        dd('lll');
                         $storeEmployee = Employee::create($employee_data_one);
                         $storeEmployee = EmployeeSalary::create($employee_data_one);
                         $storeEmployee = UserDetail::create($employee_data_one);
@@ -1269,20 +1310,11 @@ class EmployeeController extends Controller
                         $storeEmployee = UserEducation::create($employee_data_one);
                         $storeEmployee = UserDependent::create($employee_data_one);
                         $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
-                        // dd('c');
+                        // dd('d');
+                        $all_data_import['data_new'][$nik_employee] = $nik_employee;
                     }
-                } else {
-                    // dd('lll');
-                    $storeEmployee = Employee::create($employee_data_one);
-                    $storeEmployee = EmployeeSalary::create($employee_data_one);
-                    $storeEmployee = UserDetail::create($employee_data_one);
-                    $storeEmployee = UserAddress::create($employee_data_one);
-                    $storeEmployee = UserEducation::create($employee_data_one);
-                    $storeEmployee = UserDependent::create($employee_data_one);
-                    $storeEmployee = EmployeeCutiSetup::create($employee_data_one);
-                    // dd('d');
-                    $all_data_import['data_new'][$nik_employee] = $nik_employee;
-                }
+
+                */
 
                 echo $nik_employee . "-start user detail</br>";
 
@@ -1292,49 +1324,53 @@ class EmployeeController extends Controller
 
                 echo $nik_employee . "-start salary</br>";
 
-                foreach ($premis as $premi) {
 
-                    if (!empty($employee_data_one[$premi->uuid])) {
-                        $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
-                        $employee_data_one['premi_uuid'] = $premi->uuid;
-                        $employee_data_one['uuid'] = $nik_employee . '-' . $premi->uuid;
-                        $premi_value = $employee_data_one[$premi->uuid];
+                /*
 
-                        if (!empty($get_all_employee_premis[$nik_employee . '-' . $premi->uuid])) {
-                            $data_old_premi[$premi->uuid] = $get_all_employee_premis[$nik_employee . '-' . $premi->uuid]->toArray();
+                    foreach ($premis as $premi) {
+
+                        if (!empty($employee_data_one[$premi->uuid])) {
                             $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
-
-                            if ($data_old_premi[$premi->uuid]['date_start'] >  $employee_data_one['date_start']) {
-                                if (empty($employee_data_one['date_end_effective'])) {
-                                    $employee_data_one['date_end'] = $data_old_premi[$premi->uuid]['date_start'];
-                                } else {
-                                    $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
-                                }
-                                $storeEmployee = EmployeePremi::create($employee_data_one);
-                            } elseif ($data_old_premi[$premi->uuid]['date_start']  == $employee_data_one['date_start']) {
-                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_premi[$premi->uuid]['id']], $employee_data_one);
-                            } else {
-                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_premi[$premi->uuid]['id']], ['date_end' => $employee_data_one['date_start']]);
-                                $storeEmployee = EmployeePremi::create($employee_data_one);
-                            }
-                        } else {
-                            $storeEmployee = EmployeePremi::create($employee_data_one);
-                        }
-                        // dd($storeEmployee);
-                    }
-                    $data_old_arr = [];
-                    if (!empty($get_all_employee_premis[$nik_employee . '-' . $premi->uuid])) {
-                        if (empty($employee_data_one[$premi->uuid])) {
-                            $employee_data_one['premi_value'] = 0;
                             $employee_data_one['premi_uuid'] = $premi->uuid;
                             $employee_data_one['uuid'] = $nik_employee . '-' . $premi->uuid;
-                            $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $get_all_employee_premis[$nik_employee . '-' . $premi->uuid]['id']], ['date_end' => $employee_data_one['date_start']]);
-                            $storeEmployee = EmployeePremi::create($employee_data_one);
-                        }
-                        $data_old_arr[] = $get_all_employee_premis[$nik_employee . '-' . $premi->uuid];
-                    }
-                }
+                            $premi_value = $employee_data_one[$premi->uuid];
 
+                            if (!empty($get_all_employee_premis[$nik_employee . '-' . $premi->uuid])) {
+                                $data_old_premi[$premi->uuid] = $get_all_employee_premis[$nik_employee . '-' . $premi->uuid]->toArray();
+                                $employee_data_one['premi_value'] = $employee_data_one[$premi->uuid];
+
+                                if ($data_old_premi[$premi->uuid]['date_start'] >  $employee_data_one['date_start']) {
+                                    if (empty($employee_data_one['date_end_effective'])) {
+                                        $employee_data_one['date_end'] = $data_old_premi[$premi->uuid]['date_start'];
+                                    } else {
+                                        $employee_data_one['date_end'] = $employee_data_one['date_end_effective'];
+                                    }
+                                    $storeEmployee = EmployeePremi::create($employee_data_one);
+                                } elseif ($data_old_premi[$premi->uuid]['date_start']  == $employee_data_one['date_start']) {
+                                    $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_premi[$premi->uuid]['id']], $employee_data_one);
+                                } else {
+                                    $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $data_old_premi[$premi->uuid]['id']], ['date_end' => $employee_data_one['date_start']]);
+                                    $storeEmployee = EmployeePremi::create($employee_data_one);
+                                }
+                            } else {
+                                $storeEmployee = EmployeePremi::create($employee_data_one);
+                            }
+                            // dd($storeEmployee);
+                        }
+                        $data_old_arr = [];
+                        if (!empty($get_all_employee_premis[$nik_employee . '-' . $premi->uuid])) {
+                            if (empty($employee_data_one[$premi->uuid])) {
+                                $employee_data_one['premi_value'] = 0;
+                                $employee_data_one['premi_uuid'] = $premi->uuid;
+                                $employee_data_one['uuid'] = $nik_employee . '-' . $premi->uuid;
+                                $storeEmployee = EmployeePremi::updateOrCreate(['id'   => $get_all_employee_premis[$nik_employee . '-' . $premi->uuid]['id']], ['date_end' => $employee_data_one['date_start']]);
+                                $storeEmployee = EmployeePremi::create($employee_data_one);
+                            }
+                            $data_old_arr[] = $get_all_employee_premis[$nik_employee . '-' . $premi->uuid];
+                        }
+                    }
+
+                */
 
                 echo $nik_employee . "-end</br>";
                 // dd('user detail will');
@@ -1906,7 +1942,7 @@ class EmployeeController extends Controller
             'request' => $validateData
         ];
 
-        return ResponseFormatter::toJson($data, 'zzz');
+        return ResponseFormatter::toJson($data, 'success store data');
     }
 
     public function allEmployeeData()

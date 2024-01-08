@@ -2234,6 +2234,7 @@ class EmployeeAbsenController extends Controller
                         $data_one_row['date'] =  $date->format('Y-m-d');
 
                         $data_one_row['uuid']  = $data_one_row['date'] . '-' . $data_one_row['employee_uuid'];
+                        
                         $store = EmployeeAbsen::updateOrCreate(
                             [
                                 'employee_uuid'  => $data_one_row['nik_employee'],

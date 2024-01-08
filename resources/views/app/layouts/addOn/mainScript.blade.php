@@ -159,7 +159,7 @@
     // ================================= UI
     function stopLoading() {
             console.log('stop loading')
-            $('#loading-modal').modal('hide')
+            $('#loading-modal').hide()
             $('.modal').modal('hide')
         }
 
