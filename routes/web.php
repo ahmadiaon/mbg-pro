@@ -951,8 +951,6 @@ Route::middleware(['islogin'])->group(function () {
 
 
 
-
-
     Route::get('/user-employee/{nik_employee}/edit', [EmployeeController::class, 'show']);
     Route::post('/user-employee/store', [EmployeeController::class, 'store']);
     Route::post('/user-employee/cekNikEmployee', [EmployeeController::class, 'cekNikEmployee']);
@@ -970,7 +968,6 @@ Route::middleware(['islogin'])->group(function () {
 Route::middleware(['webIsLogin'])->group(function () {
     Route::prefix('/web')->group(function () {
         Route::get('/profile', [WebUserController::class, 'profile']);
-
 
         Route::prefix('/pendapatan')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'index']);
