@@ -128,7 +128,33 @@ class WebUserController extends Controller
 
             card employee
 
+            //database local
+
+            1. nik_employee
+            2. name
+            3. position
+            4. departement
+            5. company
+            6. picture
+
+            nik = {
+                nik,
+                name,
+                position,
+                department,
+                company,
+                picture,
+            }
+
+            bagaiaman dengan filter departement?
+            => ambil hanya niknya,
+            bagaimana dengan data yang dari database lain?
+            => langsung/codenya lalu di view yang nyari ? 
+            ==> langsung description yang di local
             
+
+
+
 
         */
     }
