@@ -118,6 +118,21 @@ class UserController extends Controller
         return ResponseFormatter::ResponseJson($userStore, 'Store Success', 200);
     }
 
+    public function editUser(Request $request){
+        $password = Hash::make($request->nik_number); 
+        $userStore = User::updateOrCreate(['nik_employee'=> ResponseFormatter::toUUID($request->nik_employee)],[
+            'pin'   => NULL,
+            'password' => $password,
+        ]);
+        if($userStore){
+            $userDetailStore = UserDetail::updateOrCreate(['date_end'=> null,'uuid'=>ResponseFormatter::toUUID($request->nik_employee)],[
+                'nik_number' => $request->nik_number,
+            ]);
+        }
+        return ResponseFormatter::ResponseJson($request->all(), 'Store Success', 200);
+    
+    }
+
 
     public function getfull(Request $request)
     {

@@ -148,6 +148,7 @@
             });
         });
     </script>
+    
     {{-- insert field --}}
     <script>
         $(document).ready(function() {

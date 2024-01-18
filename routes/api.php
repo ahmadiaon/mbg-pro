@@ -22,6 +22,12 @@ Route::prefix('mbg')->group(function () {
     Route::post('/user', [UserController::class, 'storeUser']);
     
     Route::post('/get/user/available', [UserController::class, 'cekAvailableEmployee']);
+
+    Route::prefix('manage')->group(function () {
+        Route::prefix('users')->group(function () {
+            Route::post('/edit', [UserController::class, 'editUser']);
+        });
+    });
    
 });
 

@@ -598,9 +598,8 @@ class EmployeeController extends Controller
         // $user_nik = [
             
         // ];
-
+            
         foreach($user_nik as $item){
-
             $nik_employee_uuid = ResponseFormatter::toUUID($item['nik_employee']);
             
             $nik_ktp = $item['nik_ktp'];
@@ -625,7 +624,7 @@ class EmployeeController extends Controller
         $layout = [
             'head_datatable'        => true,
             'javascript_datatable'  => true,
-            'head_form'             => true,
+        'head_form'             => true,
             'javascript_form'       => true,
             'active'                        => 'employees-index'
         ];

@@ -110,4 +110,29 @@ class WebUserController extends Controller
             'title'         => 'User'
         ]);
     }
+
+    public function manageIndexUser(){
+        
+
+        return view('app.manage.user.indexManageUser');
+    }
+    public function storeUser(Request $request){
+        /*
+            1. declaration
+                1. nik_employee
+                2. new pin
+                3. new ktp
+            2. Update
+            3. 
+
+
+            card employee
+
+            
+
+        */
+    }
+
+
+
 }

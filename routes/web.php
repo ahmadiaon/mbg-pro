@@ -981,6 +981,8 @@ Route::middleware(['webIsLogin'])->group(function () {
         Route::prefix('/manage')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
+
+            Route::get('/users', [WebUserController::class, 'manageIndexUser']);
             Route::post('/slip', [WebSlipController::class, 'slipStore']);
             Route::get('/app', function () {
                 return view('app.menuApp');
@@ -993,6 +995,9 @@ Route::middleware(['webIsLogin'])->group(function () {
 });
 
 Route::prefix('/web')->group(function () {
+    
+    // Route::get('/manage/users', [WebUserController::class, 'manageIndexUser']);
+
     Route::get('/logout', [WebUserController::class, 'logout']);
     Route::get('/login', function () {        
         return view('app.login');
