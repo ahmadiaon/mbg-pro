@@ -17,6 +17,12 @@ Route::prefix('mbg')->group(function () {
         Route::post('/data', [ApiSlipController::class, 'data']);
     });
 
+    Route::post('/get/user', [UserController::class, 'getUser']);
+
+    Route::post('/user', [UserController::class, 'storeUser']);
+    
+    Route::post('/get/user/available', [UserController::class, 'cekAvailableEmployee']);
+   
 });
 
 Route::prefix('v1')->group(function () {
@@ -37,35 +43,7 @@ Route::prefix('v2')->group(function () {
     Route::get('businesss/list', [Api\User\BusinessController::class, 'listBusiness']);
 
     //* Role Admin
-    Route::prefix('admin')->group(function () {
-        //* Auth
-        Route::post('login', [Api\Auth\AuthController::class, 'loginAdmin']);
-        Route::post('register', [Api\Auth\AuthController::class, 'registerAdmin']);
 
-        Route::group(['middleware' => ['auth:admins']], function () {
-
-            // Profiling User
-            // Route::resource('user', Api\Admin\UserController::class)->except(['create', 'edit']);
-
-            // Community
-            Route::resource('community', Api\Admin\CommunityController::class)->except(['create', 'edit']);
-
-            // Community Category
-            Route::resource('community/category', Api\Admin\CommunityCategoryController::class)->except(['create', 'edit']);
-
-            // Profiling Admin
-            Route::resource('profile', Api\Admin\AdminController::class)->except(['create', 'edit']);
-
-            // Slide Admin
-            Route::resource('slide', Api\Admin\SlideController::class)->except(['create', 'edit']);
-
-            // Gallery Admin
-            Route::resource('gallery', Api\Admin\GalleryController::class)->except(['create', 'edit']);
-
-            //* Logout
-            Route::post('logout', [Api\Auth\AuthController::class, 'logoutAdmin']);
-        });
-    });
 
     //* Role User
     Route::prefix('user')->group(function () {
@@ -82,7 +60,7 @@ Route::prefix('v2')->group(function () {
             // Financial Registers
             Route::post('financial-service/register/{id}', [Api\User\FinancialServicesController::class, 'registerFinancialServicesUser']);
             Route::post('financial-service/register-download/{id}', [Api\User\FinancialServicesController::class, 'downloadRegister']);
-            
+
             // Financial Submission
             Route::post('financial-service/submission/{id}', [Api\User\FinancialServicesController::class, 'submissionFinancialServicesUser']);
             Route::get('detail-financial/{id}', [Api\User\FinancialServicesController::class, 'DetailFinancial']);

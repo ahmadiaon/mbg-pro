@@ -77,6 +77,7 @@ use App\Http\Controllers\WebSlipController;
 use App\Http\Controllers\WebUserController;
 use App\Models\Employee\EmployeeHourMeterBonus;
 use Illuminate\Queue\Connectors\DatabaseConnector;
+use Illuminate\Support\Facades\Session;
 
 Route::prefix('/support')->group(function () {
     Route::post('/set-date', [AdminController::class, 'setDate']);
@@ -968,6 +969,9 @@ Route::middleware(['islogin'])->group(function () {
 Route::middleware(['webIsLogin'])->group(function () {
     Route::prefix('/web')->group(function () {
         Route::get('/profile', [WebUserController::class, 'profile']);
+        Route::get('/menu', function () {
+            return view('app.menu');
+        });
 
         Route::prefix('/pendapatan')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'index']);
@@ -978,16 +982,32 @@ Route::middleware(['webIsLogin'])->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
             Route::post('/slip', [WebSlipController::class, 'slipStore']);
-            // Route::get('/users', [UserController::class, 'indexManage']);
+            Route::get('/app', function () {
+                return view('app.menuApp');
+            });
+        });
+        Route::prefix('/menu')->group(function () {
+            Route::get('/user', [WebUserController::class, 'user']);
         });
     });
 });
 
 Route::prefix('/web')->group(function () {
     Route::get('/logout', [WebUserController::class, 'logout']);
-    Route::get('/login', function () {
+    Route::get('/login', function () {        
         return view('app.login');
     });
     Route::post('/login', [WebUserController::class, 'login']);
+    Route::get('/session', function () {
+        dd(session('user_authentication'));
+        return view('app.menuApp');
+    });
+    Route::get('/set-session', function () {
+        
+        Session::put('user_authentication', '$storeEmployee');
+        return view('app.menuApp');
+    });
 });
-//9:00
+
+
+

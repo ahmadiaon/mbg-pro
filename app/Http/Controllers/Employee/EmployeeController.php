@@ -586,15 +586,18 @@ class EmployeeController extends Controller
             ['nik_employee' => 'MB/HO-180051', 'nik_ktp' => '6205076702950001'],
             ['nik_employee' => 'MB/FO-170342', 'nik_ktp' => '6205052609980002'],
             ['nik_employee' => 'MB/HO-200063', 'nik_ktp' => '6205052810680001'],
-            ['nik_employee' => 'MB/PL-200361', 'nik_ktp' => '6304151810860002']
-        ];
-
-        $user_nik = [
+            ['nik_employee' => 'MB/PL-200361', 'nik_ktp' => '6304151810860002'],
             ['nik_employee' => 'MBLE-231201', 'nik_ktp' => '3205162311790001'],
             
             ['nik_employee' => 'MBLE-220681', 'nik_ktp' => '6204040710950003'],
             ['nik_employee' => 'MBLE-0422003', 'nik_ktp' => '62130828081234563'],
+            ['nik_employee' => 'MB/PL-210455', 'nik_ktp' => '1234']
+            
         ];
+
+        // $user_nik = [
+            
+        // ];
 
         foreach($user_nik as $item){
 

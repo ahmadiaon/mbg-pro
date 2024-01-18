@@ -166,4 +166,14 @@
     function startLoading() {
         $('#loading-modal').modal('show')
     }
+    function showModalSuccess(data){
+            $('#success-modal').modal('show');
+        }
+
+    function setValueInput(idElement, valElement){
+        $(`#${idElement}`).val(valElement);
+    }
+    function getInputValue(idElement){
+        return $(`#${idElement}`).val();
+    }
 </script>

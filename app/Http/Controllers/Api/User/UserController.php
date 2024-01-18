@@ -9,10 +9,116 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Employee\Employee;
+use App\Models\Identity;
+use App\Models\Privilege\UserPrivilege;
+use App\Models\UserDetail\UserDetail;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+
+
+    public function getUser(Request $request){
+        $auth_login = $request->header('auth_login');
+        $user = User::where('auth_login', $auth_login)->first();
+        $identity = UserDetail::where('uuid', $user->nik_employee)->whereNull('date_end')->first();
+
+
+        $mergedArray = (array)$user + (array)$identity;
+        $data = (object)$mergedArray;
+
+        $data = array_merge($user->toArray(),$identity->toArray());
+       
+        return ResponseFormatter::ResponseJson($data, 'Success', 200);
+    }
+
+    public function cekAvailableEmployee(Request $request){
+        $dataForm = $request->all();
+        $data = User::where('nik_employee', ResponseFormatter::toUUID($request->nik_employee))->first();
+        if(!$request->pin && !$request->nik_number ){
+            if($data){
+                if($data->pin){
+                    $data = "pin";
+                }else{
+                    $data = "ktp";
+                }               
+            }
+            return ResponseFormatter::ResponseJson($data, 'Store Success', 200);
+        }else{
+            //    login
+
+            $dataUser = User::where('nik_employee', ResponseFormatter::toUUID($request->nik_employee))->first();
+            $isValid = false;
+            if ($dataUser) {
+                if (Hash::check($request->pin, $dataUser->pin)) {
+                    $isValid = true;
+                }
+
+                if (Hash::check($request->nik_number, $dataUser->password)) {
+                    $isValid = true;
+                }
+                
+
+                if($isValid){
+                    $token = Str::random(60);
+                    $storeEmployee = User::updateOrCreate(
+                        ['id'   => $dataUser->id],
+                        ['auth_login' => $token]
+                    );
+                    $storeEmployee = User::where('auth_login', $token)->first();
+                    $userDetail = UserDetail::where('uuid', ResponseFormatter::toUUID($storeEmployee->nik_employee))->first();
+                    $storeEmployee->user_details = $userDetail;
+    
+                    $user_privileges = UserPrivilege::where_nik_employee($storeEmployee->nik_employee);
+    
+                    $storeEmployee->user_privileges = $user_privileges;
+                    
+                    session(['user_authentication' => $storeEmployee]);
+                    Session::put('user_authentication', $storeEmployee);
+                    return ResponseFormatter::ResponseJson([
+                        'status'=>'success',
+                        'data'  => session('user_authentication')
+                    ], 'Validasi Login Sukses', 200);
+                }
+                
+            }
+            return ResponseFormatter::ResponseJson(['status'=>'failed','data' => $request->nik_number], 'Validasi Login Gagal', 200);
+        }
+        
+    }
+
+
+
+    public function storeUser(Request $request){
+        $auth_login = $request->header('auth_login');
+        $user = User::where('auth_login', $auth_login)->first();
+        $dataForm = $request->formData;
+        $hashPin = $user->pin;
+        if($dataForm['pin']){
+            if(strlen($dataForm['pin']) == 6){
+                $hashPin = Hash::make($dataForm['pin']); 
+            }            
+        }
+
+
+        $userStore = User::updateOrCreate(['nik_employee'=> $user->nik_employee],[
+            'pin'   => $hashPin,
+            'email' => $dataForm['email'],
+            'phone_number' => $dataForm['phone_number'],
+        ]);
+
+        if($userStore){
+            $userDetailStore = UserDetail::updateOrCreate(['date_end'=> null,'uuid'=>$user->nik_employee],[
+                'phone_number' => $dataForm['phone_number'],
+            ]);
+        }
+        return ResponseFormatter::ResponseJson($userStore, 'Store Success', 200);
+    }
+
+
     public function getfull(Request $request)
     {
         $token = $request->token;

@@ -38,11 +38,11 @@
                 <ul>
                     <li>
                         <span>Jabatan:</span>
-                        <text class="index-employee-position">udin</text>
+                        <text class="index-employee-position">tidak ada</text>
                     </li>
                     <li>
                         <span>Departemen:</span>
-                        <text class="index-employee-department">udin</text>
+                        <text class="index-employee-department">tidak ada</text>
                     </li>
                     <li>
                         <span>Phone Number:</span>
@@ -66,7 +66,7 @@
         </div>
     </div>
 
-    <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 mb-30">
+    <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 mb-30" hidden>
         <div class=" height-100-p overflow-hidden">
             <div class="faq-wrap">
                 <h4 class="mb-20 h4 text-blue">Detail Lainnya</h4>
@@ -439,7 +439,7 @@
 @section('script_javascript')
     <script>
         console.log(localStorage.getItem('ui_dataset'));
-        console.log(@json(session('user_authentication')))
+        console.log(@json(session('user_authentication')));
         let user_authentication = @json(session('user_authentication'));
         
         let _token = $('meta[name="csrf-token"]').attr('content');

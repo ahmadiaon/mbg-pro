@@ -36,7 +36,7 @@
     <script src="/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
     <script src="/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
     <script src="/vendors/scripts/datatable-setting.js"></script>
-   
+
 
 </head>
 
@@ -101,6 +101,25 @@
             </div>
         </div>
     </div>
+    {{-- success modal --}}
+    <div class="modal fade" id="success-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center font-18">
+                    <h3 class="mb-20">Data Tersimpan</h3>
+                    <div class="mb-30 text-center">
+                        <img src="{{ env('APP_URL') }}vendors/images/success.png" />
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="stopLoading()" data-dismiss="modal">
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- js -->
     @yield('script_javascript')
@@ -108,12 +127,12 @@
         console.log('doc start');
         $('#main-content').hide();
         // startLoading();
-   </script>
+    </script>
 
     <script>
         $(document).ready(function() {
             console.log('doc ready');
-            $('#loading-modal').hide();      
+            $('#loading-modal').hide();
             $('#main-content').show();
         });
 

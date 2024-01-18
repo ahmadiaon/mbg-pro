@@ -24,6 +24,8 @@ class CreateUsersTable extends Migration
             // secondary
             $table->string('nik_employee')->nullable();
             $table->string('password')->nullable();
+            
+            $table->string('pin')->nullable();
 
             $table->string('auth_login')->nullable();
             $table->string('last_login_time')->nullable();

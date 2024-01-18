@@ -16,6 +16,12 @@
                         <span class="micon fa fa-user-o"></span><span class="mtext">Profile</span>
                     </a>
                 </li>
+                <li>
+                    <a href="/web/menu" id="menu" class="dropdown-toggle no-arrow">
+                        {{-- <i class="icon-copy bi bi-app"></i> --}}
+                        <span class="micon bi bi-app"></span><span class="mtext">Menu</span>
+                    </a>
+                </li>
                 <li class="dropdown">
                     <a href="javascript:;" id="pendapatan" class="dropdown-toggle">
                         <span class="micon fa fa-book"></span><span class="mtext">Pendapatan</span>
@@ -34,7 +40,6 @@
                 @endif
 
 
-
                 @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
                     <li class="dropdown">
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
@@ -45,6 +50,7 @@
                             <li><a id="slip" href="/web/manage/slip">Slip Gaji </a></li>
                             @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
                                 <li><a id="slip" href="/web/manage/users">Users </a></li>
+                                <li><a id="slip" href="/web/manage/app">Aplikasi </a></li>
                             @endif
                         </ul>
                     </li>
