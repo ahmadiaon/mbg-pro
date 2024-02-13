@@ -25,6 +25,11 @@ class WebAbsensiController extends Controller
     }
 
     public function manageIndex(){
+        $TES = "DSA/SAD";
+
+        dd($TES);
+
+
         return view('app.manage.absensi.index', [
             'title'         => 'Slip'
         ]);

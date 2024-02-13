@@ -9,7 +9,7 @@
                         <h4 class="text-blue h4">Filter</h4>
                     </button>
                 </div>
-                <div id="faq1" class="collapse show" data-parent="#accordion" >
+                <div id="faq1" class="collapse show" data-parent="#accordion">
                     <div class="row clearfix">
                         <div class="col-md-6 mb-10">
                             <div class="card-box pd-20" id="the-filter-employee-tonase">
@@ -237,7 +237,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="custom-control custom-radio mb-5">
-                                            <input  type="radio" id="show_type_off" name="show_type"
+                                            <input type="radio" id="show_type_off" name="show_type"
                                                 class="custom-control-input" value="off" />
                                             <label class="custom-control-label" for="show_type_off">Off</label>
                                         </div>
@@ -270,11 +270,11 @@
                 <div class="row pd-20">
                     <div class="col-auto">
                         <h4 class="text-blue h4">Daftar Karyawan</h4>
-                        
+
                     </div>
                     <div class="col text-right" <div class="btn-group">
                         <div class="btn-group dropdown">
-                            <button onclick="exportData()" type="date" class="btn btn-danger">
+                            <button onclick="exportDataFull()" type="date" class="btn btn-danger">
                                 Export Data <span class="caret"></span>
                             </button>
                         </div>
@@ -300,7 +300,7 @@
                                 @endif
                                 <a class="dropdown-item" id="btn-export" href="/user/export-simple/">Template Simpel
                                 </a>
-                                <a class="dropdown-item disabled" id="btn-export" href="#">Template Full
+                                <a class="dropdown-item" id="btn-export" href="/user/export-full">Template Full
                                 </a>
                                 <a class="dropdown-item" id="btn-import" data-toggle="modal" data-target="#import-modal"
                                     href="">Import</a>
@@ -381,8 +381,6 @@
             </div>
         </div>
     </div>
-
-    
 @endsection
 
 @section('js')
@@ -390,6 +388,8 @@
         let data_export = null;
         var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
         var end = new Date(arr_date_today.year, arr_date_today.month, 0);
+
+        let database = JSON.parse(localStorage.getItem('DATABASE'));
         $('#date_range_in_out').val(`${formatDate(end)}`);
         $('#date_range_this_time_in_out').val(`${formatDate(start)} - ${formatDate(end)}`);
         $('#date_range').val(`${formatDate(start)} - ${formatDate(end)}`);
@@ -473,21 +473,19 @@
             showDataTableUser();
         }
 
-        function exportData() {
+        function exportDataFull() {
             startLoading();
-            let _token = $('meta[name="csrf-token"]').attr('content');
-            // cg('data_datatable', data_datatable);
-            let data_ex = JSON.stringify(data_datatable);
+            let db = JSON.parse(localStorage.getItem('DATABASE'));
             $.ajax({
-                url: '/hour-meter/export',
+                url: '/user/export-full',
                 type: "POST",
                 data: {
-                    _token: _token,
-                    data_export: data_ex,
-                    filter: filter
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    data_export: 'db'
                 },
                 success: function(response) {
-                    // cg('response', response);
+                    cg('response', response);
+                    // return false;
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");
@@ -495,9 +493,35 @@
                     stopLoading();
                 },
                 error: function(response) {
+                    cg('response', response);
                     alertModal()
                 }
             });
+        }
+
+        function cardEmployees(nik_employee) {
+            let bg='';
+            if (data_database['data_employee_out'][nik_employee]) {
+                bg = 'bg-warning';
+            }
+            return `
+                <div class="name-avatar d-flex align-items-center pr-2 ${bg} card-box pl-2">
+                    <div class="avatar mr-2 flex-shrink-0">
+                        <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
+                            width="50" height="50" alt="">
+                    </div>
+                    <div class="txt">
+                        <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${database['employees'][nik_employee]['company']} |
+                            ${database['employees'][nik_employee]['department']}</span>
+                        <div class="font-14 weight-600">${database['employees'][nik_employee]['name']}</div>
+                        <div class="font-12 weight-500">${database['employees'][nik_employee]['nik_employee_with_space']}</div>
+                        <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
+                            ${database['employees'][nik_employee]['position']}
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function showDataTableUser() {
@@ -538,8 +562,15 @@
 
             $('#table-user').append(element_table);
 
+
+
             // datatable
-            data.push(element_profile_employee)
+            var employees_card_element = {
+                mRender: function(data, type, row) {
+                    return cardEmployees(row.nik_employee)
+                }
+            };
+            data.push(employees_card_element);
 
             if (filter.show_type != 'simple') {
                 data_table_schema['employees'].forEach(element_employee_schema => {
@@ -584,24 +615,15 @@
                     filter: filter
                 },
                 success: function(response) {
-                    // cg('response data-x', response);
-                    // return false;
                     datax = response.data;
                     let data_datable_obj = datax.employee_filter_company_x_site;
                     data_export = data_datable_obj;
                     let data_datable = [];
                     if (data_datable_obj) {
                         Object.values(data_datable_obj).forEach(element_data_datable_obj => {
-                            // if(data_datable_obj.nik_employee == undefined){
-                                // cg('data_datable_obj',element_data_datable_obj);
-                            //     return false;
-                            // }
                             data_datable.push(element_data_datable_obj);
                         });
                     }
-                    cg('response data-x', data_export);
-                    // return false;
-                    // cg('response', data_datable);
                     $('#table-user-employees').DataTable({
                         scrollX: true,
                         scrollY: "700px",
@@ -617,41 +639,10 @@
                     console.log(response)
                 }
             });
-
-            // _token = $('meta[name="csrf-token"]').attr('content');
-            // $.ajax({
-            //     url: '/user/data',
-            //     type: "POST",
-            //     data: {
-            //         _token: _token,
-            //         filter: filter
-            //     },
-            //     success: function(response) {
-            //         datax = response.data;
-            //         let data_datable_obj = datax.data_datatable_data;
-            //         let data_datable = [];
-            //         if (data_datable_obj) {
-            //             Object.values(data_datable_obj).forEach(element_data_datable_obj => {
-            //                 data_datable.push(element_data_datable_obj);
-            //             });
-            //         }
-            //         cg('response', response);
-            //         $('#table-user-employees').DataTable({
-            //             scrollX: true,
-            //             serverSide: false,
-            //             data: data_datable,
-            //             columns: data
-            //         });
-            //     },
-
-            //     error: function(response) {
-            //         console.log(response)
-            //     }
-            // });
             return false;
         }
 
-        function acceptProposalShow(){
+        function acceptProposalShow() {
             $('#accept-proposal').modal('show');
         }
 

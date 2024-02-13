@@ -476,16 +476,7 @@
 
         }
 
-        function getDateToday() {
-            console.log('getDateToday')
-            let date_now = new Date();
-            let day = padToDigits(2, date_now.getDate());
-            let month = padToDigits(2, date_now.getMonth() + 1);
-            let year = date_now.getFullYear();
-
-            let today = year + '-' + month + '-' + day;
-            return today;
-        }
+        
 
         function setValue(url, table) {
             console.log('setValue')
@@ -631,6 +622,18 @@
 
             return [year, month, day].join('-');
         }
+
+        function getDateToday() {
+            console.log('getDateToday')
+            let date_now = new Date();
+            let day = padToDigits(2, date_now.getDate());
+            let month = padToDigits(2, date_now.getMonth() + 1);
+            let year = date_now.getFullYear();
+
+            let today = year + '-' + month + '-' + day;
+            return today;
+        }
+
 
         function formatDateArr(d) {
 

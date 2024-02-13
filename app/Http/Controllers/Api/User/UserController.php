@@ -8,8 +8,16 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\DatabaseData;
+use App\Models\DatabaseDataSource;
+use App\Models\DatabaseField;
+use App\Models\DatabaseTable;
+use App\Models\Department;
 use App\Models\Employee\Employee;
 use App\Models\Identity;
+use App\Models\Menu;
+use App\Models\Position;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\UserDetail\UserDetail;
 use Illuminate\Database\QueryException;
@@ -133,6 +141,137 @@ class UserController extends Controller
     
     }
 
+    public static function db_local_storage(){
+        $database = [];
+
+        $employees = Employee::whereNull('date_end')->get(); 
+        $identitiesQ = UserDetail::whereNull('date_end')->get();
+        $idientities = [];
+        foreach($identitiesQ as $identity){
+            $idientities[$identity->uuid] = $identity;
+        }
+
+        $Q_position = Position::get();
+        $positions = [];
+        foreach($Q_position as $position){
+            $positions[$position->uuid] = $position;
+        }
+
+        $Q_department = Department::get();
+        $departments = [];
+        foreach($Q_department as $department){
+            $departments[$department->uuid] = $department;
+        }
+
+        $Q_company = Company::get();
+        $companys = [];
+        foreach($Q_company as $company){
+            $companys[$company->uuid] = $company;
+        }
+
+        $data_employee = [];
+        $arr_data_employee = [];
+        foreach($employees as $employee){
+            if(!empty($idientities[$employee->nik_employee])){
+                $employee->name = $idientities[$employee->nik_employee]['name'];
+                $employee->photo_path = $idientities[$employee->nik_employee]['photo_path'];
+                $data_employee[$employee->nik_employee] = $employee;
+            }else{
+                $employee->name = 'Tidak ada';
+                $employee->photo_path = null;
+                $data_employee[$employee->nik_employee] = $employee;
+            }
+
+            if(!empty($positions[$employee->position_uuid])){
+                $employee->position = $positions[$employee->position_uuid]['position'];
+            }else{
+                $employee->position = 'Tidak ada';
+            }
+
+            if(!empty($departments[$employee->department_uuid])){
+                $employee->department = $departments[$employee->department_uuid]['department'];
+            }else{
+                $employee->department = 'Tidak ada';
+            }
+
+            if(!empty($companys[$employee->company_uuid])){
+                $employee->company = $companys[$employee->company_uuid]['company'];
+            }else{
+                $employee->company = 'Tidak ada';
+            }
+            $arr_data_employee[] = $employee->nik_employee;
+            $data_employee[$employee->nik_employee] = $employee;            
+        }
+
+
+        // C O M P A N Y
+
+        $Q_Menu = Menu::get();
+        $data_menu = [];
+        foreach($Q_Menu as $menu){
+            $data_menu[$menu->uuid] = $menu;
+        }
+
+        $database['employees'] = $data_employee;
+        $database['db']['menu'] = $data_menu;
+
+        // 
+
+        $Q_table = DatabaseTable::get();
+        $data_table = [];
+        foreach($Q_table as $table){
+            $data_table[$table->code_table] = $table;
+        }
+
+        $Q_field = DatabaseField::get();
+        $data_field = [];
+        foreach($Q_field as $field){
+            $data_field[$field->code_table_field][$field->code_field] = $field;
+        }
+
+        $Q_data = DatabaseData::get();
+        $data_data = [];
+        foreach($Q_data as $data){
+            $data_data[$data->code_table_data][$data->code_data][$data->code_field_data] = $data;
+        }
+
+        $Q_data_source = DatabaseDataSource::get();
+        $data_data_source = [];
+        foreach($Q_data_source as $data_source){
+            $data_data_source[$data_source->code_data_source] = $data_source;
+        }
+
+        $database['db']['database_field'] = $data_field;
+        $database['db']['database_data'] = $data_data;
+        $database['db']['arr_employees'] = $arr_data_employee;
+        $database['db']['database_table'] = $data_table;
+        $database['db']['database_data_source'] = $data_data_source;
+
+        return $database;
+    }
+
+    public function localStorage(Request $request){
+
+       
+        
+        request()->session()->put('db_local_storage', $this->db_local_storage());
+        return ResponseFormatter::ResponseJson( session('db_local_storage'), 'Store Success', 200);
+    }
+
+    public function localStorageWeb(){
+        request()->session()->put('db_local_storage', $this->db_local_storage());
+    }
+
+
+    public function getEmployees(Request $request){
+        $employees = Employee::whereNull('date_end')->get(); 
+        $data_employees = [];
+        foreach($employees as $employee){
+            $data_employees[] = $employee->nik_employee;
+        }
+        return ResponseFormatter::ResponseJson($data_employees, 'Success', 200);
+    }
+
 
     public function getfull(Request $request)
     {
@@ -141,6 +280,7 @@ class UserController extends Controller
         $user = User::where('auth_login', $token)->first();
         if ($user) {
             $data = Employee::showWhereNik_employee($user->nik_employee);
+
             return ResponseFormatter::toJson($data, 'success');
         }
         return ResponseFormatter::toJson(null, 'Not Found');

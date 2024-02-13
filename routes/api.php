@@ -2,19 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Pendapatan\HaulingController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Support\DatabaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('mbg')->group(function () {
     Route::post('employee', [UserController::class, 'getfull']);
+    Route::post('/local-storage', [UserController::class, 'localStorage']);
 
     Route::prefix('absensi')->group(function () {
         Route::post('/', [ApiEmployeeAbsensiController::class, 'getAbsenEmployee']);
     });
     Route::prefix('slip')->group(function () {
         Route::post('/data', [ApiSlipController::class, 'data']);
+    });
+
+    Route::prefix('pendapatan')->group(function () {
+        Route::prefix('hauling')->group(function () {
+            Route::post('/store', [HaulingController::class, 'store']);
+            Route::post('/get', [HaulingController::class, 'get']);
+            Route::post('/delete', [HaulingController::class, 'delete']);
+        });     
     });
 
     Route::post('/get/user', [UserController::class, 'getUser']);
@@ -24,11 +35,30 @@ Route::prefix('mbg')->group(function () {
     Route::post('/get/user/available', [UserController::class, 'cekAvailableEmployee']);
 
     Route::prefix('manage')->group(function () {
-        Route::prefix('users')->group(function () {
-            Route::post('/edit', [UserController::class, 'editUser']);
+        Route::prefix('employees')->group(function () {
+            Route::post('/get', [UserController::class, 'getEmployees']);
         });
-    });
-   
+
+        Route::prefix('users')->group(function () {
+            Route::post('/edit', [UserController::class, 'editUser']);            
+        });
+
+        Route::prefix('app')->group(function () {
+            Route::post('/store', [DatabaseController::class, 'store']);
+        });
+
+        
+
+        Route::prefix('database')->group(function () {
+            Route::post('/store-database', [DatabaseController::class, 'storeData']);
+        });
+
+        Route::prefix('menu')->group(function () {
+            Route::post('/', [MenuController::class, 'store']);  
+            Route::post('/get', [MenuController::class, 'get']);  
+            Route::post('/delete', [MenuController::class, 'delete']); 
+        });
+    });   
 });
 
 Route::prefix('v1')->group(function () {

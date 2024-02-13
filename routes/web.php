@@ -6,6 +6,8 @@ use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Aktivity\AktivityController;
 use App\Http\Controllers\AllowanceController;
+use App\Http\Controllers\Api\Pendapatan\HaulingController;
+use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\OverBurden\HourMeterController;
 use App\Http\Controllers\ShiftListController;
@@ -73,6 +75,7 @@ use App\Http\Controllers\Vehicle\GroupVehicleController;
 use App\Http\Controllers\Vehicle\StatusController;
 use App\Http\Controllers\Vehicle\VehicleController;
 use App\Http\Controllers\WebAbsensiController;
+use App\Http\Controllers\WebHaulingController;
 use App\Http\Controllers\WebSlipController;
 use App\Http\Controllers\WebUserController;
 use App\Models\Employee\EmployeeHourMeterBonus;
@@ -817,10 +820,7 @@ Route::middleware(['islogin'])->group(function () {
 
 
 
-    // Route::get('/data-setup-hauling', [HaulingSetupController::class, 'anyData']);
-    // hour-meter
 
-    // user
     Route::prefix('/user')->group(function () {
         Route::get('/data-session', [EmployeeController::class, 'dataSession']);
         Route::get('/', [EmployeeController::class, 'index']);
@@ -852,6 +852,7 @@ Route::middleware(['islogin'])->group(function () {
         Route::get('/{nik_employee}/edit', [UserDetailController::class, 'show']);
         Route::get('/export-data', [UserDetailController::class, 'exportData']);
         Route::get('/export', [UserDetailController::class, 'export']);
+        Route::post('/export-full', [UserDetailController::class, 'exportFull']);
         Route::post('/export', [UserDetailController::class, 'exportAction']);
         Route::get('/monitoring', [UserDetailController::class, 'monitoring']);
 
@@ -968,6 +969,8 @@ Route::middleware(['islogin'])->group(function () {
 
 Route::middleware(['webIsLogin'])->group(function () {
     Route::prefix('/web')->group(function () {
+        
+        Route::post('/local-storage', [UserController::class, 'localStorage']);
         Route::get('/profile', [WebUserController::class, 'profile']);
         Route::get('/menu', function () {
             return view('app.menu');
@@ -976,16 +979,31 @@ Route::middleware(['webIsLogin'])->group(function () {
         Route::prefix('/pendapatan')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'index']);
             Route::get('/slip', [WebAbsensiController::class, 'slip']);
+            Route::prefix('/hauling')->group(function () {
+                Route::get('/', [WebHaulingController::class, 'index']); 
+                Route::post('/get', [HaulingController::class, 'get']);
+                Route::post('/export', [HaulingController::class, 'export']);
+            });
         });
 
         Route::prefix('/manage')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
 
+
+            Route::get('/database', [DatabaseController::class, 'indexData']);
+
             Route::get('/users', [WebUserController::class, 'manageIndexUser']);
             Route::post('/slip', [WebSlipController::class, 'slipStore']);
             Route::get('/app', function () {
                 return view('app.menuApp');
+            });
+            Route::get('/menu', function () {
+                return view('app.manageMenuApp');
+            });
+
+            Route::get('/localdata', function () {
+                return view('app.localdata');
             });
         });
         Route::prefix('/menu')->group(function () {
@@ -1007,8 +1025,7 @@ Route::prefix('/web')->group(function () {
         dd(session('user_authentication'));
         return view('app.menuApp');
     });
-    Route::get('/set-session', function () {
-        
+    Route::get('/set-session', function () {        
         Session::put('user_authentication', '$storeEmployee');
         return view('app.menuApp');
     });

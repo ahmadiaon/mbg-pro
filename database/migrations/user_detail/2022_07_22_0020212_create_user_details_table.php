@@ -25,7 +25,7 @@ return new class extends Migration
 
             $table->string('place_of_birth')->nullable();// 1
             $table->date('date_of_birth')->nullable();// 1
-            $table->date('religion_uuid')->nullable();
+            $table->string('religion_uuid')->nullable();
 
             $table->string('blood_group')->nullable();// 1
             $table->string('status')->nullable();// 1

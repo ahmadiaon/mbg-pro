@@ -31,8 +31,12 @@
                     <p class="card-text">
                         Sub menu
                     </p>
+                    @if (!empty(session('user_authentication')->user_privileges->superadmin))
+                    <a href="/web/pendapatan/hauling" class="mb-2 btn btn-sm btn-outline-primary">Hauling</a>
+                    @endif
                     <a href="/web/pendapatan/absensi" class="mb-2 btn btn-sm btn-outline-warning">absensi</a>
-                    <a href="web/pendapatan/slip" class="mb-2 btn btn-sm btn-outline-success">slip</a>
+                    <a href="/web/pendapatan/slip" class="mb-2 btn btn-sm btn-outline-success">slip</a>
+
                 </div>
                 <div class="card-footer text-muted"></div>
             </div>
@@ -51,10 +55,33 @@
                 <div class="card-footer text-muted"></div>
             </div>
         </div>
+        <div class="col-sm-12 col-md-4 mb-20 ">
+            <div class="card card-box mb-20">
+                <h5 class="card-header weight-500">Pengelolaan</h5>
+                <div class="card-body">
+
+                    <p class="card-text">
+                        Sub menu
+                    </p>
+                    <a href="/web/manage/hauling" class="mb-2 btn btn-sm btn-outline-primary">Profile</a>
+                    <a href="/web/manage/user" class="mb-2 btn btn-sm btn-outline-info">Akun</a>
+                    <a href="/web/manage/localdata" class="mb-2 btn btn-sm btn-outline-info">local data</a>
+                </div>
+                <div class="card-footer text-muted"></div>
+            </div>
+        </div>
 
     </div>
 @endsection()
 
 @section('script_javascript')
-    <script></script>
+    <script>
+        CL('database');
+        let data_for_looping_menu = [];
+        // $(document).ready(function() {
+        //     Object.values(db['db']['menu']).forEach(element => {
+
+        //     });
+        // });
+    </script>
 @endsection()

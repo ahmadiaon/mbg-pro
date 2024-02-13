@@ -715,6 +715,7 @@ class EmployeeController extends Controller
         $createSheet->setCellValue('E19', 'DEPARTEMEN');
         $createSheet->setCellValue('F19', 'SITE');
         $createSheet->setCellValue('G19', 'PERUSAHAAN');
+        
 
         $validatedData['data_export'] = (array)$validatedData['data_export'];
 
@@ -1046,9 +1047,12 @@ class EmployeeController extends Controller
                 if (!empty($data_old)) {
                     $employee_data_one = $data_old;
                 }
+                echo $nik_employee.'';
 
                 foreach ($arr_index as $item_index) {
+                    $employee_data_one[$item_index['database'] . '_real'] = $sheet->getCell($item_index['index'] . $no_employee)->getValue();
                     if (!empty($sheet->getCell($item_index['index'] . $no_employee)->getValue())) {
+                        $employee_data_one[$item_index['database'] . '_real'] = $sheet->getCell($item_index['index'] . $no_employee)->getValue();
                         switch ($item_index['data_type']) {
                             case 'uuid':
                                 if (!empty($arr_atribut_size[ResponseFormatter::toUUID($sheet->getCell($item_index['index'] . $no_employee)->getValue())])) {
@@ -1239,7 +1243,7 @@ class EmployeeController extends Controller
                 // $storeEmployee = UserEducation::updateOrCreate([''],$employee_data_one);
                 // $storeEmployee = UserDependent::updateOrCreate([''],$employee_data_one);
                 // $storeEmployee = EmployeeCutiSetup::updateOrCreate([''],$employee_data_one);
-
+                // dd($employee_data_one);
                 $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                 $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                 $storeEmployee = EmployeeSalary::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);

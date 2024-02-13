@@ -117,6 +117,15 @@ class ResponseFormatter
     return $result;
   }
 
+  public static function getTIme($data = null){
+    if($data){
+      $cls_date =  Carbon::parse($data);
+      $timeOnly = $cls_date->format('H:i');
+      return $timeOnly;
+    }
+    return $time = null;
+  }
+
   public static function excelToDateArray($date = null)
   {
 

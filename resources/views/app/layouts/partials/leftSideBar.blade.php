@@ -50,7 +50,9 @@
                             <li><a id="slip" href="/web/manage/slip">Slip Gaji </a></li>
                             @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
                                 <li><a id="slip" href="/web/manage/users">Users </a></li>
-                                <li><a id="slip" href="/web/manage/app">Aplikasi </a></li>
+                                <li><a id="slip" href="/web/manage/app">Aplikasi </a></li>                                
+                                <li><a id="slip" href="/web/manage/menu">Menu </a></li>
+                                <li><a id="slip" href="/web/manage/database">Database </a></li>
                             @endif
                         </ul>
                     </li>

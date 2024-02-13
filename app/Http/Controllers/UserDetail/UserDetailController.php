@@ -29,6 +29,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class UserDetailController extends Controller
 {
@@ -100,6 +101,131 @@ class UserDetailController extends Controller
         return view('authentication.login', [
             'title'         => 'Login'
         ]);
+    }
+
+    public function exportFull(Request $request){
+        $db = session('db_local_storage');
+        $database = [];
+
+        $employees = Employee::whereNull('date_end')->get(); 
+        $identitiesQ = UserDetail::whereNull('date_end')->get();
+        $idientities = [];
+        foreach($identitiesQ as $identity){
+            $idientities[$identity->uuid] = $identity;
+        }
+
+        $Q_position = Position::get();
+        $positions = [];
+        foreach($Q_position as $position){
+            $positions[$position->uuid] = $position;
+        }
+
+        $Q_department = Department::get();
+        $departments = [];
+        foreach($Q_department as $department){
+            $departments[$department->uuid] = $department;
+        }
+
+        $Q_company = Company::get();
+        $companys = [];
+        foreach($Q_company as $company){
+            $companys[$company->uuid] = $company;
+        }
+
+        $data_employee = [];
+        $arr_data_employee = [];
+        foreach($employees as $employee){
+            if(!empty($idientities[$employee->nik_employee])){
+                $employee->name = $idientities[$employee->nik_employee]['name'];
+                $employee->photo_path = $idientities[$employee->nik_employee]['photo_path'];
+                $data_employee[$employee->nik_employee] = $employee;
+            }else{
+                $employee->name = 'Tidak ada';
+                $employee->photo_path = null;
+                $data_employee[$employee->nik_employee] = $employee;
+            }
+
+            if(!empty($positions[$employee->position_uuid])){
+                $employee->position = $positions[$employee->position_uuid]['position'];
+            }else{
+                $employee->position = 'Tidak ada';
+            }
+
+            if(!empty($departments[$employee->department_uuid])){
+                $employee->department = $departments[$employee->department_uuid]['department'];
+            }else{
+                $employee->department = 'Tidak ada';
+            }
+
+            if(!empty($companys[$employee->company_uuid])){
+                $employee->company = $companys[$employee->company_uuid]['company'];
+            }else{
+                $employee->company = 'Tidak ada';
+            }
+            $arr_data_employee[] = $employee->nik_employee;
+            $data_employee[$employee->nik_employee] = $employee;            
+        }
+
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+
+        $createSheet->setCellValue('A19', 'NO.');
+        $createSheet->setCellValue('B19', 'NIK');
+        $createSheet->setCellValue('C19', 'NAMA');
+        $createSheet->setCellValue('D19', 'POSISI');
+        $createSheet->setCellValue('E19', 'DEPARTEMEN');
+        $createSheet->setCellValue('F19', 'SITE');
+        $createSheet->setCellValue('G19', 'PERUSAHAAN');
+
+        $row_employees = 20;
+        foreach ($data_employee as $item_data_export) {
+            $createSheet->setCellValue('B' . $row_employees, $item_data_export->nik_employee_with_space);
+            $createSheet->setCellValue('C' . $row_employees, $item_data_export->name);
+            $createSheet->setCellValue('D' . $row_employees, $item_data_export->position);
+            $createSheet->setCellValue('E' . $row_employees, $item_data_export->department);
+            $createSheet->setCellValue('F' . $row_employees, $item_data_export->site_uuid);
+            $createSheet->setCellValue('G' . $row_employees, $item_data_export->company_uuid);
+
+            $row_employees++;
+        }
+
+        $styleArray_header = array(
+            'font' => [
+                'bold' => true,
+            ],
+            'borders' => array(
+                'outline' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('argb' => '000000'),
+                ),
+                'inside' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('argb' => '000000'),
+                ),
+            ),
+            'fill' => [
+                'fillType' =>  fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => '4c4ce9'
+                ]
+            ],
+        );
+        //header
+        $createSheet->getStyle('A19:G20')->applyFromArray($styleArray_header);
+        $createSheet->getColumnDimension('B')->setAutoSize(true);
+        $createSheet->getColumnDimension('C')->setAutoSize(true);
+        $createSheet->getColumnDimension('D')->setAutoSize(true);
+        $createSheet->getColumnDimension('E')->setAutoSize(true);
+        $createSheet->getColumnDimension('F')->setAutoSize(true);
+        $createSheet->getColumnDimension('G')->setAutoSize(true);
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/export-karyawan-' . rand(99, 9999) . 'file.xls';
+        $crateWriter->save($name);
+
+        return ResponseFormatter::toJson($name, 'full export');
+
+
+
     }
 
 

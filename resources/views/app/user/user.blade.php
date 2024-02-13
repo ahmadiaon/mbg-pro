@@ -148,7 +148,7 @@
             });
         });
     </script>
-    
+
     {{-- insert field --}}
     <script>
         $(document).ready(function() {
@@ -158,7 +158,6 @@
 
         function getUserInfo() {
             let _token = $('meta[name="csrf-token"]').attr('content');
-            conLog('authToken', ui_dataset.ui_dataset.user_authentication.auth_login)
             $.ajax({
                 url: '/api/mbg/get/user',
                 type: "POST",
@@ -171,7 +170,6 @@
                     _token: _token,
                 }),
                 success: function(response) {
-                    conLog('success', response)
                     setValueInput('nik_employee', response.data.nik_employee);
                     setValueInput('email', response.data.email);
                     setValueInput('phone_number', response.data.phone_number);
@@ -202,7 +200,6 @@
                 }
                 formDataArray.push(objPinInsert);
 
-                conLog('formDataArray', formDataArray)
 
                 if (pinInsert.length > 1) {
                     conLog('formDataArray', 'formDataArray')
@@ -239,8 +236,6 @@
                     }),
                     success: function(response) {
                         showModalSuccess();
-
-
 
                     },
                     error: function(response) {
@@ -282,48 +277,139 @@
         });
     </script>
 
+
+    {{-- LOCAL STORAGE --}}
+    <script>
+        $(document).ready(function() {
+            refreshSession();
+        });
+    </script>
+
     <script>
         let menuData = {
             'form': {
                 'sub-menu': {
-                    'Profile': {                        
+                    'Profile': {
                         "multiple": "multiple",
                         "form": {
                             'DATA-KARYAWAN': {
-                                "status_form":"primary",
-                                "code_key":"nik_employee",
-                                "fields":{
-                                    'NIK-EMPLOYEE':"TEXT",
-                                    'JOIN-DATE':'DATE',
-                                    'LONG-CONTRACT':'NUMBER',
-                                    'SK-CONTRACT':'TEXT',
-                                    'POSITION':"FROM-DB",
-                                    'DEPARTMENT':"FROM-DB",                                    
+                                "status_form": "primary",
+                                "parent_table": null,
+                                "code_key": "nik_employee",
+                                "fields": {
+                                    'NIK-EMPLOYEE': "TEXT",
+                                    'JOIN-DATE': 'DATE',
+                                    'LONG-CONTRACT': 'NUMBER',
+                                    'SK-CONTRACT': 'TEXT',
+                                    'POSITION': "FROM-DB",
+                                    'DEPARTMENT': "FROM-DB",
                                 }
                             },
                             'IDENTITAS': {
-                                "status_form":"standart",
-                                "code_key":"nik_employee",
-                                "fields":{
-                                    'NAME':"TEXT",
-                                    'GENDER':'FROM-DB',
-                                    'DATE-BIRTH':'DATE',                                    
+                                "status_form": "standart",
+                                "parent_table": "DATA-KARYAWAN",
+                                "code_key": "nik_employee",
+                                "fields": {
+                                    'NAME': "TEXT",
+                                    'GENDER': 'FROM-DB',
+                                    'DATE-BIRTH': 'DATE',
                                 }
                             },
                             'ADRESS': {
-                                "status_form":"standart",
-                                "code_key":"nik_employee",
-                                "fields":{
-                                    'NAME':"TEXT",
-                                    'GENDER':'FROM-DB',
-                                    'DATE-BIRTH':'DATE',                                    
+                                "status_form": "standart",
+                                "parent_table": "DATA-KARYAWAN",
+                                "code_key": "nik_employee",
+                                "fields": {
+                                    'NAME': "TEXT",
+                                    'GENDER': 'FROM-DB',
+                                    'DATE-BIRTH': 'DATE',
+                                }
+                            },
+                            'PERUSAHAAN': {
+                                "status_form": "primary",// ini untuk mengaitkan datanya, //jika ia menjadi secondari, maka otomatis code data nya mengikuti code data primarynya
+                                "parent_table": null,//Ex. "DATA-KARYAWAN"
+                                "code_data_key": "SHORT-NAME", //ini yg di jadikan acuan ketika table ini di referensikan, 
+                                                               //tinggal nnti data apa yg ingin di tampilkan di pilihan,
+                                                               //lalu ini yang di jadikan code_data ke uuid
+                                                               // jenis menu pasti jadi sub menu
+
+                                "table_name": "Perusahaan",
+                                "menu":"DATABASE",
+                                "description_table":"",
+
+
+
+                                "fields": {
+                                    'SHORT-NAME' : "text",
+                                    'SHORT-NAME' : {
+                                        'table': "PERUSAHAAN",
+                                        'description':"Nama Pendek",
+                                        'type_data':"TEXT",
+                                        'field' : "NAMA-PENDEK",
+                                        'code_field':"PERUSAHAAN-NAMA-PENDEK",
+                                    },
+                                    'LONG-NAME' : "text",//
+                                    'KEPEMILIKAN-BATUBARA' : "FROM-DB",//FROM DB STATUS-KEPEMILIKAN-BATU "HAVE"/"DOES NOT HAVE"
+                                    'KEPEMILIKAN-BATUBARA' : {
+                                        'table': "PERUSAHAAN",
+                                        'description':"Kepemilikan Batubara",
+                                        'type_data':"FROM-DB",
+                                        'type_data':{
+                                            'code_field_source':"PERUSAHAAN-KEPEMILIKAN-BATUBARA",
+                                            'table_data_reference':"STATUS-KEPEMILIKAN-BATUBARA",
+                                            'field_get_form_reference':''
+                                        },
+                                        'field' : "KEPEMILIKAN-BATUBARA",
+                                        'code_field':"PERUSAHAAN-KEPEMILIKAN-BATUBARA",
+                                    },
+                                    'CODE-DATA' : "text",//UUID SHORT-NAME
+                                }
+                            },
+
+                            'PERUSAHAAN': {
+                                'PT. MB': {
+                                    'SHORT-NAME': 'PT. MB',
+                                    'LONG-NAME': 'PT. Mitra Barito',
+                                    'HAVING-COAL': 'HAVE',
+                                    'CODE-DATA': 'PT. MB'
+                                },
+                                'PT. MBLE': {
+                                    'SHORT-NAME': 'PT. MB',
+                                    'LONG-NAME': 'PT. Mitra Barito Lumbung Energi',
+                                    'HAVING-COAL': 'Do not have',
+                                    'CODE-DATA': 'PT. MBLE'
+                                }
+                            },
+                            'DATA-MENU': {
+                                'MENU': {
+                                    'PROFILE': {
+                                        "DESCRIPTION": "Profile",
+                                        "LEVEL": "MENU",
+                                        "MENU": null,
+                                    }
+                                },
+                                "SUB-MENU": {
+                                    "PROFILE": {
+                                        "USER": {
+                                            "DESCRIPTION": "User",
+                                            "LEVEL": "SUB-MENU",
+                                            "MENU": "PROFILE",
+                                        },
+                                        "DATA": {
+                                            "DESCRIPTION": "User",
+                                            "LEVEL": "SUB-MENU",
+                                            "MENU": "PROFILE",
+                                        },
+                                    }
                                 }
                             }
+
                         }
 
                     }
                 }
             }
-        }
+        };
+        conLog('xx',menuData);
     </script>
 @endsection()

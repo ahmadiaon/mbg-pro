@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
+use App\Http\Controllers\Api\User\UserController;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\User;
 use App\Models\UserDetail\UserDetail;
@@ -27,7 +28,6 @@ class WebUserController extends Controller
                 $isValid = true;
             }
             
-
             if($isValid){
                
                 $token = Str::random(60);
@@ -45,18 +45,17 @@ class WebUserController extends Controller
                 session()->flush();
                 session(['user_authentication' => $storeEmployee]);
                 session()->put('user_authentication', $storeEmployee);
-               
+                request()->session()->put('db_local_storage', UserController::db_local_storage());
+
                 return redirect()->intended('/web/profile');
 
                 Session::put('user_authentication', $storeEmployee);
+                
                 return ResponseFormatter::ResponseJson([
                     'status'=>'success',
                     'data'  => session('user_authentication')
                 ], 'Validasi Login Sukses', 200);
-                
-                
-            }
-            
+            }            
         }
         return back()->with('isError', 'Login Failed!');
       
@@ -78,7 +77,8 @@ class WebUserController extends Controller
                 $storeEmployee->user_privileges = $user_privileges;
 
                 session()->put('user_authentication', $storeEmployee);
-                return redirect()->intended('/web/profile');
+               
+                return redirect()->intended('/web/menu');
                 return $storeEmployee;
             }
         }
@@ -99,6 +99,7 @@ class WebUserController extends Controller
 
     public function profile()
     {
+        // dd(session()->all());
         return view('app.user.profile', [
             'title'         => 'Login'
         ]);
@@ -106,6 +107,7 @@ class WebUserController extends Controller
 
     public function user()
     {
+        // UserController::localStorageWeb();
         return view('app.user.user', [
             'title'         => 'User'
         ]);
@@ -113,7 +115,6 @@ class WebUserController extends Controller
 
     public function manageIndexUser(){
         
-
         return view('app.manage.user.indexManageUser');
     }
     public function storeUser(Request $request){
@@ -138,12 +139,12 @@ class WebUserController extends Controller
             6. picture
 
             nik = {
-                nik,
-                name,
-                position,
-                department,
-                company,
-                picture,
+                nik, => nik_employee_with_space
+                name, => user_details->name
+                position, => positions->position
+                department, => departments->department
+                company, => companies->company
+                picture, => user_details->photo_path
             }
 
             bagaiaman dengan filter departement?
@@ -155,9 +156,12 @@ class WebUserController extends Controller
 
 
 
-
+            privilege
+            jika karyawan biasa === 0
+            jika karyawan memiliki privilege > 0
         */
     }
+
 
 
 

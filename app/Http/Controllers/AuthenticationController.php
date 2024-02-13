@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
+use App\Http\Controllers\Api\User\UserController;
 use App\Models\Company;
 use App\Models\Employee\Employee;
 use App\Models\Privilege\UserPrivilege;
@@ -49,7 +50,7 @@ class AuthenticationController extends Controller
                         ->whereNull('user_details.date_end')
                         ->get()
                         ->first();
-                    $dataUser = $col_dataUser;
+                    // return $dataUser = $col_dataUser;
 
                     $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($col_dataUser['nik_employee']);
                     $dataUser->is_login  = true;
@@ -97,6 +98,9 @@ class AuthenticationController extends Controller
                     // $request->session()->put('data_companies', $arr_companies);
 
                     ResponseFormatter::setAllSession();
+                    $request->session()->put('db_local_storage', UserController::db_local_storage());
+
+                    // dd(session()->all());
 
                     return redirect()->intended('/me/' . $col_dataUser['nik_employee']);
                 } else {

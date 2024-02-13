@@ -23,7 +23,7 @@ class webIsLogin
         $user = User::where('auth_login', session('user_authentication')->auth_login)->first(); 
 
         if(!$user){
-            return redirect()->intended('/web/login'.session('user_authentication')->auth_login);
+            return redirect()->intended('/web/login');
         }
         
         return $next($request);

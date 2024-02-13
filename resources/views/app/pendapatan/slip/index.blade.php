@@ -98,6 +98,7 @@
                     let slips = response.data;
                     if (Object.keys(slips).length > 0) {
                         $('#no-slips').remove()
+                        $('#slips').empty()
                         slips.forEach(element => {
                             conLog('aa', element);
                             $('#slips').append(`

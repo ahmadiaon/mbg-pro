@@ -1,4 +1,5 @@
 <script>
+    let db = JSON.parse(localStorage.getItem('DATABASE'));
     let COLOR_BOOTSTRAP = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
     var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
     var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
@@ -26,9 +27,9 @@
         }
     }
 
-    conLog('udin', localStorage.getItem('ui_dataset'));
+    // conLog('udin', localStorage.getItem('ui_dataset'));
     if (localStorage.getItem('ui_dataset')) {
-        conLog('not null', localStorage.getItem('ui_dataset'));
+        // conLog('not null', localStorage.getItem('ui_dataset'));
         ui_dataset = JSON.parse(localStorage.getItem('ui_dataset'));
     }
 
@@ -50,7 +51,83 @@
         localStorage.setItem('ui_dataset', JSON.stringify(ui_dataset));
     }
 
-    conLog('ui_dataset after set date', JSON.parse(localStorage.getItem('ui_dataset')));
+    // conLog('ui_dataset after set date', JSON.parse(localStorage.getItem('ui_dataset')));
+
+    function CL(data_string) {
+        console.log(data_string);
+    }
+
+    function formatDate(d) {
+
+        var month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [year, month, day].join('-');
+    }
+
+    function getDateToday() {
+        console.log('getDateToday')
+        let date_now = new Date();
+        let day = padToDigits(2, date_now.getDate());
+        let month = padToDigits(2, date_now.getMonth() + 1);
+        let year = date_now.getFullYear();
+
+        let today = year + '-' + month + '-' + day;
+        return today;
+    }
+
+    function addDays(date, days) {
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+
+    function setRangeDate(date_start, date_end) {
+        let dateTanggalWaktuBerangkat = new Date(date_start)
+        let day = padToDigits(2, dateTanggalWaktuBerangkat.getDate());
+        let month = padToDigits(2, dateTanggalWaktuBerangkat.getMonth() + 1);
+        let year = dateTanggalWaktuBerangkat.getFullYear();
+        let stringDateStart = `${month}/${day}/${year}`;
+
+        let dateEnd = new Date(date_end)
+        let day_end = padToDigits(2, dateEnd.getDate());
+        let month_end = padToDigits(2, dateEnd.getMonth() + 1);
+        let year_end = dateEnd.getFullYear();
+        let stringDateEnd = `${month_end}/${day_end}/${year_end}`;
+        let range = `${stringDateStart} - ${stringDateEnd}`;
+        return range;
+    }
+
+    function dateToString(the_date) {
+        let dateTanggalWaktuBerangkat = new Date(the_date)
+        let day = padToDigits(2, dateTanggalWaktuBerangkat.getDate());
+        let month = padToDigits(2, dateTanggalWaktuBerangkat.getMonth() + 1);
+        let year = dateTanggalWaktuBerangkat.getFullYear();
+
+        return `${day} ${months[dateTanggalWaktuBerangkat.getMonth() + 1]} ${year}`
+    }
+
+    function dateToTime(the_date) {
+        var dateObject = new Date(the_date);
+        var hours = dateObject.getHours();
+        var minutes = dateObject.getMinutes();
+        return padZero(hours) + ":" + padZero(minutes);
+    }
+
+    function padZero(number) {
+        return number < 10 ? "0" + number : number;
+    }
+
+    function toUUID(the_text) {
+        const regex = /[^a-zA-Z0-9]/g;
+        // Ganti semua simbol dengan tanda dash ("-")
+        const resultString = the_text.replace(regex, "-");
+        return resultString.toUpperCase();
+    }
+
 
     function setUIdate(param_ui_year = ui_dataset.ui_dataset.ui_date.year, param_ui_month = ui_dataset.ui_dataset
         .ui_date.month,
@@ -158,22 +235,55 @@
 
     // ================================= UI
     function stopLoading() {
-            console.log('stop loading')
-            $('#loading-modal').hide()
-            $('.modal').modal('hide')
-        }
+        console.log('stop loading')
+        $('#loading-modal').hide()
+        $('.modal').modal('hide')
+    }
 
     function startLoading() {
         $('#loading-modal').modal('show')
     }
-    function showModalSuccess(data){
-            $('#success-modal').modal('show');
-        }
 
-    function setValueInput(idElement, valElement){
+    function showModalSuccess(data) {
+        $('#success-modal').modal('show');
+    }
+
+    function setValueInput(idElement, valElement) {
         $(`#${idElement}`).val(valElement);
     }
-    function getInputValue(idElement){
+
+    function getInputValue(idElement) {
         return $(`#${idElement}`).val();
+    }
+</script>
+
+{{-- LOCAL STORAGE --}}
+<script>
+    async function refreshSession() {
+        $.ajax({
+            url: '/web/local-storage',
+            type: "POST",
+            headers: {
+                'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                // Add other custom headers if needed
+            },
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function(response) {
+                conLog('response localStorage', response);
+                CL('db_local_storage');
+                CL(@json(session('db_local_storage')));
+
+                localStorage.setItem('DATABASE', JSON.stringify(response.data));
+                db = JSON.parse(localStorage.getItem('DATABASE'));
+                // showModalSuccess();
+            },
+            error: function(response) {
+                conLog('error', 'localStorage')
+                conLog('error', response);
+                stopLoading();
+            }
+        });
     }
 </script>
