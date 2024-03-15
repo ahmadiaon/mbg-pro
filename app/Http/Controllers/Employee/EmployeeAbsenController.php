@@ -2196,15 +2196,24 @@ class EmployeeAbsenController extends Controller
             } elseif ('DARI-LIST' == ResponseFormatter::toUUID($sheet->getCell('C' . '1')->getValue())) {
                 // return ResponseFormatter::toJson('list','list');
                 $no_employee = 21;
-
+                
                 // $employees = [];
                 $arr_data_list = [];
                 while ($sheet->getCell('A' . $no_employee)->getValue() != null) {
+
+                    $cel_val = $sheet->getCell('J' .  $no_employee)->getValue();
+                    $firstCharacter = substr($cel_val, 0, 1); 
+                    if($firstCharacter == '='){
+                        $value = $sheet->getCell('J' .  $no_employee)->getOldCalculatedValue();
+                    }else{
+                        $value = $sheet->getCell('J' .  $no_employee)->getValue();
+                    }
+
                     $data_one_row = [
                         'nik_employee' => ResponseFormatter::toUUID($sheet->getCell('B' . $no_employee)->getValue()),
                         'employee_uuid' => ResponseFormatter::toUUID($sheet->getCell('B' . $no_employee)->getValue()),
                         'date_start' => ResponseFormatter::excelToDate($sheet->getCell('H' .  $no_employee)->getValue()),
-                        'date_end' => ResponseFormatter::excelToDate($sheet->getCell('J' .  $no_employee)->getOldCalculatedValue()),
+                        'date_end' => ResponseFormatter::excelToDate($value),
                         'status_absen_uuid' => ResponseFormatter::toUUID($sheet->getCell('K' .  $no_employee)->getValue()),
                         'description' => $sheet->getCell('L' .  $no_employee)->getValue(),
                     ];
