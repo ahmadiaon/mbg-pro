@@ -1012,8 +1012,8 @@ Route::middleware(['webIsLogin'])->group(function () {
     });
 });
 
-Route::prefix('/web')->group(function () {
-    
+Route::prefix('/web')->group(function () {//before login
+    //
     // Route::get('/manage/users', [WebUserController::class, 'manageIndexUser']);
 
     Route::get('/logout', [WebUserController::class, 'logout']);

@@ -13,6 +13,8 @@ class CreateUserPrivilegesTable extends Migration
             $table->string('uuid')->nullable();
             $table->string('nik_employee')->nullable();
             $table->string('privilege_uuid')->nullable();
+            $table->string('jenis_privilege')->nullable();
+            $table->string('value_privilege')->nullable();
             $table->timestamps();
         });
     }

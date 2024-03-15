@@ -26,7 +26,7 @@ class WebAbsensiController extends Controller
 
     public function manageIndex(){
         $TES = "DSA/SAD";
-
+        
         dd($TES);
 
 

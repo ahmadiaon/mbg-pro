@@ -54,12 +54,16 @@
                     url: '/web/manage/slip',
                     method: 'POST',
                     data: formData,
+                    success: function(response) {
+                        let slips = response.data;
+                        CL(response);
+                    },
                     contentType: false,
                     processData: false,
                 });
-                $('#successMessage').show();
-                stopLoading();
             }
+            $('#successMessage').show();
+            stopLoading();
         }
     </script>
 @endsection()

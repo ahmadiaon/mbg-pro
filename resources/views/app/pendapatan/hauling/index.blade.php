@@ -1,4 +1,25 @@
 @extends('app.layouts.main')
+@section('src_css')
+    
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libsa/orgchart/2.1.3/css/jquery.orgchart.min.css" />
+    <style>
+        #chart-container {
+            font-family: Arial;
+            height: 420px;
+            border: 2px dashed #aaa;
+            border-radius: 5px;
+            overflow: auto;
+            text-align: center;
+        }
+
+        #github-link {
+            position: fixed;
+            top: 0px;
+            right: 10px;
+            font-size: 3em;
+        }
+    </style>
+@endsection()
 
 @section('content')
     <div class="page-header">
@@ -520,6 +541,206 @@
         </div>
     </div>
 
+    <div class="card-box pd-20">
+        <div class="pd-20 clearfix mb-10">
+            <div class="pull-left">
+                <h4 class="text-blue h4">STRUKTUR ORGANISASI</h4>
+            </div>
+            <div class="pull-right" hidden>
+                <a href="#basic-form1" id="FILTER-basic-form1" class="btn btn-primary btn-sm scroll-click"
+                    rel="content-y" data-toggle="collapse" role="button">Reset</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12  mt-10">
+                <h1 class="pd-20">Filter</h1>
+                <div class="row pd-20">
+                    <div class="col-md-12 col-sm-12">
+                        <div id="chart-container" style="text-align: left;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-box pd-20">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="sitemap">
+                    <h5 class="h5">Multi Level Sitemap</h5>
+                    <ul>
+                        <li><a href="#">Level 1</a></li>
+                        <li><a href="#">Level 1</a></li>
+                        <li class="child">
+                            <h5 class="h5">KTT</h5>
+                            <ul>
+                                <li><a href="#">Rahmad Saleh</a></li>
+                                <li class="child">
+                                    <h5 class="h5">PJO</h5>
+                                    <ul>
+                                        <li><a href="#">Denny PA Tanjung</a></li>
+                                        <li class="child">
+                                            <h5 class="h5">HSE Dept.</h5>
+                                            <ul>
+                                                <li><a href="#">Purwanto</a></li>
+                                                <li class="child">
+                                                    <h5 class="h5">Staf</h5>
+                                                    <ul>
+                                                        <li class="child">
+                                                            <h5 class="h5">Admin</h5>
+                                                            <ul>
+                                                                <li><a href="#">Nadia Maulida</a></li>
+                                                                <li><a href="#">Achmad Maulana</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="child">
+                                                            <h5 class="h5">Pengawas Safety</h5>
+                                                            <ul>
+                                                                <li><a href="#">Marsianus Julian</a></li>
+                                                                <li class="child">
+                                                                    <h5 class="h5">Safety Man</h5>
+                                                                    <ul>
+                                                                        <li><a href="#">Prabowo</a></li>
+                                                                        <li><a href="#">Yoga</a></li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="child">
+                                                            <h5 class="h5">Pengawas Enviro</h5>
+                                                            <ul>
+                                                                <li><a href="#">Rizain</a></li>
+                                                                <li class="child">
+                                                                    <h5 class="h5">Enviro Creq</h5>
+                                                                    <ul>
+                                                                        <li><a href="#">Bagas</a></li>
+                                                                        <li><a href="#">Farhan</a></li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="child">
+                            <h5 class="h5">Level 2</h5>
+                            <ul>
+                                <li><a href="#">Level 2</a></li>
+                                <li><a href="#">Level 2</a></li>
+                                <li class="child">
+                                    <h5 class="h5">Level 3</h5>
+                                    <ul>
+                                        <li><a href="#">Level 3</a></li>
+                                        <li><a href="#">Level 3</a></li>
+                                        <li class="child">
+                                            <h5 class="h5">Level 3</h5>
+                                            <ul>
+                                                <li><a href="#">Level 3</a></li>
+                                                <li><a href="#">Level 3</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="sitemap">
+                    <h5 class="h5">Multi Level Sitemap</h5>
+                    <ul>
+                        <li><a href="#">Level 1</a></li>
+                        <li><a href="#">Level 1</a></li>
+                        <li class="child">
+                            <h5 class="h5">KTT</h5>
+                            <ul>
+                                <li><a href="#">Rahmad Saleh</a></li>
+                                <li class="child">
+                                    <h5 class="h5">PJO</h5>
+                                    <ul>
+                                        <li><a href="#">Denny PA Tanjung</a></li>
+                                        <li class="child">
+                                            <h5 class="h5">HSE Dept.</h5>
+                                            <ul>
+                                                <li><a href="#">Purwanto</a></li>
+                                                <li class="child">
+                                                    <h5 class="h5">Staf</h5>
+                                                    <ul>
+                                                        <li class="child">
+                                                            <h5 class="h5">Admin</h5>
+                                                            <ul>
+                                                                <li><a href="#">Nadia Maulida</a></li>
+                                                                <li><a href="#">Achmad Maulana</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="child">
+                                                            <h5 class="h5">Pengawas Safety</h5>
+                                                            <ul>
+                                                                <li><a href="#">Marsianus Julian</a></li>
+                                                                <li class="child">
+                                                                    <h5 class="h5">Safety Man</h5>
+                                                                    <ul>
+                                                                        <li><a href="#">Prabowo</a></li>
+                                                                        <li><a href="#">Yoga</a></li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="child">
+                                                            <h5 class="h5">Pengawas Enviro</h5>
+                                                            <ul>
+                                                                <li><a href="#">Rizain</a></li>
+                                                                <li class="child">
+                                                                    <div class="card-box row">
+                                                                        <div class="col-12">
+                                                                            <h5>KTT</h5>
+                                                                            <p>Rahmad Saleh</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="child">
+                            <h5 class="h5">Level 2</h5>
+                            <ul>
+                                <li><a href="#">Level 2</a></li>
+                                <li><a href="#">Level 2</a></li>
+                                <li class="child">
+                                    <h5 class="h5">Level 3</h5>
+                                    <ul>
+                                        <li><a href="#">Level 3</a></li>
+                                        <li><a href="#">Level 3</a></li>
+                                        <li class="child">
+                                            <h5 class="h5">Level 3</h5>
+                                            <ul>
+                                                <li><a href="#">Level 3</a></li>
+                                                <li><a href="#">Level 3</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade customscroll" id="modal-filter" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -551,9 +772,11 @@
             </div>
         </div>
     </div>
+
 @endsection()
 
 @section('script_javascript')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/2.1.3/js/jquery.orgchart.min.js"></script>
     <script src="/src/plugins/switchery/switchery.min.js"></script>
     <!-- bootstrap-tagsinput js -->
     <script src="/src/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
@@ -759,7 +982,7 @@
             });
         }
 
-        function exportHauling(){
+        function exportHauling() {
             let site_uuid_dialy = $("input[type='radio'][name='site_uuid_dialy']:checked").val();
             let date_dialy = $('#date_dialy').val();
 
@@ -777,7 +1000,7 @@
                     dlink.click();
                 },
                 error: function(response) {
-                    alertModal()
+                    CL(response);
                 }
             });
         }
@@ -864,7 +1087,7 @@
                 });
                 dataFilter(database_data_hauling);
                 reCreateTable();
-                createDataTable(database_data_hauling);                
+                createDataTable(database_data_hauling);
                 $('#modal-filter').modal('hide');
             });
 
@@ -873,10 +1096,11 @@
             let currentHour = date_time_now.getHours();
             let date_data = date_time_now;
 
-            if(currentHour < 6){
-                date_data = addDays(new Date(),-1);               
+            if (currentHour < 6) {
+                date_data = addDays(new Date(), -1);
             }
-            $('#FILTER-RANGE').val(setRangeDate(formatDate(date_data), formatDate(addDays(date_data,1)))).trigger('change');
+            $('#FILTER-RANGE').val(setRangeDate(formatDate(date_data), formatDate(addDays(date_data, 1)))).trigger(
+                'change');
             storeFilterHauling();
 
 
@@ -898,57 +1122,57 @@
         // UNIT units
         Object.values(db['db']['database_data']['UNIT']).forEach(element => {
             $(`.units`).append(`
-                    <option value="${element['UNIT-NOMOR-LAMBUNG']['code_data']}">${element['UNIT-NOMOR-LAMBUNG']['value_data']}</option>
+                    <option value="${element['NOMOR-LAMBUNG']['code_data']}">${element['NOMOR-LAMBUNG']['value_data']}</option>
                 `);
         });
 
         // PERUSAHAAN
         Object.values(db['db']['database_data']['PERUSAHAAN']).forEach(element => {
             $(`.PERUSAHAAN`).append(`
-                    <option value="${element['PERUSAHAAN-NAMA-PERUSAHAAN-PENDEK']['code_data']}">${element['PERUSAHAAN-NAMA-PERUSAHAAN-PENDEK']['value_data']}</option>
+                    <option value="${element['NAMA-PERUSAHAAN-PENDEK']['code_data']}">${element['NAMA-PERUSAHAAN-PENDEK']['value_data']}</option>
                 `);
         });
 
         // PERUSAHAAN
         Object.values(db['db']['database_data']['PENGIRIM-BATU']).forEach(element => {
             $(`.PENGIRIM-BATU`).append(`
-                    <option value="${element['PENGIRIM-BATU-PENGIRIM-BATU']['code_data']}">${element['PENGIRIM-BATU-PENGIRIM-BATU']['value_data']}</option>
+                    <option value="${element['PENGIRIM-BATU']['code_data']}">${element['PENGIRIM-BATU']['value_data']}</option>
                 `);
         });
 
         Object.values(db['db']['database_data']['KODE-BATU']).forEach(element => {
             $(`.KODE-BATU`).append(`
-                    <option value="${element['KODE-BATU-KODE-BATU']['code_data']}">${element['KODE-BATU-KODE-BATU']['value_data']}</option>
+                    <option value="${element['KODE-BATU']['code_data']}">${element['KODE-BATU']['value_data']}</option>
                 `);
         });
 
         Object.values(db['db']['database_data']['JENIS-BATU']).forEach(element => {
             $(`.JENIS-BATU`).append(`
-                    <option value="${element['JENIS-BATU-JENIS-BATU']['code_data']}">${element['JENIS-BATU-JENIS-BATU']['value_data']}</option>
+                    <option value="${element['JENIS-BATU']['code_data']}">${element['JENIS-BATU']['value_data']}</option>
                 `);
         });
 
         Object.values(db['db']['database_data']['KONDISI-BATU-HAULING']).forEach(element => {
             $(`.KONDISI-BATU-HAULING`).append(`
-                    <option value="${element['KONDISI-BATU-HAULING-KONDISI-BATU']['code_data']}">${element['KONDISI-BATU-HAULING-KONDISI-BATU']['value_data']}</option>
+                    <option value="${element['KONDISI-BATU']['code_data']}">${element['KONDISI-BATU']['value_data']}</option>
                 `);
         });
 
         Object.values(db['db']['database_data']['LOKASI-MUAT-HAULING']).forEach(element => {
             $(`.LOKASI-MUAT-HAULING`).append(`
-                    <option value="${element['LOKASI-MUAT-HAULING-LOKASI-MUAT-HAULING']['code_data']}">${element['LOKASI-MUAT-HAULING-LOKASI-MUAT-HAULING']['value_data']}</option>
+                    <option value="${element['LOKASI-MUAT-HAULING']['code_data']}">${element['LOKASI-MUAT-HAULING']['value_data']}</option>
                 `);
         });
 
         Object.values(db['db']['database_data']['LOKASI-DUMPING-HAULING']).forEach(element => {
             $(`.LOKASI-DUMPING-HAULING`).append(`
-                    <option value="${element['LOKASI-DUMPING-HAULING-LOKASI-DUMPING-HAULING']['code_data']}">${element['LOKASI-DUMPING-HAULING-LOKASI-DUMPING-HAULING']['value_data']}</option>
+                    <option value="${element['LOKASI-DUMPING-HAULING']['code_data']}">${element['LOKASI-DUMPING-HAULING']['value_data']}</option>
                 `);
         });
 
         Object.values(db['db']['database_data']['LOKASI-STOCKFILE']).forEach(element => {
             $(`.LOKASI-STOCKFILE`).append(`
-                    <option value="${element['LOKASI-STOCKFILE-LOKASI-STOCKFILE']['code_data']}">${element['LOKASI-STOCKFILE-LOKASI-STOCKFILE']['value_data']}</option>
+                    <option value="${element['LOKASI-STOCKFILE']['code_data']}">${element['LOKASI-STOCKFILE']['value_data']}</option>
                 `);
         });
     </script>
@@ -968,7 +1192,7 @@
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     data: formDataArray,
-                    id_hauling:null
+                    id_hauling: null
                 },
                 success: function(response) {
                     CL('ajax response');
@@ -1019,10 +1243,14 @@
             });
 
             database_data_hauling_filter.forEach(id_hauling => {
-               
-                id_hauling.company_uuid = db['employees'][data_hauling[id_hauling]['code_data_driver']]['company_uuid'];
-                
-                data_hauling[id_hauling]['company_uuid'] = db['employees'][data_hauling[id_hauling]['code_data_driver']]['company_uuid'];
+
+                id_hauling.company_uuid = db['employees'][data_hauling[id_hauling]['code_data_driver']][
+                    'company_uuid'
+                ];
+
+                data_hauling[id_hauling]['company_uuid'] = db['employees'][data_hauling[id_hauling][
+                    'code_data_driver'
+                ]]['company_uuid'];
                 Object.values(data_field_hauling).forEach(field => {
                     let single_arr_data = (data_to_filter[field]).filter(item =>
                         item === data_hauling[id_hauling][field]);
@@ -1037,7 +1265,7 @@
 
             let change_filter = true;
 
-            if (Object.values(data_filter.list).length > 0) {                
+            if (Object.values(data_filter.list).length > 0) {
                 (data_filter.list).forEach(field_filter => {
                     if (change_filter == true) {
                         data_to_filter[field_filter] = data_to_filter_old[field_filter];
@@ -1050,8 +1278,8 @@
                 data_to_filter_old = Object.assign({}, data_to_filter);
             }
             (data_filter.list).forEach(field_filter => {
-                $('.'+field_filter).removeClass('btn-secondary');
-                $('.'+field_filter).addClass('btn-primary');                 
+                $('.' + field_filter).removeClass('btn-secondary');
+                $('.' + field_filter).addClass('btn-primary');
             });
 
             conLog('data_filter', data_filter);
@@ -1067,7 +1295,7 @@
             });
         }
 
-        function shiftChange(){
+        function shiftChange() {
 
         }
 
@@ -1111,7 +1339,7 @@
         function chooseUnit() {
             let idUnit = $(`#UNIT`).val();
             if (idUnit) {
-                $('#TARRA').val(db['db']['database_data']['TARA-UNIT'][idUnit]['TARA-UNIT-NILAI-TARA']['value_data']);
+                $('#TARRA').val(db['db']['database_data']['TARA-UNIT'][idUnit]['NILAI-TARA']['value_data']);
                 setNetto();
             }
 
@@ -1348,17 +1576,71 @@
             <div class="card-box">
                 <div class="d-flex flex-wrap pd-10">
                     <div class="widget-data">
-                        <div class="weight-700 font-24 text-dark">${db['db']['database_data']['UNIT'][id_unit]['UNIT-NOMOR-LAMBUNG']['value_data']}</div>
+                        <div class="weight-700 font-24 text-dark">${db['db']['database_data']['UNIT'][id_unit]['NOMOR-LAMBUNG']['value_data']}</div>
                         <div class="font-14 text-secondary weight-500">
-                            ${db['db']['database_data']['UNIT'][id_unit]['UNIT-PERUSAHAAN-PEMILIK-UNIT']['value_data']}
+                            ${db['db']['database_data']['UNIT'][id_unit]['PERUSAHAAN-PEMILIK-UNIT']['value_data']}
                         </div>
                         <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
-                            ${db['db']['database_data']['TARA-UNIT'][id_unit]['TARA-UNIT-NILAI-TARA']['value_data']} MT
+                            ${db['db']['database_data']['TARA-UNIT'][id_unit]['NILAI-TARA']['value_data']} MT
                         </div>
                     </div>
                 </div>
             </div>
             `;
         }
+    </script>
+
+    <script>
+        (function($) {
+            $(function() {
+                var ds = {
+                    'name': 'Lao Lao',
+                    'title': 'general manager',
+                    'children': [{
+                            'name': 'Bo Miao',
+                            'title': 'department manager'
+                        },
+                        {
+                            'name': 'Su Miao',
+                            'title': 'department manager',
+                            'children': [{
+                                    'name': 'Tie Hua',
+                                    'title': 'senior engineer'
+                                },
+                                {
+                                    'name': 'Hei Hei',
+                                    'title': 'senior engineer',
+                                    'children': [{
+                                            'name': 'Pang Pang',
+                                            'title': 'engineer'
+                                        },
+                                        {
+                                            'name': 'Xiang Xiang',
+                                            'title': 'UE engineer'
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            'name': 'Hong Miao',
+                            'title': 'department manager'
+                        },
+                        {
+                            'name': 'Chun Miao',
+                            'title': 'department manager'
+                        }
+                    ]
+                };
+
+                var oc = $('#chart-container').orgchart({
+                    'data': ds,
+                    'nodeContent': 'title',
+                    'direction': 'l2r',
+                    'pan': true
+                });
+
+            });
+        })(jQuery);
     </script>
 @endsection()

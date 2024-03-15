@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "ext-gd": "*",
         "barryvdh/laravel-dompdf": "^1.0",
+        "barryvdh/laravel-snappy": "^1.0",
         "doctrine/dbal": "^3.6",
         "fruitcake/laravel-cors": "^2.0",
         "grofgraf/laravel-pdf-merger": "^1.0",
@@ -15,8 +16,9 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "phpoffice/phpspreadsheet": "^1.29",
+        "phpoffice/phpspreadsheet": "^1.29.0",
         "setasign/fpdi": "^2.3",
+        "spatie/pdf-to-image": "^1.2",
         "tymon/jwt-auth": "dev-develop",
         "webklex/laravel-pdfmerger": "^1.3",
         "yajra/laravel-datatables-oracle": "~9.0"

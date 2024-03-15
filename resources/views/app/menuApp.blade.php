@@ -32,14 +32,14 @@
             </div>
         </div>
         <form>
-            <div class="row profile-info" id="field-form-1">
+            <div class="fields row profile-info" id="field-form-1">
                 <div class="col-md-4 col-sm-12">
                     <div class="form-group">
                         <label>Nama Field</label>
                         <input type="text" class="form-control description_field" id="description_field-1">
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-12 mb-2">
+                <div class="col-md-3 col-sm-12 mb-2">
                     <div class="form-group">
                         <label>Type Data Field</label>
                         <select style="width: 100%;" onchange="selectSource(1)" name="type_data_field-1"
@@ -48,9 +48,22 @@
                         </select>
                     </div>
                 </div>
+                
+                <div class="col-md-2 col-sm-12 mb-2">
+                    <div class="form-group">
+                        <label>Level</label>
+                        <select  name="level_data_field-1"
+                            id="level_data_field-1" class="form-control">
+                            <option value="1">1 | Public</option>
+                            <option value="2">2 | Admin Divisi</option>
+                            <option value="1">3 | HR</option>
+                            <option value="1">4 | Manajemen</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="col-md-2 col-sm-6">
                     <div class="form-group">
-                        <label>Urutan Field</label>
+                        <label>Urutan</label>
                         <input type="text" class="form-control" id="sort_field" value="1">
                     </div>
                 </div>
@@ -140,7 +153,7 @@
                 <div class="form-group row">
                     <label class="col-sm-12 col-md-2 col-form-label">Referensi Tabel</label>
                     <div class="col-sm-12 col-md-4">
-                        <select style="width: 100%;" name="parent_table" id="parent_table"
+                        <select style="width: 100%;"  onchange="selectParent()" name="parent_table" id="parent_table"
                             class="custom-select2 form-control database-table">
                             <option value="">Pilih Tabel Referensi</option>
                         </select>
@@ -261,23 +274,42 @@
         let structure_table;
 
         let from_table_form = {};
-        
+
+        function selectParent(){
+            let code_table = $('#parent_table').val();
+            CL(db['db']['database_table'][code_table]);
+            $('#primary_table').val(db['db']['database_field'][code_table][db['db']['database_table'][code_table]['primary_table']]['description_field']);
+
+        }
+
 
         function addFormField(id_btn) {
             let element_form_field_full = `
-                <div class="row profile-info" id="field-form-${id_btn}">
+                <div class="fields row profile-info" id="field-form-${id_btn}">
                         <div class="col-md-4 col-sm-12">
                             <div class="form-group">
                                 <label>Nama Field</label>
                                 <input type="text" class="form-control" id="description_field-${id_btn}">
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-12 mb-2">
+                        <div class="col-md-3 col-sm-12 mb-2">
                             <div class="form-group">
                                 <label>Type Data Field</label>
                                 <select onchange="selectSource(${id_btn})" style="width: 100%;" name="type_data_field-${id_btn}" id="type_data_field-${id_btn}" class="s2 form-control type-data">
                                     <option value="">Tipe Data Field</option>
                                     ${element_option_type_data}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12 mb-2">
+                            <div class="form-group">
+                                <label>Level</label>
+                                <select  name="level_data_field-${id_btn}"
+                                    id="level_data_field-${id_btn}" class="form-control">
+                                    <option value="1">1 | Public</option>
+                                    <option value="2">2 | Admin Divisi</option>
+                                    <option value="1">3 | HR</option>
+                                    <option value="1">4 | Manajemen</option>
                                 </select>
                             </div>
                         </div>
@@ -327,7 +359,7 @@
             $('#field_get').empty();
             Object.values(db['db']['database_field'][table_source]).forEach(element => {
                 $('#field_get').append(`
-                        <option value="${element.full_code_field}">${element.description_field}</option>
+                        <option value="${element.code_field}">${element.description_field}</option>
                     `);
             });
             return false;
@@ -345,7 +377,7 @@
 
 
         $(document).ready(function() {
-            
+
             refreshSession();
 
             let var_menu = "menu";
@@ -365,13 +397,12 @@
                         <option value="${element.uuid}">${element.description}</option>
                     `);
             });
-            
+
             // type data option
             Object.values(db['db']['database_data']['TYPE-DATA']).forEach(element => {
-                CL('element');CL(element);
                 element_option_type_data =
                     `${element_option_type_data }  
-                    <option value="${element['TYPE-DATA-TYPE-DATA']['code_data']}">${element['TYPE-DATA-TYPE-DATA']['value_data']}</option>`;
+                    <option value="${element['TYPE-DATA']['code_data']}">${element['TYPE-DATA']['value_data']}</option>`;
             });
             $(`.type-data`).append(element_option_type_data);
 
@@ -403,6 +434,7 @@
                         let data_field = {
                             'description_field': $(`#description_field-${i+1}`).val(),
                             'type_data_field': $(`#type_data_field-${i+1}`).val(),
+                            'level_data_field': $(`#level_data_field-${i+1}`).val(),
                             'sort_field': count_field_form,
                             'code_field': toUUID($(`#description_field-${i+1}`).val()),
                         }
@@ -482,13 +514,59 @@
 
         function actionCard(element) {
             var elementId = element.id;
-
+            CL(db);
             // Display the ID in the console (you can replace this with your own code)
             console.log('Clicked element ID: ' + elementId);
+            let string_primary_table = db['db']['database_table'][elementId]['primary_table'];
+            let arr_primary_table = string_primary_table.split(elementId);
+            conLog('arr_primary_table', arr_primary_table);
+            $('#description_table').val(db['db']['database_table'][elementId]['description_table']);
+            $('#primary_table').val(db['db']['database_field'][elementId][db['db']['database_table'][elementId][
+                'primary_table'
+            ]]['description_field']);
+            $('#menu_table').val(db['db']['database_table'][elementId]['menu_table']).trigger('change');
+            $('#parent_table').val(db['db']['database_table'][elementId]['parent_table']).trigger('change');
+
+            let edit_data_field = db['db']['database_field'][elementId];
+            // deleteFiled(1);
+            let arr_field = [];
+            Object.values(edit_data_field).forEach(edit_field => {
+                arr_field[edit_field.sort_field] = edit_field;
+            });
+            CL('arr_field');CL(arr_field);
+            $('.fields').remove();
+            arr_field.forEach(edit_field => {
+                let countField = parseInt(edit_field.sort_field) + 1;
+                let elementAddFieldForm = addFormField(countField);
+                $('#count_field').val(countField);
+
+                $('.btn-add-form-field').before(elementAddFieldForm);
+                $(`#type_data_field-${countField}`).select2();
+
+
+                $('#description_field-' + (parseInt(edit_field.sort_field) + 1)).val(edit_field.description_field);
+                $('#type_data_field-' + (parseInt(edit_field.sort_field) + 1)).val(edit_field.type_data_field);
+                $('#level_data_field-' + (parseInt(edit_field.sort_field) + 1)).val(edit_field.level_data_field);
+                $(`#select2-type_data_field-${parseInt(edit_field.sort_field) + 1}-container`).text(edit_field
+                    .type_data_field);
+                from_table_form = {};
+                if (db['db']['database_data_source'][edit_field.full_code_field] !== undefined) {
+                    from_table_form[`data-source-${countField}`] = {
+                        table_data_source: db['db']['database_data_source'][edit_field.full_code_field]['table_data_source'],
+                        field_get_data_source: db['db']['database_data_source'][edit_field.full_code_field]['field_get_data_source']
+                    }
+                    CL(from_table_form)
+                }
+
+
+                $(`#type_data_field-${countField}`).select2();
+
+
+            });
         }
 
-       
-        
+
+
 
         function refreshTable() {
             let row_data_datatable = [];
@@ -527,7 +605,6 @@
                 data_datatable.push(element);
             });
 
-            CL(data_datatable);
             // return false;
             $('#table-datatable').DataTable({
                 paging: true,

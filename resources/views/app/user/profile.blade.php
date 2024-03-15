@@ -438,8 +438,9 @@
 
 @section('script_javascript')
     <script>
-        console.log(localStorage.getItem('ui_dataset'));
-        console.log(@json(session('user_authentication')));
+        // console.log(localStorage.getItem('ui_dataset'));
+        // console.log(@json(session('user_authentication')));
+
         let user_authentication = @json(session('user_authentication'));
         
         let _token = $('meta[name="csrf-token"]').attr('content');
@@ -465,5 +466,11 @@
                     conLog('response', response)
                 }
             });
+            conLog('db', db)
+
+            if(!db){
+                refreshSession();
+                CL('nullllll');
+            }
     </script>
 @endsection()

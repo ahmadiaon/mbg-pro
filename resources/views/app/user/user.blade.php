@@ -102,6 +102,26 @@
             </div>
         </form>
     </div>
+
+    {{-- warning modal change pin --}}
+    <div class="modal fade" id="warning-modal-change-pin" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content bg-warning">
+                <div class="modal-body text-center">
+                    <h3 class="mb-15">
+                        <i class="fa fa-exclamation-triangle"></i> Warning
+                    </h3>
+                    <p>
+                        harap ganti password login anda menggunakan PIN, untuk memudahkan login di kemudian hari.
+                    </p>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">
+                        Ok
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection()
 
 @section('script_javascript')
@@ -174,6 +194,10 @@
                     setValueInput('email', response.data.email);
                     setValueInput('phone_number', response.data.phone_number);
                     setValueInput('nik_number', response.data.nik_number);
+                    if (!response.data.pin) {
+                        CL('ksong pin');
+                        $('#warning-modal-change-pin').modal('show');
+                    }
                 },
                 error: function(response) {
                     conLog('error', response)
@@ -258,7 +282,6 @@
     {{-- pin max --}}
     <script>
         $(document).ready(function() {
-
             // Menggunakan event input untuk mengawasi perubahan pada input
             $('#form-user').on('input', '.pinNumber', function() {
                 // Mendapatkan nilai input
@@ -275,141 +298,5 @@
                 }
             });
         });
-    </script>
-
-
-    {{-- LOCAL STORAGE --}}
-    <script>
-        $(document).ready(function() {
-            refreshSession();
-        });
-    </script>
-
-    <script>
-        let menuData = {
-            'form': {
-                'sub-menu': {
-                    'Profile': {
-                        "multiple": "multiple",
-                        "form": {
-                            'DATA-KARYAWAN': {
-                                "status_form": "primary",
-                                "parent_table": null,
-                                "code_key": "nik_employee",
-                                "fields": {
-                                    'NIK-EMPLOYEE': "TEXT",
-                                    'JOIN-DATE': 'DATE',
-                                    'LONG-CONTRACT': 'NUMBER',
-                                    'SK-CONTRACT': 'TEXT',
-                                    'POSITION': "FROM-DB",
-                                    'DEPARTMENT': "FROM-DB",
-                                }
-                            },
-                            'IDENTITAS': {
-                                "status_form": "standart",
-                                "parent_table": "DATA-KARYAWAN",
-                                "code_key": "nik_employee",
-                                "fields": {
-                                    'NAME': "TEXT",
-                                    'GENDER': 'FROM-DB',
-                                    'DATE-BIRTH': 'DATE',
-                                }
-                            },
-                            'ADRESS': {
-                                "status_form": "standart",
-                                "parent_table": "DATA-KARYAWAN",
-                                "code_key": "nik_employee",
-                                "fields": {
-                                    'NAME': "TEXT",
-                                    'GENDER': 'FROM-DB',
-                                    'DATE-BIRTH': 'DATE',
-                                }
-                            },
-                            'PERUSAHAAN': {
-                                "status_form": "primary",// ini untuk mengaitkan datanya, //jika ia menjadi secondari, maka otomatis code data nya mengikuti code data primarynya
-                                "parent_table": null,//Ex. "DATA-KARYAWAN"
-                                "code_data_key": "SHORT-NAME", //ini yg di jadikan acuan ketika table ini di referensikan, 
-                                                               //tinggal nnti data apa yg ingin di tampilkan di pilihan,
-                                                               //lalu ini yang di jadikan code_data ke uuid
-                                                               // jenis menu pasti jadi sub menu
-
-                                "table_name": "Perusahaan",
-                                "menu":"DATABASE",
-                                "description_table":"",
-
-
-
-                                "fields": {
-                                    'SHORT-NAME' : "text",
-                                    'SHORT-NAME' : {
-                                        'table': "PERUSAHAAN",
-                                        'description':"Nama Pendek",
-                                        'type_data':"TEXT",
-                                        'field' : "NAMA-PENDEK",
-                                        'code_field':"PERUSAHAAN-NAMA-PENDEK",
-                                    },
-                                    'LONG-NAME' : "text",//
-                                    'KEPEMILIKAN-BATUBARA' : "FROM-DB",//FROM DB STATUS-KEPEMILIKAN-BATU "HAVE"/"DOES NOT HAVE"
-                                    'KEPEMILIKAN-BATUBARA' : {
-                                        'table': "PERUSAHAAN",
-                                        'description':"Kepemilikan Batubara",
-                                        'type_data':"FROM-DB",
-                                        'type_data':{
-                                            'code_field_source':"PERUSAHAAN-KEPEMILIKAN-BATUBARA",
-                                            'table_data_reference':"STATUS-KEPEMILIKAN-BATUBARA",
-                                            'field_get_form_reference':''
-                                        },
-                                        'field' : "KEPEMILIKAN-BATUBARA",
-                                        'code_field':"PERUSAHAAN-KEPEMILIKAN-BATUBARA",
-                                    },
-                                    'CODE-DATA' : "text",//UUID SHORT-NAME
-                                }
-                            },
-
-                            'PERUSAHAAN': {
-                                'PT. MB': {
-                                    'SHORT-NAME': 'PT. MB',
-                                    'LONG-NAME': 'PT. Mitra Barito',
-                                    'HAVING-COAL': 'HAVE',
-                                    'CODE-DATA': 'PT. MB'
-                                },
-                                'PT. MBLE': {
-                                    'SHORT-NAME': 'PT. MB',
-                                    'LONG-NAME': 'PT. Mitra Barito Lumbung Energi',
-                                    'HAVING-COAL': 'Do not have',
-                                    'CODE-DATA': 'PT. MBLE'
-                                }
-                            },
-                            'DATA-MENU': {
-                                'MENU': {
-                                    'PROFILE': {
-                                        "DESCRIPTION": "Profile",
-                                        "LEVEL": "MENU",
-                                        "MENU": null,
-                                    }
-                                },
-                                "SUB-MENU": {
-                                    "PROFILE": {
-                                        "USER": {
-                                            "DESCRIPTION": "User",
-                                            "LEVEL": "SUB-MENU",
-                                            "MENU": "PROFILE",
-                                        },
-                                        "DATA": {
-                                            "DESCRIPTION": "User",
-                                            "LEVEL": "SUB-MENU",
-                                            "MENU": "PROFILE",
-                                        },
-                                    }
-                                }
-                            }
-
-                        }
-
-                    }
-                }
-            }
-        };
-        conLog('xx',menuData);
     </script>
 @endsection()

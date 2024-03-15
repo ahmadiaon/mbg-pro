@@ -19,6 +19,7 @@
                                 <a class="dropdown-item" onclick="refreshTable(2021,null , null)" href="#">2021</a>
                                 <a class="dropdown-item" onclick="refreshTable(2022,null , null)" href="#">2022</a>
                                 <a class="dropdown-item" onclick="refreshTable(2023,null , null)" href="#">2023</a>
+                                <a class="dropdown-item" onclick="refreshTable(2024,null , null)" href="#">2024</a>
                             </div>
                         </div>
                         <div class="btn-group dropdown">

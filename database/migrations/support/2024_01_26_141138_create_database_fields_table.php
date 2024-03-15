@@ -18,7 +18,8 @@ class CreateDatabaseFieldsTable extends Migration
             $table->string('code_table_field')->nullable();
             $table->string('description_field')->nullable();
             $table->string('type_data_field')->nullable();
-            $table->string('code_field')->nullable();            
+            $table->string('code_field')->nullable();      
+            $table->string('level_data_field')->nullable();            
             $table->string('full_code_field')->nullable();
             $table->string('sort_field')->nullable();
             $table->timestamps();

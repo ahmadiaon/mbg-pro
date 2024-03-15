@@ -1325,7 +1325,12 @@ class EmployeeController extends Controller
                 echo $nik_employee . "-start user detail</br>";
 
                 $employee_data_one['role'] = 'employee';
-                $employee_data_one['password'] = Hash::make('password');
+                if(!empty($employee_data_one['nik_number'])){
+                    $employee_data_one['password'] = Hash::make($employee_data_one['nik_number']);
+                }else{
+                    $employee_data_one['password'] = Hash::make('password');
+                }
+                
                 $storeUser = User::updateOrCreate(['uuid'    =>  $employee_data_one['uuid']], $employee_data_one);
 
                 echo $nik_employee . "-start salary</br>";

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Aktivity\Aktivity;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeAbsen;
+use App\Models\Employee\EmployeeOut;
 use App\Models\StatusAbsen;
 use Carbon\Carbon;
 use DateInterval;
@@ -2181,8 +2182,6 @@ class EmployeeAbsenController extends Controller
                                     'status_absen_uuid'     => ResponseFormatter::toUUID($sheet->getCell($rows[$column_date] . $no_employee)->getValue()),
                                 ]
                             );
-                            // return ResponseFormatter::toJson($store_employee_absen, 'a');
-
                             $column_date++;
                         }
                     }
@@ -2234,21 +2233,61 @@ class EmployeeAbsenController extends Controller
                 }
                 return ResponseFormatter::tojson($arr_data_list, 'from list employee absen');
             } else { //dari mesin fingger
+
+                $sheet = $spreadsheet->getSheet(2); 
+                $validatedData = $request->all();
+                
+                // ==== GET DATE DATA ====
+                
+                    $row_limit    = $sheet->getHighestDataRow();
+                    $tanggal = $sheet->getCell('C' . 3)->getValue();
+
+                    $splitTanggal =  str_split($tanggal, 1);
+
+                    $date_start =  $splitTanggal[8] . $splitTanggal[9];
+                    $date_end   =  $splitTanggal[21] . $splitTanggal[22];
+                    $month_start = $splitTanggal[5] . $splitTanggal[6];
+                    $month_end   = $splitTanggal[18] . $splitTanggal[19];
+                    $year_start = $splitTanggal[0] . $splitTanggal[1] . $splitTanggal[2] . $splitTanggal[3];
+                    $year_end  = $splitTanggal[13] . $splitTanggal[14] . $splitTanggal[15] . $splitTanggal[16];
+                    $year_end . "-" . $month_end . "-" . $date_end;
+                    $start_date = date_create($year_start . "-" . $month_start . "-" . $date_start);
+                    $end_date = date_create($year_end . "-" . $month_end . "-" . $date_end);
+                    $end_date = date_add($end_date, date_interval_create_from_date_string("1 days"));
+                // ==== END GET DATE DATA ====
+
+                // ==== VALIDATION DATE PRPCESING =====
+                    $all_datas['have_employees']['configuration'] = [
+                        'long_date' => $date_end,
+                        'first_date'    => $start_date->format('Y-m-d'),
+                        'end_date'    => $end_date->format('Y-m-d'),
+                    ];
+
+                    if (empty($validatedData['date_absen_start'])) {
+                        $data_return = [
+                            'date_absen_start' => $start_date->format('Y-m-d'),
+                            'date_absen_end' => $end_date->format('Y-m-d'),
+                        ];
+                        return ResponseFormatter::toJson($data_return, 'data return to setup');
+                    }
+
+                // ==== END VALIDATION DATE PRPCESING =====
+                $start_date = date_create($validatedData['date_absen_start']);
+                $end_date = date_create($validatedData['date_absen_end']);
+
                 $data_database = session('data_database');
                 $data_employees = [];
                 foreach ($data_database['data_employees'] as $data_employee_) {
                     $data_employees[$data_employee_->nik_employee] = $data_employee_;
                 }
-                // return ResponseFormatter::toJson($data_employees,'ssssss');
+
                 $data_employees_machine_id = $data_database['data_datatable_database']['database']['data-table']['ID-FINGGER-KARYAWAN'];
                 $employees_machine_ids = [];
                 foreach ($data_employees_machine_id as $item) {
                     $employees_machine_ids[$item['ID-FINGGER']['value_field']] = $item['ID-KARYAWAN']['value_field'];
                 }
 
-                $sheet = $spreadsheet->getSheet(2);
-                $row_limit    = $sheet->getHighestDataRow();
-                $tanggal = $sheet->getCell('C' . 3)->getValue();
+                
                 $data_employee_absen_have_employees = EmployeeAbsen::join('employees', 'employees.machine_id', 'employee_absens.employee_uuid')
                     ->groupBy(
                         'employee_absens.employee_uuid',
@@ -2266,38 +2305,9 @@ class EmployeeAbsenController extends Controller
                     $arr_employee_absen[$employee_absen_have_employees->machine_id] = $employee_absen_have_employees;
                 }
 
-                $splitTanggal =  str_split($tanggal, 1);
+                
 
-                $date_start =  $splitTanggal[8] . $splitTanggal[9];
-                $date_end   =  $splitTanggal[21] . $splitTanggal[22];
-                $month_start = $splitTanggal[5] . $splitTanggal[6];
-                $month_end   = $splitTanggal[18] . $splitTanggal[19];
-                $year_start = $splitTanggal[0] . $splitTanggal[1] . $splitTanggal[2] . $splitTanggal[3];
-                $year_end  = $splitTanggal[13] . $splitTanggal[14] . $splitTanggal[15] . $splitTanggal[16];
-                $year_end . "-" . $month_end . "-" . $date_end;
-                $start_date = date_create($year_start . "-" . $month_start . "-" . $date_start);
-                $end_date = date_create($year_end . "-" . $month_end . "-" . $date_end);
-                $end_date = date_add($end_date, date_interval_create_from_date_string("1 days"));
-
-                $validatedData = $request->all();
-
-
-                $all_datas['have_employees']['configuration'] = [
-                    'long_date' => $date_end,
-                    'first_date'    => $start_date->format('Y-m-d'),
-                    'end_date'    => $end_date->format('Y-m-d'),
-                ];
-
-                if (empty($validatedData['date_absen_start'])) {
-                    $data_return = [
-                        'date_absen_start' => $start_date->format('Y-m-d'),
-                        'date_absen_end' => $end_date->format('Y-m-d'),
-                    ];
-                    return ResponseFormatter::toJson($data_return, 'data return to setup');
-                }
-
-                $start_date = date_create($validatedData['date_absen_start']);
-                $end_date = date_create($validatedData['date_absen_end']);
+               
 
 
                 // return ResponseFormatter::toJson($validatedData,'here');
@@ -2317,22 +2327,19 @@ class EmployeeAbsenController extends Controller
                 $data_delete = EmployeeAbsen::where('employee_absens.date', '>=', $start_date->format('Y-m-d'))
                     ->where('employee_absens.date', '<=', $end_date->format('Y-m-d'))
                     ->get();
-                // ->delete();
-                // return true;
 
 
                 $arr_data_employee_absen = [];
                 foreach ($data_delete as $item_data_delete) {
                     $arr_data_employee_absen[$item_data_delete->employee_uuid][$item_data_delete->date] = $item_data_delete;
                 }
-
+                
                 foreach ($period as $key => $value) {
                     $date_data[] = $value->format('Y-m-d');
                 }
 
                 // dd($date_data);
                 $employees_count = ($row_limit - 4) / 2;
-                // return ResponseFormatter::toJson('asasas',$employees_count);
                 $i = 5;
                 $arr_machine_id = [];
 
@@ -2390,6 +2397,9 @@ class EmployeeAbsenController extends Controller
                             if (!empty($absensi)) {
                                 if (!empty($arr_data_employee_absen[$employeeName])) {
                                     if (!empty($arr_data_employee_absen[$employeeName][$abjad])) {
+                                        if(!empty($arr_data_employee_absen[$employeeName][$abjad]['cek_log'])){
+                                            $arr_cek_log_this_date = json_decode($arr_data_employee_absen[$employeeName][$abjad]['cek_log']);
+                                        }
                                         if (empty($arr_data_employee_absen[$employeeName][$abjad]['edited'])) {
                                             $old_cek_log = $arr_data_employee_absen[$employeeName][$abjad]['cek_log'];
                                         }
@@ -2493,10 +2503,6 @@ class EmployeeAbsenController extends Controller
                 $name = 'file/absensi/file/ekstrak-absen-' . rand(99, 9999) . 'file.xls';
                 $crateWriter->save($name);
                 return ResponseFormatter::toJson($all_datas, 'here');
-                // return redirect()->to('/user/absensi/after-import');
-                // return response()->download($name);
-
-                // return response()->download($name);
                 dd($dataaa);
             }
         } catch (Exception $e) {
@@ -2741,8 +2747,17 @@ class EmployeeAbsenController extends Controller
             'employee_absens.uuid as uuid',
         ]);
 
+        $Q_employee_outs = EmployeeOut::where('employee_outs.date_out', '<',  $validateData['filter']['date_filter']['date_start_filter_absen'])->get();
+
+        $data_employee_out = [];
+        foreach ($Q_employee_outs as $employee_out) {
+            $data_employee_out[$employee_out->employee_uuid] = $employee_out;
+        }
+
         $data_employee_absen = [];
         foreach ($data_employee_absen_detail as $ab) {
+
+
             $data_employee_absen[$ab->employee_uuid][] = $ab;
             if (!empty($data_response['data_employee'][$ab->employee_uuid])) {
                 $data_response['data_employee'][$ab->employee_uuid][$ab->date] = $ab;
@@ -2758,6 +2773,7 @@ class EmployeeAbsenController extends Controller
 
         $data_employee_absen = [];
         foreach ($data_employee_absen_detail as $item_data_employee_absen_detail) {
+
             if (!empty($data_database['data_employees'][$item_data_employee_absen_detail->employee_uuid])) {
                 $data_employee_absen[$item_data_employee_absen_detail->employee_uuid][$item_data_employee_absen_detail->date] = $item_data_employee_absen_detail;
             }
@@ -2783,10 +2799,12 @@ class EmployeeAbsenController extends Controller
         $data_filter_math = [];
 
         foreach ($employee_data_uuid as  $item_employee_data_uuid) {
-            if (empty($data_filter_math[$item_employee_data_uuid->nik_employee])) {
-                foreach ($math_filter as $index => $item_math_filter) {
-                    if (!empty($item_employee_data_uuid['absensi']['count_' . $index])) {
-                        $data_filter_math[$item_employee_data_uuid->nik_employee] = $item_employee_data_uuid;
+            if (empty($data_employee_out[$item_employee_data_uuid->nik_employee])) {
+                if (empty($data_filter_math[$item_employee_data_uuid->nik_employee])) {
+                    foreach ($math_filter as $index => $item_math_filter) {
+                        if (!empty($item_employee_data_uuid['absensi']['count_' . $index])) {
+                            $data_filter_math[$item_employee_data_uuid->nik_employee] = $item_employee_data_uuid;
+                        }
                     }
                 }
             }
@@ -2806,6 +2824,7 @@ class EmployeeAbsenController extends Controller
             'math_filter'    => $math_filter,
             'employee_data_uuid'    => $employee_data_uuid,
             'employee_data_machine_id'    => $employee_data_machine_id,
+            'data_employee_out' => $data_employee_out,
 
             'data_employee_absen_detail_nik_employee'    => $data_employee_absen_detail_nik_employee,
             'data_filter_math' => $data_filter_math,
@@ -2869,44 +2888,7 @@ class EmployeeAbsenController extends Controller
     }
 
 
-    // public function anyDataEmployee($year_month, $nik_employee)
-    // {
-    //     $date = explode("-", $year_month);
-    //     $year = $date[0];
-    //     $month = $date[1];
-    //     $employees = Employee::where('nik_employee', $nik_employee)->get();
-    //     $arr_data_employee_absen = [];
-    //     $status_absen = StatusAbsen::all();
 
-    //     $day_end = ResponseFormatter::getEndDay($year_month);
-
-    //     foreach ($employees as $item_employee) {
-    //         $data_employee_absen = EmployeeAbsen::whereYear('employee_absens.date', $year)
-    //             ->whereMonth('employee_absens.date', $month)
-    //             ->where('employee_uuid', $item_employee->machine_id)
-    //             ->get();
-
-    //         foreach ($data_employee_absen as $data_employee_absen_) {
-    //             $arr_date = explode('-', $data_employee_absen_->date);
-    //             $arr_data_employee_absen[(int)$arr_date[2]] = $data_employee_absen_;
-    //         }
-    //     }
-    //     for ($i = 1; $i <= $day_end; $i++) {
-    //         if (empty($arr_data_employee_absen[(int)$i])) {
-    //             $arr_data_employee_absen[(int)$i]  = [
-    //                 "date" => $year . '-' . str_pad($month, 2, 0, STR_PAD_LEFT) . '-' . str_pad($i, 2, 0, STR_PAD_LEFT),
-    //                 "status_absen_uuid" => "",
-    //                 "cek_log" => null,
-    //                 "edited" => null,
-    //                 "pay_uuid" => null,
-    //             ];
-    //         }
-    //     }
-
-
-    //     return Datatables::of($arr_data_employee_absen)
-    //         ->make(true);
-    // }
 
 
     public function showPayrol($year_month, $employee_uuid)

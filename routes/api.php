@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Database\DatabaseTableController;
 use App\Http\Controllers\Api\Pendapatan\HaulingController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Support\DatabaseController;
@@ -34,7 +35,7 @@ Route::prefix('mbg')->group(function () {
     
     Route::post('/get/user/available', [UserController::class, 'cekAvailableEmployee']);
 
-    Route::prefix('manage')->group(function () {
+    Route::prefix('manage')->group(function () {/// /api/mbg/manage/
         Route::prefix('employees')->group(function () {
             Route::post('/get', [UserController::class, 'getEmployees']);
         });
@@ -49,8 +50,10 @@ Route::prefix('mbg')->group(function () {
 
         
 
-        Route::prefix('database')->group(function () {
+        Route::prefix('database')->group(function () {// /api/mbg/manage/database/
             Route::post('/store-database', [DatabaseController::class, 'storeData']);
+            Route::post('/delete-data-database', [DatabaseController::class, 'deleteData']);
+            Route::post('/get-table', [DatabaseController::class, 'getData']);
         });
 
         Route::prefix('menu')->group(function () {

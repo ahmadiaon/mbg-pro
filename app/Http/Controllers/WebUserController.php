@@ -47,7 +47,13 @@ class WebUserController extends Controller
                 session()->put('user_authentication', $storeEmployee);
                 request()->session()->put('db_local_storage', UserController::db_local_storage());
 
-                return redirect()->intended('/web/profile');
+                if(!empty($storeEmployee->pin)){
+                    return redirect()->intended('/web/menu');
+                }else{
+                    return redirect()->intended('/web/menu/user');
+                }
+
+                
 
                 Session::put('user_authentication', $storeEmployee);
                 

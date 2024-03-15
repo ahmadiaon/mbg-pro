@@ -46,15 +46,17 @@
     <div class="modal fade" id="doc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Document</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <div class="modal-header" id="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Slip</h4>
+                    <button type="button"class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
-                <div class="modal-body">
-                    <div style="text-align: center;">
+                <div class="modal-body text-center">
+                    <canvas id="pdf-canvas" class="d-block"></canvas>
+                    <button id="changeWidth" onclick="changeWidth()"  class="btn btn-secondary">lihat</button>
+                    {{-- <div style="text-align: center;">
                         <iframe id="path_doc" src="http://192.168.8.135:8000/file/document/employee/01_ktp_file.pdf"
                             style="width:100%; height:500px;" frameborder="0"></iframe>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -65,13 +67,24 @@
 @endsection()
 
 @section('script_javascript')
-    <script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
 
-        function downloadSlip(url_slip) {
+    <script>
+        function downloadSlip(url_slip, month_year) {
+            CL(url_slip)
             var dlink = document.createElement("a");
-            dlink.href = `file/slips/${url_slip}`;
-            dlink.setAttribute("download", "");
+            dlink.href = `/file/slips/${url_slip}`;
+            dlink.setAttribute("download", month_year + ".pdf");
+            dlink.download = month_year + ".pdf";
+            // document.getElementById("downloadLink").download = "new-file-name.pdf";
             dlink.click();
+        }
+
+        function changeWidth(){
+            let width_header = $('#modal-header').width();
+            $('#pdf-canvas').width(width_header);
+            $('#changeWidth').attr('hidden',true)
+            CL(width_header);
         }
 
 
@@ -96,6 +109,7 @@
                 }),
                 success: function(response) {
                     let slips = response.data;
+                    CL(response);
                     if (Object.keys(slips).length > 0) {
                         $('#no-slips').remove()
                         $('#slips').empty()
@@ -111,7 +125,7 @@
                                     </div>
                                 </div>
                                 <div class="cta flex-shrink-0">
-                                    <a href="#" onclick="downloadSlip('${element.original_file}')" class="btn btn-sm btn-outline-primary">Unduh</a>
+                                    <a href="#" onclick="downloadSlip('${element.original_file}', 'MBG-SLIP-${element.month}-${element.year}')" class="btn btn-sm btn-outline-primary">Unduh</a>
                                     <a href="#" onclick="showdoc('${element.original_file}')" class="btn btn-sm btn-outline-primary">Lihat</a>
                                 </div>
                             </li>
@@ -132,8 +146,64 @@
         }
 
         function showdoc(path) {
-            $('#path_doc').attr("src", "{{ env('APP_URL') }}file/slips/" + path)
-            $('#doc').modal('show')
+            $('#path_doc').attr("src", "{{ env('APP_URL') }}file/slips/" + path);
+            $('#doc').modal('show');
+            let width_header = $('#modal-header').width();
+            conLog('width_header',width_header);
+            const pdfUrl = "/file/slips/" + path;
+            $('#changeWidth').attr('hidden',false)
+            pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+                // Fetch the first page of the PDF
+                pdf.getPage(1).then(function(page) {
+                    // Set canvas context
+                    const canvas = document.getElementById('pdf-canvas');
+                    const context = canvas.getContext('2d');
+
+                    // Get the viewport of the page
+                    const viewport = page.getViewport({
+                        scale: 2
+                    });
+
+                    // // Set canvas dimensions
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    // Render the page content into the canvas
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext).promise.then(function() {
+                    //     // Convert canvas to image with specified width
+                    //     const maxWidth = 100; // Set maximum width
+                    //     const aspectRatio = canvas.width / canvas.height;
+                    //     const width = Math.min(maxWidth, canvas.width);
+                    //     const height = width / aspectRatio;
+
+                    //     // Create new canvas with adjusted dimensions
+                    //     const scaledCanvas = document.createElement('canvas');
+                    //     const scaledContext = scaledCanvas.getContext('2d');
+                    //     scaledCanvas.width = width;
+                    //     scaledCanvas.height = height;
+
+                    //     // Draw scaled canvas image
+                    //     // scaledContext.drawImage(canvas, 0, 0, width, height);
+
+                    //     // // Convert scaled canvas to data URL
+                    //     // const imageDataUrl = scaledCanvas.toDataURL('image/jpeg');
+
+                    //     // // Display image
+                    //     // const imageContainer = document.getElementById('img-canvas');
+                    //     // const img = new Image();
+                    //     // img.src = imageDataUrl;
+                    //     // img.width = width;
+                    //     // img.height = height;
+                    //     // imageContainer.appendChild(img);
+                    });
+                    $('#pdf-canvas').width(width_header);
+                    CL($('#modal-header').width());
+                });
+            });
         }
 
         setUImonthYear()

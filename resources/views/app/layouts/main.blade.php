@@ -27,6 +27,108 @@
     <link rel="stylesheet" type="text/css" href="/src/plugins/bootstrap-touchspin/jquery.bootstrap-touchspin.css" />
     <link rel="stylesheet" type="text/css" href="/src/plugins/datatables/css/dataTables.bootstrap4.min.css" />
     <link rel="stylesheet" type="text/css" href="/src/plugins/datatables/css/responsive.bootstrap4.min.css" />
+    <style>
+        .modal-confirm {
+            color: #636363;
+            width: 400px;
+        }
+
+        .modal-confirm .modal-content {
+            padding: 20px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .modal-confirm .modal-header {
+            border-bottom: none;
+            position: relative;
+        }
+
+        .modal-confirm h4 {
+            text-align: center;
+            font-size: 26px;
+            margin: 30px 0 -10px;
+        }
+
+        .modal-confirm .close {
+            position: absolute;
+            top: -5px;
+            right: -2px;
+        }
+
+        .modal-confirm .modal-body {
+            color: #999;
+        }
+
+        .modal-confirm .modal-footer {
+            border: none;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 13px;
+            padding: 10px 15px 25px;
+        }
+
+        .modal-confirm .modal-footer a {
+            color: #999;
+        }
+
+        .modal-confirm .icon-box {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border-radius: 50%;
+            z-index: 9;
+            text-align: center;
+            border: 3px solid #f15e5e;
+        }
+
+        .modal-confirm .icon-box i {
+            color: #f15e5e;
+            font-size: 46px;
+            display: inline-block;
+            margin-top: 13px;
+        }
+
+        .modal-confirm .btn,
+        .modal-confirm .btn:active {
+            color: #fff;
+            border-radius: 4px;
+            background: #60c7c1;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            min-width: 120px;
+            border: none;
+            min-height: 40px;
+            border-radius: 3px;
+            margin: 0 5px;
+        }
+
+        .modal-confirm .btn-secondary {
+            background: #c1c1c1;
+        }
+
+        .modal-confirm .btn-secondary:hover,
+        .modal-confirm .btn-secondary:focus {
+            background: #a8a8a8;
+        }
+
+        .modal-confirm .btn-danger {
+            background: #f15e5e;
+        }
+
+        .modal-confirm .btn-danger:hover,
+        .modal-confirm .btn-danger:focus {
+            background: #ee3535;
+        }
+
+        .trigger-btn {
+            display: inline-block;
+            margin: 100px auto;
+        }
+    </style>
 
 
     @yield('src_css')
@@ -66,7 +168,8 @@
             </div>
             <div class="footer-wrap pd-20 mb-20 card-box">
                 MBG - Online Created By
-                <a href="https://github.com/ahmadiaon" target="_blank">ahma.id</a>
+                <a href="https://github.com/ahmadiaon"  target="_blank">ahma.id </a>
+                Contact me <a href="https://wa.me/6281255897044"><i class="icon-copy bi bi-telephone-fill"></i></a>
             </div>
         </div>
     </div>
@@ -164,7 +267,32 @@
         </div>
     </div>
 
+
+    {{-- modal confirm delete datatable --}}
+    <div id="confirm-modal-async" class="modal fade">
+        <div class="modal-dialog  modal-sm modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header flex-column">
+                    <div class="icon-box">
+                        <i class="icon-copy ion-android-delete"></i>
+                    </div>
+                    <input type="hidden" name="code_data_delete" id="code_data_delete">
+                    <h4 class="modal-title w-100">Hapus Data?</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda Yakin Untuk Mengahapus data ini?</p>
+                </div>
+                <div class="modal-footer justify-content-center row">
+                    <button type="button" class="col btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button onclick="deleteThisData()" type="button" class="col btn btn-danger">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- js -->
+    @yield('src_script_javascript')
     @yield('script_javascript')
     <script>
         $('#main-content').hide();

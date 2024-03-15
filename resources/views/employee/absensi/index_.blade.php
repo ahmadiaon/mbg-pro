@@ -1101,7 +1101,7 @@
                         loopDate();
                     } else {
                         console.log(response);
-                        // return false;
+                        return false;
                         window.location.href = "/user/absensi/after-import";
                     }
                 },

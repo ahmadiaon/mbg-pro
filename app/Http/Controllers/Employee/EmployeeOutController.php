@@ -53,7 +53,7 @@ class EmployeeOutController extends Controller
 
         try{
             $spreadsheet = IOFactory::load($the_file->getRealPath());
-            $sheet        = $spreadsheet->getActiveSheet();
+            $sheet       = $spreadsheet->getActiveSheet();
 
             $rows = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ','DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ'];
         
@@ -65,9 +65,11 @@ class EmployeeOutController extends Controller
                 $employee_uuid = ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue());
                 $date = ResponseFormatter::excelToDate($sheet->getCell( 'F'.$no_employee)->getValue());
                 $out_status_uuid = ResponseFormatter::toUUID($sheet->getCell( 'E'.$no_employee)->getValue());
+
                 if(empty($out_status_uuid)){
-                    $out_status_uuid = 'unknown_out_status';
+                    $out_status_uuid = 'PHK';
                 }
+
                 if(empty($out_status[$out_status_uuid])){
                     $store_atribut_size = AtributSize::updateOrCreate(
                         ['uuid' => $out_status_uuid],
@@ -82,12 +84,14 @@ class EmployeeOutController extends Controller
                         $out_status[$out_status_uuid] = $store_atribut_size ;
                     }                    
                 }
+
                 $row_data = [
                     'employee_uuid' => ResponseFormatter::toUUID($sheet->getCell( 'B'.$no_employee)->getValue()),
                     'out_status' => $out_status_uuid,
                     'date_out' => $date,
                     'uuid' => $employee_uuid,
                 ];
+
                 $all_data_row_employee_out[] = $row_data;
                 $arr_date = explode('-',$date);
                 $endDateThisMonth = ResponseFormatter::getEndDay($arr_date[0].'-'.$arr_date[1]);
@@ -99,10 +103,10 @@ class EmployeeOutController extends Controller
                 $machine_id = $employee_uuid;
 
                 $delete_absen = EmployeeAbsen::where('employee_uuid', $machine_id)
-                ->where('date', '>=' ,$startDate->format('Y-m-d'))
+                ->where('date', '>' ,$startDate->format('Y-m-d'))
                 ->where('date', '<=' ,$endDate->format('Y-m-d'))
                 ->delete();
-                for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
+                for ($date =  $endDate; $date > $startDate; $date->modify('-1 day')) {
                     $row_data_absen = [];
                     $row_data_absen['employee_uuid'] = $machine_id;
                     $row_data_absen['status_absen_uuid']  = 'X';

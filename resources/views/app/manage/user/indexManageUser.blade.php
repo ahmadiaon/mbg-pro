@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    
+
 
     {{-- datatable --}}
     <!-- Simple Datatable start -->
@@ -36,6 +36,12 @@
                 <thead>
                     <tr>
                         <th class="table-plus datatable-nosort">Name</th>
+                        <th class="table-plus datatable-nosort">Perusahaan</th>
+                        <th class="table-plus datatable-nosort">Project</th>
+                        <th class="table-plus datatable-nosort">Department</th>
+                        <th class="table-plus datatable-nosort">Divisi</th>
+                        <th class="table-plus datatable-nosort">Feature</th>
+                        <th class="table-plus datatable-nosort">Level</th>
                         <th class="datatable-nosort">Action</th>
                     </tr>
                 </thead>
@@ -53,8 +59,7 @@
                                         HAULING</span>
                                     <div class="font-14 weight-600">Dr. Callie Reed</div>
                                     <div class="font-12 weight-500">MBLE-0422003</div>
-                                    <div class="font-12 weight-500" data-color="#b2b1b6"
-                                        style="color: rgb(178, 177, 182);">
+                                    <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
                                         Service Maintenance
                                     </div>
                                 </div>
@@ -73,16 +78,7 @@
     </div>
     <!-- Simple Datatable End -->
 
-    <div class="dropdown show">
-        <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="true">
-            <i class="dw dw-more"></i>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list show" x-placement="bottom-end" style="position: absolute; transform: translate3d(-26px, 22px, 0px); top: 0px; left: 0px; will-change: transform;">
-            <a class="dropdown-item" href="#"><i class="dw dw-eye"></i> View</a>
-            <a class="dropdown-item" href="#"><i class="dw dw-edit2"></i> Edit</a>
-            <a class="dropdown-item" href="#"><i class="dw dw-delete-3"></i> Delete</a>
-        </div>
-    </div>
+  
 
 
 
@@ -92,7 +88,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myLargeModalLabel">
-                        Ubas Data Akun
+                        Manage User
                     </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
@@ -113,7 +109,7 @@
                                 <div class="txt">
                                     <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
                                         id="company_department"
-                                        style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">PT. MBLE |
+                                        style="color: rgb(38, 94, 215); background-color: rgba(218, 68, 68, 0.96);">PT. MBLE |
                                         HAULING</span>
                                     <div id="name_modal" class="font-14 weight-600">Dr. Callie Reed</div>
                                     <div id="nik_employee_modal" class="font-12 weight-500">MBLE-0422003</div>
@@ -127,7 +123,7 @@
 
                         {{-- jenis cuti --}}
                         <div class="form-group">
-                            <div class="row">
+                            <div class="row mb-20">
                                 <div class="col-md-4">
                                     <label for="">No KTP Baru</label>
                                 </div>
@@ -136,8 +132,16 @@
                                         placeholder="No KTP baru">
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="">Level User</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" name="level_user" id="level_user" class="form-control"
+                                        placeholder="Level User">
+                                </div>
+                            </div>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -151,6 +155,7 @@
             </div>
         </div>
     </div>
+   
 @endsection()
 
 @section('script_javascript')
@@ -167,10 +172,22 @@
                             width="50" height="50" alt="">
                     </div>
                     <div class="txt">
-                        <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${database['employees'][nik_employee]['company']} |
-                            ${database['employees'][nik_employee]['department']}</span>
-                        <div class="font-14 weight-600">${database['employees'][nik_employee]['name']}</div>
+                        
+                        <div class="row">
+                            <div class="col-auto">
+                                <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${database['employees'][nik_employee]['company']} |
+                                ${database['employees'][nik_employee]['department']}</span>
+                            </div>
+                            <div class="col-1 text-right">
+                                <span onclick="editUser('${nik_employee}')" class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">  2 </span>
+                            
+                                <span onclick="editUser('${nik_employee}')" class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                style="color: rgb(38, 94, 215); background-color:rgb(255, 255, 255);">  <i class="icon-copy bi bi-pencil-fill"></i></i> </span>
+                            </div>
+                        </div>
+                        <div class="font-14 weight-600"> ${database['employees'][nik_employee]['name']}</div>
                         <div class="font-12 weight-500">${database['employees'][nik_employee]['nik_employee_with_space']}</div>
                         <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
                             ${database['employees'][nik_employee]['position']}
@@ -187,7 +204,14 @@
             // field header table
             let row_data_datatable = [];
             let header_table_element = '';
-            let header_table_field = ['Karyawan', 'Action'];
+            let header_table_field = [
+                'Karyawan',
+                'Perusahaan',
+                'Project',
+                'Department',
+                'Divisi',
+                'Feature',
+            ];
 
 
 
@@ -220,7 +244,7 @@
             $('#datatable').append(header_table_element);
 
 
-
+            
             //add row data datatable
             var employees_card_element = {
                 mRender: function(data, type, row) {
@@ -229,16 +253,56 @@
             };
             row_data_datatable.push(employees_card_element);
 
-            var action_button_element = {
+
+            var company_element = {
                 mRender: function(data, type, row) {
-                    return `
-                            <button onclick="editUser('${row}')" type="button" class="btn btn-primary">
-                                <i class="icon-copy bi bi-gear"></i>
-                            </button>
-                            `
+                    return `<div class="row">
+                                <div class="col-12 mb-10">
+                                    <span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">PT. MB</span>
+                                </div>
+                                <div class="col-12 mb-10">
+                                    <span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: #f56767;">PT. MBLE</span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah <i class="icon-copy bi bi-arrow-counterclockwise"></i></span>
+                                </div>
+                            </div>`;
+                
+                
                 }
             };
-            row_data_datatable.push(action_button_element);
+            row_data_datatable.push(company_element);
+
+            var project_element = {
+                mRender: function(data, type, row) {
+                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah</span>`;
+                }
+            };
+            row_data_datatable.push(project_element);
+
+            var department_element = {
+                mRender: function(data, type, row) {
+                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah</span>`;
+                }
+            };
+            row_data_datatable.push(department_element);
+
+            var divisi_element = {
+                mRender: function(data, type, row) {
+                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah</span>`;
+                }
+            };
+            row_data_datatable.push(divisi_element);
+            var feature_element = {
+                mRender: function(data, type, row) {
+                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah</span>`;
+                }
+            };
+            row_data_datatable.push(feature_element);
+
+         
+
+           
 
             $.ajax({
                 url: '/api/mbg/manage/employees/get',
@@ -287,9 +351,9 @@
 
     <script>
         /*
-                        get from database karyawan, list karyawan dari card.
+                            get from database karyawan, list karyawan dari card.
 
-                    */
+                        */
 
 
 
@@ -298,7 +362,7 @@
             $('#nik_employee').val(`${nik_employee}`)
             $('#company_department').text(
                 `${database['employees'][nik_employee]['company']} | ${database['employees'][nik_employee]['department']}`
-                )
+            )
             $('#name_modal').text(`${database['employees'][nik_employee]['name']}`)
             $('#nik_employee_modal').text(database['employees'][nik_employee]['nik_employee_with_space'])
             $('#position_modal').text(database['employees'][nik_employee]['position'])

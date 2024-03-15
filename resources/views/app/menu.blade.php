@@ -31,7 +31,7 @@
                     <p class="card-text">
                         Sub menu
                     </p>
-                    @if (!empty(session('user_authentication')->user_privileges->superadmin))
+                    @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
                     <a href="/web/pendapatan/hauling" class="mb-2 btn btn-sm btn-outline-primary">Hauling</a>
                     @endif
                     <a href="/web/pendapatan/absensi" class="mb-2 btn btn-sm btn-outline-warning">absensi</a>
@@ -55,6 +55,7 @@
                 <div class="card-footer text-muted"></div>
             </div>
         </div>
+        @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
         <div class="col-sm-12 col-md-4 mb-20 ">
             <div class="card card-box mb-20">
                 <h5 class="card-header weight-500">Pengelolaan</h5>
@@ -70,6 +71,7 @@
                 <div class="card-footer text-muted"></div>
             </div>
         </div>
+        @endif
 
     </div>
 @endsection()

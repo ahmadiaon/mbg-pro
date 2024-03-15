@@ -6,7 +6,7 @@ use App\Helpers\ResponseFormatter;
 use App\Models\Slip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
+use Spatie\PdfToImage\Pdf;
 
 class WebSlipController extends Controller
 {
@@ -16,8 +16,15 @@ class WebSlipController extends Controller
         $request->validate([
             'file' => '',
         ]);
-        // return ResponseFormatter::ResponseJson($request->all(),'success', 200);
         $files_file = $request->file('file');
+
+        $pdf = new Pdf($files_file[0]->path());
+        // $imagePath = public_path('pdf-image.jpg');
+        // $pdf->saveImage($imagePath);
+
+        
+        // return ResponseFormatter::ResponseJson($files_file[0]->getClientOriginalName(),'success', 200);
+        
 
         $files = [];
         $split_year_month = explode(" ",$request['month-year']);
@@ -28,14 +35,21 @@ class WebSlipController extends Controller
 
         $parent_path = 'file/slips/';
         foreach($files_file as $item_file){
+
+
             $file_name_original = $item_file->getClientOriginalName();
             $file_extension =$item_file->getClientOriginalExtension();
             $filenameWithoutExtension = pathinfo($file_name_original, PATHINFO_FILENAME);
             $file_name_change = Str::uuid().".".$file_extension;
             $employee_uuid = ResponseFormatter::toUUID($filenameWithoutExtension);
             $to_store[$file_name_original] = $file_name_change;
-            $item_file->move($parent_path, $file_name_change);            
+            $item_file->move($parent_path, $file_name_change);     
+
             $imageName = $employee_uuid."-".$year."-".$month;
+
+            
+
+            
             $data_for_store = [
                 'employee_uuid' => $employee_uuid,
                 'code_file' => $imageName, 

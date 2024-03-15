@@ -69,6 +69,13 @@
         return [year, month, day].join('-');
     }
 
+    function truncateString(str, maxLength) {
+        if (str.length > maxLength) {
+            return str.slice(0, maxLength) + "...";
+        }
+        return str;
+    }
+
     function getDateToday() {
         console.log('getDateToday')
         let date_now = new Date();
@@ -169,6 +176,12 @@
         if (day.length < 2) day = '0' + day;
 
         return [year, month, day].join('-');
+    }
+
+    async function deleteForm(id_form) {
+        conLog('id delete', id_form);
+        $('#code_data_delete').val(id_form);
+        $('#confirm-modal-async').modal('show');
     }
 
 

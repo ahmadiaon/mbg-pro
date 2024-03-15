@@ -3,6 +3,13 @@
         <div class="menu-icon bi bi-list"></div>
     </div>
     <div class="header-right">
+        <div class="dashboard-setting user-notification">
+            <div class="dropdown">
+                <a class="dropdown-toggle no-arrow" href="javascript:;" onclick="refreshSession()">
+                    <i class="icon-copy bi bi-arrow-repeat"></i>
+                </a>
+            </div>
+        </div>
         <div class="user-notification">
             <div class="dropdown">
                 <a class="dropdown-toggle no-arrow" href="#" role="button" data-toggle="dropdown">

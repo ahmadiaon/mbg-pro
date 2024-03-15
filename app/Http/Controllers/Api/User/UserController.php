@@ -219,8 +219,12 @@ class UserController extends Controller
 
         $Q_table = DatabaseTable::get();
         $data_table = [];
+        $data_table_child = [];
         foreach($Q_table as $table){
             $data_table[$table->code_table] = $table;
+            if($table->parent_table){
+                $data_table_child[$table->parent_table][] = $table->code_table;
+            }
         }
 
         $Q_field = DatabaseField::get();
@@ -229,11 +233,18 @@ class UserController extends Controller
             $data_field[$field->code_table_field][$field->code_field] = $field;
         }
 
-        $Q_data = DatabaseData::get();
+        $Q_data =DatabaseData::where('date_end')->get();
         $data_data = [];
         foreach($Q_data as $data){
             $data_data[$data->code_table_data][$data->code_data][$data->code_field_data] = $data;
         }
+
+        $Q_data =  DatabaseData::get();
+        $data_data_history = [];
+        foreach($Q_data as $data){
+            $data_data_history[$data->code_table_data][$data->code_data][$data->date_start][$data->code_field_data] = $data;
+        }
+
 
         $Q_data_source = DatabaseDataSource::get();
         $data_data_source = [];
@@ -243,17 +254,16 @@ class UserController extends Controller
 
         $database['db']['database_field'] = $data_field;
         $database['db']['database_data'] = $data_data;
+        $database['db']['database_data_history'] = $data_data_history;
         $database['db']['arr_employees'] = $arr_data_employee;
         $database['db']['database_table'] = $data_table;
         $database['db']['database_data_source'] = $data_data_source;
+        $database['db']['data_table_child'] = $data_table_child;
 
         return $database;
     }
 
-    public function localStorage(Request $request){
-
-       
-        
+    public function localStorage(Request $request){        
         request()->session()->put('db_local_storage', $this->db_local_storage());
         return ResponseFormatter::ResponseJson( session('db_local_storage'), 'Store Success', 200);
     }

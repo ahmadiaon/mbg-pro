@@ -504,6 +504,7 @@
             if (data_database['data_employee_out'][nik_employee]) {
                 bg = 'bg-warning';
             }
+            cg(nik_employee, database['employees'][nik_employee]);
             return `
                 <div class="name-avatar d-flex align-items-center pr-2 ${bg} card-box pl-2">
                     <div class="avatar mr-2 flex-shrink-0">
