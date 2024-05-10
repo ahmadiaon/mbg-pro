@@ -130,6 +130,44 @@
         }
     </style>
 
+    <style>
+        /*the container must be positioned relative:*/
+        .autocomplete {
+            position: relative;
+        }
+
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            /*position the autocomplete items to be the same width as the container:*/
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        /*when hovering an item:*/
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+
+        /*when navigating through the items using the arrow keys:*/
+        .autocomplete-active {
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
+    </style>
+
 
     @yield('src_css')
     <script src="/vendors/scripts/core.js"></script>
@@ -168,8 +206,8 @@
             </div>
             <div class="footer-wrap pd-20 mb-20 card-box">
                 MBG - Online Created By
-                <a href="https://github.com/ahmadiaon"  target="_blank">ahma.id </a>
-                Contact me <a href="https://wa.me/6281255897044"><i class="icon-copy bi bi-telephone-fill"></i></a>
+                <a href="https://github.com/ahmadiaon" target="_blank">ahma.id </a>
+                Perlu Bantuan hubungi <a href="https://wa.me/6281255897044"><i class="icon-copy bi bi-telephone-fill"></i></a>
             </div>
         </div>
     </div>
@@ -294,17 +332,11 @@
     <!-- js -->
     @yield('src_script_javascript')
     @yield('script_javascript')
-    <script>
-        $('#main-content').hide();
-    </script>
+
 
     <script>
-        $(document).ready(function() {
-            $('#loading-modal').hide();
-            $('#main-content').show();
-            CL(db)
-        });
-
+        
+        
 
         let current_url = window.location.href;
         let header_active = 'profile';

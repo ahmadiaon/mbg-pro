@@ -34,6 +34,13 @@ class AdminController extends Controller
         return ResponseFormatter::setAllSession();
     }
 
+    public function refreshData(){
+        echo 'refreshData';
+        session(['keys_random' => rand(0,100000000)]);
+        return back();
+        
+    }
+
     public function indexActivity(){
         $layout = [
             'head_datatable'        => true,

@@ -1102,6 +1102,7 @@ class EmployeeController extends Controller
 
 
 
+
                 if (!empty($employee_data_one['bpjs_ketenagakerjaan'])) {
                     $employee_data_one['is_bpjs_kesehatan'] = 'Ya';
                     $employee_data_one['is_bpjs_pensiun'] = 'Ya';
@@ -1243,6 +1244,17 @@ class EmployeeController extends Controller
                 // $storeEmployee = UserEducation::updateOrCreate([''],$employee_data_one);
                 // $storeEmployee = UserDependent::updateOrCreate([''],$employee_data_one);
                 // $storeEmployee = EmployeeCutiSetup::updateOrCreate([''],$employee_data_one);
+                
+
+                if(!empty($employee_data_one['nik_number'])){
+                    $employee_data_one['nik_number_before'] = $employee_data_one['nik_number'];
+                    $cel_val = $employee_data_one['nik_number'];
+                    $firstCharacter = substr($cel_val, 0, 1); 
+                    // if($firstCharacter == '`' or $firstCharacter == "'" ){
+                        
+                        $employee_data_one['nik_number'] = ResponseFormatter::toNumber($employee_data_one['nik_number']);
+                    // }
+                }
                 // dd($employee_data_one);
                 $storeEmployee = Employee::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);
                 $storeEmployee = UserDetail::updateOrCreate(['uuid' =>  $employee_data_one['nik_employee'], 'date_end' => null], $employee_data_one);

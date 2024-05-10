@@ -51,6 +51,7 @@ class AuthenticationController extends Controller
                         ->get()
                         ->first();
                     // return $dataUser = $col_dataUser;
+                  
 
                     $dataUser->user_privileges =  $user_privileges = UserPrivilege::where_nik_employee($col_dataUser['nik_employee']);
                     $dataUser->is_login  = true;
@@ -98,7 +99,8 @@ class AuthenticationController extends Controller
                     // $request->session()->put('data_companies', $arr_companies);
 
                     ResponseFormatter::setAllSession();
-                    $request->session()->put('db_local_storage', UserController::db_local_storage());
+                    $auth_login = $dataUser->auth_login;
+                    $request->session()->put('db_local_storage', UserController::db_local_storage($auth_login));
 
                     // dd(session()->all());
 

@@ -463,6 +463,7 @@
                                     </button>
                                 </div>
                             </div>
+                            
                             <div class="form-group row">
                                 <small class="col-12 form-text text-muted">
                                     Lokasi Stockpile Jetty
@@ -541,7 +542,7 @@
         </div>
     </div>
 
-    <div class="card-box pd-20">
+    {{-- <div class="card-box pd-20">
         <div class="pd-20 clearfix mb-10">
             <div class="pull-left">
                 <h4 class="text-blue h4">STRUKTUR ORGANISASI</h4>
@@ -739,7 +740,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="modal fade customscroll" id="modal-filter" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -1468,26 +1469,7 @@
 
 
     <script>
-        function cardEmployees(nik_employee) {
-            return `
-                <div class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
-                    <div class="avatar mr-2 flex-shrink-0">
-                        <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
-                            width="50" height="50" alt="">
-                    </div>
-                    <div class="txt">
-                        <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${db['employees'][nik_employee]['company']} |
-                            ${db['employees'][nik_employee]['department']}</span>
-                        <div class="font-14 weight-600">${db['employees'][nik_employee]['name']}</div>
-                        <div class="font-12 weight-500">${db['employees'][nik_employee]['nik_employee_with_space']}</div>
-                        <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
-                            ${db['employees'][nik_employee]['position']}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        
 
         function cardCoalMuat(id_hauling) {
             let isPO = data_hauling[id_hauling]['po'] ? `` : 'hidden';

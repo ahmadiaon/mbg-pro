@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Api\User\UserController;
+use App\Models\DatabaseData;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\User;
 use App\Models\UserDetail\UserDetail;
@@ -27,9 +28,8 @@ class WebUserController extends Controller
             if (Hash::check($request->nik_number, $dataUser->password)) {
                 $isValid = true;
             }
-            
+            // return $isValid;
             if($isValid){
-               
                 $token = Str::random(60);
                 $storeEmployee = User::updateOrCreate(
                     ['id'   => $dataUser->id],
@@ -41,11 +41,63 @@ class WebUserController extends Controller
 
                 $user_privileges = UserPrivilege::where_nik_employee(ResponseFormatter::toUUID($storeEmployee->nik_employee));
 
+                $Q_user_feture = DatabaseData::where('code_table_data','KARYAWAN-ACCESS-FEATURE')
+                                                ->where('code_data','like',ResponseFormatter::toUUID($request->nik_employee).'%')
+                                                ->where('code_field_data', 'FEATURE')
+                                                ->get();
+                $arr_data_feature = [];
+                foreach($Q_user_feture as $data_user_feture){
+                    $arr_data_feature[] =  $data_user_feture->value_data;
+                }
+
+                $Q_user_perusahaan = DatabaseData::where('code_table_data','KARYAWAN-AKSES-PERUSAHAAN')
+                                                ->where('code_data','like',ResponseFormatter::toUUID($request->nik_employee).'%')
+                                                ->where('code_field_data', 'AKSES-PERUSAHAAN')
+                                                ->get();
+                $arr_data_perusahaan = [];
+                foreach($Q_user_perusahaan as $data_user_perusahaan){
+                    $arr_data_perusahaan[] =$data_user_perusahaan->value_data;
+                }
+
+                $Q_user_department = DatabaseData::where('code_table_data','KARYAWAN-AKSES-DEPARTMENT')
+                                                ->where('code_data','like',ResponseFormatter::toUUID($request->nik_employee).'%')
+                                                ->where('code_field_data', 'AKSES-DEPARTMENT')
+                                                ->get();
+                $arr_data_department = [];
+                foreach($Q_user_department as $data_user_department){
+                    $arr_data_department[] =$data_user_department->value_data;
+                }
+
+                $Q_user_project = DatabaseData::where('code_table_data','KARYAWAN-AKSES-PROJECT')
+                                                ->where('code_data','like',ResponseFormatter::toUUID($request->nik_employee).'%')
+                                                ->where('code_field_data', 'AKSES-PROJECT')
+                                                ->get();
+                $arr_data_project = [];
+                foreach($Q_user_project as $data_user_project){
+                    $arr_data_project[] =$data_user_project->value_data;
+                }
+
+                $Q_user_divisi = DatabaseData::where('code_table_data','KARYAWAN-AKSES-DIVISI')
+                                                ->where('code_data','like',ResponseFormatter::toUUID($request->nik_employee).'%')
+                                                ->where('code_field_data', 'AKSES-DIVISI')
+                                                ->get();
+                $arr_data_divisi = [];
+                foreach($Q_user_divisi as $data_user_divisi){
+                    $arr_data_divisi[] =$data_user_divisi->value_data;
+                }
+
                 $storeEmployee->user_privileges = $user_privileges;
+                $storeEmployee->feature = array_unique($arr_data_feature);
+                $storeEmployee->PERUSAHAAN = array_unique($arr_data_perusahaan);
+                $storeEmployee->DEPARTEMEN = array_unique($arr_data_department);
+                $storeEmployee->PROJECT = array_unique($arr_data_project);
+                $storeEmployee->DIVISI = array_unique($arr_data_divisi);
+
+                // return $storeEmployee;
                 session()->flush();
                 session(['user_authentication' => $storeEmployee]);
                 session()->put('user_authentication', $storeEmployee);
-                request()->session()->put('db_local_storage', UserController::db_local_storage());
+                request()->session()->put('db_local_storage', UserController::db_local_storage($token));
 
                 if(!empty($storeEmployee->pin)){
                     return redirect()->intended('/web/menu');

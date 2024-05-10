@@ -78,17 +78,17 @@
                                 <div class="form-group justify-center row updatePinForm pd-20">
                                     <div class="col-sm-12 col-md-12 row">
                                         <input name="pinNumber-1" maxlength="1" id="pinNumber-1"
-                                            class="pinNumber col-2 form-control" type="text" >
+                                            class="pinNumber col-2 form-control" type="number" >
                                         <input name="pinNumber-2" maxlength="1" id="pinNumber-2"
-                                            class="pinNumber col-2 form-control" type="text" >
+                                            class="pinNumber col-2 form-control" type="number" >
                                         <input name="pinNumber-3" maxlength="1" id="pinNumber-3"
-                                            class="pinNumber col-2 form-control" type="text" >
+                                            class="pinNumber col-2 form-control" type="number" >
                                         <input name="pinNumber-4" maxlength="1" id="pinNumber-4"
-                                            class="pinNumber col-2 form-control" type="text" >
+                                            class="pinNumber col-2 form-control" type="number" >
                                         <input name="pinNumber-5" maxlength="1" id="pinNumber-5"
-                                            class="pinNumber col-2 form-control" type="text" >
+                                            class="pinNumber col-2 form-control" type="number" >
                                         <input name="pinNumber-6" maxlength="1" id="pinNumber-6"
-                                            class="pinNumber col-2 form-control" type="text" >
+                                            class="pinNumber col-2 form-control" type="number" >
                                     </div>
                                 </div>
 

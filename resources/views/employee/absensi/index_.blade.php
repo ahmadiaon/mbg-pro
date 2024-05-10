@@ -2,8 +2,6 @@
 
 @section('content')
     <div class="mb-20 row">
-
-
         <!-- Filter -->
         <div class="col-md-5 mb-10">
             <div class="card-box pd-20" id="the-filter-employee-tonase">
@@ -1101,7 +1099,7 @@
                         loopDate();
                     } else {
                         console.log(response);
-                        return false;
+                        // return false;
                         window.location.href = "/user/absensi/after-import";
                     }
                 },

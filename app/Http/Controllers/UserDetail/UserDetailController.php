@@ -136,7 +136,8 @@ class UserDetailController extends Controller
         $arr_data_employee = [];
         foreach($employees as $employee){
             if(!empty($idientities[$employee->nik_employee])){
-                $employee->name = $idientities[$employee->nik_employee]['name'];
+                $employee->name = $idientities[$employee->nik_employee]['name'];                
+                $employee->nik_number = $idientities[$employee->nik_employee]['nik_number'];
                 $employee->photo_path = $idientities[$employee->nik_employee]['photo_path'];
                 $data_employee[$employee->nik_employee] = $employee;
             }else{
@@ -175,7 +176,8 @@ class UserDetailController extends Controller
         $createSheet->setCellValue('D19', 'POSISI');
         $createSheet->setCellValue('E19', 'DEPARTEMEN');
         $createSheet->setCellValue('F19', 'SITE');
-        $createSheet->setCellValue('G19', 'PERUSAHAAN');
+        $createSheet->setCellValue('G19', 'PERUSAHAAN');        
+        $createSheet->setCellValue('H19', 'NIK KTP');
 
         $row_employees = 20;
         foreach ($data_employee as $item_data_export) {
@@ -185,6 +187,7 @@ class UserDetailController extends Controller
             $createSheet->setCellValue('E' . $row_employees, $item_data_export->department);
             $createSheet->setCellValue('F' . $row_employees, $item_data_export->site_uuid);
             $createSheet->setCellValue('G' . $row_employees, $item_data_export->company_uuid);
+            $createSheet->setCellValue('H' . $row_employees, "'".$item_data_export->nik_number);
 
             $row_employees++;
         }
@@ -211,13 +214,14 @@ class UserDetailController extends Controller
             ],
         );
         //header
-        $createSheet->getStyle('A19:G20')->applyFromArray($styleArray_header);
+        $createSheet->getStyle('A19:H20')->applyFromArray($styleArray_header);
         $createSheet->getColumnDimension('B')->setAutoSize(true);
         $createSheet->getColumnDimension('C')->setAutoSize(true);
         $createSheet->getColumnDimension('D')->setAutoSize(true);
         $createSheet->getColumnDimension('E')->setAutoSize(true);
         $createSheet->getColumnDimension('F')->setAutoSize(true);
         $createSheet->getColumnDimension('G')->setAutoSize(true);
+        $createSheet->getColumnDimension('H')->setAutoSize(true);
         $crateWriter = new Xls($createSpreadsheet);
         $name = 'file/absensi/export-karyawan-' . rand(99, 9999) . 'file.xls';
         $crateWriter->save($name);

@@ -19,6 +19,8 @@ use App\Models\Identity;
 use App\Models\Menu;
 use App\Models\Position;
 use App\Models\Privilege\UserPrivilege;
+use App\Models\Support\DatabaseFieldShow;
+use App\Models\Support\UserTemplate;
 use App\Models\UserDetail\UserDetail;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +31,8 @@ class UserController extends Controller
 {
 
 
-    public function getUser(Request $request){
+    public function getUser(Request $request)
+    {
         $auth_login = $request->header('auth_login');
         $user = User::where('auth_login', $auth_login)->first();
         $identity = UserDetail::where('uuid', $user->nik_employee)->whereNull('date_end')->first();
@@ -38,24 +41,25 @@ class UserController extends Controller
         $mergedArray = (array)$user + (array)$identity;
         $data = (object)$mergedArray;
 
-        $data = array_merge($user->toArray(),$identity->toArray());
-       
+        $data = array_merge($user->toArray(), $identity->toArray());
+
         return ResponseFormatter::ResponseJson($data, 'Success', 200);
     }
 
-    public function cekAvailableEmployee(Request $request){
+    public function cekAvailableEmployee(Request $request)
+    {
         $dataForm = $request->all();
         $data = User::where('nik_employee', ResponseFormatter::toUUID($request->nik_employee))->first();
-        if(!$request->pin && !$request->nik_number ){
-            if($data){
-                if($data->pin){
+        if (!$request->pin && !$request->nik_number) {
+            if ($data) {
+                if ($data->pin) {
                     $data = "pin";
-                }else{
+                } else {
                     $data = "ktp";
-                }               
+                }
             }
             return ResponseFormatter::ResponseJson($data, 'Store Success', 200);
-        }else{
+        } else {
             //    login
 
             $dataUser = User::where('nik_employee', ResponseFormatter::toUUID($request->nik_employee))->first();
@@ -68,9 +72,9 @@ class UserController extends Controller
                 if (Hash::check($request->nik_number, $dataUser->password)) {
                     $isValid = true;
                 }
-                
 
-                if($isValid){
+
+                if ($isValid) {
                     $token = Str::random(60);
                     $storeEmployee = User::updateOrCreate(
                         ['id'   => $dataUser->id],
@@ -79,128 +83,135 @@ class UserController extends Controller
                     $storeEmployee = User::where('auth_login', $token)->first();
                     $userDetail = UserDetail::where('uuid', ResponseFormatter::toUUID($storeEmployee->nik_employee))->first();
                     $storeEmployee->user_details = $userDetail;
-    
+
                     $user_privileges = UserPrivilege::where_nik_employee($storeEmployee->nik_employee);
-    
+
                     $storeEmployee->user_privileges = $user_privileges;
-                    
+
                     session(['user_authentication' => $storeEmployee]);
                     Session::put('user_authentication', $storeEmployee);
                     return ResponseFormatter::ResponseJson([
-                        'status'=>'success',
+                        'status' => 'success',
                         'data'  => session('user_authentication')
                     ], 'Validasi Login Sukses', 200);
                 }
-                
             }
-            return ResponseFormatter::ResponseJson(['status'=>'failed','data' => $request->nik_number], 'Validasi Login Gagal', 200);
+            return ResponseFormatter::ResponseJson(['status' => 'failed', 'data' => $request->nik_number], 'Validasi Login Gagal', 200);
         }
-        
     }
 
 
+    public static function getUserLogin($auth_login)
+    {
+        $user = User::where('auth_login', $auth_login)->first();
+        return $user;
+    }
 
-    public function storeUser(Request $request){
+
+    public function storeUser(Request $request)
+    {
         $auth_login = $request->header('auth_login');
         $user = User::where('auth_login', $auth_login)->first();
         $dataForm = $request->formData;
         $hashPin = $user->pin;
-        if($dataForm['pin']){
-            if(strlen($dataForm['pin']) == 6){
-                $hashPin = Hash::make($dataForm['pin']); 
-            }            
+        if ($dataForm['pin']) {
+            if (strlen($dataForm['pin']) == 6) {
+                $hashPin = Hash::make($dataForm['pin']);
+            }
         }
 
 
-        $userStore = User::updateOrCreate(['nik_employee'=> $user->nik_employee],[
+        $userStore = User::updateOrCreate(['nik_employee' => $user->nik_employee], [
             'pin'   => $hashPin,
             'email' => $dataForm['email'],
             'phone_number' => $dataForm['phone_number'],
         ]);
 
-        if($userStore){
-            $userDetailStore = UserDetail::updateOrCreate(['date_end'=> null,'uuid'=>$user->nik_employee],[
+        if ($userStore) {
+            $userDetailStore = UserDetail::updateOrCreate(['date_end' => null, 'uuid' => $user->nik_employee], [
                 'phone_number' => $dataForm['phone_number'],
             ]);
         }
         return ResponseFormatter::ResponseJson($userStore, 'Store Success', 200);
     }
 
-    public function editUser(Request $request){
-        $password = Hash::make($request->nik_number); 
-        $userStore = User::updateOrCreate(['nik_employee'=> ResponseFormatter::toUUID($request->nik_employee)],[
+    public function editUser(Request $request)
+    {
+        $password = Hash::make($request->nik_number);
+        $userStore = User::updateOrCreate(['nik_employee' => ResponseFormatter::toUUID($request->nik_employee)], [
             'pin'   => NULL,
             'password' => $password,
         ]);
-        if($userStore){
-            $userDetailStore = UserDetail::updateOrCreate(['date_end'=> null,'uuid'=>ResponseFormatter::toUUID($request->nik_employee)],[
+        if ($userStore) {
+            $userDetailStore = UserDetail::updateOrCreate(['date_end' => null, 'uuid' => ResponseFormatter::toUUID($request->nik_employee)], [
                 'nik_number' => $request->nik_number,
             ]);
         }
         return ResponseFormatter::ResponseJson($request->all(), 'Store Success', 200);
-    
     }
 
-    public static function db_local_storage(){
+    public static function db_local_storage($auth_login)
+    {
         $database = [];
-
-        $employees = Employee::whereNull('date_end')->get(); 
+        $user = UserController::getUserLogin($auth_login);
+        $user->level_user = 5;
+        $employees = Employee::whereNull('date_end')->get();
         $identitiesQ = UserDetail::whereNull('date_end')->get();
         $idientities = [];
-        foreach($identitiesQ as $identity){
+        foreach ($identitiesQ as $identity) {
             $idientities[$identity->uuid] = $identity;
         }
 
         $Q_position = Position::get();
         $positions = [];
-        foreach($Q_position as $position){
+        foreach ($Q_position as $position) {
             $positions[$position->uuid] = $position;
         }
 
         $Q_department = Department::get();
         $departments = [];
-        foreach($Q_department as $department){
+        foreach ($Q_department as $department) {
             $departments[$department->uuid] = $department;
         }
 
         $Q_company = Company::get();
         $companys = [];
-        foreach($Q_company as $company){
+        foreach ($Q_company as $company) {
             $companys[$company->uuid] = $company;
         }
 
         $data_employee = [];
         $arr_data_employee = [];
-        foreach($employees as $employee){
-            if(!empty($idientities[$employee->nik_employee])){
+        foreach ($employees as $employee) {
+            if (!empty($idientities[$employee->nik_employee])) {
                 $employee->name = $idientities[$employee->nik_employee]['name'];
                 $employee->photo_path = $idientities[$employee->nik_employee]['photo_path'];
                 $data_employee[$employee->nik_employee] = $employee;
-            }else{
+            } else {
                 $employee->name = 'Tidak ada';
                 $employee->photo_path = null;
                 $data_employee[$employee->nik_employee] = $employee;
             }
 
-            if(!empty($positions[$employee->position_uuid])){
+            if (!empty($positions[$employee->position_uuid])) {
                 $employee->position = $positions[$employee->position_uuid]['position'];
-            }else{
+            } else {
                 $employee->position = 'Tidak ada';
             }
 
-            if(!empty($departments[$employee->department_uuid])){
+            if (!empty($departments[$employee->department_uuid])) {
                 $employee->department = $departments[$employee->department_uuid]['department'];
-            }else{
+            } else {
                 $employee->department = 'Tidak ada';
             }
 
-            if(!empty($companys[$employee->company_uuid])){
+            if (!empty($companys[$employee->company_uuid])) {
                 $employee->company = $companys[$employee->company_uuid]['company'];
-            }else{
+            } else {
                 $employee->company = 'Tidak ada';
             }
             $arr_data_employee[] = $employee->nik_employee;
-            $data_employee[$employee->nik_employee] = $employee;            
+            $data_employee[$employee->nik_employee] = $employee;
         }
 
 
@@ -208,7 +219,7 @@ class UserController extends Controller
 
         $Q_Menu = Menu::get();
         $data_menu = [];
-        foreach($Q_Menu as $menu){
+        foreach ($Q_Menu as $menu) {
             $data_menu[$menu->uuid] = $menu;
         }
 
@@ -220,63 +231,211 @@ class UserController extends Controller
         $Q_table = DatabaseTable::get();
         $data_table = [];
         $data_table_child = [];
-        foreach($Q_table as $table){
+        foreach ($Q_table as $table) {
             $data_table[$table->code_table] = $table;
-            if($table->parent_table){
+            if ($table->parent_table) {
                 $data_table_child[$table->parent_table][] = $table->code_table;
             }
         }
 
-        $Q_field = DatabaseField::get();
+        $Q_field = DatabaseField::where('level_data_field', '<=', $user->level_user)->get();
         $data_field = [];
-        foreach($Q_field as $field){
+        $data_field_join = [];
+        foreach ($Q_field as $field) {
             $data_field[$field->code_table_field][$field->code_field] = $field;
+            $tipe_data_field[$field->code_table_field][$field->code_field] = $field->type_data_field;
+            if ($data_table[$field->code_table_field]['parent_table']) {
+                $data_field_join[$data_table[$field->code_table_field]['parent_table']][$field->code_field] = $field;
+            } else {
+                $data_field_join[$field->code_table_field][$field->code_field] = $field;
+            }
         }
 
-        $Q_data =DatabaseData::where('date_end')->get();
+
+
+        $Q_data = DatabaseData::where('date_end')->get();
         $data_data = [];
-        foreach($Q_data as $data){
-            $data_data[$data->code_table_data][$data->code_data][$data->code_field_data] = $data;
+        $uuid_all = [];
+        foreach ($Q_data as $data) {
+            $data_data[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)][$data->code_field_data]['value_data'] = $data->value_data;
+            $data_data[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)][$data->code_field_data]['uuid_data'] = $data->uuid_data;
+            $uuid_all[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)] = $data->uuid_data;
+
         }
 
         $Q_data =  DatabaseData::get();
         $data_data_history = [];
-        foreach($Q_data as $data){
-            $data_data_history[$data->code_table_data][$data->code_data][$data->date_start][$data->code_field_data] = $data;
+        foreach ($Q_data as $data) {
+            $data_data_history[$data->code_table_data][$data->code_data][$data->date_start][$data->code_field_data]['value_data'] = $data->value_data;
+            $data_data_history[$data->code_table_data][$data->code_data][$data->date_start][$data->code_field_data]['uuid_data'] = $data->uuid_data;
+            
         }
+
+        $Q_data_DatabaseFieldShow = DatabaseFieldShow::get();
+        $dataDatabaseFieldShow = [];
+        foreach ($Q_data_DatabaseFieldShow as $data_user_template) {
+            $dataDatabaseFieldShow[$data_user_template->table_code][$data_user_template->field_code][$data_user_template->sort_field] = $data_user_template;
+        }
+
+        
+
+
 
 
         $Q_data_source = DatabaseDataSource::get();
         $data_data_source = [];
-        foreach($Q_data_source as $data_source){
+        foreach ($Q_data_source as $data_source) {
             $data_data_source[$data_source->code_data_source] = $data_source;
         }
 
+        $Q_data_source = UserTemplate::get();
+        $dataUserTemplate = [];
+        foreach ($Q_data_source as $data_user_template) {
+            $dataUserTemplate[$data_user_template->employee_uuid][$data_user_template->code_table_get][$data_user_template->code_field] = $data_user_template;
+        }
+
+
+
+        $all_field_parent_table = [];
+
+        foreach ($data_table_child as $code_table_parent => $table_parent) {
+            if (!empty($data_field[$code_table_parent])) {
+                $all_field_parent_table[$code_table_parent] = $data_field[$code_table_parent];
+                foreach ($table_parent as $item_table_child) {
+                    $all_field_parent_table[$code_table_parent] = array_merge($data_field[$item_table_child], $all_field_parent_table[$code_table_parent]);
+                }
+            }
+        }
+
+        foreach ($dataDatabaseFieldShow as $index_code_table => $itemFS) { //loop table
+            if(!empty($data_data[$index_code_table])){
+                foreach ($data_data[$index_code_table] as $code_data => $item_data_field_gabungan) {//loop data
+                    foreach ($itemFS as $item_code_field_show => $item_field_item_gabungan) { //loop field
+                        if(empty($item_data_field_gabungan[$item_code_field_show])){
+                            $data_data[$index_code_table][$code_data][$item_code_field_show]['value_data'] = $code_data;
+                            $data_data[$index_code_table][$code_data][$item_code_field_show]['uuid_data'] = $uuid_all[$index_code_table][$code_data];
+                        }
+                    }
+                }
+            }
+            
+        }
+
+
+
+        $data_public = [];
+        foreach ($data_table as $code_table_parent => $table_parent) {
+            $field_table_parent = [];
+            if (!empty($all_field_parent_table[$code_table_parent])) {
+                $field_table_parent = $all_field_parent_table[$code_table_parent];
+            } else {
+                $field_table_parent = $data_field[$code_table_parent];
+            }
+            if (!empty($data_data[$code_table_parent])) {
+                $code_table = (!empty($data_table[$code_table_parent]['parent_table'])) ? $data_table[$code_table_parent]['parent_table'] : $code_table_parent;
+                foreach ($data_data[$code_table_parent] as $code_data => $item_data) {
+                    foreach ($item_data as $code_field => $item_field) {
+                        if (!empty($data_field[$code_table_parent][$code_field])) {
+                            $data_public[$code_table][$code_data][$code_field] = $item_field['value_data'];
+                            $value = $item_field['value_data'];
+                            switch ($tipe_data_field[$code_table_parent][$code_field]) {
+                                case 'DARI-TABEL':
+                                    $code_table_data_source = $data_data_source[$code_table_parent . '-' . $code_field]['table_data_source'];
+                                    $field_data_source = $data_data_source[$code_table_parent . '-' . $code_field]['field_get_data_source'];
+                                    if (!empty($data_data[$code_table_data_source][$value])) {
+                                        $value = (!empty($data_data[$code_table_data_source][$value][$field_data_source])) ? $data_data[$code_table_data_source][$value][$field_data_source]['value_data'] : null;
+                                    } else {
+                                        $value = null;
+                                    }
+                                    break;
+                                case 'INPUT-AUTOCOMPLITE':
+                                    $code_table_data_source = $data_data_source[$code_table_parent . '-' . $code_field]['table_data_source'];
+                                    $field_data_source = $data_data_source[$code_table_parent . '-' . $code_field]['field_get_data_source'];
+                                    $value = (!empty($data_data[$code_table_data_source][$value])) ? $data_data[$code_table_data_source][$value][$field_data_source]['value_data'] : null;
+                                    break;
+                                case 'GABUNGAN':
+                                    $value = $item_field['value_data'];
+                                    break;
+                                default:
+                                    $value = $item_field['value_data'];
+                                    break;
+                            }
+                            $data_public['public_value'][$code_table][$code_data][$code_field] = $value;
+                        }
+                    }
+                }
+            }
+        }
+        // }
+        
+        $data_gabungan = [];
+        foreach ($dataDatabaseFieldShow as $index_code_table => $itemFS) {
+            if (!empty($data_public['public_value'][$index_code_table])) {
+                foreach ($data_public['public_value'][$index_code_table] as $code_data => $item_data_field_gabungan) {
+                    foreach ($itemFS as $item_code_field_show => $item_field_item_gabungan) {
+                        $gabungan = '';
+                        $uuid_data = '';
+                        foreach ($item_field_item_gabungan as $item_code_field) {
+                            // return $item_field_item_gabungan;
+                            // $code_data_real = $data_field_join[$index_code_table][$item_code_field->field_show_code]['code_table_field'];
+                            $code_data_real = $item_code_field->table_code;
+                            if (!empty($data_public['public_value'][$code_data_real][$code_data][$item_code_field->field_show_code])) {
+                                $gabungan =  $gabungan . $item_code_field->split_by . $data_public['public_value'][$code_data_real][$code_data][$item_code_field->field_show_code];
+                            } else {
+                                $gabungan = $gabungan . $item_code_field->split_by . '-';
+                            }
+                        }
+                        $gabungan = substr($gabungan, 1);
+                        $data_public['public_value'][$index_code_table][$code_data][$item_code_field_show] = $gabungan;
+                        $data_public[$index_code_table][$code_data][$item_code_field_show] = $gabungan;
+                        $data_data[$index_code_table][$code_data][$item_code_field_show]['value_data'] = $gabungan;
+                    }
+                }
+            }
+        }
+
+        // $arr_employee
+        // foreach($data_data['KARYAWAN'] as $item_karyawan){
+
+        // }
+
+        // return  $data_public['public_value'];
+
         $database['db']['database_field'] = $data_field;
+        $database['db']['database_field_join'] = $data_field_join;
+        $database['db']['database_field_show'] = $dataDatabaseFieldShow;
         $database['db']['database_data'] = $data_data;
-        $database['db']['database_data_history'] = $data_data_history;
+        // $database['db']['database_data_history'] = $data_data_history;
         $database['db']['arr_employees'] = $arr_data_employee;
         $database['db']['database_table'] = $data_table;
         $database['db']['database_data_source'] = $data_data_source;
         $database['db']['data_table_child'] = $data_table_child;
+        $database['db']['table_show_template'] = $dataUserTemplate;
+        $database['db']['all_field_parent_table'] = $all_field_parent_table;
+        $database['user'] = $user;
+        $database['public'] = $data_public;
 
         return $database;
     }
 
-    public function localStorage(Request $request){        
-        request()->session()->put('db_local_storage', $this->db_local_storage());
-        return ResponseFormatter::ResponseJson( session('db_local_storage'), 'Store Success', 200);
+    public function localStorage(Request $request)
+    {
+
+        request()->session()->put('db_local_storage', $this->db_local_storage($request->header('auth_login')));
+        return ResponseFormatter::ResponseJson(session('db_local_storage'), 'Store Success', 200);
     }
 
-    public function localStorageWeb(){
-        request()->session()->put('db_local_storage', $this->db_local_storage());
+    public function localStorageWeb($auth_login)
+    {
+        request()->session()->put('db_local_storage', $this->db_local_storage($auth_login));
     }
 
 
-    public function getEmployees(Request $request){
-        $employees = Employee::whereNull('date_end')->get(); 
+    public function getEmployees(Request $request)
+    {
+        $employees = Employee::whereNull('date_end')->get();
         $data_employees = [];
-        foreach($employees as $employee){
+        foreach ($employees as $employee) {
             $data_employees[] = $employee->nik_employee;
         }
         return ResponseFormatter::ResponseJson($data_employees, 'Success', 200);
@@ -296,11 +455,11 @@ class UserController extends Controller
         return ResponseFormatter::toJson(null, 'Not Found');
     }
 
-    public function indexManage(){
-
+    public function indexManage()
+    {
     }
 
-    
+
     // Show User Profile By Id
     public function showProfile($id)
     {

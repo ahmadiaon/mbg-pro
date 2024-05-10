@@ -22,6 +22,22 @@
                         <span class="micon bi bi-app"></span><span class="mtext">Menu</span>
                     </a>
                 </li>
+
+
+                @if (!empty(session('user_authentication')['feature']))
+                    <li class="dropdown">
+                        <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
+                            <span class="micon bi bi-grid-1x2-fill"></span><span class="mtext">Pengelolaan</span>
+                        </a>
+                        @if (in_array( 'ABSENSI',session('user_authentication')['feature']))
+                            <ul class="submenu">
+                                <li><a id="absensi" class="" href="/web/pengelolaan/absensi">Absensi</a></li>
+                            </ul>
+                        @endif
+                    </li>
+                @endif
+
+
                 <li class="dropdown">
                     <a href="javascript:;" id="pendapatan" class="dropdown-toggle">
                         <span class="micon fa fa-book"></span><span class="mtext">Pendapatan</span>
@@ -43,14 +59,14 @@
                 @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
                     <li class="dropdown">
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
-                            <span class="micon fa fa-book"></span><span class="mtext">Pengelolaan</span>
+                            <span class="micon bi bi-menu-button-wide"></span><span class="mtext">Database</span>
                         </a>
                         <ul class="submenu">
                             <li><a id="absensi" class="" href="/web/manage/absensi">Absensi</a></li>
                             <li><a id="slip" href="/web/manage/slip">Slip Gaji </a></li>
                             @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
                                 <li><a id="slip" href="/web/manage/users">Users </a></li>
-                                <li><a id="slip" href="/web/manage/app">Aplikasi </a></li>                                
+                                <li><a id="slip" href="/web/manage/app">Aplikasi </a></li>
                                 <li><a id="slip" href="/web/manage/menu">Menu </a></li>
                                 <li><a id="slip" href="/web/manage/database">Database </a></li>
                             @endif

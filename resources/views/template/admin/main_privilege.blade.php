@@ -968,7 +968,7 @@
             cg('dataUser', @json(session('dataUser')));
             Object.values(data_database.data_employees).forEach(employee_element => {
                 $('.employees').append(
-                    `<option value="${employee_element.nik_employee}">${employee_element.name} - ${employee_element.position} | ${employee_element.company_uuid}-${employee_element.site_uuid}</option>`
+                    `<option value="${employee_element.nik_employee}">${employee_element.nik_employee} | ${employee_element.name} - ${employee_element.position} | ${employee_element.company_uuid}-${employee_element.site_uuid}</option>`
                 );
             });
 

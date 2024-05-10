@@ -91,6 +91,7 @@ Route::prefix('/support')->group(function () {
 });
 
 Route::get('/test-udin', [EmployeeController::class, 'allEmployeeData']);
+Route::get('/refresh-data', [AdminController::class, 'refreshData']);
 
 //his data his only
 Route::get('/get/data/{nik_employee}', [UserDetailController::class, 'show']);
@@ -989,7 +990,9 @@ Route::middleware(['webIsLogin'])->group(function () {
         Route::prefix('/manage')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
-
+            Route::get('/privilege', [UserPrivilegeController::class, 'index']);
+            
+    // Route::get('/user-privilege', [UserPrivilegeController::class, 'index']);
 
             Route::get('/database', [DatabaseController::class, 'indexData']);
 
@@ -1005,6 +1008,10 @@ Route::middleware(['webIsLogin'])->group(function () {
             Route::get('/localdata', function () {
                 return view('app.localdata');
             });
+        });
+        Route::prefix('/pengelolaan')->group(function () {
+            Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
+
         });
         Route::prefix('/menu')->group(function () {
             Route::get('/user', [WebUserController::class, 'user']);

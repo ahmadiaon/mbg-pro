@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Api\Database\DatabaseTableController;
 use App\Http\Controllers\Api\Pendapatan\HaulingController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Employee\EmployeeAbsenController;
 use App\Http\Controllers\Support\DatabaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,15 @@ Route::prefix('mbg')->group(function () {
         });     
     });
 
+    Route::prefix('pengelolaan')->group(function () {//  /api/mbg/pengelolaan/absensi
+        Route::prefix('absensi')->group(function () {
+            // Route::post('/store', [HaulingController::class, 'store']);
+            Route::post('/get', [EmployeeAbsenController::class, 'getApiAbsensi']);
+            Route::post('/store-single', [EmployeeAbsenController::class, 'storeApiAbsensiSingle']);
+            // Route::post('/delete', [HaulingController::class, 'delete']);
+        });     
+    });
+
     Route::post('/get/user', [UserController::class, 'getUser']);
 
     Route::post('/user', [UserController::class, 'storeUser']);
@@ -47,13 +57,16 @@ Route::prefix('mbg')->group(function () {
         Route::prefix('app')->group(function () {
             Route::post('/store', [DatabaseController::class, 'store']);
         });
-
+        
         
 
         Route::prefix('database')->group(function () {// /api/mbg/manage/database/
             Route::post('/store-database', [DatabaseController::class, 'storeData']);
             Route::post('/delete-data-database', [DatabaseController::class, 'deleteData']);
             Route::post('/get-table', [DatabaseController::class, 'getData']);
+            Route::post('/store-template', [DatabaseController::class, 'storeTemplate']);
+            Route::post('/export-datatable', [DatabaseController::class, 'exportDatatable']);
+            Route::post('/import-datatable', [DatabaseController::class, 'importDatatable']);
         });
 
         Route::prefix('menu')->group(function () {

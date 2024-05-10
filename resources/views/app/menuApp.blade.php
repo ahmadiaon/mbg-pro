@@ -20,6 +20,7 @@
             </div>
         </div>
     </div>
+
     <div class="pd-20 card-box mb-30">
         <div class="clearfix mb-10">
             <div class="pull-left">
@@ -48,16 +49,15 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="col-md-2 col-sm-12 mb-2">
                     <div class="form-group">
                         <label>Level</label>
-                        <select  name="level_data_field-1"
-                            id="level_data_field-1" class="form-control">
+                        <select name="level_data_field-1" id="level_data_field-1" class="form-control">
                             <option value="1">1 | Public</option>
                             <option value="2">2 | Admin Divisi</option>
-                            <option value="1">3 | HR</option>
-                            <option value="1">4 | Manajemen</option>
+                            <option value="3">3 | HR</option>
+                            <option value="4">4 | Manajemen</option>
                         </select>
                     </div>
                 </div>
@@ -109,7 +109,7 @@
                             placeholder="Nama Tabel">
                     </div>
                     <div class="col-sm-12 col-md-2">
-                        <input class="form-control" id="count_field" type="hidden" value="1" placeholder="">
+                        <input class="form-control" id="count_field" type="text" value="1" placeholder="">
                     </div>
 
                 </div>
@@ -153,14 +153,14 @@
                 <div class="form-group row">
                     <label class="col-sm-12 col-md-2 col-form-label">Referensi Tabel</label>
                     <div class="col-sm-12 col-md-4">
-                        <select style="width: 100%;"  onchange="selectParent()" name="parent_table" id="parent_table"
+                        <select style="width: 100%;" onchange="selectParent()" name="parent_table" id="parent_table"
                             class="custom-select2 form-control database-table">
                             <option value="">Pilih Tabel Referensi</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <button type="button" class="col-6 btn btn-primary btn-block create-form">Create Form</button>
+                    <button type="button" class="col-6 btn btn-primary btn-block create-form">Simpan form</button>
                 </div>
             </div>
             <div class="profile-info">
@@ -239,13 +239,6 @@
                         <option value="">Pilih tabel</option>
                     </select>
                 </div>
-                {{-- <div class="modal-body">
-                    <label for="field_source">Kolom Rujukan</label>
-                    <select name="field_source" id="field_source" class="custom-select2 form-control select-field_source"
-                        style="width: 100%;">
-                        <option value="">Pilih kolom</option>
-                    </select>
-                </div> --}}
                 <div class="modal-body">
                     <label for="field_get">Kolom diambil</label>
                     <select name="field_get" id="field_get" class="custom-select2 form-control select-field_get"
@@ -265,6 +258,42 @@
             </div>
         </div>
     </div>
+
+    {{-- modal GABUNGAN --}}
+    <div class="modal fade" id="modal-GABUNGAN" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Buat Field Gabungan
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="text" name="" id="sort-gabungan" value="-1">
+                    <div class="row">
+
+                        <div class="col-12 text-center" id="button-add-gabungan">
+                            <button onclick="addGabungan()" class="col-12 btn-bloc btn btn-primary">tambah</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="button" class="btn btn-primary" id="save-from-table" data-dismiss="modal"
+                        onclick="saveGabunganField()">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection()
 
 @section('script_javascript')
@@ -272,16 +301,20 @@
         let element_option_type_data = '';
         let type_data_fields;
         let structure_table;
+        let element_option_chosee_table = '';
 
         let from_table_form = {};
+        let gabungan_field = {};
 
-        function selectParent(){
+        function selectParent() {
             let code_table = $('#parent_table').val();
             CL(db['db']['database_table'][code_table]);
-            $('#primary_table').val(db['db']['database_field'][code_table][db['db']['database_table'][code_table]['primary_table']]['description_field']);
-
+            if (code_table) {
+                $('#primary_table').val(db['db']['database_field'][code_table][db['db']['database_table'][code_table][
+                    'primary_table'
+                ]]['description_field']);
+            }
         }
-
 
         function addFormField(id_btn) {
             let element_form_field_full = `
@@ -308,8 +341,8 @@
                                     id="level_data_field-${id_btn}" class="form-control">
                                     <option value="1">1 | Public</option>
                                     <option value="2">2 | Admin Divisi</option>
-                                    <option value="1">3 | HR</option>
-                                    <option value="1">4 | Manajemen</option>
+                                    <option value="3">3 | HR</option>
+                                    <option value="4">4 | Manajemen</option>
                                 </select>
                             </div>
                         </div>
@@ -341,11 +374,24 @@
 
         function selectSource(id_form) {
             let val_option_source_field = $(`#type_data_field-${id_form}`).val();
-            CL(val_option_source_field)
+            conLog('id_form', id_form)
             switch (val_option_source_field) {
                 case 'DARI-TABEL':
                     $('#save-from-table').attr('onclick', `saveFromTable(${id_form})`)
                     $('#modal-from_table').modal('show');
+                    return false;
+                    break;
+                case KONSTANTA['Input Autocomplite']:
+                    $('#save-from-table').attr('onclick', `saveFromTable(${id_form})`)
+                    $('#modal-from_table').modal('show');
+                    return false;
+                    break;
+                case 'GABUNGAN':
+                    $('#save-from-table').attr('onclick', `saveFromTable(${id_form})`);
+                    $(`#sort-gabungan`).val(-1);
+                    $('.gabungan-fields').remove();
+                    addGabungan();
+                    $('#modal-GABUNGAN').modal('show');
                     return false;
                     break;
                 default:
@@ -369,11 +415,11 @@
             CL('save data source')
             from_table_form[`data-source-${id_form}`] = {
                 table_data_source: $(`#table`).val(),
-                field_get_data_source: $(`#field_get`).val()
+                field_get_data_source: $(`#field_get`).val(),
+                primary_field_data_source: $(`#field_get`).val(),
             }
             CL(from_table_form)
         }
-
 
 
         $(document).ready(function() {
@@ -389,6 +435,12 @@
                     `);
             });
 
+            Object.entries(db['db']['database_field_join']).forEach(([key, value]) => {
+                element_option_chosee_table =
+                    `${element_option_chosee_table }  
+                    <option value="${key}">${db['db']['database_table'][key]['description_table']}</option>`;
+            });
+
 
             // menu option
             Object.values(db['db']['menu']).forEach(element => {
@@ -399,10 +451,10 @@
             });
 
             // type data option
-            Object.values(db['db']['database_data']['TYPE-DATA']).forEach(element => {
+            Object.entries(db['public']['public_value']['TYPE-DATA']).forEach(([key, value]) => {
                 element_option_type_data =
                     `${element_option_type_data }  
-                    <option value="${element['TYPE-DATA']['code_data']}">${element['TYPE-DATA']['value_data']}</option>`;
+                    <option value="${key}">${value['TYPE-DATA']}</option>`;
             });
             $(`.type-data`).append(element_option_type_data);
 
@@ -438,8 +490,13 @@
                             'sort_field': count_field_form,
                             'code_field': toUUID($(`#description_field-${i+1}`).val()),
                         }
-                        if ($(`#type_data_field-${i+1}`).val() == 'DARI-TABEL') {
+                        if ($(`#type_data_field-${i+1}`).val() == 'DARI-TABEL' || $(
+                                `#type_data_field-${i+1}`).val() == KONSTANTA['Input Autocomplite']) {
                             data_field.data_source = from_table_form[`data-source-${i+1}`]
+                        }
+
+                        if ($(`#type_data_field-${i+1}`).val() == 'GABUNGAN') {
+                            data_field.gabungan = gabungan_field[`gabungan-filed-${i+1}`]
                         }
                         data_form.push(data_field);
                         count_field_form++;
@@ -447,7 +504,7 @@
                 }
                 form_detail.field = data_form
                 CL(form_detail)
-
+                // return false;
 
                 // S T O R E
                 $.ajax({
@@ -514,6 +571,7 @@
 
         function actionCard(element) {
             var elementId = element.id;
+            gabungan_field = {};
             CL(db);
             // Display the ID in the console (you can replace this with your own code)
             console.log('Clicked element ID: ' + elementId);
@@ -533,17 +591,15 @@
             Object.values(edit_data_field).forEach(edit_field => {
                 arr_field[edit_field.sort_field] = edit_field;
             });
-            CL('arr_field');CL(arr_field);
+            CL('arr_field');
+            CL(arr_field);
             $('.fields').remove();
             arr_field.forEach(edit_field => {
                 let countField = parseInt(edit_field.sort_field) + 1;
                 let elementAddFieldForm = addFormField(countField);
                 $('#count_field').val(countField);
-
                 $('.btn-add-form-field').before(elementAddFieldForm);
                 $(`#type_data_field-${countField}`).select2();
-
-
                 $('#description_field-' + (parseInt(edit_field.sort_field) + 1)).val(edit_field.description_field);
                 $('#type_data_field-' + (parseInt(edit_field.sort_field) + 1)).val(edit_field.type_data_field);
                 $('#level_data_field-' + (parseInt(edit_field.sort_field) + 1)).val(edit_field.level_data_field);
@@ -552,21 +608,34 @@
                 from_table_form = {};
                 if (db['db']['database_data_source'][edit_field.full_code_field] !== undefined) {
                     from_table_form[`data-source-${countField}`] = {
-                        table_data_source: db['db']['database_data_source'][edit_field.full_code_field]['table_data_source'],
-                        field_get_data_source: db['db']['database_data_source'][edit_field.full_code_field]['field_get_data_source']
+                        table_data_source: db['db']['database_data_source'][edit_field.full_code_field][
+                            'table_data_source'
+                        ],
+                        field_get_data_source: db['db']['database_data_source'][edit_field.full_code_field][
+                            'field_get_data_source'
+                        ]
                     }
                     CL(from_table_form)
                 }
-
+                if (db['db']['database_field_show'][edit_field.code_table_field]) {
+                    if (db['db']['database_field_show'][edit_field.code_table_field][edit_field.code_field]) {
+                        let field_gabungan = {};
+                        (db['db']['database_field_show'][edit_field.code_table_field][edit_field.code_field]).forEach(element => {
+                            field_gabungan[element.sort_field] = {
+                                field_show_code: element.field_show_code,
+                                table_show_code: element.table_show_code,
+                                split_by: element.split_by,
+                                sort_field: element.sort_field,
+                            }
+                        });
+                        gabungan_field[`gabungan-filed-${countField}`] = field_gabungan;
+                        conLog('gabungan_field',gabungan_field)
+                    }
+                }
 
                 $(`#type_data_field-${countField}`).select2();
-
-
             });
         }
-
-
-
 
         function refreshTable() {
             let row_data_datatable = [];
@@ -615,5 +684,123 @@
         }
 
         refreshTable();
+    </script>
+
+
+    <script>
+        //gabungan
+        function addGabungan() {
+            let id_form = $('#count_field').val();
+            let new_id = parseInt($(`#sort-gabungan`).val()) + 1;
+            let element_option_gabungan = ``;
+            for (for_fields = 1; for_fields < id_form; for_fields++) {
+                let value_ = toUUID($(`#description_field-${for_fields}`).val());
+                let description_ = $(`#description_field-${for_fields}`).val();
+                element_option_gabungan = `${element_option_gabungan} <option value="${value_}">${description_}</option>`;
+            }
+
+            if ($(`#parent_table`).val()) {
+                let parent_table = $(`#parent_table`).val();
+                if (db['db']['database_field_join'][parent_table]) {
+                    Object.values(db['db']['database_field_join'][parent_table]).forEach(element => {
+                        let value_ = element['code_field'];
+                        let description_ = element['description_field'];
+                        element_option_gabungan =
+                            `${element_option_gabungan} <option value="${value_}">${description_}</option>`;
+                    });
+                }
+            }
+            $(`#sort-gabungan`).val(new_id)
+            $('#button-add-gabungan').before(`
+                <div class="col-12 gabungan-fields" id="gabungan-${new_id}">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="table">Tabel Referensi</label>
+                                <select name="table_references" id="table_references-${new_id}"
+                                    onchange="chooseTableReferenceJoin()" 
+                                    class="custom-select2 form-control select-table database-table"
+                                    style="width: 100%;">
+                                    <option value="">Pilih Field</option>
+                                    ${element_option_chosee_table}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="table">Field</label>
+                                <select name="gabungan-fields" id="gabungan-fields-${new_id}" 
+                                    class="custom-select2 form-control select-table database-table"
+                                    style="width: 100%;">
+                                    <option value="">Pilih Field</option>
+                                    ${element_option_gabungan}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="field_get">Pembatas ${new_id}</label>
+                                <input type="text" class="form-control" name="gabungan-pembatas-${new_id}" id="gabungan-pembatas-${new_id}">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <label for="field_get">hapus</label>
+                            <button type="button"  onclick="deleteFieldGabungan(${new_id})" class="form-control btn btn-danger btn-delete">
+                                <i class="icon-copy dw dw-delete-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `);
+            $(`#sort-gabungan`).val(new_id);
+            $(`#gabungan-fields-${new_id}`).select2();
+            $(`#table_references-${new_id}`).select2();
+        }
+
+        function chooseTableReferenceJoin() {
+            /*
+            tujuannya adalah menentukan field untuk field
+            */
+
+            let id_field = parseInt($(`#sort-gabungan`).val());
+            let code_table = $(`#table_references-${id_field}`).val();
+            conLog(id_field, code_table)
+            element_option_gabungan = '';
+            Object.values(db['db']['database_field_join'][code_table]).forEach(element => {
+                let value_ = element['code_field'];
+                let description_ = element['description_field'];
+                element_option_gabungan =
+                    `${element_option_gabungan} <option value="${value_}">${description_}</option>`;
+            });
+            $(`#gabungan-fields-${id_field}`).append(element_option_gabungan);
+            conLog('element_option_gabungan', element_option_gabungan)
+        }
+
+        function saveGabunganField() {
+            let id_form = $('#count_field').val();
+            let count_field_gabungan = $('#sort-gabungan').val();
+            conLog('count_field_gabungan', count_field_gabungan)
+            let field_gabungan = {};
+            let sort_field = 0;
+            for (loop_save_gabungan = 0; loop_save_gabungan <= count_field_gabungan; loop_save_gabungan++) {
+                if ($(`#gabungan-fields-${loop_save_gabungan}`).val()) {
+                    field_gabungan[sort_field] = {
+                        field_show_code: $(`#gabungan-fields-${loop_save_gabungan}`).val(),
+                        table_show_code: ($(`#table_references-${loop_save_gabungan}`).val()) ? $(
+                            `#table_references-${loop_save_gabungan}`).val() :
+                        null, //kalau null berrti nnti adalah nama table ini
+                        split_by: $(`#gabungan-pembatas-${loop_save_gabungan}`).val(),
+                        sort_field: sort_field,
+                    }
+                    sort_field++;
+                }
+            }
+            gabungan_field[`gabungan-filed-${id_form}`] = field_gabungan;
+            conLog('gabungan_field', gabungan_field);
+        }
+
+        function deleteFieldGabungan(id_delete) {
+            $(`#gabungan-${id_delete}`).remove();
+        }
     </script>
 @endsection()
