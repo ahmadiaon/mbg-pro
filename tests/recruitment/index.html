@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Recruitment - MBG</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/logo.png" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500&family=Jost:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="51">
+    <div class="container-xxl bg-white p-0">
+        <!-- Spinner Start -->
+        <div id="spinner"
+            class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+
+        <!-- Navbar & Hero Start -->
+        <div class="container-xxl position-relative p-0" id="home">
+            <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+                <a href="" class="navbar-brand p-0">
+                    <h1 class="m-0">MBG</h1>
+                    <!-- <img src="img/logo.png" alt="Logo"> -->
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto py-0">
+                        <a href="#home" class="nav-item nav-link active">Home</a>
+                    </div>
+                    <a href="" class="btn btn-primary-gradient rounded-pill py-2 px-4 ms-3 d-none d-lg-block">Lamar
+                        Sekarang</a>
+                </div>
+            </nav>
+
+            <div class="container-xxl bg-primary hero-header">
+                <div class="container px-lg-5">
+                    <div class="row g-5">
+                        <div class="col-lg-8 text-center text-lg-start">
+                            <h1 class="text-white mb-4 animated slideInDown">Changing The Future Together</h1>
+                            <p class="text-white pb-3 animated slideInDown"> Sebagai perusahaan yang berdedikasi pada industri ini, kami berkomitmen untuk menyediakan layanan berkualitas tinggi dan berkelanjutan. Dengan pengalaman dan keahlian yang luas, kami memastikan setiap tahap operasi berjalan efisien dan aman, mendukung kebutuhan industri pertambangan batu bara dengan standar tertinggi</p>
+
+                        </div>
+                        <div class="col-lg-4 d-flex justify-content-center justify-content-lg-end wow fadeInUp"
+                            data-wow-delay="0.3s">
+                            <div class="owl-carousel screenshot-carousel">
+                                <img class="img-fluid" src="img/1.JPG" alt="">
+                                <img class="img-fluid" src="img/4.png" alt="">
+                                <img class="img-fluid" src="img/3.jpg" alt="">
+                                <img class="img-fluid" src="img/5.png" alt="">
+                                <img class="img-fluid" src="img/2.JPG" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Navbar & Hero End -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Contact Start -->
+        <div class="container-xxl py-5" id="contact">
+            <div class="container py-5 px-lg-5">
+                <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                    <h5 class="text-primary-gradient fw-medium">Buat Lamaran Pekerjaan</h5>
+                    <h1 class="mb-5">Bergabung Sekarang!</h1>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="wow fadeInUp" data-wow-delay="0.3s">
+                            <p class="text-center mb-4">Silahkan isi data diri dan kirimkan lamaran terbaik anda. *Tanpa biaya</p>
+                            <form id="form-store" action="/api/recruitment/store" method="post"
+                                enctype="multipart/form-data">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input required type="text" class="form-control" name="full_name"
+                                                id="full_name" placeholder="Your Name">
+                                            <label for="full_name">Nama Lengkap *</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" name="phone_number"
+                                                id="phone_number" placeholder="Your Name">
+                                            <label for="phone_number">No HP</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" name="email" class="form-control" id="email"
+                                                placeholder="Your Email">
+                                            <label for="email">Email</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select onchange="provinsiChanged()" style="width: 100%;" name="provinsi"
+                                                id="provinsi" class="form-control">
+                                                <option value="">Pilih Provinsi</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select onchange="kabupatenChanged()" style="width: 100%;" name="kabupaten"
+                                                id="kabupaten" class="form-control">
+                                                <option value="">Pilih Kabupaten</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select style="width: 100%;" name="kecamatan" id="kecamatan"
+                                                class="form-control">
+                                                <option value="">Pilih Kecamatan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" placeholder="Leave a message here"
+                                                id="address_description" name="address_description"
+                                                style="height: 150px"></textarea>
+                                            <label for="address_description">Keterangan Alamat</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <select style="width: 100%;" name="position" id="position"
+                                                class="form-control">
+                                                <option value="">Pilih Posisi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="file" class="form-control" name="uploaded_file" accept=".pdf"
+                                                id="uploaded_file" placeholder="uploaded_file">
+                                            <label for="uploaded_file">File CV (1 file .pdf tergabung ) *</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <button onclick="storeData()"
+                                            class="btn btn-primary-gradient rounded-pill py-3 px-5" type="button">Kirim
+                                            Lamaran</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Contact End -->
+
+
+        <!-- Footer Start -->
+        <div class="container-fluid bg-primary text-light footer wow fadeIn" data-wow-delay="0.1s">
+            <div class="container px-lg-5">
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                            &copy; <a class="border-bottom" href="https://mitrabarito.com">mitrabarito.com</a>, All
+                            Right Reserved.
+                            Designed By <a class="border-bottom" href="https://github.com/ahmadiaon">ahma.id</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-lg-square back-to-top pt-2"><i class="bi bi-arrow-up text-white"></i></a>
+    </div>
+
+    <div class="modal fade" id="loading-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <br>
+                <br>
+                <div class="modal-body text-center">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="success-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center font-18">
+                    <h3 class="mb-20">Data Tersimpan</h3>
+                    <div class="mb-30 text-center">
+                        <i class="icon-copy bi bi-check2"></i>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="stopLoading()" data-dismiss="modal">
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/counterup/counterup.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+    <script>
+        let data_provinsi = {};
+        let data_kabupaten = {};
+        let data_kecamatan = {};
+        fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/provinces.json`)
+            .then(response => response.json())
+            .then(provincies => {
+                provincies.forEach(provinci => {
+                    // console.log(provinci);
+                    data_provinsi[provinci.id] = provinci.name;
+                    $('#provinsi').append(`<option value="${provinci.id}">${provinci.name}</option>`);
+                });
+                console.log(data_provinsi);
+            });
+
+        $.ajax({
+            url: 'http://app.mitrabarito.com/api/mbg/db/JABATAN',
+            type: "GET",
+            success: function (response) {
+
+                Object.values(response.data.the_data).forEach(element => {
+                    // console.log(element);   
+
+                    $('#position').append(`<option value="${element['JABATAN']['code_data']}">${element['JABATAN']['value_data']}</option>`);
+                });
+            },
+            error: function (response) {
+                console.log('errr');
+            }
+        });
+
+        function stopLoading(){
+            $('.modal').modal('hide');
+        }
+
+        function provinsiChanged() { //untuk mengubah kabupaten
+            $('#kabupaten').empty();
+            let id_provincies = $(`#provinsi`).val();
+            console.log(`http://www.emsifa.com/api-wilayah-indonesia/api/regencies/${id_provincies}.json`);
+            fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/regencies/${id_provincies}.json`)
+                .then(response => response.json())
+                .then(regencies => {
+                    regencies.forEach(kabupaten => {
+
+                        data_kabupaten[kabupaten.id] = kabupaten.name;
+                        $('#kabupaten').append(`<option value="${kabupaten.id}">${kabupaten.name}</option>`);
+                    });
+                });
+        }
+
+
+
+        function kabupatenChanged() { //untuk mengubah kecamatan
+            $('#kecamatan').empty();
+            let id_kabupaten = $(`#kabupaten`).val();
+            fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/districts/${id_kabupaten}.json`)
+                .then(response => response.json())
+                .then(regencies => {
+                    regencies.forEach(kecamatan => {
+
+                        data_kecamatan[kecamatan.id] = kecamatan.name;
+                        $('#kecamatan').append(`<option value="${kecamatan.id}">${kecamatan.name}</option>`);
+                    });
+                });
+        }
+
+        function storeData() {
+            let _url = $('#form-store').attr('action');
+            var form = $('#form-store')[0];
+            var form_data = new FormData(form);
+            if ($('#full_name').val()) {
+                form_data.append("text_provinsi", data_provinsi[$('#provinsi').val()]);
+                form_data.append("text_kabupaten", data_kabupaten[$('#kabupaten').val()]);
+                form_data.append("text_kecamatan", data_kecamatan[$('#kecamatan').val()]);
+                console.log(form_data);
+                $('#loading-modal').modal('show');
+                $.ajax({
+                    url: 'http://app.mitrabarito.com/api/recruitment/store',
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    success: function (response) {
+                        console.log(response);
+                        $('#loading-modal').modal('hide');
+                        $('#success-modal').modal('show');
+
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    }
+                });
+            }
+
+        }
+    </script>
+</body>
+
+</html>
