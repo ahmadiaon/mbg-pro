@@ -914,6 +914,7 @@ class ComposerStaticInit06f75ac418af319c81f547dc936acf55
         'App\\Models\\ProductionPremi' => __DIR__ . '/../..' . '/app/Models/ProductionPremi.php',
         'App\\Models\\PurchaseOrder\\Galery' => __DIR__ . '/../..' . '/app/Models/PurchaseOrder/Galery.php',
         'App\\Models\\PurchaseOrder\\PurchaseOrder' => __DIR__ . '/../..' . '/app/Models/PurchaseOrder/PurchaseOrder.php',
+        'App\\Models\\Recruitment\\Recruitment' => __DIR__ . '/../..' . '/app/Models/Recruitment/Recruitment.php',
         'App\\Models\\Religion' => __DIR__ . '/../..' . '/app/Models/Religion.php',
         'App\\Models\\Roaster' => __DIR__ . '/../..' . '/app/Models/Roaster.php',
         'App\\Models\\Safety\\Atribut' => __DIR__ . '/../..' . '/app/Models/Safety/Atribut.php',

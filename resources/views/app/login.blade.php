@@ -35,7 +35,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 col-lg-7">
-                    <img src="/vendors/images/gambar-mb.png" alt="" />
+                    {{-- <img src="/vendors/images/gambar-mb.png" alt="" /> --}}
                 </div>
                 <div class="col-md-6 col-lg-5">
                     <div class="login-box bg-white box-shadow border-radius-10">
@@ -52,7 +52,6 @@
                                 <div class="input-group-append custom">
                                     <span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
                                 </div>
-
                             </div>
                             <div class="row pb-30 not-found" style="display: none;">
                                 <div class="col-12">
@@ -76,19 +75,19 @@
                             <input type="hidden" name="pin" id="pin">
                             <div class="input-group custom pin"style="display: none;">
                                 <div class="form-group justify-center row updatePinForm pd-20">
-                                    <div class="col-sm-12 col-md-12 row">
+                                    <div class="col-sm-12 col-md-12 btn-group">
                                         <input name="pinNumber-1" maxlength="1" id="pinNumber-1"
-                                            class="pinNumber col-2 form-control" type="number" >
+                                            class="pinNumber form-control mr-1" type="number" >
                                         <input name="pinNumber-2" maxlength="1" id="pinNumber-2"
-                                            class="pinNumber col-2 form-control" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number" >
                                         <input name="pinNumber-3" maxlength="1" id="pinNumber-3"
-                                            class="pinNumber col-2 form-control" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number" >
                                         <input name="pinNumber-4" maxlength="1" id="pinNumber-4"
-                                            class="pinNumber col-2 form-control" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number" >
                                         <input name="pinNumber-5" maxlength="1" id="pinNumber-5"
-                                            class="pinNumber col-2 form-control" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number" >
                                         <input name="pinNumber-6" maxlength="1" id="pinNumber-6"
-                                            class="pinNumber col-2 form-control" type="number" >
+                                            class="pinNumber  form-control" type="number" >
                                     </div>
                                 </div>
 
@@ -164,6 +163,9 @@
             $(`.pin`).hide();
 
         }
+        $(".btns-login").click(function(event) {
+            $(`.loadingLogin`).show();
+        });
 
         function cekAvailableEmployee() {
 
@@ -171,8 +173,6 @@
             $(`.not-found`).hide();
             $('.not-match').hide()
             
-
-
             let _token = $('meta[name="csrf-token"]').attr('content');
             var pinInsert = getPinInsert();
             $.ajax({
@@ -198,10 +198,12 @@
                             if (response.data.status == 'success') {
                                 console.log(response.data)
                                 $('#pin').val(pinInsert)
-                                console.log(@json(session('user_authentication')))
+                                // console.log(@json(session('user_authentication')))
                                 $('#btnSubmit').removeAttr("onclick");
                                 $("#btnSubmit").attr("type", "submit");
+                                $("#btnSubmit").attr("class", "btn btn-outline-primary btn-lg btn-block btns-login");
                                 $('#btnSubmit').click();
+                                refreshSession();
                                 // window.location.href = '/web/profile';
                             }else{
                                 $('.not-match').show()

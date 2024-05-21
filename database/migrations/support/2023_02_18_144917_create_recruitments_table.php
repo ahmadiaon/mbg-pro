@@ -13,7 +13,7 @@ class CreateRecruitmentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('recruitments', function (Blueprint $table) {
+        Schema::create('recruitments_', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->nullable();
             $table->string('employee_recruiter')->nullable();

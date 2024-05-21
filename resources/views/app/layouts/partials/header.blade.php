@@ -39,7 +39,7 @@
                     <span class="user-icon">
                         <img src="/vendors/images/photo4.jpg" alt="" />
                     </span>
-                    <span class="user-name">Ross C. Lopez</span>
+                    <span class="user-name">Mitra Barito Group</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
                     <a class="dropdown-item" href="/web/profile"><i class="dw dw-user1"></i> Profile</a>

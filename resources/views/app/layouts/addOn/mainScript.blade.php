@@ -354,13 +354,16 @@
     }
 
     function getDataTable(code_data, filter) {
-
+        conLog('filter', filter)
         let data_table_filtered = [];
         if (db['public'][code_data]) {
             let is_includes = true;
             Object.entries(db['public'][code_data]).forEach(([key, value]) => {
                 is_includes = true;
                 filter.forEach(i_filter => {
+                    // conLog('i_filter.array_filter', i_filter.array_filter);                    
+                    // conLog('value[i_filter.field]', value[i_filter.field]);
+                    // conLog('data_table_filtered',data_table_filtered)
                     if (!(i_filter.array_filter).includes(value[i_filter.field])) {
                         is_includes = false;
                         return;
@@ -465,14 +468,21 @@
             GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = {};
         }
 
-        if (field_data == KONSTANTA['tb_karyawan']) {
-            GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public']['public_value']['KARYAWAN'][
-                primary_key_data
-            ]['NRP'];
-            return emmp(primary_key_data);
-        }
+
 
         if (type_data == 'TEXT') {
+            if (field_data == KONSTANTA['tb_karyawan']) {
+
+                // try {
+                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public']['public_value']['KARYAWAN'][
+                    primary_key_data
+                ]['NRP'];
+                return emmp(primary_key_data);
+                // } catch (error) {
+                //     return `-${primary_key_data}`;
+                // }
+
+            }
             value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db']['database_data'][
                 table_data
             ][primary_key_data][
@@ -498,7 +508,7 @@
 
 
                     //table, to get primary,
-                    // conLog('data_source', data_source);
+                    // conLog('primary_key_data', primary_key_data);
 
                     // conLog('code_table_data_source', code_table_data_source);
                     // conLog('field_get_data_source', field_get_data_source);
@@ -520,12 +530,16 @@
                             'value_data'
                         ]) : null;
                         if (value_data_table) {
+                            
+                            // conLog('DATATABLE', value_data_table);
                             // conLog('base data', toUUID(value_data_table)); //[][field_get_data_source]['value_data']
-                            try {
-                                if (field_get_data_source == KONSTANTA['tb_karyawan']) {
+                            // try {
+                                if (code_table_data_source == 'KARYAWAN') {
+                                    
                                     GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
                                         'public_value'
-                                    ]['KARYAWAN'][primary_key_data]['NRP'];
+                                    ]['KARYAWAN'][value_data_table]['NRP'];
+                                    // conLog('MASUK', GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]);
                                     return emmp(toUUID(value_data_table));
                                     break;
                                 }
@@ -534,9 +548,9 @@
                                 ][
                                     field_get_data_source
                                 ];
-                            } catch (error) {
-                                value_data_table = null;
-                            }
+                            // } catch (error) {
+                            //     value_data_table = null;
+                            // }
                         }
                     }
                     GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
@@ -601,7 +615,7 @@
                 let count_absensi = {};
                 let element_count_absen = ``;
                 let element_detail_absen = ``;
-                let element_two_column =``;
+                let element_two_column = ``;
                 // conLog('data_properties', data_properties);
                 if (data_properties) {
                     const startDate = new Date(filter_absensi.date_start);
@@ -623,14 +637,14 @@
                         }
                         if (data_properties[date_current]) {
                             detail_absen_current_date = data_properties[date_current];
-                        }else{
+                        } else {
                             detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
                         }
                         let obj_current_date = getDateObj(currentDate);
                         // console.log(detail_absen_current_date);
-                        if(count_absensi[detail_absen_current_date.status_absen_uuid]){
+                        if (count_absensi[detail_absen_current_date.status_absen_uuid]) {
                             count_absensi[detail_absen_current_date.status_absen_uuid]++;
-                        }else{
+                        } else {
                             count_absensi[detail_absen_current_date.status_absen_uuid] = 1;
                         }
                         element_detail_absen += `<div id="element_absen-${primary_key_data}-${date_current}" class="col-auto mb-1">
@@ -646,7 +660,7 @@
                         // Move to the next day
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
-                    Object.entries(count_absensi).forEach(([key,values]) => {
+                    Object.entries(count_absensi).forEach(([key, values]) => {
                         element_count_absen += `<div class="col-auto mb-1">
                                                     <button style=" background-color: ${db['public']['DATABASE-ABSENSI'][key]['WARNA-ABSENSI']}" class="btn font-14  weight-600 ">${key} : ${values}</button>
                                                 </div>`;
@@ -1064,6 +1078,7 @@
                 CL('db');
                 CL(db);
                 conLog('ui_dataset', ui_dataset)
+                // location.reload();
                 // showModalSuccess();
             },
             error: function(response) {
@@ -1118,5 +1133,10 @@
     } else {
         setLocalStorage('filter_absen', default_filter_absensi);
         filter_absensi = default_filter_absensi;
+    }
+
+    // conLog('db', db);
+    if (!db) {
+        refreshSession();
     }
 </script>

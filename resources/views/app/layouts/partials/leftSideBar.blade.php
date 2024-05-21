@@ -29,9 +29,22 @@
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
                             <span class="micon bi bi-grid-1x2-fill"></span><span class="mtext">Pengelolaan</span>
                         </a>
-                        @if (in_array( 'ABSENSI',session('user_authentication')['feature']))
+                        @if (in_array('ABSENSI', session('user_authentication')['feature']))
                             <ul class="submenu">
                                 <li><a id="absensi" class="" href="/web/pengelolaan/absensi">Absensi</a></li>
+                            </ul>
+                        @endif
+                    </li>
+
+                    <li class="dropdown">
+
+                        @if (in_array('RECRUITMENT', session('user_authentication')['feature']))
+                            <a href="javascript:;" id="recruitment" class="dropdown-toggle">
+                                <span class="micon bi bi-grid-1x2-fill"></span><span class="mtext">Rekruitment</span>
+                            </a>
+                            <ul class="submenu">
+                                <li><a id="recruitment" class=""
+                                        href="/web/recruitment/recruitment">Rekruitment</a></li>
                             </ul>
                         @endif
                     </li>

@@ -83,6 +83,58 @@ class DatabaseController extends Controller
         return view('app.manage.database.index');
     }
 
+    public function getTableData($code_table){
+
+        $Q_table = DatabaseTable::where('code_table', $code_table)->get();
+        $data_table = [];
+        $data_table_child = [];
+        foreach ($Q_table as $table) {
+            // $data_table['table'] = $table;
+            $data_table['all_table'][$table->code_table] = $table;
+            $data_table['the_table'] = $table;
+        }
+
+
+        $Q_field = DatabaseField::where('code_table_field', $code_table)->get();
+        foreach ($Q_field as $field) {
+            // $data_table['fields'][$field->code_field] = $field;
+            $data_table['all_fields'][$field->full_code_field] = $field;
+        }
+
+        $Q_table = DatabaseTable::where('parent_table', $code_table)->get();
+        foreach ($Q_table as $table) {
+            $Q_field = DatabaseField::where('code_table_field', $table->code_table)->get();
+            foreach ($Q_field as $field) {
+                // $data_table['child']['table'][$table->code_table]['fields'][$field->code_field] = $field;                
+                $data_table['all_fields'][$field->full_code_field] = $field;
+            }
+            $data_table['child']['table'][$table->code_table]['table'] = $table;
+            $data_table['all_table'][$table->code_table] = $table;
+        }
+
+        foreach ($data_table['all_fields']  as $arr_field) {
+            $data_table['arr_fields'][] =  $arr_field;
+            if ($arr_field->code_table_field ==  $data_table['the_table']['code_table']) {
+                $data_table['the_fields'][$arr_field->code_field] = $arr_field;
+            }
+        }
+
+        $data_table['the_table']['fields'] = $data_table['the_fields'];
+
+
+
+        // DATA
+        $Q_data_table = DatabaseData::where('code_table_data', $code_table)->whereNull('date_end')->get();
+        // $data_table['the_data'] = $Q_data_table;
+        foreach ($Q_data_table  as $data_datatable) {
+            $data_table['the_data'][$data_datatable->uuid_data][$data_datatable->code_field_data] =  $data_datatable;
+        }
+
+        $data_table['the_template'] = null;
+
+        return ResponseFormatter::ResponseJson($data_table, 'Success get data', 200);
+    }
+
     public function storeTemplate(Request $request)
     {
         $auth_login = $request->header('auth_login');

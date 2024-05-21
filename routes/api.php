@@ -6,12 +6,18 @@ use App\Http\Controllers\Api\Database\DatabaseTableController;
 use App\Http\Controllers\Api\Pendapatan\HaulingController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Employee\EmployeeAbsenController;
+use App\Http\Controllers\Recruitment\RecruitmentController;
 use App\Http\Controllers\Support\DatabaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('recruitment')->group(function () {
+    Route::post('store', [RecruitmentController::class, 'store']);
+    Route::post('get', [RecruitmentController::class, 'getData']);
+});
 
 Route::prefix('mbg')->group(function () {
+    Route::get('db/{table}', [DatabaseController::class, 'getTableData']);
     Route::post('employee', [UserController::class, 'getfull']);
     Route::post('/local-storage', [UserController::class, 'localStorage']);
 

@@ -260,6 +260,7 @@ return array(
     'App\\Models\\ProductionPremi' => $baseDir . '/app/Models/ProductionPremi.php',
     'App\\Models\\PurchaseOrder\\Galery' => $baseDir . '/app/Models/PurchaseOrder/Galery.php',
     'App\\Models\\PurchaseOrder\\PurchaseOrder' => $baseDir . '/app/Models/PurchaseOrder/PurchaseOrder.php',
+    'App\\Models\\Recruitment\\Recruitment' => $baseDir . '/app/Models/Recruitment/Recruitment.php',
     'App\\Models\\Religion' => $baseDir . '/app/Models/Religion.php',
     'App\\Models\\Roaster' => $baseDir . '/app/Models/Roaster.php',
     'App\\Models\\Safety\\Atribut' => $baseDir . '/app/Models/Safety/Atribut.php',

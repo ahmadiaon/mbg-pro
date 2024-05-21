@@ -99,6 +99,8 @@ class AuthenticationController extends Controller
                     // $request->session()->put('data_companies', $arr_companies);
 
                     ResponseFormatter::setAllSession();
+
+                    // dd(session('data_database'));
                     $auth_login = $dataUser->auth_login;
                     $request->session()->put('db_local_storage', UserController::db_local_storage($auth_login));
 

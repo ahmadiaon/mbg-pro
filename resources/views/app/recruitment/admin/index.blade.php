@@ -1,122 +1,42 @@
 @extends('app.layouts.main')
 
+@section('src_css')
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 80px;
+            height: 80px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+@endsection
+
+
 @section('content')
     <div class="faq-wrap">
-        <h4 class="mb-20 h4 text-blue">Absensi</h4>
+        <h4 class="mb-20 h4 text-blue">Recruitment</h4>
         <div id="accordion">
-            <div class="card">
-                <div class="card-header">
-                    <button class="btn btn-block" data-toggle="collapse" data-target="#filter-manage-absensi">
-                        Filter data absesnsi
-                    </button>
-                </div>
-                <div id="filter-manage-absensi" class="collapse" data-parent="#accordion">
-                    <div class="pd-20">
-                        <div class="row">
-                            <div class="col-md-5 col-sm-12">
-                                <div class="clearfix">
-                                    <div class="pull-left">
-                                        <h4 class="text-blue h4">Filter</h4>
-                                        <p class="mb-30">filter untuk penyesuaian data yang ditampilkan</p>
-                                    </div>
-                                </div>
-                                <form>
-                                    <div class="form-group row">
-                                        <label class="col-sm-12 col-md-3 col-form-label">Perusahaan</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <button type="button" onclick="filterDatatable('PERUSAHAAN')"
-                                                class=" form-control pemilik_batu btn btn-secondary filter">
-                                                <div class="row">
-                                                    <div class="col-6 text-left text-white">
-                                                        Filter Perusahaan
-                                                    </div>
-                                                    <div class="col-6 text-right">
-                                                        <i class="icon-copy bi bi-funnel"></i>
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-12 col-md-3 col-form-label">Project</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <button type="button" onclick="filterDatatable('PROJECT')"
-                                                class=" form-control PROJECT btn btn-secondary filter">
-                                                <div class="row">
-                                                    <div class="col-6 text-left text-white">
-                                                        Filter Project
-                                                    </div>
-                                                    <div class="col-6 text-right">
-                                                        <i class="icon-copy bi bi-funnel"></i>
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
 
-
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-12 col-md-3 col-form-label">Departemen</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <button type="button" onclick="filterDatatable('DEPARTEMEN')"
-                                                class=" form-control DEPARTEMEN btn btn-secondary filter">
-                                                <div class="row">
-                                                    <div class="col-6 text-left text-white">
-                                                        Filter Departemen
-                                                        <div class="div"></div>
-                                                    </div>
-                                                    <div class="col-6 text-right">
-                                                        <i class="icon-copy bi bi-funnel"></i>
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-12 col-md-3 col-form-label">Divisi</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <button type="button" onclick="filterDatatable('DIVISI')"
-                                                class=" form-control DEPARTEMEN btn btn-secondary filter">
-                                                <div class="row">
-                                                    <div class="col-6 text-left text-white">
-                                                        Filter Divisi
-                                                        <div class="div"></div>
-                                                    </div>
-                                                    <div class="col-6 text-right">
-                                                        <i class="icon-copy bi bi-funnel"></i>
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-12 col-md-6 form-text">
-                                            Tanggal <br>(mm/dd/yyyy - mm/dd/yyyy)
-                                        </label>
-                                        <div class="col-sm-12 col-md-6">
-                                            <input class="form-control datetimepicker-range" id="FILTER-RANGE"
-                                                name="filter_range" type="text" placeholder="">
-                                        </div>
-                                    </div>
-                                    <div class="form-group row pd-20">
-                                        <button onclick="getDataAbsensi()" type="button"
-                                            class="btn btn-primary b-block col-md-12" href="">
-                                            Simpan </button>
-
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
             <div class="card">
                 <div class="card-header">
                     <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#data-table-manage-absensi">
-                        data table absensi karyawan
+                        Data Recruitment
                     </button>
                 </div>
 
@@ -125,7 +45,7 @@
                     <div class="">
                         <div class="row pd-20">
                             <div class="col-auto">
-                                <h4 class="text-blue h4">Absensi Karyawans</h4>
+                                <h4 class="text-blue h4">Recruitment</h4>
                             </div>
                             <div class="col text-right">
                                 <div class="btn-group">
@@ -190,8 +110,8 @@
                                             <a class="dropdown-item" onclick="exportAbsen()" id="btn-export"
                                                 href="#">Export +
                                                 Data</a>
-                                            <a class="dropdown-item" onclick="openModalExportDialy()"
-                                                id="btn-export-dialy" href="#">Dialy
+                                            <a class="dropdown-item" onclick="openModalExportDialy()" id="btn-export-dialy"
+                                                href="#">Dialy
                                                 Report</a>
                                             <a class="dropdown-item" onclick="reportOpenModalReportStatusAbsen()"
                                                 id="btn-export-dialy" href="#">Lap. Tidak Hadir</a>
@@ -211,19 +131,38 @@
                             </div>
                         </div>
                         <div class="mb-20" id="datatable-data">
-                            <table class="data-table table hover multiple-select-row nowrap">
+                            <table id="table-datatable-data" class="display nowrap stripe hover table"
+                                style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="table-plus datatable-nosort">Name</th>
-                                        <th>Total</th>
-                                        <th>Absensi</th>
+                                        <th class="table-plus datatable-nosort">Tanggal</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>Posisi</th>
+                                        <th>Provinsi</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
+                                        <td>2024-05-15</td>
                                         <td class="table-plus">Gloria F. Mead</td>
-                                        <td>25</td>
-                                        <td>Sagittarius</td>
+                                        <td>HR Manager</td>
+                                        <td>Kalimantan Tengah</td>
+                                        <td><span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Melamar</span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-outline btn-secondary">
+                                                <i class="icon-copy bi bi-filetype-pdf"></i>
+                                            </button>
+                                            <button class="btn btn-outline btn-primary">
+                                                <i class="icon-copy bi bi-gear"></i>
+                                            </button>
+                                            <button class="btn btn-outline btn-success">
+                                                <i class="icon-copy bi bi-telephone-forward-fill"></i>
+                                            </button>
+                                        </td>
                                     </tr>
 
                                 </tbody>
@@ -237,168 +176,57 @@
 
         </div>
     </div>
-    {{-- filter data modal --}}
-    <div class="modal fade customscroll" id="modal-filter" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+
+
+    <div id="pdfModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header mb-10">
-                    <h5 class="modal-title" id="filter-table-name">
-                        Filter Driver
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip"
-                        data-placement="bottom" title="" data-original-title="Close Modal">
+                <div class="modal-header">
+                    <h5 class="modal-title">PDF Viewer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body pd-0 mt-20">
-                    <div class="task-list-form">
-                        <input type="hidden" name="filter-name" id="filter-name">
-                        <div class="" id="datatable-filter">
-
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="filterSave()" id="btn-save-filter" class="btn btn-primary">
-                        Filter
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        Batal
-                    </button>
+                <div class="modal-body">
+                    <div id="loader" class="loader"></div>
+                    <iframe id="pdfViewer" style="display:none;" width="100%" height="500px"></iframe>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal edit live-->
-    <div class="modal fade" id="modal-show-fingger" role="dialog" aria-labelledby="myLargeModalLabel"
+
+
+    <div class="modal fade" id="small-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="name-date">
-                        xx
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Tindak Lanjut Lamaran
                     </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
                     </button>
                 </div>
                 <div class="modal-body">
-                    {{-- karyawan --}}
-                    <label for="">Riwayat cek log</label>
-                    <input class="form-control cek_log-show" disabled cols="10" rows="3">
-                    <input class="form-control cek_log-show" type="hidden" name="cek_log-show" id="cek_log-show"
-                        cols="10" rows="3">
-                    <label for="">Keterangan</label>
-                    <textarea class="form-control" name="absen_description-show" id="absen_description-show" cols="30"
-                        rows="10"></textarea>
-                    <div id="button-status_absen">
-                        {{-- status absen --}}
-                    </div>
-                    <input type="hidden" name="" id="employee_uuid-show">
-                    <input type="hidden" name="" id="date-show">
-                    <label class="mt-3" for="">Ubah Status Absen</label>
-                    <div class="row justify-content-md-center " id="button-status_absen_uuid">
-                        <div class="col-auto">
-
-                        </div>
-                    </div>
+                    <p>
+                        Silahkan pilih tindak lanjut lamaran ini. 
+                    </p>
+                    <input type="hidden" name="id_recruitment" id="id_recruitment">
                 </div>
-
-
-
                 <div class="modal-footer text-center">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- import -->
-    <div class="modal fade" id="import-modal" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="form-import" action="/user/absensi/import" method="post" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Import Absensi</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                    <div class="btn-list ">
+                        <button onclick="updateRecruitment('Disimpan')" type="button" class="btn" data-bgcolor="#3b5998" data-color="#ffffff" style="color: rgb(255, 255, 255); background-color: rgb(59, 89, 152);">
+                            <i class="icon-copy bi bi-file-earmark-check"></i> Simpan
+                        </button>
+                        <button type="button" onclick="updateRecruitment('Ditolak')"  class="btn" data-bgcolor="#bd081c" data-color="#ffffff" style="color: rgb(255, 255, 255); background-color: rgb(189, 8, 28);">
+                            <i class="icon-copy bi bi-file-earmark-excel"></i> Tolak
+                        </button>
+                        <button data-dismiss="modal" type="button" class="btn" data-bgcolor="#00b489" data-color="#ffffff" style="color: rgb(255, 255, 255); background-color: rgb(0, 180, 137);">
+                            <i class="icon-copy bi bi-x-lg"></i> close
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Pilih Absensi</label>
-                            <input autofocus name="uploaded_file" type="file"
-                                class="form-control-file form-control height-auto" />
-                        </div>
-                        <div class="form-group row date-setup">
-                            <div class="col-6">
-                                <label for="">Mulai tanggal</label>
-                                <select onchange="loopDate()" name="date_absen_start" style="width: 100%"
-                                    id="date_absen_start" class="custom-select2 form-control">
-
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label for="">Sampai tanggal</label>
-                                <select name="date_absen_end" style="width: 100%" id="date_absen_end"
-                                    class="custom-select2 form-control">
-
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="button" onclick="storeUserDocument('import')"
-                            class="btn btn-primary">Upload</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    {{-- after import --}}
-    <div class="modal fade bd-example-modal-xl" id="after-import" tabindex="-1" role="dialog"
-        aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="card-box mb-30 ">
-                    <div class="row pd-20">
-                        <div class="col-auto">
-                            <h4 class="text-blue h4">Absensi Karyawans</h4>
-                        </div>
-                        <div class="col text-right">
-                            <div class="btn-group">
-                                <div class="btn-group dropdown">
-                                    <button type="button" class="btn btn-primary dropdown-toggle waves-effect"
-                                        data-toggle="dropdown" aria-expanded="false">
-                                        Menu <span class="caret"></span>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" id="btn-export" onclick="exportEmployee()"
-                                            href="#">Export Karyawan</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="datatable-data-after-import">
-                        <table id="table-fingger-identified" class="display nowrap stripe hover table"
-                            style="width:100%">
-                            <thead>
-                                <tr id="header-table-fingger-identified">
-                                    <th>Detail Data Karyawan</th>
-                                    <th>Nama fingger</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -422,8 +250,6 @@
             'site_uuid': [],
             'math': []
         };
-
-
 
         let database_datatable = {};
         database_datatable['show-fields'] = [
@@ -480,9 +306,6 @@
         let arr_status_absen = [];
 
 
-
-
-
         function getDataAbsensi() {
             let date_range = $('#FILTER-RANGE').val();
             let split_date_range = date_range.split(" - ");
@@ -504,22 +327,137 @@
 
         function getWithNewData() {
             $.ajax({
-                url: '/api/mbg/pengelolaan/absensi/get',
+                url: '/api/recruitment/get',
                 type: "POST",
                 headers: {
                     'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    filter_absensi: filter_absensi
+                    _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
+                    conLog('response', response);
+                    let data_database_recruitments = response.data;
 
-                    detail_absensi = response.data;
-                    conLog('detail_absensi', detail_absensi);
-                    conLog('filter_absensi', filter_absensi);
-                    // setLocalStorage('filter_absen',filter_absensi);
-                    refreshTableData();
+                    let row_data_datatable = [];
+                    conLog('database_datatable', ui_dataset);
+                    let header_table_element = '';
+
+                    var element_card_tanggal = {
+                        mRender: function(data, type, row) {
+                            if (data_database_recruitments[row]['time_propose']) {
+                                return data_database_recruitments[row]['time_propose'];
+                            }
+                            return '';
+                        }
+                    };
+                    row_data_datatable.push(element_card_tanggal);
+
+                    var element_card_full_name = {
+                        mRender: function(data, type, row) {
+                            if (data_database_recruitments[row]['full_name']) {
+                                return data_database_recruitments[row]['full_name'];
+                            }
+                            return '';
+                        }
+                    };
+                    row_data_datatable.push(element_card_full_name);
+
+
+                    var element_card_full_name = {
+                        mRender: function(data, type, row) {
+                            if (data_database_recruitments[row]['position']) {
+                                return data_show = showFieldData('TEXT', 'JABATAN',
+                                    'JABATAN',
+                                    toUUID(data_database_recruitments[row]['position'])
+                                );
+                            }
+                            return '';
+                        }
+                    };
+                    row_data_datatable.push(element_card_full_name);
+
+
+                    var element_card_provinsi = {
+                        mRender: function(data, type, row) {
+                            if (data_database_recruitments[row]['provinsi']) {
+                                return data_database_recruitments[row]['provinsi'];
+                            }
+                            return '';
+                        }
+                    };
+                    row_data_datatable.push(element_card_provinsi);
+
+
+                    var element_card_status = {
+                        mRender: function(data, type, row) {
+                            if (data_database_recruitments[row]['status']) {
+                                if (data_database_recruitments[row]['status'] == 'Diajukan') {
+                                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Diajukan</span>`;
+                                } else if (data_database_recruitments[row]['status'] == 'Ditolak') {
+                                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                style="color: rgb(215, 38, 38); background-color: rgb(231, 235, 245);">Ditolak</span>`;
+                                } else if (data_database_recruitments[row]['status'] == 'Disimpan') {
+                                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                style="color: rgb(38, 215, 177); background-color: rgb(231, 235, 245);">Disimpan</span>`;
+                                } else {
+                                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                style="color: rgb(215, 38, 177); background-color: rgb(231, 235, 245);">tidak ada</span>`;
+                                }
+                                // return data_database_recruitments[row]['status'];
+                            }
+                            return '';
+                        }
+                    };
+                    row_data_datatable.push(element_card_status);
+
+                    var element_card_file = {
+                        mRender: function(data, type, row) {
+                            let element_row = ``;
+                            if (data_database_recruitments[row]['file']) {
+                                element_row = `
+                                            <button onclick="openDoc('${data_database_recruitments[row]['file']}')" class="btn btn-outline btn-secondary">
+                                                <i class="icon-copy bi bi-filetype-pdf"></i>
+                                            </button>`;
+                                // return data_database_recruitments[row]['file'];
+                            }
+
+
+                            if (data_database_recruitments[row]['phone_number']) {
+                                element_row += `
+                                <a target="_blank" href="https://wa.me/${data_database_recruitments[row]['phone_number']}">
+                                    <button class="btn btn-outline btn-success">
+                                                <i class="icon-copy bi bi-telephone-forward-fill"></i>
+                                            </button>
+                                        </a>`;
+                            }
+
+                            element_row = `${element_row}
+                                                <button onclick="showAction('${row}')"  class="btn btn-outline btn-primary">
+                                                    <i class="icon-copy bi bi-gear"></i>
+                                                </button>
+                                            `;
+                            return element_row;
+                        }
+                    };
+                    row_data_datatable.push(element_card_file);
+
+                    // ====== D A T A    F O R    D A T A T A B L E ===
+
+
+                    let data_datatable = [];
+                    if (data_database_recruitments) {
+                        data_datatable = Object.keys(data_database_recruitments);
+                    }
+
+                    $('#table-datatable-data').DataTable({
+                        paging: false,
+                        serverSide: false,
+                        data: data_datatable,
+                        columns: row_data_datatable
+                    });
+
                 },
                 error: function(response) {
                     conLog('response', response)
@@ -528,7 +466,7 @@
             });
         }
 
-
+        getWithNewData();
 
         /*
             mengambil perusahaan yang hanya sesuai dengan yg di beri akses
@@ -699,8 +637,8 @@
             $('#datatable-data-after-import').empty();
             let header_table_element = '';
             let row_data_datatable = [];
-            
-            let data_datatable_after_import=[];
+
+            let data_datatable_after_import = [];
             // ============ create header table
             header_table_element = `                    
                 <table id="table-fingger-identified" class="display nowrap stripe hover table" style="width:100%">
@@ -728,10 +666,10 @@
                 data_datatable_after_import = Object.keys(after_import_data['identification']);
             }
 
-            conLog('data_datatable_after_import',data_datatable_after_import);
+            conLog('data_datatable_after_import', data_datatable_after_import);
 
             $('#table-fingger-identified').DataTable({
-                
+
                 scrollX: true,
                 scrollY: "600px",
                 paging: false,
@@ -747,31 +685,13 @@
             conLog('database_datatable', ui_dataset);
             let header_table_element = '';
 
-            database_datatable['show-fields'].forEach(field_table => {
-                let code_field = field_table['code_field'];
-                let type_data_field = field_table['tipe_data_field'];
-                let data_code_table = field_table['code_table_field'];
+            var element_card_tanggal = {
+                mRender: function(data, type, row) {
 
-                // ============ create header table
-                header_table_element =
-                    `${header_table_element} <th> ${field_table['description_field']} </th>`
-                // ============ create header table
-                var element_card = {
-                    mRender: function(data, type, row) {
-                        let detail_properties = null;
-                        try {
-                            detail_properties = detail_absensi[row]['detail_absen'];
-                        } catch (error) {
-
-                        }
-                        let data_show = showFieldData(type_data_field, data_code_table, code_field,
-                            toUUID(row), detail_properties
-                        );
-                        return data_show;
-                    }
-                };
-                row_data_datatable.push(element_card);
-            });
+                    return data_show;
+                }
+            };
+            row_data_datatable.push(element_card_tanggal);
 
             // ============ create header table
             header_table_element = `                    
@@ -876,8 +796,9 @@
         }
 
         $(document).ready(function() {
-            getDataAbsensi();
+            // getDataAbsensi();
             conLog('random', @json(session('keys_random')));
+
         });
     </script>
 
@@ -1075,7 +996,7 @@
                         $('#import-modal').modal('hide');
                         $('#after-import').modal('show');
                         after_import_data = response.data;
-                        conLog('after_import_after_absen',after_import_data);
+                        conLog('after_import_after_absen', after_import_data);
                         getDataAbsensi();
                         // response.data.
                         // refreshTableAfterImport();
@@ -1086,6 +1007,61 @@
                 error: function(response) {
                     cg('errr', response);
                     alertModal()
+                }
+            });
+        }
+
+        function showAction(id_recruitment){
+            $(`#id_recruitment`).val(id_recruitment);
+            $('#small-modal').modal('show');
+        }
+
+        function updateRecruitment(status_recruitment){
+            console.log('status_recruitment');console.log(status_recruitment);
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/recruitment/store',
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    id:  $(`#id_recruitment`).val(),
+                    status: status_recruitment,
+                },
+                success: function (response) {
+                    console.log(response);
+                    
+                    showModalSuccess();
+                    location.reload();
+                    
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function openDoc(name_doc) {
+            console.log(name_doc);
+            var modal = $('#pdfModal');
+            var loader = $('#loader');
+            var pdfViewer = $('#pdfViewer');
+            pdfViewer.attr('src', '');
+            modal.modal('show');
+            $.ajax({
+                url: '/file/recruitment/' + name_doc, // Replace with your PDF URL
+                method: 'GET',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(data) {
+                    var url = URL.createObjectURL(data);
+                    pdfViewer.attr('src', url);
+                    loader.hide();
+                    pdfViewer.show();
+
+                },
+                error: function() {
+                    loader.hide();
+                    alert('Failed to load PDF');
                 }
             });
         }

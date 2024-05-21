@@ -17,12 +17,12 @@ class isLogin
      */
     public function handle(Request $request, Closure $next)
     {
-        
-        if(!session('dataUser')){
+        // dd(session('user_authentication'));
+        if(!session('user_authentication')){
             
             return redirect()->intended('/login');
         }
-        if( session('dataUser') == '0'){
+        if( session('user_authentication') == '0'){
             
             return redirect()->intended('/login');
         }

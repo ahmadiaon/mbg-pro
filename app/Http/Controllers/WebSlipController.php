@@ -35,8 +35,6 @@ class WebSlipController extends Controller
 
         $parent_path = 'file/slips/';
         foreach($files_file as $item_file){
-
-
             $file_name_original = $item_file->getClientOriginalName();
             $file_extension =$item_file->getClientOriginalExtension();
             $filenameWithoutExtension = pathinfo($file_name_original, PATHINFO_FILENAME);
@@ -46,9 +44,6 @@ class WebSlipController extends Controller
             $item_file->move($parent_path, $file_name_change);     
 
             $imageName = $employee_uuid."-".$year."-".$month;
-
-            
-
             
             $data_for_store = [
                 'employee_uuid' => $employee_uuid,

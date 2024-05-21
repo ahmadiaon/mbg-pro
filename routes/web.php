@@ -54,6 +54,7 @@ use App\Http\Controllers\Privilege\UserPrivilegeController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\PurchaseOrder\GaleryController;
 use App\Http\Controllers\PurchaseOrder\PurchaseOrderController;
+use App\Http\Controllers\Recruitment\RecruitmentController as RecruitmentRecruitmentController;
 use App\Http\Controllers\RecruitmentController;
 use App\Http\Controllers\ReligionController;
 use App\Http\Controllers\Safety\AtributSizeController;
@@ -986,7 +987,7 @@ Route::middleware(['webIsLogin'])->group(function () {
                 Route::post('/export', [HaulingController::class, 'export']);
             });
         });
-
+        
         Route::prefix('/manage')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
@@ -1012,6 +1013,9 @@ Route::middleware(['webIsLogin'])->group(function () {
         Route::prefix('/pengelolaan')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
 
+        });
+        Route::prefix('/recruitment')->group(function () {
+            Route::get('/recruitment', [RecruitmentRecruitmentController::class, 'manageIndex']);
         });
         Route::prefix('/menu')->group(function () {
             Route::get('/user', [WebUserController::class, 'user']);

@@ -47,7 +47,10 @@ class WebUserController extends Controller
                                                 ->get();
                 $arr_data_feature = [];
                 foreach($Q_user_feture as $data_user_feture){
-                    $arr_data_feature[] =  $data_user_feture->value_data;
+                    if(!in_array($data_user_feture->value_data, $arr_data_feature)){
+                        $arr_data_feature[] =  $data_user_feture->value_data;
+                    }
+                    
                 }
 
                 $Q_user_perusahaan = DatabaseData::where('code_table_data','KARYAWAN-AKSES-PERUSAHAAN')
@@ -56,7 +59,9 @@ class WebUserController extends Controller
                                                 ->get();
                 $arr_data_perusahaan = [];
                 foreach($Q_user_perusahaan as $data_user_perusahaan){
-                    $arr_data_perusahaan[] =$data_user_perusahaan->value_data;
+                    if(!in_array($data_user_perusahaan->value_data, $arr_data_perusahaan)){
+                        $arr_data_perusahaan[] =  $data_user_perusahaan->value_data;
+                    }
                 }
 
                 $Q_user_department = DatabaseData::where('code_table_data','KARYAWAN-AKSES-DEPARTMENT')
@@ -65,16 +70,31 @@ class WebUserController extends Controller
                                                 ->get();
                 $arr_data_department = [];
                 foreach($Q_user_department as $data_user_department){
-                    $arr_data_department[] =$data_user_department->value_data;
+                    // $arr_data_department[] =$data_user_department->value_data;
+
+                    if(!in_array($data_user_department->value_data, $arr_data_department)){
+                        $arr_data_department[] =  $data_user_department->value_data;
+                    }
                 }
 
                 $Q_user_project = DatabaseData::where('code_table_data','KARYAWAN-AKSES-PROJECT')
                                                 ->where('code_data','like',ResponseFormatter::toUUID($request->nik_employee).'%')
                                                 ->where('code_field_data', 'AKSES-PROJECT')
                                                 ->get();
-                $arr_data_project = [];
+                $arr_data_projects = [];
                 foreach($Q_user_project as $data_user_project){
-                    $arr_data_project[] =$data_user_project->value_data;
+                    // $arr_data_projects[] = $data_user_project->value_data;
+
+                    if(!in_array($data_user_project->value_data, $arr_data_projects)){
+                        $arr_data_projects[] =  $data_user_project->value_data;
+                    }
+                }
+
+                $arr_data_project = [];
+                $arr_data_projects = array_unique($arr_data_projects);
+                foreach($arr_data_projects as $data_user_project){
+                    $arr_data_project[] = $data_user_project;
+
                 }
 
                 $Q_user_divisi = DatabaseData::where('code_table_data','KARYAWAN-AKSES-DIVISI')
@@ -83,7 +103,11 @@ class WebUserController extends Controller
                                                 ->get();
                 $arr_data_divisi = [];
                 foreach($Q_user_divisi as $data_user_divisi){
-                    $arr_data_divisi[] =$data_user_divisi->value_data;
+                    // $arr_data_divisi[] =$data_user_divisi->value_data;
+
+                    if(!in_array($data_user_divisi->value_data, $arr_data_divisi)){
+                        $arr_data_divisi[] =  $data_user_divisi->value_data;
+                    }
                 }
 
                 $storeEmployee->user_privileges = $user_privileges;
@@ -98,7 +122,9 @@ class WebUserController extends Controller
                 session(['user_authentication' => $storeEmployee]);
                 session()->put('user_authentication', $storeEmployee);
                 request()->session()->put('db_local_storage', UserController::db_local_storage($token));
+                ResponseFormatter::setAllSession();
 
+                // dd(session('data_database'));
                 if(!empty($storeEmployee->pin)){
                     return redirect()->intended('/web/menu');
                 }else{
