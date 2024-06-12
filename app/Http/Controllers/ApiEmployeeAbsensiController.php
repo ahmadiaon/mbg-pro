@@ -24,12 +24,10 @@ class ApiEmployeeAbsensiController extends Controller
         // $user = User::all();
 
 
-        $data_absensi = EmployeeAbsen::join('status_absens', 'status_absens.uuid', 'employee_absens.status_absen_uuid')
-        ->where('employee_absens.employee_uuid',$user->nik_employee)
+        $data_absensi = EmployeeAbsen::where('employee_absens.employee_uuid',$user->nik_employee)
         ->where('employee_absens.date', '>=',  $filter['date_start'])
         ->where('employee_absens.date', '<=',  $filter['date_end'])
         ->get([
-            'status_absens.*',
             'employee_absens.*'
         ]);
 

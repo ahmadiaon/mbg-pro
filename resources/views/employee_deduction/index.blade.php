@@ -256,7 +256,6 @@
                                     <label for="">Harga</label>
                                     <input type="text" name="value_employee_deduction" id="value_employee_deduction"
                                         class="form-control"  onkeyup="toRupiah(this)" value="Rp. ">
-
                                 </div>
                             </div>
                         </div>

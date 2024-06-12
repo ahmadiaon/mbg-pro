@@ -19,6 +19,12 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class EmployeeCutiController extends Controller
 {
+    public function webIndex()
+    {
+        return view('app.manage.roaster-kerja.index', [
+            'title'         => 'Roaster Kerja'
+        ]);
+    }
     public function index()
     {
         $layout = [

@@ -78,7 +78,7 @@
     </div>
     <!-- Simple Datatable End -->
 
-  
+
 
 
 
@@ -109,7 +109,8 @@
                                 <div class="txt">
                                     <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
                                         id="company_department"
-                                        style="color: rgb(38, 94, 215); background-color: rgba(218, 68, 68, 0.96);">PT. MBLE |
+                                        style="color: rgb(38, 94, 215); background-color: rgba(218, 68, 68, 0.96);">PT. MBLE
+                                        |
                                         HAULING</span>
                                     <div id="name_modal" class="font-14 weight-600">Dr. Callie Reed</div>
                                     <div id="nik_employee_modal" class="font-12 weight-500">MBLE-0422003</div>
@@ -155,47 +156,12 @@
             </div>
         </div>
     </div>
-   
 @endsection()
 
 @section('script_javascript')
     {{-- pin max --}}
     <script>
         let database = JSON.parse(localStorage.getItem('DATABASE'));
-
-
-        function cardEmployees(nik_employee) {
-            return `
-                <div class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
-                    <div class="avatar mr-2 flex-shrink-0">
-                        <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
-                            width="50" height="50" alt="">
-                    </div>
-                    <div class="txt">
-                        
-                        <div class="row">
-                            <div class="col-auto">
-                                <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${database['employees'][nik_employee]['company']} |
-                                ${database['employees'][nik_employee]['department']}</span>
-                            </div>
-                            <div class="col-1 text-right">
-                                <span onclick="editUser('${nik_employee}')" class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">  2 </span>
-                            
-                                <span onclick="editUser('${nik_employee}')" class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                style="color: rgb(38, 94, 215); background-color:rgb(255, 255, 255);">  <i class="icon-copy bi bi-pencil-fill"></i></i> </span>
-                            </div>
-                        </div>
-                        <div class="font-14 weight-600"> ${database['employees'][nik_employee]['name']}</div>
-                        <div class="font-12 weight-500">${database['employees'][nik_employee]['nik_employee_with_space']}</div>
-                        <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
-                            ${database['employees'][nik_employee]['position']}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
 
 
         $(document).ready(function() {
@@ -244,11 +210,11 @@
             $('#datatable').append(header_table_element);
 
 
-            
+
             //add row data datatable
             var employees_card_element = {
                 mRender: function(data, type, row) {
-                    return cardEmployees(row)
+                    return emmp(row)
                 }
             };
             row_data_datatable.push(employees_card_element);
@@ -267,15 +233,15 @@
                                     <span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah <i class="icon-copy bi bi-arrow-counterclockwise"></i></span>
                                 </div>
                             </div>`;
-                
-                
+
+
                 }
             };
             row_data_datatable.push(company_element);
 
             var project_element = {
                 mRender: function(data, type, row) {
-                    return `<span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah</span>`;
+                    return `<span  onclick="editUser('${row}')" class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7" style="color: rgba(10, 11, 2, 0.97); background-color: rgba(237, 255, 46, 0.97);">Ubah NIK</span>`;
                 }
             };
             row_data_datatable.push(project_element);
@@ -300,36 +266,14 @@
             };
             row_data_datatable.push(feature_element);
 
-         
-
-           
-
-            $.ajax({
-                url: '/api/mbg/manage/employees/get',
-                type: "POST",
-                async: false,
-                headers: {
-                    'auth_login': @json(session('user_authentication'))
-                    // Add other custom headers if needed
-                },
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    nik_employee: null
-                },
-                success: function(response) {
-                    let data_datatable = response.data;
-                    $('#table-datatable').DataTable({
-                        paging: true,
-                        serverSide: false,
-                        data: data_datatable,
-                        columns: row_data_datatable
-                    });
-                },
-                error: function(response) {
-                    conLog('error', response)
-                    //alertModal()
-                }
+            data_datatable = Object.keys(db['db']['database_data']['KARYAWAN']);
+            $('#table-datatable').DataTable({
+                paging: true,
+                serverSide: false,
+                data: data_datatable,
+                columns: row_data_datatable
             });
+
 
             // Menggunakan event input untuk mengawasi perubahan pada input
             $('#form-user').on('input', '.pinNumber', function() {
@@ -350,22 +294,21 @@
     </script>
 
     <script>
-        /*
-                            get from database karyawan, list karyawan dari card.
-
-                        */
+       
 
 
 
         function editUser(nik_employee) {
 
+            conLog('nik_employee',db['public']['public_value']['KARYAWAN'][nik_employee])
             $('#nik_employee').val(`${nik_employee}`)
             $('#company_department').text(
-                `${database['employees'][nik_employee]['company']} | ${database['employees'][nik_employee]['department']}`
+                `${db['public']['public_value']['KARYAWAN'][nik_employee]['NAMA-KARYAWAN']}`
             )
-            $('#name_modal').text(`${database['employees'][nik_employee]['name']}`)
-            $('#nik_employee_modal').text(database['employees'][nik_employee]['nik_employee_with_space'])
-            $('#position_modal').text(database['employees'][nik_employee]['position'])
+            $('#name_modal').text(`${db['public']['public_value']['KARYAWAN'][nik_employee]['NAMA-KARYAWAN']}`)
+            $('#nik_number').val(`${db['public']['public_value']['KARYAWAN'][nik_employee]['NIK-KTP']}`)
+            $('#nik_employee_modal').text(db['public']['public_value']['KARYAWAN'][nik_employee]['NRP'])
+            $('#position_modal').text(db['public']['public_value']['KARYAWAN'][nik_employee]['JABATAN'])
 
             $('#create-absen').modal('show');
         }

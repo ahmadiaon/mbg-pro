@@ -14,6 +14,7 @@ use App\Models\Support\UserTemplate;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -83,7 +84,8 @@ class DatabaseController extends Controller
         return view('app.manage.database.index');
     }
 
-    public function getTableData($code_table){
+    public function getTableData($code_table)
+    {
 
         $Q_table = DatabaseTable::where('code_table', $code_table)->get();
         $data_table = [];
@@ -180,12 +182,12 @@ class DatabaseController extends Controller
                     ],
                     [
                         'uuid_data' => $uuid_data,
-                        'value_data' => $data_database_datatable['description-'.$data_source_this_field['code_field']],
+                        'value_data' => $data_database_datatable['description-' . $data_source_this_field['code_field']],
                         'date_start' => Carbon::now()->format('Y-m-d'),
                         'date_end' => null,
                     ]
                 );
-                unset($data_database_datatable['description-'.$data_source_this_field['code_field']]);
+                unset($data_database_datatable['description-' . $data_source_this_field['code_field']]);
             }
         }
 
@@ -204,7 +206,7 @@ class DatabaseController extends Controller
 
         foreach ($data_database_datatable as $index => $value) {
             // if($database_datatable['database_data_source'][$request['data_table']['code_table'].'-'.$index]){
-                
+
             // }
             $store_data = DatabaseData::updateOrCreate(
                 [
@@ -222,7 +224,7 @@ class DatabaseController extends Controller
             );
         }
 
-       
+
         $data_return['uuid_data'] = $uuid_data;
         $data_return['data_database_datatable'] = $data_database_datatable;
 
@@ -278,7 +280,7 @@ class DatabaseController extends Controller
                     ], [
                         'split_by' =>  $value['split_by'],
                         'sort_field' =>  $value['sort_field'],
-                        'table_show_code' => ($value['table_show_code'])?($value['table_show_code']):$table_code
+                        'table_show_code' => ($value['table_show_code']) ? ($value['table_show_code']) : $table_code
                     ]);
                 }
             }
@@ -365,12 +367,13 @@ class DatabaseController extends Controller
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
 
+        $code_table_data = ($database_datatable['db']['database_table'][$request->code_table_data]['parent_table'])?$database_datatable['db']['database_table'][$request->code_table_data]['parent_table']:$request->code_table_data;
 
+        
         $createSheet->setCellValue('A1', 'No.');
 
         $count_data = 1;
         foreach ($request->fields as $field) {
-
             $createSheet->setCellValue($abjads[$count_data] . '1', $field['description_field']);
             $createSheet->setCellValue($abjads[$count_data] . '2', $field['code_table_field']);
             $count_data++;
@@ -384,18 +387,23 @@ class DatabaseController extends Controller
             foreach ($Q_get_data as $item_get_data) {
                 $data_get_data[$item_get_data->code_data][$item_get_data->code_field_data] = $item_get_data;
             }
-
-            foreach ($request['data_export']['data'] as $item_export) {
+            // return ResponseFormatter::ResponseJson('$name', $database_datatable, 200);
+            foreach ($request['data_export']['data'] as $code_data=>$item_export) {
                 $createSheet->setCellValue('A' . $count_data_export, $count_data_export - 2);
                 $count_abjads_field = 1;
 
-                foreach ($request->fields as $field) {
-                    if (!empty($item_export[$field['code_field']])) {
-                        $value_show = $item_export[$field['code_field']];
-                        $createSheet->setCellValue($abjads[$count_abjads_field] . $count_data_export, $value_show);
+                if(!empty($database_datatable['public']['public_value'][$code_table_data][$code_data])){
+                    $data_code_data = $database_datatable['public']['public_value'][$code_table_data][$code_data];
+                    foreach ($request->fields as $field) {
+                        if (!empty($data_code_data[$field['code_field']])) {
+                            $value_show = $data_code_data[$field['code_field']];
+                            $createSheet->setCellValue($abjads[$count_abjads_field] . $count_data_export, $value_show);
+                        }
+                        $count_abjads_field++;
                     }
-                    $count_abjads_field++;
                 }
+
+               
                 $count_data_export++;
             }
         }
@@ -405,16 +413,19 @@ class DatabaseController extends Controller
         $name = 'file/export/' . rand(99, 9999) . '-file.xls';
         $crateWriter->save($name);
 
-        return ResponseFormatter::ResponseJson($name, $data_get_data, 200);
+        return ResponseFormatter::ResponseJson($name, 'export database', 200);
     }
 
     public function importDatatable(Request $request)
     {
         $the_file = $request->file('uploaded_file');
+        $auth_login =  $request->header('auth_login');
         $abjads = ResponseFormatter::abjads();
         $database_datatable['database_table'] = DatabaseController::getTables();
         $database_datatable['database_field'] = DatabaseController::getFields();
         $database_datatable['database_data_source'] = DatabaseController::getDataSource();
+
+        $db = UserController::db_local_storage($auth_login);
 
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
@@ -429,25 +440,33 @@ class DatabaseController extends Controller
             */
             $column_fields = [];
             $loop_col = 1;
+
+            $table_arr = [];
+            $field_arr = [];
             while ($sheet->getCell($abjads[$loop_col] . '2')->getValue() != null) {
                 $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
+                if(!in_array($table_code,$table_arr)){
+                    $table_arr[] = $table_code;
+                }
+                
                 $field_code = ResponseFormatter::toUUID($sheet->getCell($abjads[$loop_col] . '1')->getValue());
                 $column_fields['excel_properties'][$table_code][] = $field_code;
                 if (!empty($database_datatable['database_field'][$table_code])) {
                     if (!empty($database_datatable['database_field'][$table_code][$field_code])) {
+                        if(!in_array($field_code,$field_arr)){
+                            $field_arr[] = $field_code;
+                        }
                         $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
                         $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
                         $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
-                        if(!empty($database_datatable['database_data_source'][$table_code.'-'.$field_code])){//jika ada di data source
+                        if (!empty($database_datatable['database_data_source'][$table_code . '-' . $field_code])) { //jika ada di data source
                             $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = true;
                         }
                     }
                 }
-
-
                 $loop_col++;
             }
-           
+
 
             $i = 3;
             while ($sheet->getCell('A' . $i)->getValue() != null) {
@@ -462,7 +481,7 @@ class DatabaseController extends Controller
                     $code_data = null;
                     $value_data = null;
                     if ($sheet->getCell($index_column_key . $i)->getValue() != null) {
-                        $value_data = ($value['is_uuid'])?ResponseFormatter::toUUID($sheet->getCell($index_column_key . $i)->getValue()):$sheet->getCell($index_column_key . $i)->getValue();
+                        $value_data = ($value['is_uuid']) ? ResponseFormatter::toUUID($sheet->getCell($index_column_key . $i)->getValue()) : $sheet->getCell($index_column_key . $i)->getValue();
                         $code_table_data = $value['table_code'];
                         $code_field_data = $value['field_code'];
                         $code_data = ResponseFormatter::toUUID($value_data);
@@ -470,15 +489,24 @@ class DatabaseController extends Controller
                     }
                 }
                 // return ResponseFormatter::ResponseJson($arr_value,'store data from importDatatable', 200);
-                
+
                 $i++;
             }
             foreach ($arr_value as $row_to_insert) {
-                $uuid_data = Str::uuid();
+                $uuid_data = null;
                 foreach ($row_to_insert as $table_code => $table_to_insert) {
                     
                     $field_code_primary_code = $database_datatable['database_table'][$table_code]['primary_table'];
                     $table_code_primary_code = ($database_datatable['database_table'][$table_code]['parent_table']) ? $database_datatable['database_table'][$table_code]['parent_table'] : $table_code;
+                    
+                    if(empty($uuid_data)){
+                        $code_data = ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]);
+                        if(!empty($db['db']['database_data'][$table_code_primary_code][$code_data])){
+                            $uuid_data = $db['db']['database_data'][$table_code_primary_code][$code_data][$field_code_primary_code]['uuid_data'];
+                        }else{
+                            $uuid_data = Str::uuid();
+                        }
+                    }
 
                     foreach ($table_to_insert as $field_code => $field_to_insert) {
                         // return ResponseFormatter::ResponseJson($field_to_insert, 'store data from importDatatable', 200);
@@ -489,10 +517,6 @@ class DatabaseController extends Controller
                             'code_data' => ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]),
                             'uuid_data' => $uuid_data,
                         ];
-                        $Q_add_date_end_old_data = DatabaseData::where('code_table_data' , $data_insert['code_table_data'])
-                                                                    ->where('code_field_data', $data_insert['code_field_data'])
-                                                                    ->where('code_data',$data_insert['code_data'])
-                                                                    ->update(['date_end' => Carbon::now()->format('Y-m-d')]);
 
                         $Q_store_data = DatabaseData::updateOrCreate(
                             [
@@ -511,8 +535,25 @@ class DatabaseController extends Controller
                     }
                 }
             }
+
+            if(in_array('IDENTITAS-KARYAWAN',$table_arr)){
+                if(in_array('NIK-KTP',$field_arr)){
+                    foreach ($arr_value as $row_to_insert){
+                        if($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']){
+                            User::updateOrCreate([
+                                'uuid'=> ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+        
+                            ],[
+                                'password' => Hash::make($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']),
+                                'role' => 'employee'
+                            ]);
+                        }
+                    }
+                }
+            }
             return ResponseFormatter::ResponseJson($arr_data_insert, 'store data from importDatatable', 200);
-            
         } catch (Exception $e) {
             // $error_code = $e->errorInfo[1];
             return ResponseFormatter::ResponseJson($e, 'store data from importDatatable err', 200);
@@ -557,6 +598,63 @@ class DatabaseController extends Controller
         return $data_table;
     }
 
+    public static function getDataFull($code_table = null, $code_data = null)
+    {
+        if ($code_table == null) {
+            $Q_table = DatabaseTable::get();
+        } else {
+            $Q_table = DatabaseTable::where('code_table', $code_table)->get();
+        }
+
+        $data_table = [];
+        $data_fields = [];
+        $arr_data_table = [];
+        $data_table_child = [];
+        foreach ($Q_table as $table) {
+            $data_table[$table->code_table] = $table;
+            $Q_field = DatabaseField::where('code_table_field', $table->code_table)->get();
+
+            foreach ($Q_field as $field) {
+                $data_fields[$table->code_table][$field->code_table_field][$field->code_field] = $field;
+            }
+
+            $arr_data_table[$table->code_table] = $table;
+            if ($table->parent_table) {
+                $data_table_child[$table->parent_table][] = $table->code_table;
+            }
+        }
+
+        $Q_table_childs = DatabaseTable::where('parent_table', $code_table)->get();
+
+
+        if ($Q_table_childs) {
+            foreach ($Q_table_childs as $I_table_childs) {
+                $arr_data_table[$I_table_childs->code_table] = $I_table_childs;
+                $Q_field = DatabaseField::where('code_table_field', $I_table_childs->code_table)->get();
+
+                foreach ($Q_field as $field) {
+                    $data_fields[$I_table_childs->code_table][$field->code_table_field][$field->code_field] = $field;
+                }
+            }
+        }
+        $data_return = [];
+
+        $data_return['tables'] = $arr_data_table;
+        $data_return['fields'] = $data_fields;
+
+        
+
+
+
+
+
+
+
+
+
+        return $data_return;
+    }
+
     public static function getFields($code_field = null)
     {
         if ($code_field == null) {
@@ -564,6 +662,7 @@ class DatabaseController extends Controller
         } else {
             $Q_field = DatabaseField::where('code_field', $code_field)->get();
         }
+
 
         $data_field = [];
         foreach ($Q_field as $field) {
@@ -573,11 +672,12 @@ class DatabaseController extends Controller
         return $data_field;
     }
 
-    public static function getDataSource(){
-        
+    public static function getDataSource()
+    {
+
         $Q_data_source = DatabaseDataSource::get();
         $data_data_source = [];
-        foreach($Q_data_source as $data_source){
+        foreach ($Q_data_source as $data_source) {
             $data_data_source[$data_source->code_data_source] = $data_source;
         }
 

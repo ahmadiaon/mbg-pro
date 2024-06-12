@@ -40,30 +40,32 @@ class ResponseFormatter
     return $string;
   }
 
-  public static function monthSort($stringMonth){
-      $months = [
-        "Januari" => 1,
-        "Februari" => 2,
-        "Maret" => 3,
-        "April" => 4,
-        "Mei" => 5,
-        "Juni" => 6,
-        "Juli" => 7,
-        "Agustus" => 8,
-        "September" => 9,
-        "Oktober" =>  10,
-        "November" => 11,
-        "Desember" => 12,        
-      ];
+  public static function monthSort($stringMonth)
+  {
+    $months = [
+      "Januari" => 1,
+      "Februari" => 2,
+      "Maret" => 3,
+      "April" => 4,
+      "Mei" => 5,
+      "Juni" => 6,
+      "Juli" => 7,
+      "Agustus" => 8,
+      "September" => 9,
+      "Oktober" =>  10,
+      "November" => 11,
+      "Desember" => 12,
+    ];
 
-      return $months[$stringMonth];
+    return $months[$stringMonth];
   }
 
-  public static function abjads(){
+  public static function abjads()
+  {
     $abjads = [];
     $char = range('A', 'ZZ');
-    for ($i = 'A'; $i !== 'ZZ'; $i++){
-      $abjads[]=$i;
+    for ($i = 'A'; $i !== 'ZZ'; $i++) {
+      $abjads[] = $i;
     }
     return $abjads;
   }
@@ -117,8 +119,9 @@ class ResponseFormatter
     return $result;
   }
 
-  public static function getTIme($data = null){
-    if($data){
+  public static function getTIme($data = null)
+  {
+    if ($data) {
       $cls_date =  Carbon::parse($data);
       $timeOnly = $cls_date->format('H:i');
       return $timeOnly;
@@ -183,12 +186,13 @@ class ResponseFormatter
     return $data;
   }
 
-  public static function ResponseJson($data, $message, $code){
-    if(empty($data) ){
+  public static function ResponseJson($data, $message, $code)
+  {
+    if (empty($data)) {
       return response()->json(['code' => 204, 'message' => "data not found", 'data' => null], $code);
     }
     return response()->json(['code' => $code, 'message' => $message, 'data' => $data], $code);
-  } 
+  }
 
 
 
@@ -264,29 +268,29 @@ class ResponseFormatter
   }
 
 
-  public static function setAllSession()
+  public static function setAllSessionWeb()
   {
     $data_datatable_database = [];
-    $arr_employees = Employee::data_employee();
+    // $arr_employees = Employee::data_employee();
 
-    foreach($arr_employees->first()->toArray() as $index_first=>$item_arr_employees){
-      $data_datatable_database['database']['data-schema']['employees'][] = $index_first;
-    }
-    $data_datatable_database['database']['data-schema']['employees'][] = 'full_name';
-
-
-    $arr_employees = Employee::data_employee();
-
-    $arr_employees = $arr_employees->keyBy(function ($item) {
-      return strval($item->nik_employee);
-    });
+    // foreach($arr_employees->first()->toArray() as $index_first=>$item_arr_employees){
+    //   $data_datatable_database['database']['data-schema']['employees'][] = $index_first;
+    // }
+    // $data_datatable_database['database']['data-schema']['employees'][] = 'full_name';
 
 
+    // $arr_employees = Employee::data_employee();
+
+    // $arr_employees = $arr_employees->keyBy(function ($item) {
+    //   return strval($item->nik_employee);
+    // });
 
 
 
 
-    
+
+
+
 
 
 
@@ -338,7 +342,7 @@ class ResponseFormatter
       }
     }
 
-    session()->put('data_employees', $arr_employees);
+    // session()->put('data_employees', $arr_employees);
     session()->put('data_companies', $arr_companies);
 
     $arr_position = Position::all();
@@ -362,20 +366,20 @@ class ResponseFormatter
     $atribut_sizes = DB::getSchemaBuilder()->getColumnListing('atribut_sizes');
     $data_sources = DB::getSchemaBuilder()->getColumnListing('data_sources');
 
-    foreach ($arr_employees as $employee) {
-      $employee->full_name = $employee->nik_employee . " | " . $employee->name . " | " . $employee->company_uuid . " | " . $employee->site_uuid;
-      foreach($data_datatable_database['database']['data-schema']['employees'] as $item_schema){
-        $data_datatable_database['database']['data-table']['employees'][$employee->nik_employee][$item_schema] = [
-          'code_data' => $employee->nik_employee,
-          'description' => $employee[$item_schema],
-          'field' => $item_schema,
-          'table_name' => 'employees',
-          'type_data' => 'data',
-          'value_field' => $employee[$item_schema],
-        ];
-      }      
-    }
-    $data_datatable_database['database']['data-schema']['employees'] = [];
+    // foreach ($arr_employees as $employee) {
+    //   $employee->full_name = $employee->nik_employee . " | " . $employee->name . " | " . $employee->company_uuid . " | " . $employee->site_uuid;
+    //   foreach ($data_datatable_database['database']['data-schema']['employees'] as $item_schema) {
+    //     $data_datatable_database['database']['data-table']['employees'][$employee->nik_employee][$item_schema] = [
+    //       'code_data' => $employee->nik_employee,
+    //       'description' => $employee[$item_schema],
+    //       'field' => $item_schema,
+    //       'table_name' => 'employees',
+    //       'type_data' => 'data',
+    //       'value_field' => $employee[$item_schema],
+    //     ];
+    //   }
+    // }
+    // $data_datatable_database['database']['data-schema']['employees'] = [];
 
 
     /*
@@ -390,25 +394,25 @@ class ResponseFormatter
     $data_atribut_size = [];
     $data_table_field = [];
 
-    foreach($arr_status_recruitment as $item_status_recruitment){
-      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size."-".$item_status_recruitment->uuid]['CODE'] = [
-        'code_data' => $item_status_recruitment->size."-".$item_status_recruitment->uuid,
+    foreach ($arr_status_recruitment as $item_status_recruitment) {
+      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size . "-" . $item_status_recruitment->uuid]['CODE'] = [
+        'code_data' => $item_status_recruitment->size . "-" . $item_status_recruitment->uuid,
         'description' => $item_status_recruitment->name_atribut,
         'field' => 'data-atribut-size',
         'table_name' => $item_status_recruitment->size,
         'type_data' => 'data',
         'value_field' => $item_status_recruitment->uuid,
       ];
-      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size."-".$item_status_recruitment->uuid]['DESCRIPTION'] = [
-        'code_data' => $item_status_recruitment->size."-".$item_status_recruitment->uuid,
+      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size . "-" . $item_status_recruitment->uuid]['DESCRIPTION'] = [
+        'code_data' => $item_status_recruitment->size . "-" . $item_status_recruitment->uuid,
         'description' => $item_status_recruitment->name_atribut,
         'field' => 'data-atribut-size',
         'table_name' => $item_status_recruitment->size,
         'type_data' => 'data',
         'value_field' => $item_status_recruitment->name_atribut,
       ];
-      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size."-".$item_status_recruitment->uuid]['VALUE'] = [
-        'code_data' => $item_status_recruitment->size."-".$item_status_recruitment->uuid,
+      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size . "-" . $item_status_recruitment->uuid]['VALUE'] = [
+        'code_data' => $item_status_recruitment->size . "-" . $item_status_recruitment->uuid,
         'description' => $item_status_recruitment->name_atribut,
         'field' => 'data-atribut-size',
         'table_name' => $item_status_recruitment->size,
@@ -423,11 +427,11 @@ class ResponseFormatter
     $data_datatable_database['database']['data-table']['test-one'] = $arr_aktivity->where('field', 'GROUP-FORM');
     $search = [
       'field' => 'GROUP-FORM',
-      'key'=> 'code_data'
+      'key' => 'code_data'
     ];
 
-    foreach($data_datatable_database['database']['data-table']['test-one'] as $data_search){
-      $data_datatable_database['database']['data-search'][$search['field']][$data_search->value_field][] = $data_search->code_data;  
+    foreach ($data_datatable_database['database']['data-table']['test-one'] as $data_search) {
+      $data_datatable_database['database']['data-search'][$search['field']][$data_search->value_field][] = $data_search->code_data;
     }
 
 
@@ -437,10 +441,9 @@ class ResponseFormatter
     }
 
     $arr_data_source = DataSource::all();
-    
+
     foreach ($arr_data_source as $data_source) {
       $data_datatable_database['database']['data-table']['data_sources'][$data_source->table_source][$data_source->source_code] = $data_source;
-      
     }
 
     foreach ($arr_status_recruitment as $item) {
@@ -505,13 +508,13 @@ class ResponseFormatter
 
 
     //grouping data if from table
-    foreach($data_datatable_database['database']['data-table']['tb_activity'] as $table_name=>$table_field){
-      $data_datatable_database['database']['table'][$table_name] =$table_field;
-      foreach($table_field as $index_data_source=>$field){        
-        if($field->value_field == 'from_table'){
-          $data_datatable_database['database']['table'][$table_name.'-'.$index_data_source] = $field;
-          if(!empty($data_datatable_database['database']['data-table']['data_sources'][$table_name.'-'.$index_data_source])){
-              $data_datatable_database['database']['data-table']['table_field'][$table_name.'-'.$data_datatable_database['database']['data-table']['data_sources'][$table_name.'-'.$index_data_source]] = 'xxx';
+    foreach ($data_datatable_database['database']['data-table']['tb_activity'] as $table_name => $table_field) {
+      $data_datatable_database['database']['table'][$table_name] = $table_field;
+      foreach ($table_field as $index_data_source => $field) {
+        if ($field->value_field == 'from_table') {
+          $data_datatable_database['database']['table'][$table_name . '-' . $index_data_source] = $field;
+          if (!empty($data_datatable_database['database']['data-table']['data_sources'][$table_name . '-' . $index_data_source])) {
+            $data_datatable_database['database']['data-table']['table_field'][$table_name . '-' . $data_datatable_database['database']['data-table']['data_sources'][$table_name . '-' . $index_data_source]] = 'xxx';
           }
         }
       }
@@ -525,7 +528,294 @@ class ResponseFormatter
         'user_details' => $user_details,
         'atribut_sizes' => $atribut_sizes,
         'data_sources' => $data_sources,
-        'data_table_field'=>$data_table_field
+        'data_table_field' => $data_table_field
+      ],
+      // 'data_employees' => $arr_employees,
+      // 'count_employee' => $arr_employees->count(),
+      'data_employee_out' => $data_employee_out,
+      'data_employee_talents' => $data_employee_talents,
+      'data_departments' => $arr_departments,
+      'data_coal_froms' => $arr_coal_from,
+      'data_positions' => $arr_position,
+      'data_companies' => $arr_companies,
+      'data_company_obj' => $arr_companies_obj,
+      'data_atribut_sizes' => $data_atribut_size,
+      'data_religions' => $arr_religion,
+      'data_pohs' => $arr_pohs,
+      'data_premis' => $data_premis,
+      'data_dictionaries' => $arr_dictionary,
+      'data_status_absens' => $arr_status_absens,
+      'data_math_status_absens' => $arr_math_status_absens,
+      'data_payment_groups' => $arr_payment_group,
+      'data_datatable_database' => $data_datatable_database
+    ];
+    // dd($data_database);
+    session()->put('data_database', $data_database);
+    return $data_database;
+    // return ResponseFormatter::toJson($data_database, 'data_database');
+  }
+
+  public static function setAllSession()
+  {
+    $data_datatable_database = [];
+    $arr_employees = Employee::data_employee();
+
+    foreach($arr_employees->first()->toArray() as $index_first=>$item_arr_employees){
+      $data_datatable_database['database']['data-schema']['employees'][] = $index_first;
+    }
+    $data_datatable_database['database']['data-schema']['employees'][] = 'full_name';
+
+
+    // $arr_employees = Employee::data_employee();
+
+    $arr_employees = $arr_employees->keyBy(function ($item) {
+      return strval($item->nik_employee);
+    });
+
+
+
+
+
+
+
+
+
+
+    $data_employee_out = EmployeeOut::all();
+    $data_employee_out = $data_employee_out->keyBy(function ($item) {
+      return strval($item->employee_uuid);
+    });
+
+    $arr_religion = Religion::all();
+    $arr_religion = $arr_religion->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $arr_status_absens = StatusAbsen::all();
+    $arr_status_absens = $arr_status_absens->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $arr_math_status_absens = StatusAbsen::groupBy('math')->get('math');
+    $arr_math_status_absens = $arr_math_status_absens->keyBy(function ($item) {
+      return strval($item->math);
+    });
+
+
+    $arr_coal_from = CoalFrom::all();
+    $arr_coal_from = $arr_coal_from->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $arr_dictionary = Dictionary::all();
+    $arr_dictionary = $arr_dictionary->keyBy(function ($item) {
+      return strval($item->database);
+    });
+
+
+
+    $data_arr_company_coal_from = [];
+    foreach ($arr_coal_from as $item_arr_status_absens) {
+      $data_arr_company_coal_from[$item_arr_status_absens->company_uuid][$item_arr_status_absens->uuid] = $item_arr_status_absens;
+    }
+
+    $arr_companies = Company::all();
+    $arr_companies_obj = $arr_companies->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+    foreach ($arr_companies_obj as $item_arr_companies) {
+      if ($item_arr_companies->uuid != "MBLE") {
+        $item_arr_companies->coal_from = $data_arr_company_coal_from[$item_arr_companies->uuid];
+      }
+    }
+
+    // session()->put('data_employees', $arr_employees);
+    session()->put('data_companies', $arr_companies);
+
+    $arr_position = Position::all();
+    $arr_position = $arr_position->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $arr_departments = Department::all();
+    $arr_departments = $arr_departments->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $arr_pohs = Poh::all();
+    $arr_pohs = $arr_pohs->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+
+    $employees = DB::getSchemaBuilder()->getColumnListing('employees');
+    $user_details = DB::getSchemaBuilder()->getColumnListing('user_details');
+    $atribut_sizes = DB::getSchemaBuilder()->getColumnListing('atribut_sizes');
+    $data_sources = DB::getSchemaBuilder()->getColumnListing('data_sources');
+
+    foreach ($arr_employees as $employee) {
+      $employee->full_name = $employee->nik_employee . " | " . $employee->name . " | " . $employee->company_uuid . " | " . $employee->site_uuid;
+      foreach ($data_datatable_database['database']['data-schema']['employees'] as $item_schema) {
+        $data_datatable_database['database']['data-table']['employees'][$employee->nik_employee][$item_schema] = [
+          'code_data' => $employee->nik_employee,
+          'description' => $employee[$item_schema],
+          'field' => $item_schema,
+          'table_name' => 'employees',
+          'type_data' => 'data',
+          'value_field' => $employee[$item_schema],
+        ];
+      }
+    }
+    $data_datatable_database['database']['data-schema']['employees'] = [];
+
+
+    /*
+    uuid = code_data,
+    name_atribut = description
+    size = table_name
+    *field = data,
+    value_atribut = value_data,
+
+    */
+    $arr_status_recruitment = AtributSize::all();
+    $data_atribut_size = [];
+    $data_table_field = [];
+
+    foreach ($arr_status_recruitment as $item_status_recruitment) {
+      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size . "-" . $item_status_recruitment->uuid]['CODE'] = [
+        'code_data' => $item_status_recruitment->size . "-" . $item_status_recruitment->uuid,
+        'description' => $item_status_recruitment->name_atribut,
+        'field' => 'data-atribut-size',
+        'table_name' => $item_status_recruitment->size,
+        'type_data' => 'data',
+        'value_field' => $item_status_recruitment->uuid,
+      ];
+      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size . "-" . $item_status_recruitment->uuid]['DESCRIPTION'] = [
+        'code_data' => $item_status_recruitment->size . "-" . $item_status_recruitment->uuid,
+        'description' => $item_status_recruitment->name_atribut,
+        'field' => 'data-atribut-size',
+        'table_name' => $item_status_recruitment->size,
+        'type_data' => 'data',
+        'value_field' => $item_status_recruitment->name_atribut,
+      ];
+      $data_datatable_database['database']['data-table'][$item_status_recruitment->size][$item_status_recruitment->size . "-" . $item_status_recruitment->uuid]['VALUE'] = [
+        'code_data' => $item_status_recruitment->size . "-" . $item_status_recruitment->uuid,
+        'description' => $item_status_recruitment->name_atribut,
+        'field' => 'data-atribut-size',
+        'table_name' => $item_status_recruitment->size,
+        'type_data' => 'data',
+        'value_field' => $item_status_recruitment->value_atribut,
+      ];
+    }
+
+
+
+    $arr_aktivity = Aktivity::all();
+    $data_datatable_database['database']['data-table']['test-one'] = $arr_aktivity->where('field', 'GROUP-FORM');
+    $search = [
+      'field' => 'GROUP-FORM',
+      'key' => 'code_data'
+    ];
+
+    foreach ($data_datatable_database['database']['data-table']['test-one'] as $data_search) {
+      $data_datatable_database['database']['data-search'][$search['field']][$data_search->value_field][] = $data_search->code_data;
+    }
+
+
+    foreach ($arr_aktivity as $aktivity) {
+      $data_datatable_database['database']['data-table'][$aktivity->table_name][$aktivity->code_data][$aktivity->field] = $aktivity;
+      $data_table_field[$aktivity->type_data][$aktivity->table_name][$aktivity->code_data][] = $aktivity->field;
+    }
+
+    $arr_data_source = DataSource::all();
+
+    foreach ($arr_data_source as $data_source) {
+      $data_datatable_database['database']['data-table']['data_sources'][$data_source->table_source][$data_source->source_code] = $data_source;
+    }
+
+    foreach ($arr_status_recruitment as $item) {
+      $data_atribut_size[$item->size][$item->uuid] = $item;
+      $data_atribut_size['all'][$item->uuid] = $item;
+      // $data_datatable_database['database']['data-table'][$item->size][$item->uuid] = $item;
+    }
+    foreach ($data_atribut_size as $uuid_item_table => $item_table) {
+      // $data_datatable_database['database']['data-schema'][$uuid_item_table] = $atribut_sizes;
+    }
+    $arr_status_recruitment = $arr_status_recruitment->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+    session()->put('data_st', $arr_status_recruitment);
+
+    $data_employee_talents = self::data_employee_talent();
+
+
+
+    $arr_payment_group = PaymentGroup::all();
+    $arr_payment_group = $arr_payment_group->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    $data_premis = Premi::all();
+    $data_premis = $data_premis->keyBy(function ($item) {
+      return strval($item->uuid);
+    });
+
+    // $data_datatable_database['database']['data-table']['employees'] = $arr_employees;
+
+    foreach ($data_datatable_database['database']['data-table'] as $table_name => $table) {
+
+      foreach ($table as $code_item => $item_table) {
+        $arr_item_table = $item_table;
+        if (gettype($item_table) == 'object') {
+          $arr_item_table = $item_table->toArray();
+        }
+        foreach ($arr_item_table as $field_table => $value_table) {
+          $data_datatable_database['database']['data-schema'][$table_name][] = $field_table;
+        }
+        break;
+      }
+    }
+    // foreach ($data_datatable_database['database']['data-table']['tb_activity'] as $table_name => $table_structure) {
+    //   foreach($table_structure as $index_table_fields=>$table_fields){
+    //     $data_datatable_database['database']['data-schema-detail'][$table_name][$index_table_fields] = [
+    //       'field' => $table_fields->field,
+    //       'type_data' => $table_fields->value_field
+    //     ]; 
+    //     if($table_fields->value_field == 'from_table'){
+    //       if(!empty($data_datatable_database['database']['data-table']['data_sources'][$table_name.'-'.$table_fields->field])){
+    //         $table_reference = $data_datatable_database['database']['data-table']['data_sources'][$table_name.'-'.$table_fields->field]['table_name'];
+    //         $data_datatable_database['database']['data-schema-detail'][$table_name][$index_table_fields]['table_reference'] = $table_reference;
+    //         // foreach($data_datatable_database['database']['data-table']['data_sources'][$table_fields->table_name] as $data_table_reference){
+    //         //   $data_datatable_database['database']['data-table-reference'][$table_fields->table_name][$table_reference][] = $data_table_reference;
+    //         // }            
+    //       }          
+    //     }
+    //   }      
+    // }
+
+
+    //grouping data if from table
+    foreach ($data_datatable_database['database']['data-table']['tb_activity'] as $table_name => $table_field) {
+      $data_datatable_database['database']['table'][$table_name] = $table_field;
+      foreach ($table_field as $index_data_source => $field) {
+        if ($field->value_field == 'from_table') {
+          $data_datatable_database['database']['table'][$table_name . '-' . $index_data_source] = $field;
+          if (!empty($data_datatable_database['database']['data-table']['data_sources'][$table_name . '-' . $index_data_source])) {
+            $data_datatable_database['database']['data-table']['table_field'][$table_name . '-' . $data_datatable_database['database']['data-table']['data_sources'][$table_name . '-' . $index_data_source]] = 'xxx';
+          }
+        }
+      }
+    }
+
+
+    $data_datatable_database['database']['data-schema'] = array_merge($data_datatable_database['database']['data-schema'], $data_table_field['table']['table_field']);
+    $data_database = [
+      'table_schema' => [
+        'employees' => $employees,
+        'user_details' => $user_details,
+        'atribut_sizes' => $atribut_sizes,
+        'data_sources' => $data_sources,
+        'data_table_field' => $data_table_field
       ],
       'data_employees' => $arr_employees,
       'count_employee' => $arr_employees->count(),

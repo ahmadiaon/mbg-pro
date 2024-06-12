@@ -172,6 +172,8 @@
                 </div>
             </div>
         </div>
+        <span class="badge badge-pill" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                style="color: rgb(215, 38, 177); background-color: rgb(231, 235, 245);">Diajukan</span>
         <div id="the-table">
             <div class="pb-20" id="tableabsen">
                 <table id="table-absen" class="display nowrap stripe hover table" style="width:100%">

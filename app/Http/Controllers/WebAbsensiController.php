@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 class WebAbsensiController extends Controller
 {
     public function index(){
-        return view('app.pendapatan.absensi.index', [
+        return view('app.pendapatan.absensi.index_list', [
             'title'         => 'Absensi'
         ]);
     }

@@ -89,12 +89,13 @@
 
 
         function refreshTable(ui_year, ui_month, ui_day) {
-            setUIdate(ui_year, ui_month, ui_day)
+            setUImonthYear();
+            setUIdate(ui_year, ui_month, ui_day);
             let _token = $('meta[name="csrf-token"]').attr('content');
 
             $('#slips').empty()
 
-            conLog('abn', ui_dataset.ui_dataset.user_authentication.auth_login)
+            // conLog('abn', ui_dataset.ui_dataset.user_authentication.auth_login)
             $.ajax({
                 url: '/api/mbg/slip/data',
                 type: "POST",
@@ -109,12 +110,12 @@
                 }),
                 success: function(response) {
                     let slips = response.data;
-                    CL(response);
+                    // CL(response);
                     if (Object.keys(slips).length > 0) {
                         $('#no-slips').remove()
                         $('#slips').empty()
                         slips.forEach(element => {
-                            conLog('aa', element);
+                            // conLog('aa', element);
                             $('#slips').append(`
                                 <li class="d-flex align-items-center justify-content-between">
                                 <div class="name-avatar d-flex align-items-center pr-2">
@@ -130,10 +131,10 @@
                                 </div>
                             </li>
                         `);
-                            conLog('bbbb', 'sss')
+                            // conLog('bbbb', 'sss')
                         });
                     } else {
-                        conLog('aaa', 'sss')
+                        // conLog('aaa', 'sss')
                         $('#slips').append(`
                             <div class="txt" id="no-slips">
                                 <div class="font-14 weight-600">Tidak ada slip</div>                    
@@ -146,8 +147,9 @@
         }
 
         function showdoc(path) {
+            startLoading();
             $('#path_doc').attr("src", "{{ env('APP_URL') }}file/slips/" + path);
-            $('#doc').modal('show');
+            
             let width_header = $('#modal-header').width();
             conLog('width_header',width_header);
             const pdfUrl = "/file/slips/" + path;
@@ -201,6 +203,8 @@
                     //     // imageContainer.appendChild(img);
                     });
                     $('#pdf-canvas').width(width_header);
+                    $('#loading-modal').modal('hide');
+                    $('#doc').modal('show');
                     CL($('#modal-header').width());
                 });
             });

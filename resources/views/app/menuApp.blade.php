@@ -403,7 +403,7 @@
             let table_source = $(`#table`).val();
 
             $('#field_get').empty();
-            Object.values(db['db']['database_field'][table_source]).forEach(element => {
+            Object.values(db['db']['database_field_join'][table_source]).forEach(element => {
                 $('#field_get').append(`
                         <option value="${element.code_field}">${element.description_field}</option>
                     `);

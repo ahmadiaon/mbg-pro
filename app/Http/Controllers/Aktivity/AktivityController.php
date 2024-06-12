@@ -84,9 +84,14 @@ class AktivityController extends Controller
         foreach ($data_field as $item_field) {
             $createSheet->setCellValue($abjads[$row_header_table] . $col_header_table, $item_field->description);
             $array_data_field[$item_field->sub_code_data] = $item_field;
+            
             $data_data_source[$data_sources[$item_field->field]['table_name']] = $data_database[$data_sources[$item_field->field]['table_name']];
             $row_header_table++;
+            
+            
         }
+        
+        return ResponseFormatter::toJson($data_field, "success ge data");
 
         //function foreachDataTable
         $col_header_table++;

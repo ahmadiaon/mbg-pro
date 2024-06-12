@@ -141,7 +141,6 @@
                 <a href="#" onclick="btnRefreshDataTable()" id="btn-refresh-datatable"
                     class="btn btn-primary btn-sm " role="button">refresh</a>
             </div>
-
         </div>
         <form action="#" id="FORM-FILTER">
             <div class="row">
@@ -343,7 +342,6 @@
 
 @section('script_javascript')
     <script>
-
         function togleVisibleElement(id_to_hide, btn_togle_hide) {
             CL($(`#${id_to_hide}`).attr('hidden'));
             if ($(`#${id_to_hide}`).attr('hidden') == 'hidden') {
@@ -387,6 +385,7 @@
             var form_data = new FormData(form);
             conLog('form_data', form_data);
             //  return false;
+            startLoading()
             $.ajax({
                 url: '/api/mbg/manage/database/import-datatable',
                 type: "POST",
@@ -398,7 +397,7 @@
                 processData: false,
                 success: function(response) {
                     conLog('responses data import', response);
-
+                    stopLoading();
                 },
                 error: function(response) {
                     conLog('response err', response)
@@ -467,158 +466,7 @@
                 `;
         }
 
-        function cardFormField(id_field, data_field) {
-            let element_field = '';
-            let element_input_field_ = ``;
-            let data_source_this_field = db['db']['database_data_source'][data_field.full_code_field];
-            let element_option_data_source = ``;
-
-
-            switch (data_field.type_data_field) {
-                case 'TEXT':
-                    element_input_field_ =
-                        `<input type="text" class="form-control" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
-                    element_field = `
-                        <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
-                                <label>${data_field.description_field}</label>
-                                ${element_input_field_}
-                            </div>
-                        </div>`;
-                    $(`#${id_field}`).append(element_field)
-                    break;
-                case 'DARI-TABEL':
-                    let NRP = "-";
-                    if (db['db']['database_data'][data_source_this_field.table_data_source]) {
-
-                        /*
-                            1. hanya departemenyna,
-                            2. hanya apa yg di kelolanya,
-                            3. yang punya lisensi saja
-                            ('KARYAWAN','DEPARTEMEN', 'HRGA')
-                            ('KARYAWAN','LISENCE', 'A'),
-                            ('KARYAWAN','PROJECT', 'PT. MB'),
-
-                            penggabungan 
-                                UNIT => Code Jenis Unit (DT,DZ) + No. Lambung (003,004),
-                                Karyawan => NRP | Nama | Jabatan
-
-                            Array ini bisa di gabung,
-
-                            [{
-                                'nama field':value,
-                                ''
-                            },{}]
-                        */
-                        // conLog('data_source_this_field',data_source_this_field)
-                        Object.entries(db['db']['database_data'][data_source_this_field.table_data_source]).forEach(
-                            ([key, data_data_source]) => {
-                                element_option_data_source =
-                                    `${element_option_data_source} <option value="${key}">${data_data_source[data_source_this_field.field_get_data_source]['value_data']}</option>`
-                            });
-                    }
-
-                    element_input_field_ = `
-                                                <select style="width: 100%;" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" class="custom-select2 form-control">
-                                                    <option value="">Pilih Data</option>
-                                                    ${element_option_data_source}
-                                                </select>
-                                            `;
-
-                    element_field = `
-                        <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
-                                <label>${data_field.description_field}</label>
-                                ${element_input_field_}
-                            </div>
-                        </div>`;
-
-                    $(`#${id_field}`).append(element_field)
-                    $(`#${data_field.code_table_field}-${data_field.code_field}`).select2();
-                    break;
-                case KONSTANTA['Input Autocomplite']:
-                    // conLog('data_field', data_field);
-
-                    element_input_field_ =
-
-                        `
-                        <input type="text" name="${data_field.code_field}" id="code-autocomplite-${data_field.code_table_field}-${data_field.code_field}">
-                        <input type="text" name="description-${data_field.code_field}" class="form-control db-text mb-30" onkeyup="changeInput('${data_field.code_table_field}-${data_field.code_field}')" style=" margin-bottom: 60px;"  id="${data_field.code_table_field}-${data_field.code_field}">`;
-                    element_field = `
-                        <div class="col-md-12 col-sm-12">
-                            <div class="form-group mb-20 h-500">
-                                <label>${data_field.description_field}</label>
-                                ${element_input_field_}
-                            </div>
-                        </div>`;
-                    $(`#${id_field}`).append(element_field)
-                    let db_text = [];
-                    if (db['db']['database_data'][data_source_this_field.table_data_source]) {
-                        let field_get = db['db']['database_data_source'][data_field.full_code_field];
-                        conLog('field_get', field_get);
-                        let db_text_ob = Object.values(db['db']['database_data'][data_source_this_field.table_data_source]);
-                        db_text_ob.forEach(element => {
-                            let item_autocomplite = {
-                                code_data: element[field_get.field_get_data_source]['code_data'],
-                                value_data: element[field_get.field_get_data_source]['value_data'],
-                            }
-                            db_text.push(item_autocomplite);
-                        });
-                    }
-                    CL(db_text)
-
-                    autocompleteNew(document.getElementById(`${data_field.code_table_field}-${data_field.code_field}`),
-                        db_text, data_field.code_field);
-                    break;
-                case 'COLOR':
-
-                    element_input_field_ =
-
-                        `<input type="color" onchange="setColor('${data_field.code_table_field}-${data_field.code_field}')" class="form-control-color form-control" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />`;
-                    element_field = `
-                        <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
-                                <label>${data_field.description_field}</label>
-                                <div class="row">
-                                    <div class="col-6">
-                                        ${element_input_field_}
-                                    </div>
-                                    <div class="col-6">
-                                        <input type="text" class="form-control" id="color-${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />
-                                    </div>
-                                </div>                                
-                            </div>
-                        </div>`;
-                    $(`#${id_field}`).append(element_field)
-                    break;
-                case 'DATE':
-                    element_input_field_ =
-                        `<input type="date" class="form-control" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
-                    element_field = `
-                        <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
-                                <label>${data_field.description_field}</label>
-                                ${element_input_field_}
-                            </div>
-                        </div>`;
-                    $(`#${id_field}`).append(element_field)
-                    break;
-                case 'hidden':
-                    element_input_field_ =
-                        `<input type="text"  class="form-control secondary_key" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
-                    element_field = `
-                        <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
-                                <label>${data_field.description_field}</label>
-                                ${element_input_field_}
-                            </div>
-                        </div>`;
-                    $(`#${id_field}`).append(element_field)
-                    break;
-                default:
-                    break;
-            }
-        }
+       
 
         function changeInput(code_element) {
             $(`#code-autocomplite-${code_element}`).val(toUUID($(`#${code_element}`).val()));
@@ -635,45 +483,7 @@
             CL(valTable);
         }
 
-        function getValueDatabase_datatable(code_table) {
-            let database_datatable = [];
-            database_datatable['table'] = db['db']['database_table'][code_table];
-            database_datatable['fields'] = db['db']['database_field'][code_table];
-            database_datatable['show-fields'] = [];
-            database_datatable['all-fields'] = db['db']['database_field'][code_table];
-            database_datatable['table_childs'] = db['db']['data_table_child'][code_table];
-            if (database_datatable['table_childs']) {
-                database_datatable['table_childs'].forEach(code_table_child => {
-                    database_datatable['all-fields'] = $.merge(Object.values(database_datatable['all-fields']),
-                        Object.values(
-                            db['db']['database_field'][code_table_child]));
-                });
-            } else {
-                database_datatable['all-fields'] = Object.values(db['db']['database_field'][code_table]);
-            }
-
-            database_datatable['all-fields-before-clear'] = database_datatable['all-fields'];
-            database_datatable['all-fields'] = [];
-            database_datatable['all-fields-before-clear'].forEach(element => {
-                if (element['type_data_field'] != 'hidden') {
-                    database_datatable['all-fields'].push(element);
-                }
-
-            });
-
-            if (db['db']['table_show_template'][ui_dataset.ui_dataset.user_authentication.employee_uuid][code_table]) {
-                Object.values(db['db']['table_show_template'][ui_dataset.ui_dataset.user_authentication.employee_uuid][
-                    code_table
-                ]).forEach(field_show => {
-                    database_datatable['show-fields'].push(db['db']['database_field'][field_show['code_table']][
-                        field_show['code_field']
-                    ]);
-                });
-            } else {
-                database_datatable['show-fields'] = Object.values(db['db']['database_field'][code_table])
-            }
-            return database_datatable;
-        }
+        conLog('dasdsa', @JSON(session('user_authentication')))
 
         function storeFieldShow() {
             let arr_checkbox_filter = [];
@@ -967,26 +777,28 @@
                 }
             });
             if (db['db']['database_field_show'][code_table]) {
-                Object.entries(db['db']['database_field_show'][code_table]).forEach(([key_field,fields]) => {
+                Object.entries(db['db']['database_field_show'][code_table]).forEach(([key_field, fields]) => {
                     let value_gabungan = '';
-                    conLog('key_field',key_field);
+                    // conLog('key_field', key_field);
                     fields.forEach(items_field => {
-                        
-                        conLog('items_field',items_field);
-                        
-                        conLog('data items_field',$(`#${code_table}-${items_field.field_show_code}`).val());
-                        value_gabungan = value_gabungan+`${items_field.split_by}`+$(`#${code_table}-${items_field.field_show_code}`).val();
+
+                    //     conLog('items_field', items_field);
+
+                    //     conLog('data items_field', $(`#${code_table}-${items_field.field_show_code}`)
+                    // .val());
+                        value_gabungan = value_gabungan + `${items_field.split_by}` + $(
+                            `#${code_table}-${items_field.field_show_code}`).val();
                     });
                     value_gabungan = value_gabungan.slice(1);
                     let new_data_form = {
-                        name:key_field,
-                        value:value_gabungan
+                        name: key_field,
+                        value: value_gabungan
                     }
                     formDataArray.push(new_data_form);
                 });
             }
 
-            conLog('formDataArray', formDataArray);
+            // conLog('formDataArray', formDataArray);
 
             // return false;
             // conLog('data_source_this_field', data_source_this_field);
@@ -1122,7 +934,7 @@
 
         refreshTable();
 
-       
+
 
 
         function refreshTableData(code_table) {
@@ -1176,7 +988,7 @@
 
             // ============ create header table
             header_table_element = `${header_table_element} <th> Action </th>`
-            
+
             header_table_element = `                    
                 <table id="table-datatable-data" class="display nowrap stripe hover table" style="width:100%">
                     <thead>
@@ -1193,11 +1005,10 @@
             row_data_datatable.push(employees_card_element);
             let data_datatable = [];
             if (db['db']['database_data'][code_table]) {
-
                 data_datatable = Object.keys(db['db']['database_data'][code_table]);
             }
 
-            conLog('data_datatable',data_datatable);
+            conLog('data_datatable', data_datatable);
             // GLOBAL_DATA_EXPORT['data'] = data_datatable;
             // CL(GLOBAL_DATA_EXPORT);
             $('#table-datatable-data').DataTable({
@@ -1211,50 +1022,50 @@
         }
 
         function editDataForm(code_data) {
+            resetForm();
             let database_datatable = getValueDatabase_datatable($('#id-code_table').val());
             let primary_field = database_datatable['table']['primary_table'];
-            // conLog('code_data',code_data);
+            conLog('code_data', code_data);
             // conLog('primary_field',primary_field);
 
             let uuid_data = db['db']['database_data'][$('#id-code_table').val()][code_data][primary_field]['uuid_data'];
-
+            let data_for_field_edit = db['public'][$('#id-code_table').val()][code_data];
+            conLog('data_for_field_edit', data_for_field_edit);
             $('#uuid_data').val(uuid_data);
 
             // === create table fields
             Object.values(database_datatable['fields']).forEach(field => {
                 $(`#${field.code_table_field}-${field.code_field}`).val("");
-                if (db['db']['database_data'][field.code_table_field][code_data][field.code_field]) {
-                    $(`#${field.code_table_field}-${field.code_field}`).val(db['db']['database_data'][field
-                        .code_table_field
-                    ][code_data][field.code_field]['value_data']).trigger('change');;
+                if (data_for_field_edit[field.code_field]) {
+                    $(`#${field.code_table_field}-${field.code_field}`).val(data_for_field_edit[field.code_field])
+                        .trigger('change');;
                 }
             });
+            // === create table fields
 
+            // return false;
             if (database_datatable['table_childs']) {
                 database_datatable['table_childs'].forEach(element => {
                     database_datatable['field_childs'] = db['db']['database_field'][element];
                     Object.values(database_datatable['field_childs']).forEach(field => {
                         // conLog('code_data', code_data)
-                        // conLog('fields', field)
-                        if (db['db']['database_data'][field.code_table_field][code_data]) {
-                            if (db['db']['database_data'][field.code_table_field][code_data][field
-                                    .code_field
-                                ]) {
-                                let value_data = db['db'][
-                                    'database_data'
-                                ][field
-                                    .code_table_field
-                                ][code_data][field.code_field]['value_data'];
+                        // conLog('fields child', `${field.code_table_field}-${field.code_field}`)
+                        if (data_for_field_edit[field.code_field]) {
+
+                            if (data_for_field_edit[field.code_field]) {
+                                
+
+                                let value_data = data_for_field_edit[field.code_field];
+                                // conLog('have data child', value_data);
+                                // conLog('element give value', `${field.code_table_field}-${field.code_field}`);
                                 $(`#${field.code_table_field}-${field.code_field}`).val(value_data);
+                                
                                 if (field.type_data_field == KONSTANTA["Input Autocomplite"]) {
                                     $(`#code-autocomplite-${field.full_code_field}`).val(value_data);
-
                                     let data_source = db['db']['database_data_source'][field
                                         .full_code_field
                                     ];
-                                    $(`#${field.full_code_field}`).val(db['db']['database_data'][data_source
-                                        .table_data_source
-                                    ][value_data][data_source.field_get_data_source]['value_data']);
+                                    $(`#${field.full_code_field}`).val(db['public'][data_source.table_data_source][value_data][data_source.field_get_data_source]);
                                 }
                             }
                             $('.custom-select2').trigger('change');
@@ -1264,9 +1075,7 @@
                     });
                 });
                 $('.secondary_btn_store').attr('disabled', false);
-                $('.secondary_key').val(db['db']['database_data'][$('#id-code_table').val()][code_data][primary_field][
-                    'code_data'
-                ]);
+                $('.secondary_key').val(code_data);
             }
         }
     </script>

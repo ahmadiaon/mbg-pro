@@ -7,6 +7,9 @@
     var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
         "November", "Desember"
     ];
+    var months_3_char = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt",
+        "Nov", "Des"
+    ];
     let color_button = {
         alpa: 'danger',
         pay: 'primary',
@@ -130,6 +133,7 @@
     function autocompleteNew(inp, arr) {
         var currentFocus;
         conLog('inp', inp);
+        conLog('arr', arr);
         inp.addEventListener("input", function(e) {
             let id_element = this.id;
             var a, b, i, val = this.value;
@@ -395,7 +399,7 @@
             KONSTANTA['table_code_PROJECT'] = 'PROJECT';
             KONSTANTA['table_code_NAMA'] = 'KARYAWAN';
             let data_employee = db['public'][KONSTANTA['table_code_karyawan']][primary_key_data];
-
+            let bg_status_employee = 'light'
             // conLog('data_employee', primary_key_data)
             let employee_detail = {};
             employee_detail['NRP'] = primary_key_data; //DESCRIPTION
@@ -418,25 +422,26 @@
                 [KONSTANTA['table_code_PROJECT']]
                 [data_employee['PROJECT']]
                 ['NAMA-PROJECT-PENDEK'] : "-";
+            bg_status_employee = (data_employee['TANGGAL-BERAKHIR-KONTRAK--TBK-']) ? 'warning' : 'light';
 
             //  conLog('employee_detail',employee_detail)
             return `
-        <div  class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
-            <div class="avatar mr-2 flex-shrink-0">
-                <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
-                    width="50" height="50" alt="">
-            </div>
-            <div class="txt">
-                <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${employee_detail['PERUSAHAAN']} |
-                    ${employee_detail['PROJECT']}|${employee_detail['DIVISI']}</span>
-                <div class="font-14 weight-600">${data_employee['NAMA-KARYAWAN']}</div>
-                <div class="font-12 weight-500">${primary_key_data}</div>
-                <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
-                    ${employee_detail['JABATAN']}
-                </div>
-            </div>
-        </div>
+                    <div  class="name-avatar bg-${bg_status_employee} d-flex align-items-center pr-2 card-box pl-2">
+                        <div class="avatar mr-2 flex-shrink-0">
+                            <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
+                                width="50" height="50" alt="">
+                        </div>
+                        <div class="txt">
+                            <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">${employee_detail['PERUSAHAAN']} |
+                                ${employee_detail['PROJECT']}|${employee_detail['DIVISI']}</span>
+                            <div class="font-14 weight-600">${data_employee['NAMA-KARYAWAN']}</div>
+                            <div class="font-12 weight-500">${primary_key_data}</div>
+                            <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
+                                ${employee_detail['JABATAN']}
+                            </div>
+                        </div>
+                    </div>
     `;
         } catch (error) {
             return null;
@@ -446,6 +451,18 @@
 
     function showFieldData(type_data, table_data, field_data, primary_key_data, data_properties = null) {
         let value_data_table;
+
+        try {
+            value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db']['database_data'][
+                table_data
+            ][primary_key_data][
+                field_data
+            ][
+                'value_data'
+            ] : null;
+        } catch (error) {
+            value_data_table = null;
+        }
 
         // conLog('data_source', data_source);
         // conLog('primary_key_data', primary_key_data);
@@ -494,11 +511,25 @@
             GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
             return value_data_table;
         }
-        // conLog(field_data, primary_key_data);
+        let full_code_field = table_data + "-" + field_data;
+        let data_field_returned = primary_key_data;
+        // conLog('full_code_field', full_code_field);
         switch (type_data) {
+            case 'NOMINAL-UANG':
+                value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db']['database_data']
+                    [
+                        table_data
+                    ][primary_key_data][
+                        field_data
+                    ][
+                        'value_data'
+                    ] : null;
+
+                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = toValueRupiah(value_data_table);
+                return toValueRupiah(value_data_table);
+                break;
             case 'DARI-TABEL':
-                let full_code_field = table_data + "-" + field_data;
-                let data_field_returned = primary_key_data;
+
 
 
                 if (db['db']['database_data_source'][full_code_field]) {
@@ -514,11 +545,83 @@
                     // conLog('field_get_data_source', field_get_data_source);
                     // conLog('table_data', table_data);
                     // conLog('field_data', field_data);
+                    // conLog('satu', value_data_table)
                     // conLog('satu', db['public'][table_data])
-                    if (!db['public'][table_data]) {
+                    if (!value_data_table) {
                         value_data_table = null;
                     } else {
-                        value_data_table = (db['public'][table_data][primary_key_data]) ? db['public'][table_data][
+
+
+                        // value_data_table = (db['public'][table_data][primary_key_data]) ? db['public'][table_data][
+                        //     primary_key_data
+                        // ][
+                        //     field_data
+                        // ] : null;
+
+
+                        // conLog('KE DARI TABLE value_data_table', value_data_table);
+                        // value_data_table = (db['db']['database_data'][table_data][primary_key_data][field_data][
+                        //     'value_data'
+                        // ]) ? toUUID(db['db']['database_data'][table_data][primary_key_data][field_data][
+                        //     'value_data'
+                        // ]) : null;
+                        if (value_data_table) {
+
+                            // conLog('DATATABLE', value_data_table);
+                            // conLog('base data', toUUID(value_data_table)); //[][field_get_data_source]['value_data']
+                            // try {
+                            if (code_table_data_source == 'KARYAWAN') {
+
+                                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
+                                    'public_value'
+                                ]['KARYAWAN'][value_data_table]['NRP'];
+                                // conLog('MASUK', GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]);
+                                return emmp(toUUID(value_data_table));
+                                break;
+                            }
+                            // conLog('primary_key_data', primary_key_data);
+                            // conLog('value_data_table_first', value_data_table);
+
+                            value_data_table = data_field_returned = db['public'][code_table_data_source][
+                                toUUID(value_data_table)
+                            ][
+                                field_get_data_source
+                            ];
+
+                            // conLog('value_data_table_second', value_data_table);
+                            // } catch (error) {
+                            //     value_data_table = null;
+                            // }
+                        }
+                    }
+                    GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+                }
+                return data_field_returned;
+                break;
+            case 'INPUT-AUTOCOMPLITE':
+
+
+
+                if (db['db']['database_data_source'][full_code_field]) {
+                    let data_source = db['db']['database_data_source'][full_code_field];
+                    let code_table_data_source = data_source['table_data_source'];
+                    let field_get_data_source = data_source['field_get_data_source'];
+
+
+                    //table, to get primary,
+                    // conLog('primary_key_data', primary_key_data);
+
+                    // conLog('code_table_data_source', code_table_data_source);
+                    // conLog('field_get_data_source', field_get_data_source);
+                    // conLog('table_data', table_data);
+                    // conLog('field_data', field_data);
+                    // conLog('satu', db['public'][code_table_data_source])
+                    if (!db['public'][code_table_data_source]) {
+                        value_data_table = null;
+                    } else {
+                        value_data_table = (db['public'][code_table_data_source][primary_key_data]) ? db['public'][
+                            code_table_data_source
+                        ][
                             primary_key_data
                         ][
                             field_data
@@ -530,24 +633,29 @@
                             'value_data'
                         ]) : null;
                         if (value_data_table) {
-                            
+
                             // conLog('DATATABLE', value_data_table);
                             // conLog('base data', toUUID(value_data_table)); //[][field_get_data_source]['value_data']
                             // try {
-                                if (code_table_data_source == 'KARYAWAN') {
-                                    
-                                    GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
-                                        'public_value'
-                                    ]['KARYAWAN'][value_data_table]['NRP'];
-                                    // conLog('MASUK', GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]);
-                                    return emmp(toUUID(value_data_table));
-                                    break;
-                                }
-                                value_data_table = data_field_returned = db['public'][code_table_data_source][
-                                    toUUID(value_data_table)
-                                ][
-                                    field_get_data_source
-                                ];
+                            if (code_table_data_source == 'KARYAWAN') {
+
+                                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
+                                    'public_value'
+                                ]['KARYAWAN'][value_data_table]['NRP'];
+                                // conLog('MASUK', GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]);
+                                return emmp(toUUID(value_data_table));
+                                break;
+                            }
+                            // conLog('primary_key_data', primary_key_data);
+                            // conLog('value_data_table_first', value_data_table);
+
+                            value_data_table = data_field_returned = db['public'][code_table_data_source][
+                                toUUID(value_data_table)
+                            ][
+                                field_get_data_source
+                            ];
+
+                            // conLog('value_data_table_second', value_data_table);
                             // } catch (error) {
                             //     value_data_table = null;
                             // }
@@ -557,6 +665,7 @@
                 }
                 return data_field_returned;
                 break;
+
             case 'COLOR':
                 let datas = primary_key_data ? primary_key_data : '-';
                 let color = primary_key_data ? primary_key_data : '#ffffff';
@@ -690,6 +799,19 @@
                             </div>
                         `;
                 break;
+
+            case 'GABUNGAN':
+                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
+                return primary_key_data;
+                break;
+            case 'DATE':
+                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+                if (value_data_table) {
+
+                    return toShortStringDate_fromFormatDate(value_data_table);
+                }
+                return value_data_table;
+                break;
             default:
                 let xxx = null;
                 try {
@@ -709,6 +831,294 @@
 
     }
 
+    function cardFormField(id_field, data_field, is_disabled = '') {
+        let element_field = '';
+        let element_input_field_ = ``;
+        let data_source_this_field = db['db']['database_data_source'][data_field.full_code_field];
+        let element_option_data_source = ``;
+
+
+        switch (data_field.type_data_field) {
+            case 'TEXT':
+                element_input_field_ =
+                    `<input type="text" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+
+            case 'FILE-PDF':
+                element_input_field_ =
+                    `<input type="file"  ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+                break;
+            case 'DATETIME':
+                element_input_field_ =
+                    `<input type="text" ${is_disabled} class="form-control  datetimepicker ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field} datetime</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+                break;
+            case 'NOMINAL-UANG':
+                element_input_field_ =
+                    `<input type="text" onfocus="toRupiah(this)" onkeyup="toRupiah(this)" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field} UANF</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+                break;
+            case 'DARI-TABEL':
+                let NRP = "-";
+                if (db['db']['database_data'][data_source_this_field.table_data_source]) {
+
+                    /*
+                        1. hanya departemenyna,
+                        2. hanya apa yg di kelolanya,
+                        3. yang punya lisensi saja
+                        ('KARYAWAN','DEPARTEMEN', 'HRGA')
+                        ('KARYAWAN','LISENCE', 'A'),
+                        ('KARYAWAN','PROJECT', 'PT. MB'),
+
+                        penggabungan 
+                            UNIT => Code Jenis Unit (DT,DZ) + No. Lambung (003,004),
+                            Karyawan => NRP | Nama | Jabatan
+
+                        Array ini bisa di gabung,
+
+                        [{
+                            'nama field':value,
+                            ''
+                        },{}]
+                    */
+                    // conLog('data_source_this_field',data_source_this_field)
+                    Object.entries(db['db']['database_data'][data_source_this_field.table_data_source]).forEach(
+                        ([key, data_data_source]) => {
+                            element_option_data_source =
+                                `${element_option_data_source} <option value="${key}">${data_data_source[data_source_this_field.field_get_data_source]['value_data']}</option>`
+                        });
+                }
+
+                element_input_field_ = `
+                                                <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" class="${data_field.code_field} custom-select2 form-control">
+                                                    <option value="">Pilih Data</option>
+                                                    ${element_option_data_source}
+                                                </select>
+                                            `;
+
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+
+                $(`#${id_field}`).append(element_field)
+                $(`#${data_field.code_table_field}-${data_field.code_field}`).select2();
+                break;
+            case KONSTANTA['Input Autocomplite']:
+                // conLog('data_field', data_field);
+                if (is_disabled == 'disabled') {
+                    element_input_field_ =
+                        `<input type="text" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                    $(`#${id_field}`).append(element_field)
+                    break;
+                }
+
+                element_input_field_ =
+
+                    `
+                        <input type="text" ${is_disabled} name="${data_field.code_field}" id="code-autocomplite-${data_field.code_table_field}-${data_field.code_field}">
+                        <input type="text" ${is_disabled} name="description-${data_field.code_field}" class="${data_field.code_field} form-control db-text mb-30" onkeyup="changeInput('${data_field.code_table_field}-${data_field.code_field}')" style=" margin-bottom: 60px;"  id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group mb-20 h-500">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                let db_text = [];
+                if (db['db']['database_data'][data_source_this_field.table_data_source]) {
+                    let field_get = db['db']['database_data_source'][data_field.full_code_field];
+                    conLog('field_get', field_get);
+                    let db_text_ob = Object.values(db['db']['database_data'][data_source_this_field.table_data_source]);
+                    db_text_ob.forEach(element => {
+                        conLog('element', element)
+                        let item_autocomplite = {
+                            code_data: toUUID(element[field_get.field_get_data_source]['value_data']),
+                            value_data: element[field_get.field_get_data_source]['value_data'],
+                        }
+                        db_text.push(item_autocomplite);
+                    });
+                }
+                CL(db_text)
+                conLog('data_field.code_field', data_field.code_field)
+
+                autocompleteNew(document.getElementById(`${data_field.code_table_field}-${data_field.code_field}`),
+                    db_text, data_field.code_field);
+                break;
+            case 'COLOR':
+
+                element_input_field_ =
+
+                    `<input ${is_disabled} type="color" onchange="setColor('${data_field.code_table_field}-${data_field.code_field}')" class="form-control-color form-control" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        ${element_input_field_}
+                                    </div>
+                                    <div class="col-6">
+                                        <input ${is_disabled} type="text" class="form-control " id="color-${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+            case 'DATE':
+                element_input_field_ =
+                    `<input type="date" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+            case 'hidden':
+                element_input_field_ =
+                    `<input type="text" ${is_disabled}  class="form-control secondary_key" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+            default:
+                break;
+        }
+    }
+
+    function toNumber(numberOf) {
+        return numberOf.replace(/[^0-9]/g, '');
+    }
+
+
+    function toRupiah(arg) {
+
+        let idElement = arg.getAttribute('id');
+        let nameElement = arg.getAttribute('name');
+        let arr_idElement = idElement.split('rupiah-');
+        if ($('#rupiah-' + idElement).length == 0) {
+            $(`#${idElement}`).attr("name", `rupiah-${nameElement}`);
+            $(`#${idElement}`).after(
+                `
+        <input type="text" name="${nameElement}"
+                    id="rupiah-${idElement}" class="form-control">
+        `
+            );
+        }
+        let valueElement = $(`#${idElement}`).val();
+        var charFrontElement = valueElement.substr(0, 4);
+        var valueNumberElement = valueElement.split('Rp. ')[1];
+        if (charFrontElement != 'Rp. ') {
+            $(`#${idElement}`).val('Rp. ');
+        } else {
+            $(`#${idElement}`).val('Rp. ' + toNumber(valueNumberElement).toString().replace(/\B(?=(\d{3})+(?!\d))/g,
+                '.'));
+            $(`#rupiah-${idElement}`).val(toNumber(valueNumberElement));
+        }
+        cg('valueElement', $('#rupiah-' + idElement).length);
+    }
+
+    function toValueRupiah(numberValue) {
+        let float_number = parseFloat(numberValue);
+        let _numberValue = parseFloat(float_number.toFixed(0));
+        let rupiahFormat = _numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        rupiahFormat = 'Rp. ' + rupiahFormat;
+        return rupiahFormat;
+    }
+
+
+    function getValueDatabase_datatable(code_table) {
+        let database_datatable = [];
+        database_datatable['table'] = db['db']['database_table'][code_table];
+        database_datatable['fields'] = db['db']['database_field'][code_table];
+        database_datatable['show-fields'] = [];
+        database_datatable['all-fields'] = db['db']['database_field'][code_table];
+        database_datatable['table_childs'] = db['db']['data_table_child'][code_table];
+        if (database_datatable['table_childs']) {
+            database_datatable['table_childs'].forEach(code_table_child => {
+                database_datatable['all-fields'] = $.merge(Object.values(database_datatable['all-fields']),
+                    Object.values(
+                        db['db']['database_field'][code_table_child]));
+            });
+        } else {
+            database_datatable['all-fields'] = Object.values(db['db']['database_field'][code_table]);
+        }
+
+        database_datatable['all-fields-before-clear'] = database_datatable['all-fields'];
+        database_datatable['all-fields'] = [];
+        database_datatable['all-fields-before-clear'].forEach(element => {
+            if (element['type_data_field'] != 'hidden') {
+                database_datatable['all-fields'].push(element);
+            }
+
+        });
+        try {
+            Object.values(db['db']['table_show_template'][ui_dataset.ui_dataset.user_authentication.employee_uuid][
+                code_table
+            ]).forEach(field_show => {
+                database_datatable['show-fields'].push(db['db']['database_field'][field_show['code_table']][
+                    field_show['code_field']
+                ]);
+            });
+        } catch (error) {
+            database_datatable['show-fields'] = Object.values(db['db']['database_field'][code_table])
+        }
+        return database_datatable;
+    }
+
     // =============================================================================================================== END DATABASE DATATABLE==
 
     function getDateToday() {
@@ -720,6 +1130,23 @@
 
         let today = year + '-' + month + '-' + day;
         return today;
+    }
+
+    function toShortStringDate_fromFormatDate(formatDate) {
+        let split_date = formatDate.split('-');
+
+        return `${padToDigits(2, split_date[2])} ${months_3_char[parseInt(split_date[1])]} ${split_date[0]}`;
+    }
+
+    function parseDate_fromFormatDate(dateString) {
+        // Split the date string into its components
+        let parts = dateString.split('-');
+        let year = parseInt(parts[0], 10);
+        let month = parseInt(parts[1], 10) - 1; // Months are zero-indexed in JavaScript
+        let day = parseInt(parts[2], 10);
+
+        // Create and return the Date object
+        return new Date(year, month, day);
     }
 
     function addDays(date, days) {
@@ -835,6 +1262,19 @@
         // Ganti semua simbol dengan tanda dash ("-")
         const resultString = the_text.replace(regex, "-");
         return resultString.toUpperCase();
+    }
+
+    function UUIDtoStr(str) {
+        return str
+            .split('-') // Memisahkan string berdasarkan "-"
+            .map((word, index) => {
+                // Jika bukan kata pertama, ubah huruf pertama menjadi besar
+                if (index === 0) {
+                    return word.toLowerCase(); // Kata pertama tetap huruf kecil
+                }
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(' '); // Menggabungkan kembali menjadi satu string dengan spasi
     }
 
     function setUIdate(param_ui_year = ui_dataset.ui_dataset.ui_date.year, param_ui_month = ui_dataset.ui_dataset
@@ -1137,6 +1577,9 @@
 
     // conLog('db', db);
     if (!db) {
+        // if ((ui_dataset.ui_dataset.user_authentication.feature).length > 0) {
         refreshSession();
+        // }
+
     }
 </script>

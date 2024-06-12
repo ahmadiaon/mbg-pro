@@ -547,7 +547,7 @@ class EmployeeAbsenController extends Controller
                                 'date_end' => $item_data_absen['date'],
                                 'long_day' =>  1,
                                 'status_absen_uuid' => $item_data_absen['status_absen_uuid'],
-                                'description' => ''
+                                'absen_description' => ''
                             ];
                             $data_unabsen[$item_data->nik_employee][$xx] = $data_for_table;
                             if (!empty($data_unabsen[$item_data->nik_employee][$xx_prev])) {
@@ -578,7 +578,7 @@ class EmployeeAbsenController extends Controller
                 $createSheet->setCellValue('I' . $row_Excel, $item_absen['long_day']);
                 $createSheet->setCellValue('J' . $row_Excel, $item_absen['date_end']);
                 $createSheet->setCellValue('K' . $row_Excel, $item_absen['status_absen_uuid']);
-                $createSheet->setCellValue('L' . $row_Excel, $item_absen['description']);
+                $createSheet->setCellValue('L' . $row_Excel, $item_absen['absen_description']);
                 $row_Excel++;
             }
         }
@@ -2222,7 +2222,7 @@ class EmployeeAbsenController extends Controller
                         'date_start' => ResponseFormatter::excelToDate($sheet->getCell('H' .  $no_employee)->getValue()),
                         'date_end' => ResponseFormatter::excelToDate($value),
                         'status_absen_uuid' => ResponseFormatter::toUUID($sheet->getCell('K' .  $no_employee)->getValue()),
-                        'description' => $sheet->getCell('L' .  $no_employee)->getValue(),
+                        'absen_description' => $sheet->getCell('L' .  $no_employee)->getValue(),
                     ];
 
                     $startDate = new \DateTime($data_one_row['date_start']);
@@ -2272,7 +2272,7 @@ class EmployeeAbsenController extends Controller
                 $end_date = date_add($end_date, date_interval_create_from_date_string("1 days"));
                 // ==== END GET DATE DATA ====
 
-                // ==== VALIDATION DATE PRPCESING =====
+                // ==== VALIDATION DATE PREPROCESING =====
                 $all_datas['have_employees']['configuration'] = [
                     'long_date' => $date_end,
                     'first_date'    => $start_date->format('Y-m-d'),
@@ -2287,7 +2287,7 @@ class EmployeeAbsenController extends Controller
                     return ResponseFormatter::toJson($data_return, 'data return to setup');
                 }
 
-                // ==== END VALIDATION DATE PRPCESING =====
+                // ==== END VALIDATION DATE PREPROCESING =====
                 $start_date = date_create($validatedData['date_absen_start']);
                 $end_date = date_create($validatedData['date_absen_end']);
 
@@ -2302,6 +2302,8 @@ class EmployeeAbsenController extends Controller
                 foreach ($data_employees_machine_id as $item) {
                     $employees_machine_ids[$item['ID-FINGGER']['value_field']] = $item['ID-KARYAWAN']['value_field'];
                 }
+
+                // return ResponseFormatter::toJson($employees_machine_ids,'dasdas');
 
 
                 $data_employee_absen_have_employees = EmployeeAbsen::join('employees', 'employees.machine_id', 'employee_absens.employee_uuid')
@@ -2536,6 +2538,7 @@ class EmployeeAbsenController extends Controller
             'javascript_form'       => true,
             'active'                        => 'list-employees-absensi'
         ];
+        ResponseFormatter::setAllSession();
         return view('employee.absensi.afterImport', [
             'title'         => 'After Import',
             'layout'    => $layout

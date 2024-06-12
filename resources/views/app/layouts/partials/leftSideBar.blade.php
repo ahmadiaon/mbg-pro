@@ -27,13 +27,19 @@
                 @if (!empty(session('user_authentication')['feature']))
                     <li class="dropdown">
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
-                            <span class="micon bi bi-grid-1x2-fill"></span><span class="mtext">Pengelolaan</span>
+                            <span class="micon bi bi-calendar-range"></span><span class="mtext">Kehadiran</span>
                         </a>
-                        @if (in_array('ABSENSI', session('user_authentication')['feature']))
+                        
                             <ul class="submenu">
+                                @if (in_array('ABSENSI', session('user_authentication')['feature']))
                                 <li><a id="absensi" class="" href="/web/pengelolaan/absensi">Absensi</a></li>
+                                @endif
+                                @if (in_array('CUTI', session('user_authentication')['feature']))
+                                <li><a id="roaster-kerja" class="" href="/web/pengelolaan/roaster-kerja">Roaster Kerja</a></li>
+
+                                @endif
+
                             </ul>
-                        @endif
                     </li>
 
                     <li class="dropdown">

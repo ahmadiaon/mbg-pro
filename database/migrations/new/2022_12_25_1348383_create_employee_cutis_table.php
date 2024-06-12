@@ -25,10 +25,11 @@ class CreateEmployeeCutisTable extends Migration
             $table->date('date_real_end_cuti')->nullable();//1
             $table->string('long_cuti')->nullable();//1
             $table->string('value_money_cuti')->nullable();//1
-
+            $table->string('roaster_code')->nullable();//1 // day            
+            $table->string('nrp_job_pendding')->nullable();//1 // day     
+            $table->string('doc_job_pendding')->nullable();//1 // day
             $table->date('date_come_cuti')->nullable();
             $table->string('monitoring_cuti')->nullable();      //Sedang Cuti, Selesai, Harus Cuti, Harus Balik
-            
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->date('date_proposal')->nullable();

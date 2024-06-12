@@ -714,6 +714,7 @@
                 },
                 success: function(response) {
                     cg('response ExportForm', response);
+                    return false;
                     var dlink = document.createElement("a");
                     dlink.href = `/${response.data}`;
                     dlink.setAttribute("download", "");

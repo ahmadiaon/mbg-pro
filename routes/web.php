@@ -993,7 +993,7 @@ Route::middleware(['webIsLogin'])->group(function () {
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
             Route::get('/privilege', [UserPrivilegeController::class, 'index']);
             
-    // Route::get('/user-privilege', [UserPrivilegeController::class, 'index']);
+                // Route::get('/user-privilege', [UserPrivilegeController::class, 'index']);
 
             Route::get('/database', [DatabaseController::class, 'indexData']);
 
@@ -1011,7 +1011,8 @@ Route::middleware(['webIsLogin'])->group(function () {
             });
         });
         Route::prefix('/pengelolaan')->group(function () {
-            Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
+            Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);            
+            Route::get('/roaster-kerja', [EmployeeCutiController::class, 'webIndex']);
 
         });
         Route::prefix('/recruitment')->group(function () {
