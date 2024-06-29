@@ -6,7 +6,7 @@
         <div id="accordion">
             <div class="card">
                 <div class="card-header">
-                    <button class="btn btn-block" data-toggle="collapse" data-target="#filter-manage-absensi">
+                    <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#filter-manage-absensi">
                         Filter data absesnsi
                     </button>
                 </div>
@@ -115,7 +115,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#data-table-manage-absensi">
+                    <button class="btn btn-block" data-toggle="collapse" data-target="#data-table-manage-absensi">
                         Monitoring Data Roaster Kerja Karyawan
                     </button>
                 </div>
@@ -184,9 +184,8 @@
                                             Menu <span class="caret"></span>
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" id="btn-absen" href="#"
-                                                onclick="openModalAbsen()">Ketidakhadiran</a>
-                                            <a class="dropdown-item" onclick="exportAbsen()" id="btn-export"
+                                            <a class="dropdown-item" id="btn-export-data-cuti" href="#">Ekspor</a>
+                                            {{-- <a class="dropdown-item" onclick="exportAbsen()" id="btn-export"
                                                 href="#">Export +
                                                 Data</a>
                                             <a class="dropdown-item" onclick="openModalExportDialy()"
@@ -195,14 +194,14 @@
                                             <a class="dropdown-item" onclick="reportOpenModalReportStatusAbsen()"
                                                 id="btn-export-dialy" href="#">Lap. Tidak Hadir</a>
                                             <a class="dropdown-item" onclick="reportExportInOut()" id="btn-export-in-out"
-                                                href="#">Lap. Tidak Hadir In Out</a>
+                                                href="#">Lap. Tidak Hadir In Out</a> --}}
                                             {{-- <a class="dropdown-item" id="btn-export-dialy" href="/user/absensi/dialy-report">Dialy
                                                 Report</a> --}}
-                                            <a class="dropdown-item" id="btn-export-template"
+                                            {{-- <a class="dropdown-item" id="btn-export-template"
                                                 href="/user/absensi/export-template/">Export
                                                 Template</a>
                                             <a class="dropdown-item" id="btn-import" data-toggle="modal"
-                                                data-target="#import-modal" href="">Import</a>
+                                                data-target="#import-modal" href="">Import</a> --}}
                                         </div>
                                     </div>
 
@@ -210,7 +209,7 @@
                             </div>
                         </div>
                         <div class="mb-20" id="datatable-data">
-                            <table class="data-table table hover multiple-select-row nowrap">
+                            <table id="datatable-roaster-kerja" class="data-table table hover nowrap">
                                 <thead>
                                     <tr>
                                         <th class="table-plus datatable-nosort">Karawan</th>
@@ -220,7 +219,7 @@
                                     <tr>
                                         <td class="table-plus row">
                                             <div
-                                                class="mb-2 ml-2 mr-2 col-md-4 name-avatar bg-warning d-flex align-items-center pr-2 card-box pl-2">
+                                                class="mb-2 ml-2 mr-2 col-md-3 name-avatar d-flex align-items-center pr-2 card-box pl-2">
                                                 <div class="avatar mr-2 flex-shrink-0">
                                                     <img src="/vendors/images/photo5.jpg"
                                                         class="border-radius-100 box-shadow" width="50"
@@ -231,109 +230,143 @@
                                                         data-color="#265ed7"
                                                         style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">PT.
                                                         MBLE |
-                                                        Tambang PT. MB|-</span>
-                                                    <div class="font-14 weight-600">ABD. KADIR SUKHAIMI</div>
-                                                    <div class="font-12 weight-500">MBLE-0422085</div>
+                                                        MBG|HRGA</span>
+                                                    <div class="font-14 weight-600">AHMADI</div>
+                                                    <div class="font-12 weight-500">MBLE-0422003</div>
                                                     <div class="font-12 weight-500" data-color="#b2b1b6"
                                                         style="color: rgb(178, 177, 182);">
-                                                        -
+                                                        ETL Developer
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="mb-2 mr-2 col-md-2 tanggal-tanggal pr-2 card-box pl-2">
-                                                <div class="row">
-                                                    <div class="col-md-12">
+                                            <div class="col-md-8">
+                                                <div class="row pl-2">
+                                                    <div
+                                                        class="mb-2 mr-2 col-md-4 col-sm-12 name-avatar d-flex tanggal-tanggal pr-2 card-box">
                                                         <div class="row">
-                                                            <div class="col-md-9">
-                                                                <span class="badge badge-pill badge-sm"
-                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Bekerja</span>
-                                                                <div class="font-14 weight-600">20 Mar 2024 - 22 Jun 2024
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-9">
+                                                                        <span class="badge badge-pill badge-sm"
+                                                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Bekerja</span>
+                                                                        <span class="badge badge-pill badge-sm"
+                                                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">10:2</span>
+                                                                        <div class="font-14 weight-600">20 Mar 2024 - 22
+                                                                            Jun
+                                                                            2024
+                                                                            <a href="#edit-awal-bekerja"
+                                                                                onclick="showModalConfigureDateStartWork('MBLE-0422003')">
+                                                                                <i
+                                                                                    class="icon-copy bi bi-pencil-square"></i>
+                                                                            </a>
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2 mt-3">
+                                                                        <div class="badge badge-primary badge-pill">14
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-9">
+                                                                        <span class="badge badge-pill badge-sm"
+                                                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Mulai
+                                                                            Cuti</span>
+                                                                        <div class="font-14 weight-600">20 Mar 2024 - 04
+                                                                            Jun
+                                                                            2024
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2 mt-3">
+                                                                        <div class="badge badge-primary badge-pill">14
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-md-2 mt-3">
-                                                                <div class="badge badge-primary badge-pill">14</div>
-                                                            </div>
-                                                            <div class="col-md-9">
-                                                                <span class="badge badge-pill badge-sm"
-                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Mulai
-                                                                    Cuti</span>
-                                                                <div class="font-14 weight-600">20 Mar 2024 - 04 Jun 2024
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-2 mt-3">
-                                                                <div class="badge badge-primary badge-pill">14</div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-2 mr-2 col-md-1 countdown text-center">
-                                                <h3 class="text-center">56</h3>
-                                                <h6>hari</h6>
-                                                <span>menuju <br> <b>On Site</b></span>
-                                            </div>
-                                            <div class="mb-2 mr-2 col-md-1 dokumen card-box justify-content-between">
-                                                <h5 class="text-center">Dokumen</h5>
+                                                    <div class="mb-2 mr-2 col-md-2 col-sm-12 countdown text-center">
+                                                        <h3 class="text-center">56</h3>
+                                                        <h6>hari</h6>
+                                                        <span>menuju <br> <b>On Site</b></span>
+                                                    </div>
+                                                    <div
+                                                        class="mb-2 mr-2 col-md-2 col-sm-12 dokumen card-box justify-content-center text-center">
+                                                        <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5"
+                                                            data-color="#265ed7"
+                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">DOKUMEN</span>
+                                                        <br>
+                                                        <span class="badge badge-sm badge-info"
+                                                            class="badge badge-sm badge-success"> <i
+                                                                class="icon-copy bi bi-check-square"></i> Surat Tugas
+                                                        </span>
+                                                        <i class="icon-copy bi bi-file-earmark-text"></i>
+                                                        <br>
 
-                                                <span class="badge badge-sm badge-info" 
-                                                    class="badge badge-sm badge-success"> <i
-                                                        class="icon-copy bi bi-check-square"></i> Surat Tugas </span>
-                                                <span class="badge badge-sm badge-info"><i
-                                                        class="icon-copy bi bi-file-earmark-text"></i></span>
-                                                <br>
+                                                        <span class="badge  badge-sm badge-info"><i
+                                                                class="icon-copy bi bi-square"></i> Surat Jalan </span>
+                                                        <i class="icon-copy bi bi-file-earmark-text"></i>
+                                                        <br>
+                                                        <span class="badge  badge-sm badge-info"><i
+                                                                class="icon-copy bi bi-square"></i> Job Pending</span>
+                                                        <i class="icon-copy bi bi-file-earmark-text"></i>
+                                                        <br>
+                                                    </div>
 
-                                                <span class="badge  badge-sm badge-info"><i
-                                                        class="icon-copy bi bi-square"></i> Surat Jalan </span>
-                                                <span class="badge badge-sm badge-info"><i
-                                                        class="icon-copy bi bi-file-earmark-text"></i></span>
-                                                <br>
-                                                <span class="badge  badge-sm badge-info"><i
-                                                        class="icon-copy bi bi-square"></i> Job Pending</span>
-                                                <span class="badge badge-sm badge-info"><i
-                                                        class="icon-copy bi bi-file-earmark-text"></i></span>
-                                                <br>
-                                            </div>
+                                                    <div class="col-md-2 col-sm-12 mr-2 mb-2 proses card-box">
+                                                        <div class="text-center">
+                                                            <span class="badge badge-pill badge-sm text-center"
+                                                                data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                style="color: rgb(215, 197, 38); background-color: rgb(231, 235, 245);">On
+                                                                Site</span>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 col-sm-6">
+                                                                <span class="badge badge-sm" data-bgcolor="#e7ebf5"
+                                                                    data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">
+                                                                    <i class="icon-copy bi bi-square"></i> Diajukan
+                                                                </span>
+                                                                <i class="icon-copy bi bi-arrow-up-right-square"></i>
 
-                                            <div class="col-md-2 proses card-box">
-                                                <h5 class="text-center">On Site</h5>
-                                                <div class="row">
-                                                    <div class="col-md-6 col-sm-6">
+
+
+
+
+                                                            </div>
+                                                            {{-- <div class="col-md-6 col-sm-6">
+                                                                <a href="#">
+                                                                    <span onclick="createEmployeeCuti('MBLE-0422003')"
+                                                                        class="badge badge-sm badge-primary">
+                                                                        Proses
+                                                                    </span>
+                                                                    <i class="icon-copy bi bi-arrow-up-right-square"></i>
+                                                                </a>
+        
+                                                            </div> --}}
+                                                        </div>
+                                                        <a href="#">
+                                                            <span class="badge badge-sm badge-success">
+                                                                <i class="icon-copy bi bi-check-square"></i>
+                                                                ACC Atasan</span>
+                                                        </a>
+                                                        <i class="icon-copy bi bi-arrow-up-right-square"></i>
+                                                        <br>
+
                                                         <span class="badge badge-sm" data-bgcolor="#e7ebf5"
                                                             data-color="#265ed7"
-                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">
-                                                            <i class="icon-copy bi bi-square"></i> Diajukan
-                                                        </span>
-
-
-
-
-
+                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);"><i
+                                                                class="icon-copy bi bi-square"></i> ACC HR</span>
+                                                        <i class="icon-copy bi bi-arrow-up-right-square"></i>
                                                     </div>
-                                                    <div class="col-md-6 col-sm-6">
-                                                        <a href="#">
-                                                            <span onclick="createEmployeeCuti('MBLE-0422003')"
-                                                                class="badge badge-sm badge-primary">
-                                                                Proses <i
-                                                                    class="icon-copy bi bi-arrow-up-right-square"></i>
-                                                            </span>
-                                                        </a>
-
+                                                    <div class="col-md-1 col-sm-12 mb-2 proses card-box">
+                                                        more +
                                                     </div>
                                                 </div>
-                                                <a href="#">
-                                                    <span 
-                                                        class="badge badge-sm badge-success">
-                                                        <i class="icon-copy bi bi-check-square"></i>
-                                                        ACC Atasan</span>
-                                                </a>
-                                                <br>
-
-                                                <span class="badge badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);"><i
-                                                        class="icon-copy bi bi-square"></i> ACC HR</span>
                                             </div>
+
+
 
                                         </td>
                                     </tr>
@@ -469,6 +502,7 @@
             </form>
         </div>
     </div>
+
     {{-- after import --}}
     <div class="modal fade bd-example-modal-xl" id="after-import" tabindex="-1" role="dialog"
         aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
@@ -521,8 +555,6 @@
 
 
 
-
-
     {{-- cuti --}}
     <div class="modal fade" id="create-modal-employee-cuti" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
@@ -549,12 +581,12 @@
                                     <label for="">Awal Kerja</label>
                                 </div>
                                 <div class="col-md-4">
-                                    <input class="form-control" id="TANGGAL-AWAL-KERJA-PERIODIK" placeholder="Select Date"
-                                        type="text" />
+                                    <input class="form-control" id="TANGGAL-AWAL-KERJA-PERIODIK"
+                                        placeholder="Select Date" type="text" />
                                 </div>
                                 <div class="col-md-4">
-                                    <input class="form-control" id="LAMA-BEKERJA-TANGGAL-AWAL-KERJA-PERIODIK" value="70 Hari kerja" placeholder="Select Date"
-                                        type="text" />
+                                    <input class="form-control" id="LAMA-BEKERJA-TANGGAL-AWAL-KERJA-PERIODIK"
+                                        value="70 Hari kerja" placeholder="Select Date" type="text" />
                                 </div>
                             </div>
                         </div>
@@ -729,9 +761,91 @@
             </div>
         </div>
     </div>
+
+
+    {{-- configure date start work --}}
+    <div class="modal fade" id="create-modal-date-start-work" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Konfigurasi Ulang Awal bekerja
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <form id="form-employee-cuti" action="/employee-cuti/store" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="uuid" id="uuid-cuti">
+                    <div class="modal-body">
+
+                        {{-- jadwal cuti --}}
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="">Awal Kerja</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input onkeyup="changeLong()" type="date" class="form-control"
+                                        name="date_real_start_cuti" id="date_real_start_cuti">
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button onclick="storeCuti('employee-cuti')" type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection()
 
 @section('script_javascript')
+    <script>
+        $(document).ready(function() {
+            // Menggunakan .on('click', ...)
+            $('#btn-export-data-cuti').on('click', function() {
+                startLoading();
+                let _token = $('meta[name="csrf-token"]').attr('content');
+                $.ajax({
+                    url: '/web/pengelolaan/roaster-kerja/export',
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        data_karyawan: filter_absensi['KARYAWAN'],
+                    },
+                    success: function(response) {
+                        cg('response', response);
+                        stopLoading();
+                        // return false;
+                        var dlink = document.createElement("a");
+                        dlink.href = `/file/absensi/${response.data}`;
+                        dlink.setAttribute("download", "");
+                        dlink.click();
+                        stopLoading();
+                    },
+                    error: function(response) {
+                        cg('err export', response)
+                        alertModal()
+                    }
+                });
+
+                // Tambahkan kode lain yang Anda inginkan di sini
+            });
+        });
+    </script>
     <script>
         let detail_absensi;
         let value_checkbox = {
@@ -775,8 +889,6 @@
             //     'tipe_data_field': "DETAIL_ABSENSI"
             // },
         ];
-        conLog('ui_dataset', ui_dataset);
-        conLog('filter_absensi', filter_absensi);
 
         let year;
         let month;
@@ -814,10 +926,43 @@
             let split_date_range = date_range.split(" - ");
             filter_absensi.date_start = formatDate(parseDateString(split_date_range[0], 'mm/dd/yyyy'));
             filter_absensi.date_end = formatDate(parseDateString(split_date_range[1], 'mm/dd/yyyy'));
+            // let array_karyawan = db['db']['arr_employees'][]
+            let arr_filtered_karyawan = [];
+            let row_data_datatable = [];
+            let arr_part = [];
+
+            filter_absensi['DIVISI'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DIVISI'][element]);
+                conLog(element, db['db']['arr_employees']['DIVISI'][element]);
+            });
+
+            arr_filtered_karyawan = arr_part;
+
+            arr_part = [];
+            filter_absensi['DEPARTEMEN'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DEPARTEMEN'][element]);
+            });
+
+            arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+            arr_part = [];
+            filter_absensi['PROJECT'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PROJECT'][element]);
+            });
+            arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+            arr_part = [];
+            filter_absensi['PERUSAHAAN'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PERUSAHAAN'][element]);
+            });
+            arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+            filter_absens['KARYAWAN'] = arr_filtered_karyawan;
+
+
+            conLog('arr_filtered_karyawan', arr_filtered_karyawan);
             setLocalStorage('filter_absen', filter_absensi);
+
             conLog('filter_absensi', filter_absensi);
-            conLog('default_filter_absensi', default_filter_absensi);
-            getWithNewData();
+            // conLog('default_filter_absensi', default_filter_absensi);
+            // getWithNewData();
             // if (parseDateString(split_date_range[0], 'mm/dd/yyyy') < start || parseDateString(split_date_range[1],
             //         'mm/dd/yyyy') > end) {
             //     conLog('lewat', 'lewat')
@@ -826,6 +971,176 @@
             //     conLog('belum lewat', 'belum lewat')
             //     refreshTableData();
             // }
+
+
+            $('#datatable-data').empty();
+            let data_datatable = arr_filtered_karyawan;
+            conLog('data_datatable', data_datatable)
+            let header_table_element = '';
+
+
+            // ============ create header table
+            header_table_element = `                    
+                <table id="datatable-roaster-kerja" class="display nowrap stripe hover table" style="width:100%">
+                    <thead>
+                        <tr style="width:100%">
+                            <th style="width:100%" class="datatable-nosort">Karawan</th>
+                        </tr>
+                    </thead>
+                </table>
+            `;
+            $('#datatable-data').append(header_table_element);
+            // ============ create header table
+
+
+            var element_card = {
+                mRender: function(data, type, row) {
+                    return `           <div class="row">
+                                            <div class="col-md-4">
+                                                ${emmp(row)}
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="row pl-2">
+                                                    <div
+                                                        class="mb-2 mr-2 col-md-4 col-sm-12 name-avatar d-flex tanggal-tanggal pr-2 card-box">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-9">
+                                                                        <span class="badge badge-pill badge-sm"
+                                                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Bekerja</span>
+                                                                        <span class="badge badge-pill badge-sm"
+                                                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">10:2</span>
+                                                                        <div class="font-14 weight-600">20 Mar 2024 - 22
+                                                                            Jun
+                                                                            2024
+                                                                            <a href="#edit-awal-bekerja"
+                                                                                onclick="showModalConfigureDateStartWork('MBLE-0422003')">
+                                                                                <i
+                                                                                    class="icon-copy bi bi-pencil-square"></i>
+                                                                            </a>
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2 mt-3">
+                                                                        <div class="badge badge-primary badge-pill">14
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-9">
+                                                                        <span class="badge badge-pill badge-sm"
+                                                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Mulai
+                                                                            Cuti</span>
+                                                                        <div class="font-14 weight-600">20 Mar 2024 - 04
+                                                                            Jun
+                                                                            2024
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2 mt-3">
+                                                                        <div class="badge badge-primary badge-pill">14
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-2 mr-2 col-md-2 col-sm-12 countdown text-center">
+                                                        <h3 class="text-center">56</h3>
+                                                        <h6>hari</h6>
+                                                        <span>menuju <br> <b>On Site</b></span>
+                                                    </div>
+                                                    <div
+                                                        class="mb-2 mr-2 col-md-2 col-sm-12 dokumen card-box justify-content-center text-center">
+                                                        <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5"
+                                                            data-color="#265ed7"
+                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">DOKUMEN</span>
+                                                        <br>
+                                                        <span class="badge badge-sm badge-info"
+                                                            class="badge badge-sm badge-success"> <i
+                                                                class="icon-copy bi bi-check-square"></i> Surat Tugas
+                                                        </span>
+                                                        <i class="icon-copy bi bi-file-earmark-text"></i>
+                                                        <br>
+
+                                                        <span class="badge  badge-sm badge-info"><i
+                                                                class="icon-copy bi bi-square"></i> Surat Jalan </span>
+                                                        <i class="icon-copy bi bi-file-earmark-text"></i>
+                                                        <br>
+                                                        <span class="badge  badge-sm badge-info"><i
+                                                                class="icon-copy bi bi-square"></i> Job Pending</span>
+                                                        <i class="icon-copy bi bi-file-earmark-text"></i>
+                                                        <br>
+                                                    </div>
+
+                                                    <div class="col-md-2 col-sm-12 mr-2 mb-2 proses card-box">
+                                                        <div class="text-center">
+                                                            <span class="badge badge-pill badge-sm text-center"
+                                                                data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                style="color: rgb(215, 197, 38); background-color: rgb(231, 235, 245);">On
+                                                                Site</span>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 col-sm-6">
+                                                                <span class="badge badge-sm" data-bgcolor="#e7ebf5"
+                                                                    data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">
+                                                                    <i class="icon-copy bi bi-square"></i> Diajukan
+                                                                </span>
+                                                                <i class="icon-copy bi bi-arrow-up-right-square"></i>
+
+
+
+
+
+                                                            </div>
+                                                            {{-- <div class="col-md-6 col-sm-6">
+                                                                <a href="#">
+                                                                    <span onclick="createEmployeeCuti('MBLE-0422003')"
+                                                                        class="badge badge-sm badge-primary">
+                                                                        Proses
+                                                                    </span>
+                                                                    <i class="icon-copy bi bi-arrow-up-right-square"></i>
+                                                                </a>
+        
+                                                            </div> --}}
+                                                        </div>
+                                                        <a href="#">
+                                                            <span class="badge badge-sm badge-success">
+                                                                <i class="icon-copy bi bi-check-square"></i>
+                                                                ACC Atasan</span>
+                                                        </a>
+                                                        <i class="icon-copy bi bi-arrow-up-right-square"></i>
+                                                        <br>
+
+                                                        <span class="badge badge-sm" data-bgcolor="#e7ebf5"
+                                                            data-color="#265ed7"
+                                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);"><i
+                                                                class="icon-copy bi bi-square"></i> ACC HR</span>
+                                                        <i class="icon-copy bi bi-arrow-up-right-square"></i>
+                                                    </div>
+                                                    <div class="col-md-1 col-sm-12 mb-2 proses card-box">
+                                                        more +
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                    
+                    `;
+                }
+            };
+            row_data_datatable.push(element_card);
+
+            $('#datatable-roaster-kerja').DataTable({
+                scrollX: true,
+                scrollY: "600px",
+                paging: false,
+                serverSide: false,
+                data: data_datatable,
+                columns: row_data_datatable
+            });
         }
 
         function getWithNewData() {
@@ -855,6 +1170,9 @@
                 }
             });
         }
+
+
+        
 
 
 
@@ -943,7 +1261,7 @@
                                     <th> ${table_field[table_detail['primary_table']]['description_field']}</th>
                                     `;
             headerTableFilter = `                    
-                    <table id="table-datatable-filter" class="checkbox-datatable nowrap stripe hover table" style="width:100%">
+                    <table id="table-datatable-filter" class="checkbox-datatable nowrap table" style="width:100%">
                         <thead>
                             <tr>
                                 ${headerTableFilter}
@@ -981,6 +1299,10 @@
                 }
             };
             row_data_datatable.push(element_card);
+
+
+
+            let data_datatable = [];
             // return false;
             $('#table-datatable-filter').DataTable({
                 paging: false,
@@ -1116,7 +1438,6 @@
 
 
             // ====== D A T A    F O R    D A T A T A B L E ===
-
             let filter = [{
                     field: "PERUSAHAAN",
                     array_filter: filter_absensi.PERUSAHAAN,
@@ -1138,7 +1459,9 @@
             let data_datatable = [];
             if (employee_filtereds) {
                 data_datatable = employee_filtereds;
+                
             }
+            filter_absens['karyawan'] = data_datatable;
 
             $('#table-datatable-data').DataTable({
                 scrollX: true,
@@ -1234,7 +1557,7 @@
             $('.cek_log-show').val(`${detail_absensi[employee_uuid]['detail_absen'][date_absen]['cek_log']}`);
             $('#modal-show-fingger').modal('show');
         }
-        
+
         function storeUpdateAbsenDay(status_absen_code) {
             let employee_uuid = $('#employee_uuid-show').val();
             $.ajax({
@@ -1425,19 +1748,26 @@
 
         function createEmployeeCuti(NRP) {
             $('#form-employee-cuti')[0].reset();
-            let code_data_roaster_cuti = db['public']['KARYAWAN'][NRP]['ROSTER-CUTI']; 
+            let code_data_roaster_cuti = db['public']['KARYAWAN'][NRP]['ROSTER-CUTI'];
             let data_cuti = {
-                'TANGGAL-AWAL-KERJA-PERIODIK' : db['public']['KEHADIRAN-ROASTER-CUTI'][NRP]['TANGGAL-AWAL-KERJA-PERIODIK'],
-                'DATABASE-ROSTER-CUTI-JUMLAH-HARI-KERJA' : db['public']['DATABASE-ROSTER-CUTI'][code_data_roaster_cuti]['JUMLAH-HARI-KERJA']
+                'TANGGAL-AWAL-KERJA-PERIODIK': db['public']['KEHADIRAN-ROASTER-CUTI'][NRP][
+                    'TANGGAL-AWAL-KERJA-PERIODIK'
+                ],
+                'DATABASE-ROSTER-CUTI-JUMLAH-HARI-KERJA': db['public']['DATABASE-ROSTER-CUTI'][code_data_roaster_cuti][
+                    'JUMLAH-HARI-KERJA'
+                ]
             }
 
             // conLog(data_cuti['TANGGAL-AWAL-KERJA-PERIODIK'],  parseDate_fromFormatDate(data_cuti['TANGGAL-AWAL-KERJA-PERIODIK']));
-            
+
 
             $('#create-modal-employee-cuti').modal('show');
-            $('#TANGGAL-AWAL-KERJA-PERIODIK').val(toShortStringDate_fromFormatDate(data_cuti['TANGGAL-AWAL-KERJA-PERIODIK']));
-            $('#LAMA-BEKERJA-TANGGAL-AWAL-KERJA-PERIODIK').val(`${Math.floor(countBetweenDate(parseDate_fromFormatDate(data_cuti['TANGGAL-AWAL-KERJA-PERIODIK']), Date()))} hari kerja`);
-            
+            $('#TANGGAL-AWAL-KERJA-PERIODIK').val(toShortStringDate_fromFormatDate(data_cuti[
+                'TANGGAL-AWAL-KERJA-PERIODIK']));
+            $('#LAMA-BEKERJA-TANGGAL-AWAL-KERJA-PERIODIK').val(
+                `${Math.floor(countBetweenDate(parseDate_fromFormatDate(data_cuti['TANGGAL-AWAL-KERJA-PERIODIK']), Date()))} hari kerja`
+            );
+
         }
 
         function changeLong() {
@@ -1472,6 +1802,10 @@
             } else {
                 $('.form-kompensasi_cuti').show();
             }
+        }
+
+        function showModalConfigureDateStartWork(NRP) {
+            $(`#create-modal-date-start-work`).modal('show');
         }
     </script>
 @endsection

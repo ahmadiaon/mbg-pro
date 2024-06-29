@@ -86,6 +86,25 @@
         localStorage.setItem('ui_dataset', JSON.stringify(ui_dataset));
     }
 
+    var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
+    var end = new Date(arr_date_today.year, arr_date_today.month, 0);
+    var date_today = new Date();
+    if (date_today < end) {
+        end = date_today;
+    }
+
+    let default_filter_absensi = {
+        date_start: formatDate(start),
+        date_end: formatDate(end),
+        PERUSAHAAN: ui_dataset.ui_dataset.user_authentication.PERUSAHAAN,
+        PROJECT: ui_dataset.ui_dataset.user_authentication.PROJECT,
+        DEPARTEMEN: ui_dataset.ui_dataset.user_authentication.DEPARTEMEN,
+        DIVISI: ui_dataset.ui_dataset.user_authentication.DIVISI,
+        KARYAWAN: [],
+    }
+    let filter_absensi = {}
+
+
     function CL(data_string) {
         console.log(Object.keys({
             data_string
@@ -444,7 +463,7 @@
                     </div>
     `;
         } catch (error) {
-            return null;
+            return primary_key_data;
         }
 
     }
@@ -453,22 +472,25 @@
         let value_data_table;
 
         try {
-            value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db']['database_data'][
+            value_data_table = db['db']['database_data'][
                 table_data
             ][primary_key_data][
                 field_data
             ][
                 'value_data'
-            ] : null;
+            ];
         } catch (error) {
             value_data_table = null;
+
+            return value_data_table;
         }
 
-        // conLog('data_source', data_source);
-        // conLog('primary_key_data', primary_key_data);
+
+        // conLog('value_data_table', value_data_table);
+        conLog('primary_key_data', primary_key_data);
         // // conLog('code_table_data_source', code_table_data_source);
         // // conLog('field_get_data_source', field_get_data_source);
-        // conLog('table_data', table_data);
+        conLog('table_data', table_data);
         // conLog('field_data', field_data);
         // conLog('satu', db['public'][table_data])
 
@@ -582,11 +604,16 @@
                             // conLog('primary_key_data', primary_key_data);
                             // conLog('value_data_table_first', value_data_table);
 
-                            value_data_table = data_field_returned = db['public'][code_table_data_source][
-                                toUUID(value_data_table)
-                            ][
-                                field_get_data_source
-                            ];
+                            try {
+                                value_data_table = data_field_returned = db['public'][code_table_data_source][
+                                    toUUID(value_data_table)
+                                ][
+                                    field_get_data_source
+                                ];
+                            } catch (error) {
+                                value_data_table = null;
+                            }
+
 
                             // conLog('value_data_table_second', value_data_table);
                             // } catch (error) {
@@ -807,7 +834,6 @@
             case 'DATE':
                 GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
                 if (value_data_table) {
-
                     return toShortStringDate_fromFormatDate(value_data_table);
                 }
                 return value_data_table;
@@ -1119,6 +1145,33 @@
         return database_datatable;
     }
 
+    function filter_data_karyawan() {
+
+    }
+
+    function mergeArrays(array1 =[], array2 = []) {
+
+        if(array1.length < 0){
+            return array2
+            
+        }
+        if(array2.length < 0){
+            return array1
+            
+        }
+        
+        return [...new Set([...array1, ...array2])];
+    }
+
+    function innerJoinArrays(array1, array2) {
+        if(array1.length >= 1 && array2.length >= 1 ){
+
+            return array1.filter(value => array2.includes(value));
+            
+        }
+        return [];
+    }
+
     // =============================================================================================================== END DATABASE DATATABLE==
 
     function getDateToday() {
@@ -1132,8 +1185,87 @@
         return today;
     }
 
-    function toShortStringDate_fromFormatDate(formatDate) {
-        let split_date = formatDate.split('-');
+    function dateDiff(startDate, endDate) {
+        // Convert the startDate and endDate to Date objects if they are not already
+        startDate = new Date(startDate);
+        endDate = new Date(endDate);
+
+        // Initialize the years, months, and days difference
+        let yearsDiff = endDate.getFullYear() - startDate.getFullYear();
+        let monthsDiff = endDate.getMonth() - startDate.getMonth();
+        let daysDiff = endDate.getDate() - startDate.getDate();
+
+        // Adjust the months difference if necessary
+        if (monthsDiff < 0) {
+            yearsDiff--;
+            monthsDiff += 12;
+        }
+
+        // Adjust the days difference if necessary
+        if (daysDiff < 0) {
+            monthsDiff--;
+            let previousMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
+            daysDiff += previousMonth.getDate();
+        }
+
+        return {
+            years: yearsDiff,
+            months: monthsDiff,
+            days: daysDiff
+        };
+    }
+
+    function calculateMonthsBetweenDates(date1, date2) {
+        // Convert the dates to Date objects if they are not already
+        const startDate = new Date(date1);
+        const endDate = new Date(date2);
+
+        // Get the year and month for both dates
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth();
+        const endYear = endDate.getFullYear();
+        const endMonth = endDate.getMonth();
+
+        // Calculate the total months difference
+        let months = (endYear - startYear) * 12 + (endMonth - startMonth);
+
+        // Adjust if the end date is before the start date in the same month
+        if (endDate.getDate() < startDate.getDate()) {
+            months--;
+        }
+
+        return months;
+    }
+
+    function excelSerialToDate(serial) {
+        // Excel serial date starts from 1 January 1900
+        // JavaScript date starts from 1 January 1970
+        if (serial.includes('-')) {
+            return serial;
+        } else {
+            const baseDate = new Date(1899, 11, 30); // December 30, 1899
+            const newDate = new Date(baseDate.getTime() + serial * 86400000); // 86400000 ms in a day
+
+            // Extract year, month, and day from newDate
+            const year = newDate.getFullYear();
+            const month = String(newDate.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+            const day = String(newDate.getDate()).padStart(2, '0');
+
+            // Return in yyyy-mm-dd format
+            return `${year}-${month}-${day}`;
+        }
+
+
+
+    }
+
+    function toShortStringDate_fromFormatDate(formatDates) {
+        if (formatDates.includes('-')) {
+            // console.log("String contains '-'");
+        } else {
+            formatDates = excelSerialToDate(formatDates);
+        }
+        let split_date = formatDates.split('-');
 
         return `${padToDigits(2, split_date[2])} ${months_3_char[parseInt(split_date[1])]} ${split_date[0]}`;
     }
@@ -1515,9 +1647,15 @@
 
                 localStorage.setItem('DATABASE', JSON.stringify(response.data));
                 db = response.data;
-                CL('db');
-                CL(db);
-                conLog('ui_dataset', ui_dataset)
+                conLog('db', db);
+                conLog('ui_dataset', ui_dataset);
+                default_filter_absensi['PERUSAHAAN'] = innerJoinArrays(Object.keys(db['public']['PERUSAHAAN']), default_filter_absensi.PERUSAHAAN);
+                default_filter_absensi['PROJECT'] = innerJoinArrays(Object.keys(db['public']['PROJECT']), default_filter_absensi.PROJECT);
+                default_filter_absensi['DEPARTEMEN'] = innerJoinArrays(Object.keys(db['public']['DEPARTEMEN']), default_filter_absensi.DEPARTEMEN);
+                default_filter_absensi['DIVISI'] = innerJoinArrays(Object.keys(db['public']['DIVISI']), default_filter_absensi.DIVISI);
+                
+                // iner joining perusahaan dll untuk biar hanya ada di db saja
+                conLog('filter_absensi',filter_absensi)
                 // location.reload();
                 // showModalSuccess();
             },
@@ -1550,36 +1688,16 @@
         return months[parseInt(month)]
     }
 
-    var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
-    var end = new Date(arr_date_today.year, arr_date_today.month, 0);
-    var date_today = new Date();
-    if (date_today < end) {
-        end = date_today;
-    }
 
-    let default_filter_absensi = {
-        date_start: formatDate(start),
-        date_end: formatDate(end),
-        PERUSAHAAN: ui_dataset.ui_dataset.user_authentication.PERUSAHAAN,
-        PROJECT: ui_dataset.ui_dataset.user_authentication.PROJECT,
-        DEPARTEMEN: ui_dataset.ui_dataset.user_authentication.DEPARTEMEN,
-        DIVISI: ui_dataset.ui_dataset.user_authentication.DIVISI,
-        KARYAWAN: [],
+    if (!db) {
+        refreshSession();
+        
+                
     }
-    // setLocalStorage('filter_absen', default_filter_absensi);
-    let filter_absensi = {}
     if (getLocalStorage('filter_absen')) {
         filter_absensi = JSON.parse(getLocalStorage('filter_absen'));
     } else {
         setLocalStorage('filter_absen', default_filter_absensi);
         filter_absensi = default_filter_absensi;
-    }
-
-    // conLog('db', db);
-    if (!db) {
-        // if ((ui_dataset.ui_dataset.user_authentication.feature).length > 0) {
-        refreshSession();
-        // }
-
     }
 </script>

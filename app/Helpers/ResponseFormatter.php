@@ -40,6 +40,25 @@ class ResponseFormatter
     return $string;
   }
 
+  public static function convertToDate($value)
+  {
+      // Check if the value is a string and in the format yyyy-mm-dd
+      if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+          return $value; // It's already in yyyy-mm-dd format
+      }
+  
+      // If the value is a number, convert it to yyyy-mm-dd
+      if (is_numeric($value)) {
+          // Convert the number to a Carbon instance, assuming the number is an Excel serial date
+          // Adjust the base date if needed; this example assumes it's an Excel date.
+          $date = Carbon::createFromFormat('Y-m-d', '1899-12-30')->addDays($value);
+          return $date->format('Y-m-d');
+      }
+  
+      // If the value is not valid, return null or throw an exception
+      return null;
+  }
+
   public static function monthSort($stringMonth)
   {
     $months = [

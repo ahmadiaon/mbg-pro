@@ -67,7 +67,7 @@
 @endsection()
 
 @section('script_javascript')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="/vendors/scripts/pdf.min.js"></script>
 
     <script>
         function downloadSlip(url_slip, month_year) {

@@ -27,6 +27,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\Else_;
 
 class UserController extends Controller
 {
@@ -415,20 +416,48 @@ class UserController extends Controller
                 }
             }
         }
-
-        // $arr_employee
-        // foreach($data_data['KARYAWAN'] as $item_karyawan){
-
-        // }
+        // return $data_public['KARYAWAN'];
+        $arr_employee = [];
+        if($user->level_user > 1){
+            foreach($data_public['KARYAWAN'] as $item_karyawan){
+                if(!empty($item_karyawan['PERUSAHAAN'])){
+                    $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $item_karyawan['NRP'];
+                }else{
+                    $arr_employee['PERUSAHAAN']['-'][] = $item_karyawan['NRP'];
+                }
+                // project
+                if(!empty($item_karyawan['PROJECT'])){
+                    $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $item_karyawan['NRP'];
+                }else{
+                    $arr_employee['PROJECT']['-'][] = $item_karyawan['NRP'];
+                }
+    
+                // DEPARTEMEN
+                if(!empty($item_karyawan['DEPARTEMEN'])){
+                    $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $item_karyawan['NRP'];
+                }else{
+                    $arr_employee['DEPARTEMEN']['-'][] = $item_karyawan['NRP'];
+                }
+    
+                // DIVISI
+                if(!empty($item_karyawan['DIVISI'])){
+                    $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $item_karyawan['NRP'];
+                }else{
+                    $arr_employee['DIVISI']['-'][] = $item_karyawan['NRP'];
+                }
+            }
+        }
+        
 
         // return  $data_public['public_value'];
+
 
         $database['db']['database_field'] = $data_field;
         $database['db']['database_field_join'] = $data_field_join;
         $database['db']['database_field_show'] = $dataDatabaseFieldShow;
         $database['db']['database_data'] = $data_data;
         // $database['db']['database_data_history'] = $data_data_history;
-        // $database['db']['arr_employees'] = $arr_data_employee;
+        $database['db']['arr_employees'] = $arr_employee;
         $database['db']['database_table'] = $data_table;
         $database['db']['database_data_source'] = $data_data_source;
         $database['db']['data_table_child'] = $data_table_child;

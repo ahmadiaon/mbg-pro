@@ -31,6 +31,8 @@ class WebUserController extends Controller
             ->whereNull('date_end')
             ->first();
 
+
+
         $storeEmployee->user_details = ['name' => $Q_user_details->value_data];
 
         $Q_user_feture = DatabaseData::where('code_table_data', 'KARYAWAN-ACCESS-FEATURE')
@@ -55,6 +57,16 @@ class WebUserController extends Controller
             }
         }
 
+        $Q_user_details = DatabaseData::where('code_table_data', 'KARYAWAN')
+            ->where('code_data', ResponseFormatter::toUUID($NRP))
+            ->where('code_field_data', 'PERUSAHAAN')
+            ->whereNull('date_end')
+            ->first();
+
+        if ($Q_user_details) {
+            $arr_data_perusahaan[] = $Q_user_details->value_data;
+        }
+
         $Q_user_department = DatabaseData::where('code_table_data', 'KARYAWAN-AKSES-DEPARTMENT')
             ->where('code_data', 'like', ResponseFormatter::toUUID($NRP) . '%')
             ->where('code_field_data', 'AKSES-DEPARTMENT')
@@ -66,6 +78,16 @@ class WebUserController extends Controller
             if (!in_array($data_user_department->value_data, $arr_data_department)) {
                 $arr_data_department[] =  $data_user_department->value_data;
             }
+        }
+
+        $Q_user_details = DatabaseData::where('code_table_data', 'KARYAWAN')
+            ->where('code_data', ResponseFormatter::toUUID($NRP))
+            ->where('code_field_data', 'DEPARTEMEN')
+            ->whereNull('date_end')
+            ->first();
+
+        if ($Q_user_details) {
+            $arr_data_department[] = $Q_user_details->value_data;
         }
 
         $Q_user_project = DatabaseData::where('code_table_data', 'KARYAWAN-AKSES-PROJECT')
@@ -81,10 +103,22 @@ class WebUserController extends Controller
             }
         }
 
+
+
         $arr_data_project = [];
         $arr_data_projects = array_unique($arr_data_projects);
         foreach ($arr_data_projects as $data_user_project) {
             $arr_data_project[] = $data_user_project;
+        }
+
+        $Q_user_details = DatabaseData::where('code_table_data', 'KARYAWAN')
+            ->where('code_data', ResponseFormatter::toUUID($NRP))
+            ->where('code_field_data', 'PROJECT')
+            ->whereNull('date_end')
+            ->first();
+
+        if ($Q_user_details) {
+            $arr_data_project[] = $Q_user_details->value_data;
         }
 
         $Q_user_divisi = DatabaseData::where('code_table_data', 'KARYAWAN-AKSES-DIVISI')
@@ -99,6 +133,17 @@ class WebUserController extends Controller
                 $arr_data_divisi[] =  $data_user_divisi->value_data;
             }
         }
+
+        $Q_user_details = DatabaseData::where('code_table_data', 'KARYAWAN')
+            ->where('code_data', ResponseFormatter::toUUID($NRP))
+            ->where('code_field_data', 'DIVISI')
+            ->whereNull('date_end')
+            ->first();
+
+        if ($Q_user_details) {
+            $arr_data_divisi[] = $Q_user_details->value_data;
+        }
+
 
         $storeEmployee->user_privileges = [$storeEmployee->role => true];
         $storeEmployee->feature = array_unique($arr_data_feature);

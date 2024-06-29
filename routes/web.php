@@ -978,6 +978,12 @@ Route::middleware(['webIsLogin'])->group(function () {
             return view('app.menu');
         });
 
+
+        Route::prefix('/hr')->group(function () {
+            Route::get('/karyawan', [DatabaseController::class, 'indexHR']);
+        });
+
+
         Route::prefix('/pendapatan')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'index']);
             Route::get('/slip', [WebAbsensiController::class, 'slip']);
@@ -1012,7 +1018,8 @@ Route::middleware(['webIsLogin'])->group(function () {
         });
         Route::prefix('/pengelolaan')->group(function () {
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);            
-            Route::get('/roaster-kerja', [EmployeeCutiController::class, 'webIndex']);
+            Route::get('/roaster-kerja', [EmployeeCutiController::class, 'webIndex']);       
+            Route::post('/roaster-kerja/export', [EmployeeCutiController::class, 'webExport']);
 
         });
         Route::prefix('/recruitment')->group(function () {

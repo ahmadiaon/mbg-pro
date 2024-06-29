@@ -87,12 +87,12 @@
                                     style="color: rgb(255, 255, 255); background-color: rgb(59, 89, 152);">
                                     <i class="icon-copy ion-folder"></i> File Karyawan
                                 </button>
-                                @if (session('dataUser')->edit_file_user)
+                                {{-- @if (session('dataUser')->edit_file_user) --}}
                                     <button type="button" class="btn btn-success" data-toggle="modal"
                                         data-target="#createFile">
                                         <i class="icon-copy ion-folder"></i> Edit
                                     </button>
-                                @endif
+                                {{-- @endif --}}
                             </div>
                           
                         </div>
@@ -197,13 +197,13 @@
                                             <div class="card-body">
                                                 <div class="profile-detail">
                                                     <div class="row">
-                                                        @if (session('dataUser')->edit_user_detail)
+                                                        {{-- @if (session('dataUser')->edit_user_detail) --}}
                                                             <div class="col-md-4 col-sm-12 text-right">
                                                                 <a href="/user/detail//edit"
                                                                     class="bg-light-blue btn text-blue weight-500 index-employee-user-detail"><i
                                                                         class="ion-plus-round"></i> Edit perlu nik</a>
                                                             </div>
-                                                        @endif
+                                                        {{-- @endif --}}
 
                                                     </div>
                                                     <div class="profile-info">
@@ -348,13 +348,13 @@
                                                             <div class="col-md-8 col-sm-12">
                                                                 <h4>Alamat</h4>
                                                             </div>
-                                                            @if (session('dataUser')->edit_user_detail)
+                                                            {{-- @if (session('dataUser')->edit_user_detail) --}}
                                                                 <div class="col-md-4 col-sm-12 text-right">
-                                                                    <a href="/user-address/detail/{{ session('dataUser')->nik_employee }}/edit"
+                                                                    <a href="/user-address/detail/edit"
                                                                         class="bg-light-blue btn text-blue weight-500 index-employee-user-address"><i
                                                                             class="ion-plus-round"></i> Edit</a>
                                                                 </div>
-                                                            @endif
+                                                            {{-- @endif --}}
                                                         </div>
 
                                                         <ul>
@@ -415,7 +415,7 @@
                                                                 <h5>Riwayat Penyakit</h5>
                                                             </div>
                                                             <div class="col-md-4 col-sm-12 text-right">
-                                                                <a href="/user-health/detail/{{ session('dataUser')->nik_employee }}/edit"
+                                                                <a href="/user-health/detail/edit"
                                                                     class="bg-light-blue btn text-blue weight-500 index-employee-user-health"><i
                                                                         class="ion-plus-round"></i>perlu nik Edit</a>
                                                             </div>
@@ -491,7 +491,7 @@
                                                             <h5>Detail Karyawan</h5>
                                                         </div>
                                                         <div class="col-md-4 col-sm-12 text-right">
-                                                            <a href="/user-employee/detail/{{ session('dataUser')->nik_employee }}/edit"
+                                                            <a href="/user-employee/detail/edit"
                                                                 class="bg-light-blue btn text-blue weight-500 index-employee-create-employee">
                                                                 <i class="ion-plus-round"></i>Edit
                                                             </a>
@@ -774,7 +774,7 @@
                 });
         });
 
-        let nik_employee = @json(session('dataUser')->nik_employee);
+        let nik_employee = 'MBLE-0422003';
         // cg('aaa',nik_employee)
 
         function firstShowEmployee(nik_employee) {

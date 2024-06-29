@@ -30,59 +30,6 @@
             </div>
         </div>
     </div>
-    <div class=" card-box mb-30">
-        <div class="pd-20 clearfix mb-10">
-            <div class="pull-left">
-                <h4 class="text-blue h4">Daftar Tabel-tabel</h4>
-            </div>
-            <div class="pull-right" hidden>
-                <a href="#" id="refresh-table" class="btn btn-primary btn-sm"role="button">refresh</a>
-            </div>
-        </div>
-        <div class="" id="datatable">
-            <table class="data-table table stripe hover nowrap" id="table-datatable">
-                <thead>
-                    <tr>
-                        <th class="table-plus datatable-nosort">Name</th>
-                        <th class="table-plus datatable-nosort">Menu</th>
-                        <th class="datatable-nosort">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="table-plus">
-                            <div class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
-                                <div class="avatar mr-2 flex-shrink-0">
-                                    <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
-                                        width="50" height="50" alt="">
-                                </div>
-                                <div class="avatar mr-2 flex-shrink-0">
-                                    <img src="/vendors/images/photo5.jpg" class="border-radius-100 box-shadow"
-                                        width="50" height="50" alt="">
-                                </div>
-                                <div class="txt">
-                                    <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                        style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">PT. MBLE |
-                                        HAULING</span>
-                                    <div class="font-14 weight-600">Dr. Callie Reed</div>
-                                    <div class="font-12 weight-500">MBLE-0422003</div>
-                                    <div class="font-12 weight-500" data-color="#b2b1b6" style="color: rgb(178, 177, 182);">
-                                        Service Maintenance
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td>
-                            <a onclick="editUser('MBLE-0422003')" class="btn btn-primary" href="#"><i
-                                    class="dw dw-edit2"></i> Edit</a>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-    </div>
     <div class="row pd-20">
         <div id="form-parent" class="pd-20 card-box mb-30 col-md-7 col-sm-12">
             <div class="clearfix mb-10">
@@ -132,109 +79,9 @@
 
 
     <div class="card-box mb-20">
-        <div class="pd-20 clearfix mb-10">
-            <div class="pull-left">
-                <h4 id="text-form-description" class="text-blue h4">Data Table</h4>
-                <input type="text" class="form-control" id="id-code_table">
-            </div>
-            <div class="pull-right">
-                <a href="#" onclick="btnRefreshDataTable()" id="btn-refresh-datatable"
-                    class="btn btn-primary btn-sm " role="button">refresh</a>
-            </div>
-        </div>
-        <form action="#" id="FORM-FILTER">
-            <div class="row">
-                <div class="col-12  mt-10">
-                    <div class="row pd-20">
-                        {{-- filter --}}
-                        <div class="col-md-5 col-sm-12 card-box pt-20 mr-20">
-                            <div class="pd-10 clearfix mb-10">
-                                <div class="pull-left">
-                                    <h4 id="text-filter" class="text-blue h4">Filter</h4>
-                                    <input type="hidden" class="form-control" id="id-filter">
-                                </div>
-                                <div class="pull-right">
-                                    <button id="btn-toggle-filter" type="button"
-                                        onclick="togleVisibleElement('datatable-filter','btn-toggle-filter')"
-                                        class="btn btn-primary btn-sm"><i class="icon-copy bi bi-box-arrow-in-up">
-                                        </i>hide</button>
-                                    <a href="#" onclick="btnRefreshDataTable()" id="btn-refresh-datatable"
-                                        class="btn btn-primary btn-sm " role="button">refresh</a>
-                                </div>
-                            </div>
-                            <div class="pb-20" id="datatable-filter">
-                                <table class="data-table table stripe hover nowrap" id="table-datatable-filter">
-                                    <thead>
-                                        <tr>
-                                            <th class="table-plus datatable-nosort">Fields</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="table-plus">
-                                                <div class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
-                                                    <div class="txt">
-                                                        <div class="font-12 weight-500" data-color="#b2b1b6"
-                                                            style="color: rgb(178, 177, 182);">
-                                                            Silhkan pilih tabel diatas
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {{--  show fields --}}
-                        <div class=" col-md-6 col-sm-12 card-box pt-20">
-                            <div class="pd-10 clearfix mb-10">
-                                <div class="pull-left">
-                                    <h4 id="text-field-show" class="text-blue h4">Field show</h4>
-                                    <input type="hidden" class="form-control" id="id-filter">
-                                </div>
-                                <div class="pull-right">
-                                    <button id="btn-toggle-field-show" type="button"
-                                        onclick="togleVisibleElement('datatable-field-show','btn-toggle-field-show')"
-                                        class="btn btn-primary btn-sm"><i class="icon-copy bi bi-box-arrow-in-up">
-                                        </i>hide</button>
-                                    <a href="#datatable-data" onclick="storeFieldShow()" id="btn-refresh-datatable"
-                                        class="btn btn-primary btn-sm " role="button">Update tabel</a>
-                                </div>
-                            </div>
-                            <div class="pb-20" id="datatable-field-show">
-                                <table class="data-table table stripe hover nowrap" id="table-datatable-field-show">
-                                    <thead>
-                                        <tr>
-                                            <th class="table-plus datatable-nosort">Fields</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="table-plus">
-                                                <div class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
-                                                    <div class="txt">
-                                                        <div class="font-12 weight-500" data-color="#b2b1b6"
-                                                            style="color: rgb(178, 177, 182);">
-                                                            Silhkan pilih tabel diatas
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </form>
+        
         <div class="row pd-20">
-            <div class="col-md-6 col-sm-12">FILTER</div>
+            <div class="col-md-6 col-sm-12">Data Karyawan</div>
             <div class="col-md-6 col-sm-12 text-right">
                 <button class="btn btn-secondary" data-toggle="modal" data-target="#modal-import-datatable"
                     type="button">
@@ -522,6 +369,8 @@
         }
 
         function updateFieldShow(code_table) {
+            // return false;
+            $('#datatable').empty();
             CL('database_datatable');
             let database_datatable = getValueDatabase_datatable(code_table);
             let rowDataFieldShow = [];
@@ -541,7 +390,7 @@
                                         <th> Tabel</th>
                                         `;
             headerTableFieldShow = `                    
-                            <table id="table-datatable-field-show" class="checkbox-datatable nowrap stripe hover table" style="width:100%">
+                            <table id="table-datatable-field-showS" class="checkbox-datatable nowrap stripe hover table" style="width:100%">
                                 <thead>
                                     <tr>
                                         ${headerTableFieldShow}
@@ -550,8 +399,9 @@
                             </table>
                         `;
 
-
+            // return false;
             $('#datatable-field-show').empty();
+
             $('#text-field-show').val(code_table);
             $('#datatable-field-show').append(headerTableFieldShow);
 
@@ -582,14 +432,17 @@
                 }
             };
             rowDataFieldShow.push(table_description_element);
+            // return false;
+            // conLog('database_datatable', database_datatable['all-fields']);
 
-            $('#table-datatable-field-show').DataTable({
+
+            $('#table-datatable-field-showS').DataTable({
                 paging: false,
                 scrollX: true,
                 scrollY: "400px",
 
-                responsive: true,
-                serverSide: false,
+                // responsive: true,
+                // serverSide: false,
                 data: Object.values(database_datatable['all-fields']),
                 columns: rowDataFieldShow
             });
@@ -679,7 +532,7 @@
             $(`#id-code_table`).val(code_table);
 
             // fields show
-            updateFieldShow(code_table);
+
             createFormField(code_table);
             refreshTableData(code_table);
         }
@@ -710,6 +563,7 @@
                         </thead>
                     </table>
                 `;
+            // return false;
 
             $('#datatable-field-show').empty();
             $('#text-field-show').val(code_table);
@@ -837,64 +691,8 @@
             });
         }
 
-        function refreshTable() {
-            let row_data_datatable = [];
-            let header_table_element = '';
-            let header_table_field = ['Description Table', 'Menu', 'Action'];
 
-            $('#datatable').empty();
-
-            // create header table                    
-            header_table_field.forEach(element => {
-                header_table_element = `${header_table_element} <th> ${element} </th>`
-            });
-
-            header_table_element = `                    
-                        <table id="table-datatable" class="display nowrap stripe hover table" style="width:100%">
-                            <thead>
-                                <tr>
-                                    ${header_table_element}
-                                </tr>
-                            </thead>
-                        </table>
-                    `;
-
-            $('#datatable').append(header_table_element);
-
-            //add row data datatable
-            var employees_card_element = {
-                mRender: function(data, type, row) {
-                    return row.description_table
-                }
-            };
-            row_data_datatable.push(employees_card_element);
-
-            var menu_table_element = {
-                mRender: function(data, type, row) {
-                    return row.menu_table
-                }
-            };
-            row_data_datatable.push(menu_table_element);
-
-
-
-            var action_table_element = {
-                mRender: function(data, type, row) {
-                    return `<button onclick="actionCard('${row.code_table}')"  class="btn btn-sm btn-secondary">
-                                <i class="icon-copy bi bi-gear"></i>
-                            </button>`;
-                }
-            };
-            row_data_datatable.push(action_table_element);
-
-            let data_datatable = Object.values(db['db']['database_table']);
-            $('#table-datatable').DataTable({
-                paging: true,
-                serverSide: false,
-                data: data_datatable,
-                columns: row_data_datatable
-            });
-        }
+        actionCard('KARYAWAN');
 
         async function deleteThisData() {
             let uuid_data = $('#code_data_delete').val();
@@ -932,7 +730,7 @@
             }
         }
 
-        refreshTable();
+        // refreshTable();
 
 
 
@@ -941,6 +739,18 @@
             let row_data_datatable = [];
             let database_datatable = getValueDatabase_datatable(code_table);
             conLog('database_datatable', database_datatable);
+            database_datatable['show-fields'] = [{
+                "id": 26,
+                "code_table_field": "KARYAWAN",
+                "description_field": "NRP",
+                "type_data_field": "TEXT",
+                "level_data_field": "1",
+                "code_field": "NRP",
+                "full_code_field": "KARYAWAN-NRP",
+                "sort_field": "0",
+                "created_at": "2024-02-29T02:27:41.000000Z",
+                "updated_at": "2024-02-29T02:27:41.000000Z"
+            }];
 
             let header_table_element = ``;
 
@@ -961,27 +771,17 @@
                     mRender: function(data, type, row) {
                         let code_data = row;
                         let data_show = null;
-                        try {
+                        if (typeof db['db']['database_data'][data_code_table][code_data] !== 'undefined') {
                             if (typeof db['db']['database_data'][data_code_table][code_data][code_field] !==
                                 'undefined') {
-                                // conLog('type_data_field',type_data_field)
+                                // conLog('type_data_field',type_data_field);
+                                // conLog('data_code_table',data_code_table);
+                                // conLog('data_code_table',data_code_table);
                                 data_show = showFieldData(type_data_field, data_code_table, code_field,
                                     toUUID(code_data)
                                 );
                             }
-                        } catch (error) {
-
-                            return data_show;
                         }
-                        // if (typeof db['db']['database_data'][data_code_table][code_data] !== 'undefined') {
-                        //     if (typeof db['db']['database_data'][data_code_table][code_data][code_field] !==
-                        //         'undefined') {
-                        //         // conLog('type_data_field',type_data_field)
-                        //         data_show = showFieldData(type_data_field, data_code_table, code_field,
-                        //             toUUID(code_data)
-                        //         );
-                        //     }
-                        // }
                         return data_show;
                     }
                 };

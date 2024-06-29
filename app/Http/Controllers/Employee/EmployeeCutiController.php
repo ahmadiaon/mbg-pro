@@ -107,6 +107,53 @@ class EmployeeCutiController extends Controller
         ]);
     }
 
+    public function webExport(Request $request)
+    {
+
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+
+
+        $fields = [
+            'name'=>'NAMA KARYAWAN',
+            'jabatan'=>'JABATAN',
+            'date_start_work'=>'TANGGAL AWAL BEKERJA',
+            'roaster_code'=>'ROASTER CUTI',
+            'date_schedule_start_cuti'=>'TANGGAL JADWAL AWAL CUTI',
+            'date_schedule_end_cuti'=>'TANGGAL JADWAL AKHIR CUTI',
+            'date_real_start_cuti'=>'TANGGAL REALISASI AWAL CUTI',
+            'date_real_end_cuti'=>'TANGGAL REALISASI AKHIR CUTI',
+            'kompensasi_cuti'=>'KOMPENSASI CUTI',
+            'fasilitas_cuti'=>'FASILITAS CUTI',
+            'value_money_cuti'=>'NILAI FASILITAS',
+            'nrp_job_pendding'=>'NRP JOB PENDDING',
+            'name_job_pendding'=>'NAMA JOB PENDING',
+            'doc_job_pendding'=>'FILE JOB PENDING',
+            'nrp_atasan_langsung'=>'NRP ATASAN LANGSUNG',
+            'name_atasan_langsung'=>'NAMA ATASAN LANGSUNG',
+            'nrp_hr_acc'=>'NRP HR ACC',
+            'name_hr_acc'=>'NAMA HR ACC',
+            'nrp_manajer'=>'NRP MANAJER',
+            'name_manajer'=>'NAMA MANAJER',
+        ];
+
+        $createSheet->setCellValue('A2', 'Excel');
+        $createSheet->setCellValue('A1', 'NO.');
+
+        // foreach($){
+
+        // }
+
+
+        $crateWriter = new Xls($createSpreadsheet);
+        $file_name = 'Cuti Karyawan-' . rand(99, 9999) . 'file.xls';
+        $name = 'file/absensi/' . $file_name;
+        $crateWriter->save($name);
+
+
+        return ResponseFormatter::ResponseJson($file_name, 'file export', 200);
+    }
+
     public function show($uuid)
     {
         $data = EmployeeCuti::where('uuid', $uuid)->first();
@@ -120,7 +167,7 @@ class EmployeeCutiController extends Controller
         //nik
         $data_database = session('data_database');
         $group_names = EmployeeCutiGroup::all();
-          $date_today_ =  Carbon::createFromFormat('Y-m-d',  ResponseFormatter::getDateToday());
+        $date_today_ =  Carbon::createFromFormat('Y-m-d',  ResponseFormatter::getDateToday());
         // $date_today_ =  Carbon::createFromFormat('Y-m-d',  '2023-05-20');
 
         $cuti = [];
@@ -273,19 +320,18 @@ class EmployeeCutiController extends Controller
                     if ($item_data_employee_cuti['date_real_end_cuti'] > $date_today_->format('Y-m-d')) {
                         $warning_cuti[$item_data_employee_cuti->employee_uuid][$item_data_employee_cuti->uuid]['monitoring_cuti'] = 'Sedang Cuti';
                     }
-                    
                 } elseif (!empty($item_data_employee_cuti->date_come_cuti)) {
                     $warning_cuti[$item_data_employee_cuti->employee_uuid][$item_data_employee_cuti->uuid]['monitoring_cuti'] = 'Selesai';
                 }
             }
         }
 
-        foreach($warning_cuti as $item_warning_cuti){
-            foreach($item_warning_cuti as $i_item_warning_cuti){
-                if($i_item_warning_cuti['monitoring_cuti'] != 'Selesai'){
+        foreach ($warning_cuti as $item_warning_cuti) {
+            foreach ($item_warning_cuti as $i_item_warning_cuti) {
+                if ($i_item_warning_cuti['monitoring_cuti'] != 'Selesai') {
                     $arr_warning[] = $i_item_warning_cuti;
-                }               
-            }           
+                }
+            }
         }
 
         // EmployeeCuti::insert(

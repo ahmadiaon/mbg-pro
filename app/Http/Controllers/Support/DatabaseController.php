@@ -79,9 +79,15 @@ class DatabaseController extends Controller
         ]);
     }
 
+
     public function indexData()
     {
         return view('app.manage.database.index');
+    }
+
+    public function indexHR()
+    {
+        return view('app.manage.database.index_HR');
     }
 
     public function getTableData($code_table)
@@ -367,9 +373,9 @@ class DatabaseController extends Controller
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
 
-        $code_table_data = ($database_datatable['db']['database_table'][$request->code_table_data]['parent_table'])?$database_datatable['db']['database_table'][$request->code_table_data]['parent_table']:$request->code_table_data;
-
+        $code_table_data = ($database_datatable['db']['database_table'][$request->code_table_data]['parent_table']) ? $database_datatable['db']['database_table'][$request->code_table_data]['parent_table'] : $request->code_table_data;
         
+
         $createSheet->setCellValue('A1', 'No.');
 
         $count_data = 1;
@@ -388,11 +394,11 @@ class DatabaseController extends Controller
                 $data_get_data[$item_get_data->code_data][$item_get_data->code_field_data] = $item_get_data;
             }
             // return ResponseFormatter::ResponseJson('$name', $database_datatable, 200);
-            foreach ($request['data_export']['data'] as $code_data=>$item_export) {
+            foreach ($request['data_export']['data'] as $code_data => $item_export) {
                 $createSheet->setCellValue('A' . $count_data_export, $count_data_export - 2);
                 $count_abjads_field = 1;
 
-                if(!empty($database_datatable['public']['public_value'][$code_table_data][$code_data])){
+                if (!empty($database_datatable['public']['public_value'][$code_table_data][$code_data])) {
                     $data_code_data = $database_datatable['public']['public_value'][$code_table_data][$code_data];
                     foreach ($request->fields as $field) {
                         if (!empty($data_code_data[$field['code_field']])) {
@@ -403,18 +409,19 @@ class DatabaseController extends Controller
                     }
                 }
 
-               
+
                 $count_data_export++;
             }
         }
 
 
         $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/export/' . rand(99, 9999) . '-file.xls';
+        $name = 'file/export/' .$code_table_data.'-'. rand(99, 9999) . '-file.xls';
         $crateWriter->save($name);
 
         return ResponseFormatter::ResponseJson($name, 'export database', 200);
     }
+
 
     public function importDatatable(Request $request)
     {
@@ -426,7 +433,8 @@ class DatabaseController extends Controller
         $database_datatable['database_data_source'] = DatabaseController::getDataSource();
 
         $db = UserController::db_local_storage($auth_login);
-
+        // $db = session('db_local_storage');
+        // return ResponseFormatter::ResponseJson($db, 'column_fields', 200);
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
@@ -443,21 +451,23 @@ class DatabaseController extends Controller
 
             $table_arr = [];
             $field_arr = [];
+
             while ($sheet->getCell($abjads[$loop_col] . '2')->getValue() != null) {
                 $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
-                if(!in_array($table_code,$table_arr)){
+                if (!in_array($table_code, $table_arr)) {
                     $table_arr[] = $table_code;
                 }
-                
+
                 $field_code = ResponseFormatter::toUUID($sheet->getCell($abjads[$loop_col] . '1')->getValue());
                 $column_fields['excel_properties'][$table_code][] = $field_code;
                 if (!empty($database_datatable['database_field'][$table_code])) {
                     if (!empty($database_datatable['database_field'][$table_code][$field_code])) {
-                        if(!in_array($field_code,$field_arr)){
+                        if (!in_array($field_code, $field_arr)) {
                             $field_arr[] = $field_code;
                         }
                         $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
                         $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
+                        $column_fields['index_column'][$abjads[$loop_col]]['type_data_field'] = $db['db']['database_field'][$table_code][$field_code]['type_data_field'];
                         $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
                         if (!empty($database_datatable['database_data_source'][$table_code . '-' . $field_code])) { //jika ada di data source
                             $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = true;
@@ -467,7 +477,7 @@ class DatabaseController extends Controller
                 $loop_col++;
             }
 
-
+            // return ResponseFormatter::ResponseJson($db, 'column_fields', 200);
             $i = 3;
             while ($sheet->getCell('A' . $i)->getValue() != null) {
 
@@ -482,6 +492,11 @@ class DatabaseController extends Controller
                     $value_data = null;
                     if ($sheet->getCell($index_column_key . $i)->getValue() != null) {
                         $value_data = ($value['is_uuid']) ? ResponseFormatter::toUUID($sheet->getCell($index_column_key . $i)->getValue()) : $sheet->getCell($index_column_key . $i)->getValue();
+                        if ($value['type_data_field'] == 'DATE') {
+                            if ($value_data) {
+                                $value_data = ResponseFormatter::convertToDate($value_data);
+                            }
+                        }
                         $code_table_data = $value['table_code'];
                         $code_field_data = $value['field_code'];
                         $code_data = ResponseFormatter::toUUID($value_data);
@@ -492,60 +507,73 @@ class DatabaseController extends Controller
 
                 $i++;
             }
+            // return ResponseFormatter::ResponseJson($arr_value,'store data from importDatatable', 200);
+
             foreach ($arr_value as $row_to_insert) {
                 $uuid_data = null;
                 foreach ($row_to_insert as $table_code => $table_to_insert) {
-                    
-                    $field_code_primary_code = $database_datatable['database_table'][$table_code]['primary_table'];
-                    $table_code_primary_code = ($database_datatable['database_table'][$table_code]['parent_table']) ? $database_datatable['database_table'][$table_code]['parent_table'] : $table_code;
-                    
-                    if(empty($uuid_data)){
-                        $code_data = ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]);
-                        if(!empty($db['db']['database_data'][$table_code_primary_code][$code_data])){
-                            $uuid_data = $db['db']['database_data'][$table_code_primary_code][$code_data][$field_code_primary_code]['uuid_data'];
-                        }else{
-                            $uuid_data = Str::uuid();
+                    // try {
+                        $field_code_primary_code = $database_datatable['database_table'][$table_code]['primary_table'];
+                        $table_code_primary_code = ($database_datatable['database_table'][$table_code]['parent_table']) ? $database_datatable['database_table'][$table_code]['parent_table'] : $table_code;
+                        // $x = $db['db']['database_data'][$table_code_primary_code][$code_data];
+
+                        if (empty($uuid_data)) {
+                            $code_data = ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]);
+                            if (!empty($db['db']['database_data'][$table_code_primary_code][$code_data])) {
+                                try {
+                                    $uuid_data = $db['db']['database_data'][$table_code_primary_code][$code_data][$field_code_primary_code]['uuid_data'];
+                                } catch (\Throwable $th) {
+                                    return ResponseFormatter::ResponseJson($db['db']['database_data'][$table_code_primary_code][$code_data], $field_code_primary_code, 200);
+                                }
+                                
+                            } else {
+                                $uuid_data = Str::uuid();
+                            }
                         }
-                    }
 
-                    foreach ($table_to_insert as $field_code => $field_to_insert) {
-                        // return ResponseFormatter::ResponseJson($field_to_insert, 'store data from importDatatable', 200);
-                        $data_insert = [
-                            'code_table_data' => $table_code,
-                            'code_field_data' => $field_code,
-                            'value_data' => $field_to_insert,
-                            'code_data' => ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]),
-                            'uuid_data' => $uuid_data,
-                        ];
-
-                        $Q_store_data = DatabaseData::updateOrCreate(
-                            [
-                                'code_table_data' => $data_insert['code_table_data'], //table data source
-                                'code_field_data' => $data_insert['code_field_data'],
-                                'code_data' => $data_insert['code_data'], //value primary key
+                        foreach ($table_to_insert as $field_code => $field_to_insert) {
+                            // return ResponseFormatter::ResponseJson($field_to_insert, 'store data from importDatatable', 200);
+                            $data_insert = [
+                                'code_table_data' => $table_code,
+                                'code_field_data' => $field_code,
+                                'value_data' => $field_to_insert,
+                                'code_data' => ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]),
                                 'uuid_data' => $uuid_data,
-                            ],
-                            [
-                                'value_data' => $data_insert['value_data'],
-                                'date_start' => Carbon::now()->format('Y-m-d'),
-                                'date_end' => null,
-                            ]
-                        );
-                        $arr_data_insert[] = $data_insert;
-                    }
+                            ];
+
+                            $Q_store_data = DatabaseData::updateOrCreate(
+                                [
+                                    'code_table_data' => $data_insert['code_table_data'], //table data source
+                                    'code_field_data' => $data_insert['code_field_data'],
+                                    'code_data' => $data_insert['code_data'], //value primary key
+                                    'uuid_data' => $uuid_data,
+                                ],
+                                [
+                                    'value_data' => $data_insert['value_data'],
+                                    'date_start' => Carbon::now()->format('Y-m-d'),
+                                    'date_end' => null,
+                                ]
+                            );
+                            $arr_data_insert[] = $data_insert;
+                        }
+                    // } catch (\Throwable $th) {
+                        
+                    //     return ResponseFormatter::ResponseJson($field_to_insert, 'err', 200);
+                    //     //throw $th;
+                    // }
                 }
             }
 
-            if(in_array('IDENTITAS-KARYAWAN',$table_arr)){
-                if(in_array('NIK-KTP',$field_arr)){
-                    foreach ($arr_value as $row_to_insert){
-                        if($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']){
+            if (in_array('IDENTITAS-KARYAWAN', $table_arr)) {
+                if (in_array('NIK-KTP', $field_arr)) {
+                    foreach ($arr_value as $row_to_insert) {
+                        if ($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']) {
                             User::updateOrCreate([
-                                'uuid'=> ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-        
-                            ],[
+
+                            ], [
                                 'password' => Hash::make($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']),
                                 'role' => 'employee'
                             ]);
@@ -642,7 +670,7 @@ class DatabaseController extends Controller
         $data_return['tables'] = $arr_data_table;
         $data_return['fields'] = $data_fields;
 
-        
+
 
 
 
