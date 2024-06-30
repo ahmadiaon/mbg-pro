@@ -56,7 +56,7 @@
         cg('kosong', @json(session('year_month')));
     }
 
-    cg('arr_date_today', arr_date_today)
+    // cg('arr_date_today', arr_date_today)
 
     function cg(message, data) {
         console.log(message + ':');
@@ -471,6 +471,17 @@
     function showFieldData(type_data, table_data, field_data, primary_key_data, data_properties = null) {
         let value_data_table;
 
+
+
+
+        // conLog('value_data_table', value_data_table);
+        // conLog('primary_key_data', primary_key_data);
+        // conLog('code_table_data_source', code_table_data_source);
+        // conLog('field_get_data_source', field_get_data_source);
+        // conLog('table_data', table_data);
+        // conLog('field_data', field_data);
+        // conLog('satu', db['public'][table_data])
+
         try {
             value_data_table = db['db']['database_data'][
                 table_data
@@ -480,20 +491,10 @@
                 'value_data'
             ];
         } catch (error) {
-            value_data_table = null;
+            value_data_table = primary_key_data;
 
             return value_data_table;
         }
-
-
-        // conLog('value_data_table', value_data_table);
-        conLog('primary_key_data', primary_key_data);
-        // // conLog('code_table_data_source', code_table_data_source);
-        // // conLog('field_get_data_source', field_get_data_source);
-        conLog('table_data', table_data);
-        // conLog('field_data', field_data);
-        // conLog('satu', db['public'][table_data])
-
         // CL(data_properties);
         if (!GLOBAL_DATA_EXPORT['data']) {
             GLOBAL_DATA_EXPORT['data'] = {};
@@ -715,8 +716,7 @@
                 GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
                 return `<div class="row justify-content-md-center">
                                     <div class="col-12 justify-content-md-center"><sup>09</sup></div>
-                                    <div class="col-12 justify-content-md-center">
-                                        
+                                    <div class="col-12 justify-content-md-center">                                        
                                         <div type="button" name="status_absen_uuid" class="bg-primary" id="status_absen_uuid-text-2024-04-09-MBLE-210493">
                                             <sup>09</sup> OFF                                            
                                         </div>   
@@ -753,37 +753,39 @@
                 let element_detail_absen = ``;
                 let element_two_column = ``;
                 // conLog('data_properties', data_properties);
-                if (data_properties) {
-                    const startDate = new Date(filter_absensi.date_start);
-                    const endDate = new Date(filter_absensi.date_end);
+                // if (data_properties) {
+                const startDate = new Date(filter_absensi.date_start);
+                const endDate = new Date(filter_absensi.date_end);
 
 
 
-                    let currentDate = new Date(startDate);
-                    while (currentDate <= endDate) {
-                        let date_current = formatDate(currentDate);
-                        let detail_absen_current_date = {
-                            absen_description: null,
-                            cek_log: '-',
-                            color: "#544545",
-                            date: date_current,
-                            employee_uuid: null,
-                            status_absen_uuid: "-",
-                            uuid: null
-                        }
+                let currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    let date_current = formatDate(currentDate);
+                    let detail_absen_current_date = {
+                        absen_description: null,
+                        cek_log: '-',
+                        color: "#544545",
+                        date: date_current,
+                        employee_uuid: null,
+                        status_absen_uuid: "-",
+                        uuid: null
+                    }
+                    try {
                         if (data_properties[date_current]) {
                             detail_absen_current_date = data_properties[date_current];
-                        } else {
-                            detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
                         }
-                        let obj_current_date = getDateObj(currentDate);
-                        // console.log(detail_absen_current_date);
-                        if (count_absensi[detail_absen_current_date.status_absen_uuid]) {
-                            count_absensi[detail_absen_current_date.status_absen_uuid]++;
-                        } else {
-                            count_absensi[detail_absen_current_date.status_absen_uuid] = 1;
-                        }
-                        element_detail_absen += `<div id="element_absen-${primary_key_data}-${date_current}" class="col-auto mb-1">
+                    } catch (error) {
+                        detail_absen_current_date = detail_absen_current_date;
+                        detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
+                    }
+                    let obj_current_date = getDateObj(currentDate);
+                    if (count_absensi[detail_absen_current_date.status_absen_uuid] >= 1) {
+                        count_absensi[detail_absen_current_date.status_absen_uuid]++;
+                    } else {
+                        count_absensi[detail_absen_current_date.status_absen_uuid] = 1;
+                    }
+                    element_detail_absen += `<div id="element_absen-${primary_key_data}-${date_current}" class="col-auto mb-1">
                                                     <div onclick="manageAbsensiDay('${primary_key_data}', '${date_current}')" style=" background-color: ${db['public']['DATABASE-ABSENSI'][detail_absen_current_date.status_absen_uuid]['WARNA-ABSENSI']}" class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
                                                         <div class="txt text-center">
                                                             <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
@@ -793,15 +795,15 @@
                                                     </div>
                                                 </div>`;
 
-                        // Move to the next day
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-                    Object.entries(count_absensi).forEach(([key, values]) => {
-                        element_count_absen += `<div class="col-auto mb-1">
+                    // Move to the next day
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                Object.entries(count_absensi).forEach(([key, values]) => {
+                    element_count_absen += `<div class="col-auto mb-1">
                                                     <button style=" background-color: ${db['public']['DATABASE-ABSENSI'][key]['WARNA-ABSENSI']}" class="btn font-14  weight-600 ">${key} : ${values}</button>
                                                 </div>`;
-                    });
-                    element_two_column = `<div class="col-md-2 col-sm-12">
+                });
+                element_two_column = `<div class="col-md-2 col-sm-12">
                                     <div class="row">
                                         ${element_count_absen}
                                     </div>
@@ -810,13 +812,13 @@
                                     ${element_detail_absen}
                                 </div>`;
 
-                } else {
-                    element_two_column = ` <div class="col-md-9 col-sm-12"> 
-                                            <div class="alert alert-secondary" role="alert">
-                                                Data tidak ditemukan.
-                                            </div>
-                                        </div>`;
-                }
+                // } else {
+                //     element_two_column = ` <div class="col-md-9 col-sm-12"> 
+                //                             <div class="alert alert-secondary" role="alert">
+                //                                 Data tidak ditemukan.
+                //                             </div>
+                //                         </div>`;
+                // }
                 return `    <div id="row-absensi-${primary_key_data}" class="row justify-content-md-center">
                                 <div class="col-md-3 col-sm-12 mb-2">
                                     ${emmp(primary_key_data)}
@@ -1149,25 +1151,25 @@
 
     }
 
-    function mergeArrays(array1 =[], array2 = []) {
+    function mergeArrays(array1 = [], array2 = []) {
 
-        if(array1.length < 0){
+        if (array1.length < 0) {
             return array2
-            
+
         }
-        if(array2.length < 0){
+        if (array2.length < 0) {
             return array1
-            
+
         }
-        
+
         return [...new Set([...array1, ...array2])];
     }
 
     function innerJoinArrays(array1, array2) {
-        if(array1.length >= 1 && array2.length >= 1 ){
+        if (array1.length >= 1 && array2.length >= 1) {
 
             return array1.filter(value => array2.includes(value));
-            
+
         }
         return [];
     }
@@ -1632,6 +1634,7 @@
 {{-- LOCAL STORAGE --}}
 <script>
     async function refreshSession() {
+        console.log('session refreshed')
         $.ajax({
             url: '/web/local-storage',
             type: "POST",
@@ -1648,14 +1651,20 @@
                 localStorage.setItem('DATABASE', JSON.stringify(response.data));
                 db = response.data;
                 conLog('db', db);
-                conLog('ui_dataset', ui_dataset);
-                default_filter_absensi['PERUSAHAAN'] = innerJoinArrays(Object.keys(db['public']['PERUSAHAAN']), default_filter_absensi.PERUSAHAAN);
-                default_filter_absensi['PROJECT'] = innerJoinArrays(Object.keys(db['public']['PROJECT']), default_filter_absensi.PROJECT);
-                default_filter_absensi['DEPARTEMEN'] = innerJoinArrays(Object.keys(db['public']['DEPARTEMEN']), default_filter_absensi.DEPARTEMEN);
-                default_filter_absensi['DIVISI'] = innerJoinArrays(Object.keys(db['public']['DIVISI']), default_filter_absensi.DIVISI);
-                
+                // conLog('ui_dataset', ui_dataset);
+                default_filter_absensi['PERUSAHAAN'] = innerJoinArrays(Object.keys(db['public'][
+                    'PERUSAHAAN'
+                ]), default_filter_absensi.PERUSAHAAN);
+                default_filter_absensi['PROJECT'] = innerJoinArrays(Object.keys(db['public'][
+                    'PROJECT']), default_filter_absensi.PROJECT);
+                default_filter_absensi['DEPARTEMEN'] = innerJoinArrays(Object.keys(db['public'][
+                    'DEPARTEMEN'
+                ]), default_filter_absensi.DEPARTEMEN);
+                default_filter_absensi['DIVISI'] = innerJoinArrays(Object.keys(db['public']['DIVISI']),
+                    default_filter_absensi.DIVISI);
+
                 // iner joining perusahaan dll untuk biar hanya ada di db saja
-                conLog('filter_absensi',filter_absensi)
+                conLog('filter_absensi', filter_absensi)
                 // location.reload();
                 // showModalSuccess();
             },
@@ -1691,8 +1700,8 @@
 
     if (!db) {
         refreshSession();
-        
-                
+
+
     }
     if (getLocalStorage('filter_absen')) {
         filter_absensi = JSON.parse(getLocalStorage('filter_absen'));

@@ -136,13 +136,13 @@
                                         </button>
 
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" onclick="refreshTable(2021,null)"
+                                            <a class="dropdown-item" onclick="refreshTable('2021',null)"
                                                 href="#">2021</a>
-                                            <a class="dropdown-item" onclick="refreshTable(2022,null)"
+                                            <a class="dropdown-item" onclick="refreshTable('2022',null)"
                                                 href="#">2022</a>
-                                            <a class="dropdown-item" onclick="refreshTable(2023,null)"
+                                            <a class="dropdown-item" onclick="refreshTable('2023',null)"
                                                 href="#">2023</a>
-                                            <a class="dropdown-item" onclick="refreshTable(2024,null)"
+                                            <a class="dropdown-item" onclick="refreshTable('2024',null)"
                                                 href="#">2024</a>
                                         </div>
                                     </div>
@@ -152,29 +152,29 @@
                                             <span class="caret"></span>
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" onclick="refreshTable(null, 01 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '01' )"
                                                 href="#">Januari</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 02 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '02' )"
                                                 href="#">Februari</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 03 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '03' )"
                                                 href="#">Maret</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 04 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '04' )"
                                                 href="#">April</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 05 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '05' )"
                                                 href="#">Mei</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 06 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '06' )"
                                                 href="#">Juni</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 07 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '07' )"
                                                 href="#">Juli</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 08 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '08' )"
                                                 href="#">Agustus</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 09 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '09' )"
                                                 href="#">September</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 10 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '10' )"
                                                 href="#">Oktober</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 11 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '11' )"
                                                 href="#">November</a>
-                                            <a class="dropdown-item" onclick="refreshTable(null, 12 )"
+                                            <a class="dropdown-item" onclick="refreshTable(null, '12' )"
                                                 href="#">Desember</a>
                                         </div>
                                     </div>
@@ -285,11 +285,11 @@
                 </div>
                 <div class="modal-body">
                     {{-- karyawan --}}
-                    <label for="">Riwayat cek log</label>
+                    <label>Riwayat cek log</label>
                     <input class="form-control cek_log-show" disabled cols="10" rows="3">
                     <input class="form-control cek_log-show" type="hidden" name="cek_log-show" id="cek_log-show"
                         cols="10" rows="3">
-                    <label for="">Keterangan</label>
+                    <label>Keterangan</label>
                     <textarea class="form-control" name="absen_description-show" id="absen_description-show" cols="30"
                         rows="10"></textarea>
                     <div id="button-status_absen">
@@ -297,7 +297,7 @@
                     </div>
                     <input type="hidden" name="" id="employee_uuid-show">
                     <input type="hidden" name="" id="date-show">
-                    <label class="mt-3" for="">Ubah Status Absen</label>
+                    <label class="mt-3">Ubah Status Absen</label>
                     <div class="row justify-content-md-center " id="button-status_absen_uuid">
                         <div class="col-auto">
 
@@ -336,14 +336,14 @@
                         </div>
                         <div class="form-group row date-setup">
                             <div class="col-6">
-                                <label for="">Mulai tanggal</label>
+                                <label>Mulai tanggal</label>
                                 <select onchange="loopDate()" name="date_absen_start" style="width: 100%"
                                     id="date_absen_start" class="custom-select2 form-control">
 
                                 </select>
                             </div>
                             <div class="col-6">
-                                <label for="">Sampai tanggal</label>
+                                <label>Sampai tanggal</label>
                                 <select name="date_absen_end" style="width: 100%" id="date_absen_end"
                                     class="custom-select2 form-control">
 
@@ -426,31 +426,13 @@
 
 
         let database_datatable = {};
-        database_datatable['show-fields'] = [
-            // {
-            //     'code_field': "NRP",
-            //     'code_table_field': "KARYAWAN",
-            //     'description_field': "NRP",
-            //     'full_code_field': 'KARYAWAN-NRP',
-            //     'tipe_data_field': "TEXT"
-            // },
-            {
-                'code_field': "COUNT_ABSEN",
-                'code_table_field': "ABSENSI",
-                'description_field': "Total Absesnsi",
-                'full_code_field': 'ABSENSI-COUNT_ABSEN',
-                'tipe_data_field': "ABSENSI_COUNT"
-            },
-            // {
-            //     'code_field': "DETAIL_ABSENSI",
-            //     'code_table_field': "ABSENSI",
-            //     'description_field': "Detail Absen",
-            //     'full_code_field': 'ABSENSI-DETAIL_ABSENSI',
-            //     'tipe_data_field': "DETAIL_ABSENSI"
-            // },
-        ];
-        conLog('ui_dataset', ui_dataset);
-        conLog('filter_absensi', filter_absensi);
+        database_datatable['show-fields'] = [{
+            'code_field': "detail_absen",
+            'code_table_field': "ABSENSI_COUNT",
+            'description_field': "Total Absesnsi",
+            'full_code_field': 'ABSENSI-COUNT_ABSEN',
+            'tipe_data_field': "ABSENSI_COUNT"
+        }, ];
 
         let year;
         let month;
@@ -489,8 +471,8 @@
             filter_absensi.date_start = formatDate(parseDateString(split_date_range[0], 'mm/dd/yyyy'));
             filter_absensi.date_end = formatDate(parseDateString(split_date_range[1], 'mm/dd/yyyy'));
             setLocalStorage('filter_absen', filter_absensi);
-            conLog('filter_absensi', filter_absensi);
-            conLog('default_filter_absensi', default_filter_absensi);
+            // conLog('filter_absensi', filter_absensi);
+            // conLog('default_filter_absensi', default_filter_absensi);
             getWithNewData();
             // if (parseDateString(split_date_range[0], 'mm/dd/yyyy') < start || parseDateString(split_date_range[1],
             //         'mm/dd/yyyy') > end) {
@@ -516,8 +498,10 @@
                 success: function(response) {
 
                     detail_absensi = response.data;
-                    conLog('detail_absensi', detail_absensi);
-                    conLog('filter_absensi', filter_absensi);
+                    db['db']['database_data']['ABSENSI_COUNT'] =detail_absensi;
+
+                    conLog('detail_absensi', db);
+                    // conLog('filter_absensi', filter_absensi);
                     // setLocalStorage('filter_absen',filter_absensi);
                     refreshTableData();
                 },
@@ -699,8 +683,8 @@
             $('#datatable-data-after-import').empty();
             let header_table_element = '';
             let row_data_datatable = [];
-            
-            let data_datatable_after_import=[];
+
+            let data_datatable_after_import = [];
             // ============ create header table
             header_table_element = `                    
                 <table id="table-fingger-identified" class="display nowrap stripe hover table" style="width:100%">
@@ -728,10 +712,10 @@
                 data_datatable_after_import = Object.keys(after_import_data['identification']);
             }
 
-            conLog('data_datatable_after_import',data_datatable_after_import);
+            conLog('data_datatable_after_import', data_datatable_after_import);
 
             $('#table-fingger-identified').DataTable({
-                
+
                 scrollX: true,
                 scrollY: "600px",
                 paging: false,
@@ -744,7 +728,7 @@
         function refreshTableData() {
             $('#datatable-data').empty();
             let row_data_datatable = [];
-            conLog('database_datatable', ui_dataset);
+            conLog('database_datatable', database_datatable);
             let header_table_element = '';
 
             database_datatable['show-fields'].forEach(field_table => {
@@ -789,35 +773,40 @@
 
             // ====== D A T A    F O R    D A T A T A B L E ===
 
-            let filter = [{
-                    field: "PERUSAHAAN",
-                    array_filter: filter_absensi.PERUSAHAAN,
-                },
-                {
-                    field: "PROJECT",
-                    array_filter: filter_absensi.PROJECT,
-                },
-                {
-                    field: "DEPARTEMEN",
-                    array_filter: filter_absensi.DEPARTEMEN,
-                },
-                {
-                    field: "DIVISI",
-                    array_filter: filter_absensi.DIVISI,
-                },
-            ];
-            let employee_filtereds = getDataTable('KARYAWAN', filter);
-            let data_datatable = [];
-            if (employee_filtereds) {
-                data_datatable = employee_filtereds;
-            }
+            let arr_filtered_karyawan = [];
+            let arr_part = [];
+
+            filter_absensi['DIVISI'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DIVISI'][element]);
+                conLog(element, db['db']['arr_employees']['DIVISI'][element]);
+            });
+
+            arr_filtered_karyawan = arr_part;
+
+            arr_part = [];
+            filter_absensi['DEPARTEMEN'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DEPARTEMEN'][element]);
+            });
+
+            arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+            arr_part = [];
+            filter_absensi['PROJECT'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PROJECT'][element]);
+            });
+            arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+            arr_part = [];
+            filter_absensi['PERUSAHAAN'].forEach(element => {
+                arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PERUSAHAAN'][element]);
+            });
+            arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+            filter_absensi['KARYAWAN'] = arr_filtered_karyawan;
 
             $('#table-datatable-data').DataTable({
                 scrollX: true,
                 scrollY: "600px",
                 paging: false,
                 serverSide: false,
-                data: data_datatable,
+                data: arr_filtered_karyawan,
                 columns: row_data_datatable
             });
         }
@@ -877,7 +866,6 @@
 
         $(document).ready(function() {
             getDataAbsensi();
-            conLog('random', @json(session('keys_random')));
         });
     </script>
 
@@ -1075,7 +1063,7 @@
                         $('#import-modal').modal('hide');
                         $('#after-import').modal('show');
                         after_import_data = response.data;
-                        conLog('after_import_after_absen',after_import_data);
+                        conLog('after_import_after_absen', after_import_data);
                         getDataAbsensi();
                         // response.data.
                         // refreshTableAfterImport();

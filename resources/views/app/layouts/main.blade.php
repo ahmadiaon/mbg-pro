@@ -207,7 +207,8 @@
             <div class="footer-wrap pd-20 mb-20 card-box">
                 MBG - Online Created By
                 <a href="https://github.com/ahmadiaon" target="_blank">ahma.id </a>
-                Perlu Bantuan hubungi <a href="https://wa.me/6281255897044"><i class="icon-copy bi bi-telephone-fill"></i></a>
+                Perlu Bantuan hubungi <a href="https://wa.me/6281255897044"><i
+                        class="icon-copy bi bi-telephone-fill"></i></a>
             </div>
         </div>
     </div>
@@ -335,19 +336,21 @@
 
 
     <script>
-        
-        
-
         let current_url = window.location.href;
         let header_active = 'profile';
         let myArray = current_url.split("/");
         header_active = myArray[4];
+
+        header_active = myArray[5];
+        header_active = header_active.replace('#', '');
         $('#title').text(`${capitalizeEachWord(header_active)} | MBG`);
         $(`#${header_active}`).addClass('active');
 
         if (myArray.length == 6) {
             header_active = myArray[5];
             header_active = header_active.replace('#', '');
+
+            // console.log(header_active);
             // $(`#${header_active}`).addClass('active');
             var element = document.querySelector(`a[href="/${myArray[3]}/${myArray[4]}/${myArray[5]}"]`);
 
@@ -355,9 +358,9 @@
             if (element) {
                 // Add a class to the element
                 element.classList.add('active');
-                console.log(element);
+                // console.log(element);
             } else {
-                console.log("Element not found");
+                // console.log("Element not found");
             }
         }
     </script>

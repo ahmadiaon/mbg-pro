@@ -867,13 +867,6 @@
 
         let database_datatable = {};
         database_datatable['show-fields'] = [
-            // {
-            //     'code_field': "NRP",
-            //     'code_table_field': "KARYAWAN",
-            //     'description_field': "NRP",
-            //     'full_code_field': 'KARYAWAN-NRP',
-            //     'tipe_data_field': "TEXT"
-            // },
             {
                 'code_field': "COUNT_ABSEN",
                 'code_table_field': "ABSENSI",
@@ -881,13 +874,6 @@
                 'full_code_field': 'ABSENSI-COUNT_ABSEN',
                 'tipe_data_field': "ABSENSI_COUNT"
             },
-            // {
-            //     'code_field': "DETAIL_ABSENSI",
-            //     'code_table_field': "ABSENSI",
-            //     'description_field': "Detail Absen",
-            //     'full_code_field': 'ABSENSI-DETAIL_ABSENSI',
-            //     'tipe_data_field': "DETAIL_ABSENSI"
-            // },
         ];
 
         let year;
@@ -954,7 +940,7 @@
                 arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PERUSAHAAN'][element]);
             });
             arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
-            filter_absens['KARYAWAN'] = arr_filtered_karyawan;
+            filter_absensi['KARYAWAN'] = arr_filtered_karyawan;
 
 
             conLog('arr_filtered_karyawan', arr_filtered_karyawan);
