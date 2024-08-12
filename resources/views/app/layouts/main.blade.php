@@ -167,6 +167,16 @@
             color: #ffffff;
         }
     </style>
+    <style>
+        /* Ensure the select element takes full width of its container */
+        .multi-wrap-select-wrapper {
+            width: 100%;
+        }
+
+        .multi-wrap-select {
+            width: 100%;
+        }
+    </style>
 
 
     @yield('src_css')
@@ -330,6 +340,38 @@
         </div>
     </div>
 
+    <!-- The Modal -->
+    <div class="modal fade bs-example-modal-lg" id="pdfModal" tabindex="-1" role="dialog"
+        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Show File
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="pdfIframe"
+                        src="http://127.0.0.1:8000/file/database/FILE-KARYAWAN-MBLE-0422003-FILE-KTP.pdf"
+                        style="width:100%; height:600px;" frameborder="0"></iframe>
+                    <div  id="imageContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button  data-dismiss="modal" type="button" class="btn btn-secondary">
+                        Batal
+                    </button>
+                    <button id="id_download_file" type="button" class="btn btn-primary">
+                        Unduh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- js -->
     @yield('src_script_javascript')
     @yield('script_javascript')
@@ -342,7 +384,10 @@
         header_active = myArray[4];
 
         header_active = myArray[5];
-        header_active = header_active.replace('#', '');
+        header_active = myArray.at(-1);
+        if (header_active.indexOf('#') !== -1) {
+            header_active = header_active.replace('#', '');
+        }
         $('#title').text(`${capitalizeEachWord(header_active)} | MBG`);
         $(`#${header_active}`).addClass('active');
 

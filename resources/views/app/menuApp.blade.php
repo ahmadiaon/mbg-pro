@@ -78,10 +78,18 @@
                 </div>
             </div>
             <div class="row justify-content-center btn-add-form-field">
-                <div class="col-md-4 col-sm-12">
+                <div class="col-md-3 col-sm-12">
                     <div class="form-group">
                         <button type="button" class="btn-block btn btn-primary add-form-field">
                             Tambah
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary agrement" onclick="openPersetujuan()"
+                            alt="modal">
+                            Tambah Persetujuan
                         </button>
                     </div>
                 </div>
@@ -294,6 +302,48 @@
             </div>
         </div>
     </div>
+
+    {{-- modal agrement --}}
+    <div class="modal fade" id="modal-agrement" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Buat Persetujuan
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="text" name="" id="sort-persetujuan" value="0">
+                    <div class="row" id="field-kehadiran">
+
+                        <div class="col-12 row row-persetujuan">
+
+                        </div>
+
+
+
+                        <div class="col-12 text-center" id="button-add-persetujuan">
+                            <button onclick="addPersetujuan()" class="col-12 btn-bloc btn btn-primary">tambah</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="button" class="btn btn-primary" id="save-from-table" onclick="addAgrement()">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection()
 
 @section('script_javascript')
@@ -305,6 +355,7 @@
 
         let from_table_form = {};
         let gabungan_field = {};
+        let persetujuan = {};
 
         function selectParent() {
             let code_table = $('#parent_table').val();
@@ -411,6 +462,7 @@
             return false;
         }
 
+
         function saveFromTable(id_form) {
             CL('save data source')
             from_table_form[`data-source-${id_form}`] = {
@@ -420,6 +472,126 @@
             }
             CL(from_table_form)
         }
+
+        function openPersetujuan() {
+            $(`#modal-agrement`).modal('show');
+            let code_table = toUUID($('#description_table').val());
+            $('.row-persetujuan').empty();
+            if (code_table) {
+                if (db['db']['database_persetujuan'][code_table]) {
+                    conLog('persetujuan', db['db']['database_persetujuan'][code_table]);
+                    let count_persetujuan = 0;
+                    Object.values(db['db']['database_persetujuan'][code_table]).forEach(element => {
+                        addPersetujuan();
+                        $(`#SUPPORT-TABLE-LEVEL-PERSETUJUAN-${count_persetujuan}`).val(element.level).trigger('change');
+                        $(`#SUPPORT-TABLE-DESKRIPSI-PERSETUJUAN-${count_persetujuan}`).val(element.description).trigger('change');
+                        $(`#SUPPORT-TABLE-GROUP-PERSETUJUAN-${count_persetujuan}`).val(element.grade).trigger('change');
+                        $(`#SUPPORT-TABLE-REFERENCE-PERSETUJUAN-${count_persetujuan}`).val(element.reference).trigger('change');
+                        count_persetujuan++;
+                    });
+                }
+            }
+        }
+
+        function addAgrement() {
+            let longPersetujuan = $('#sort-persetujuan').val();
+            persetujuan = {};
+            for (let countPersetujuan = 0; countPersetujuan < longPersetujuan; countPersetujuan++) {
+                conLog('val countPersetujuan', $(`#SUPPORT-TABLE-LEVEL-PERSETUJUAN-${countPersetujuan}`).val());
+                if ($(`#SUPPORT-TABLE-LEVEL-PERSETUJUAN-${countPersetujuan}`).val()) {
+                    let level_persetujuan = $(`#SUPPORT-TABLE-LEVEL-PERSETUJUAN-${countPersetujuan}`).val();
+                    let obj_persetujuan = {};
+                    obj_persetujuan = {};
+                    obj_persetujuan['grade'] = $(`#SUPPORT-TABLE-GROUP-PERSETUJUAN-${countPersetujuan}`).val();
+                    obj_persetujuan['description'] = $(`#SUPPORT-TABLE-DESKRIPSI-PERSETUJUAN-${countPersetujuan}`).val();
+                    obj_persetujuan['level'] = $(`#SUPPORT-TABLE-LEVEL-PERSETUJUAN-${countPersetujuan}`).val();
+                    obj_persetujuan['reference'] = $(`#SUPPORT-TABLE-REFERENCE-PERSETUJUAN-${countPersetujuan}`).val();
+                    persetujuan[level_persetujuan] = obj_persetujuan;
+                }
+            }
+            conLog('persetujuan', persetujuan);
+
+        }
+
+        function addPersetujuan() {
+            code_table_reference = toUUID($('#description_table').val());
+            let countPersetujuan = $('#sort-persetujuan').val();
+            let divPersetujuan = `
+                            <div class="col-md-5 persetujuan-${countPersetujuan}">
+                                <div class="form-group" id="field-kehadiran-level-persetujuan-${countPersetujuan}">
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-5 persetujuan-${countPersetujuan}">
+                                <div class="form-group" id="field-kehadiran-deskripsi-persetujuan-${countPersetujuan}">
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-5 persetujuan-${countPersetujuan}">
+                                <div class="form-group" id="field-kehadiran-group-persetujuan-${countPersetujuan}">
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-5 persetujuan-${countPersetujuan}">
+                                <div class="form-group" id="field-kehadiran-reference-persetujuan-${countPersetujuan}">
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-2 fa-hover persetujuan-${countPersetujuan}">
+                                <div class="form-group" id="field-kehadiran-btn-persetujuan">
+                                    <label for="del-persetujuan">Hapus</label>
+                                    <button onclick="deletePersetujuan(${countPersetujuan})" type="button" class="btn" data-bgcolor="#bd081c" data-color="#ffffff" style="color: rgb(255, 255, 255); background-color: rgb(189, 8, 28);">
+										<i class="icon-copy bi bi-backspace-fill"></i>
+									</button>
+                                </div>
+                            </div>`;
+            $('.row-persetujuan').append(divPersetujuan);
+            conLog('elelel', db['db']['database_field']['SUPPORT-TABLE']['LEVEL-PERSETUJUAN']);
+            let old_level = db['db']['database_field']['SUPPORT-TABLE']['LEVEL-PERSETUJUAN']['full_code_field'];
+            db['db']['database_field']['SUPPORT-TABLE']['LEVEL-PERSETUJUAN']['full_code_field'] = db['db']['database_field']
+                ['SUPPORT-TABLE']['LEVEL-PERSETUJUAN']['full_code_field'] + '-' + countPersetujuan;
+            let old_deskkripsi = db['db']['database_field']['SUPPORT-TABLE']['DESKRIPSI-PERSETUJUAN']['full_code_field'];
+            db['db']['database_field']['SUPPORT-TABLE']['DESKRIPSI-PERSETUJUAN']['full_code_field'] = db['db'][
+                'database_field'
+            ]['SUPPORT-TABLE']['DESKRIPSI-PERSETUJUAN']['full_code_field'] + '-' + countPersetujuan;
+            let old_group = db['db']['database_field']['SUPPORT-TABLE']['GROUP-PERSETUJUAN']['full_code_field'];
+            db['db']['database_field']['SUPPORT-TABLE']['GROUP-PERSETUJUAN']['full_code_field'] = db['db']['database_field']
+                ['SUPPORT-TABLE']['GROUP-PERSETUJUAN']['full_code_field'] + '-' + countPersetujuan;
+            
+            let old_reference = db['db']['database_field']['SUPPORT-TABLE']['REFERENCE-PERSETUJUAN']['full_code_field'];
+            db['db']['database_field']['SUPPORT-TABLE']['REFERENCE-PERSETUJUAN']['full_code_field'] = db['db']['database_field']
+                ['SUPPORT-TABLE']['REFERENCE-PERSETUJUAN']['full_code_field'] + '-' + countPersetujuan;
+
+            conLog('ekekek', db['db']['database_field']['SUPPORT-TABLE']['LEVEL-PERSETUJUAN']);
+            cardFormField('field-kehadiran-level-persetujuan-' + countPersetujuan, db['db']['database_field'][
+                'SUPPORT-TABLE'
+            ]['LEVEL-PERSETUJUAN']);
+            cardFormField('field-kehadiran-deskripsi-persetujuan-' + countPersetujuan, db['db']['database_field'][
+                'SUPPORT-TABLE'
+            ]['DESKRIPSI-PERSETUJUAN']);
+            cardFormField('field-kehadiran-group-persetujuan-' + countPersetujuan, db['db']['database_field'][
+                'SUPPORT-TABLE'
+            ]['GROUP-PERSETUJUAN']);
+            cardFormField('field-kehadiran-reference-persetujuan-' + countPersetujuan, db['db']['database_field'][
+                'SUPPORT-TABLE'
+            ]['REFERENCE-PERSETUJUAN']);
+            db['db']['database_field']['SUPPORT-TABLE']['LEVEL-PERSETUJUAN']['full_code_field'] = old_level;
+            db['db']['database_field']['SUPPORT-TABLE']['DESKRIPSI-PERSETUJUAN']['full_code_field'] = old_deskkripsi;
+            db['db']['database_field']['SUPPORT-TABLE']['GROUP-PERSETUJUAN']['full_code_field'] = old_group;
+            db['db']['database_field']['SUPPORT-TABLE']['REFERENCE-PERSETUJUAN']['full_code_field'] = old_reference;
+
+            $('#sort-persetujuan').val(parseInt(countPersetujuan) + 1);
+        }
+
+        function deletePersetujuan(countPersetujuan) {
+            $(`.persetujuan-${countPersetujuan}`).remove();
+        }
+
+
+
+
+
+
 
 
         $(document).ready(function() {
@@ -524,8 +696,11 @@
                         count_field_form++;
                     }
                 }
-                form_detail.field = data_form
-                CL(form_detail)
+                form_detail.field = data_form;
+                form_detail.persetujuan = persetujuan;
+                CL('form_detail');
+                CL(form_detail);
+                conLog('form_detail', form_detail)
                 // return false;
 
                 // S T O R E
@@ -642,7 +817,8 @@
                 if (db['db']['database_field_show'][edit_field.code_table_field]) {
                     if (db['db']['database_field_show'][edit_field.code_table_field][edit_field.code_field]) {
                         let field_gabungan = {};
-                        (db['db']['database_field_show'][edit_field.code_table_field][edit_field.code_field]).forEach(element => {
+                        (db['db']['database_field_show'][edit_field.code_table_field][edit_field.code_field])
+                        .forEach(element => {
                             field_gabungan[element.sort_field] = {
                                 field_show_code: element.field_show_code,
                                 table_show_code: element.table_show_code,
@@ -651,7 +827,7 @@
                             }
                         });
                         gabungan_field[`gabungan-filed-${countField}`] = field_gabungan;
-                        conLog('gabungan_field',gabungan_field)
+                        conLog('gabungan_field', gabungan_field)
                     }
                 }
 
@@ -716,9 +892,15 @@
             let new_id = parseInt($(`#sort-gabungan`).val()) + 1;
             let element_option_gabungan = ``;
             for (for_fields = 1; for_fields < id_form; for_fields++) {
-                let value_ = toUUID($(`#description_field-${for_fields}`).val());
-                let description_ = $(`#description_field-${for_fields}`).val();
-                element_option_gabungan = `${element_option_gabungan} <option value="${value_}">${description_}</option>`;
+                try {
+
+                    let value_ = toUUID($(`#description_field-${for_fields}`).val());
+                    let description_ = $(`#description_field-${for_fields}`).val();
+                    element_option_gabungan =
+                        `${element_option_gabungan} <option value="${value_}">${description_}</option>`;
+                } catch (error) {
+
+                }
             }
 
             if ($(`#parent_table`).val()) {

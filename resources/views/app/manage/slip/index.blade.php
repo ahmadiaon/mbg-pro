@@ -56,7 +56,7 @@
                     data: formData,
                     success: function(response) {
                         let slips = response.data;
-                        CL(response);
+                        CL(i);
                     },
                     contentType: false,
                     processData: false,

@@ -99,7 +99,7 @@
                         data-toggle="collapse" role="button">Reset</a>
                 </div>
             </div>
-            <form id="fields" class="header-form">
+            <form id="fields" class="header-form" enctype="multipart/form-data">
                 <div class="row profile-info" id="field-form">
                     <div class="col-md-12 col-sm-12">
                         <div class="form-group">
@@ -324,7 +324,6 @@
                             <input name="uploaded_file" type="file"
                                 class="form-control-file form-control height-auto" />
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -338,6 +337,9 @@
             </div>
         </div>
     </div>
+    
+    <div id="fileInfo"></div>
+    
 @endsection()
 
 @section('script_javascript')
@@ -633,7 +635,7 @@
                                 </button>
                             </div>
                             <div id="faq-${element}" class="collapse" data-parent="#sub-form">
-                                <form class="form-${element}">
+                                <form id="form-id-${element}" class="form-${element}" enctype="multipart/form-data">
                                     <div id="fields-${element}" class="card-body">
                                     
                                     </div>
@@ -658,6 +660,31 @@
                 $('.faq-wrap').attr('hidden', true);
             }
             //=========== create field form
+
+
+            // ========== PERSETUJUAN ========
+                if (db['db']['database_persetujuan'][code_table]) {
+                    $('.faq-wrap').attr('hidden', false);
+                    $(`#sub-form`).append(`
+                        <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#faq-PERSETUJUAN">
+                                    PERSETUJUAN
+                                </button>
+                            </div>
+                            <div id="faq-PERSETUJUAN" class="collapse" data-parent="#sub-form">
+                                <form id="form-id-PERSETUJUAN" class="form-PERSETUJUAN" enctype="multipart/form-data">
+                                    <div id="fields-PERSETUJUAN" class="card-body">
+                                    
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    `);
+
+                    Object.values(db['db']['database_persetujuan'][code_table]).forEach(element => {});
+                }
+            // ========== PERSETUJUAN ========
         }
 
         async function actionCard(code_table) {
@@ -760,9 +787,53 @@
 
         }
 
+        function handleFileInput(event) {
+            const input = event.target;
+            const fileList = input.files;
+            const fileInfo = document.getElementById('fileInfo');
+
+            fileInfo.innerHTML = ''; // Clear previous file info
+
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                const fileDetails = `
+            <p>Input Name: ${input.name}</p>
+            <p>File Name: ${file.name}</p>
+            <p>File Size: ${file.size} bytes</p>
+            <p>File Type: ${file.type}</p>
+        `;
+                fileInfo.innerHTML += fileDetails;
+            }
+        }
+
         function storeDataTable(code_table) {
+            const fileInputs_element = document.querySelectorAll(`input[type="file"].${code_table}`);
+
+            fileInputs_element.forEach(input => {
+                conLog('xx', input);
+                input.addEventListener('change', handleFileInput);
+            });
+
+            const form = document.getElementById('myForm');
+            const formData = new FormData();
+            const fileInputs = document.querySelectorAll(`input[type="file"].${code_table}`);
+            const fileInfo = document.getElementById('fileInfo');
+
+            fileInfo.innerHTML = ''; // Clear previous file info
+
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    for (let i = 0; i < input.files.length; i++) {
+                        formData.append(input.name, input.files[i]);
+                    }
+                }
+            });
+            formData.append('code_table_data', code_table);
+
+
             // fields
             var formDataArray = $(`.form-${code_table}`).serializeArray();
+            // var formDataArray = new FormData(document.getElementById(`#form-id-${code_table}`));
             let db_table = db['db']['database_table'][code_table];
             let data_source_this_field = {};
             Object.values(db['db']['database_field'][code_table]).forEach(element => {
@@ -818,15 +889,51 @@
                 }),
                 success: function(response) {
                     conLog('response', response);
+
+
                     if (db_table['primary_table']) {
                         $('.secondary_btn_store').attr('disabled', false);
                         $('.secondary_key').val(response['data']['data_database_datatable'][db_table[
                             'primary_table']]);
                     }
 
-                    $('#uuid_data').val(response.data.uuid_data)
-                    refreshSession();
                     showModalSuccess();
+
+                    $('#uuid_data').val(response.data.uuid_data);
+                    formData.append('code_data', response.data.code_data);
+                    formData.append('uuid_data', response.data.uuid_data);
+
+                    if (formData) {
+                        console.log('asad');
+                        $.ajax({
+                            url: '/api/mbg/manage/database/store-database-file',
+                            method: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                conLog('re', response);
+                            },
+                            contentType: false,
+                            processData: false,
+                            error: function(response) {
+                                conLog('error', response);
+                                //alertModal()
+                            }
+                        });
+                        formData.forEach((value, key) => {
+                            if (value instanceof File) {
+                                console.log(`Key: ${key}`);
+                                console.log(`File Name: ${value.name}`);
+                                console.log(`File Size: ${value.size} bytes`);
+                                console.log(`File Type: ${value.type}`);
+                            } else {
+                                console.log(`Key: ${key}`);
+                                console.log(`Value: ${value}`);
+                            }
+                        });
+                    } else {
+                        console.log('kosong');
+                    }
+                    refreshSession();
 
                 },
                 error: function(response) {
@@ -835,6 +942,10 @@
                     //alertModal()
                 }
             });
+
+
+
+
         }
 
         function refreshTable() {
@@ -890,6 +1001,7 @@
             let data_datatable = Object.values(db['db']['database_table']);
             $('#table-datatable').DataTable({
                 paging: true,
+                responsive:true,
                 serverSide: false,
                 data: data_datatable,
                 columns: row_data_datatable
@@ -962,15 +1074,13 @@
                         let code_data = row;
                         let data_show = null;
                         try {
-                            if (typeof db['db']['database_data'][data_code_table][code_data][code_field] !==
-                                'undefined') {
-                                // conLog('type_data_field',type_data_field)
-                                data_show = showFieldData(type_data_field, data_code_table, code_field,
-                                    toUUID(code_data)
-                                );
-                            }
+                            // conLog('type_data_field',type_data_field)
+                            data_show = showFieldData(type_data_field, data_code_table, code_field,
+                                toUUID(code_data)
+                            );
                         } catch (error) {
-
+                            // conLog(data_code_table, row);
+                            // conLog('code_field', code_field);
                             return data_show;
                         }
                         // if (typeof db['db']['database_data'][data_code_table][code_data] !== 'undefined') {
@@ -993,7 +1103,9 @@
                 mRender: function(data, type, row) {
                     return `<div class="table-actions">
                                 <a href="#" onclick="editDataForm('${row}')" data-color="#265ed7" style="color: rgb(38, 94, 215);"><i class="icon-copy dw dw-edit2"></i></a>
-                                <a href="#" onclick="deleteForm('${db['db']['database_data'][code_table][row][primary_field]['uuid_data']}')"  data-color="#e95959" style="color: rgb(233, 89, 89);"><i class="icon-copy dw dw-delete-3"></i></a>
+                                <a href="#" onclick="deleteForm('` + db['db']['database_data'][code_table][row][
+                        primary_field
+                    ]['uuid_data'] + `')"  data-color="#e95959" style="color: rgb(233, 89, 89);"><i class="icon-copy dw dw-delete-3"></i></a>
                             </div>`;
                 }
             };
@@ -1019,15 +1131,12 @@
             if (db['db']['database_data'][code_table]) {
                 data_datatable = Object.keys(db['db']['database_data'][code_table]);
             }
-
-            conLog('data_datatable', data_datatable);
-            // GLOBAL_DATA_EXPORT['data'] = data_datatable;
-            // CL(GLOBAL_DATA_EXPORT);
             $('#table-datatable-data').DataTable({
                 scrollX: true,
                 scrollY: "600px",
                 paging: false,
                 serverSide: false,
+                response:true,
                 data: data_datatable,
                 columns: row_data_datatable
             });
@@ -1059,20 +1168,20 @@
             if (database_datatable['table_childs']) {
                 database_datatable['table_childs'].forEach(element => {
                     database_datatable['field_childs'] = db['db']['database_field'][element];
+                    conLog(element,database_datatable['field_childs']);
                     Object.values(database_datatable['field_childs']).forEach(field => {
-                        // conLog('code_data', code_data)
-                        // conLog('fields child', `${field.code_table_field}-${field.code_field}`)
+                        conLog('code_data', code_data)
+                        conLog('fields child', `${field.code_table_field}-${field.code_field}`)
                         if (data_for_field_edit[field.code_field]) {
-
                             if (data_for_field_edit[field.code_field]) {
-
-
                                 let value_data = data_for_field_edit[field.code_field];
-                                // conLog('have data child', value_data);
-                                // conLog('element give value', `${field.code_table_field}-${field.code_field}`);
-                                $(`#${field.code_table_field}-${field.code_field}`).val(value_data);
+                                // conLog('have data child', `${field.code_table_field}-${field.code_field}`);
+                                
+                                
 
-                                if (field.type_data_field == KONSTANTA["Input Autocomplite"]) {
+                                if (field.type_data_field == 'FILE') {
+                                    conLog('value', value_data);
+                                }else if (field.type_data_field == KONSTANTA["Input Autocomplite"]) {
                                     $(`#code-autocomplite-${field.full_code_field}`).val(value_data);
                                     let data_source = db['db']['database_data_source'][field
                                         .full_code_field
@@ -1080,12 +1189,12 @@
                                     $(`#${field.full_code_field}`).val(db['public'][data_source
                                         .table_data_source
                                     ][value_data][data_source.field_get_data_source]);
+                                }else{
+                                    $(`#${field.code_table_field}-${field.code_field}`).val(value_data);
                                 }
                             }
                             $('.custom-select2').trigger('change');
-
                         }
-
                     });
                 });
                 $('.secondary_btn_store').attr('disabled', false);

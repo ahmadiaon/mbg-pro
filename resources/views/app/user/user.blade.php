@@ -103,25 +103,6 @@
         </form>
     </div>
 
-    {{-- warning modal change pin --}}
-    <div class="modal fade" id="warning-modal-change-pin" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content bg-warning">
-                <div class="modal-body text-center">
-                    <h3 class="mb-15">
-                        <i class="fa fa-exclamation-triangle"></i> Warning
-                    </h3>
-                    <p>
-                        harap ganti password login anda menggunakan PIN, untuk memudahkan login di kemudian hari.
-                    </p>
-                    <button type="button" class="btn btn-dark" data-dismiss="modal">
-                        Ok
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection()
 
 @section('script_javascript')
@@ -172,7 +153,7 @@
     {{-- insert field --}}
     <script>
         $(document).ready(function() {
-            getUserInfo();
+            // getUserInfo();
 
         });
 

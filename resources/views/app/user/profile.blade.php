@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="row">
-        
+
 
 
         <div class="col-sm-12 col-md-5">
@@ -55,8 +55,8 @@
                                         </ul>
                                         <ul class="display-contract">
                                             <li>
-                                                <div class="date" >Mulai <br> Kontrak</div>
-                                                <div class="task-name display-start-contract" >
+                                                <div class="date">Mulai <br> Kontrak</div>
+                                                <div class="task-name display-start-contract">
                                                     <i class="ion-android-alarm-clock"></i> 12 okt 2023 (24 Bulan)
                                                 </div>
                                                 <p class="display-start-contract-desc">
@@ -195,7 +195,7 @@
             // code_table = 'KARYAWAN';
             let arr_table = {};
 
-            let data_for_field_edit = db['public']['public_value'][code_table][code_data];
+            let data_for_field_edit = db['public'][code_table][code_data];
             let date_tmk_end = getDateToday();
 
             data_for_field_edit['TANGGAL-AWAL-KONTRAK'] = excelSerialToDate(data_for_field_edit['TANGGAL-AWAL-KONTRAK']);
@@ -209,7 +209,6 @@
 
 
 
-
             let count_day_tmk = dateDiff(data_for_field_edit['TANGGAL-MASUK-KERJA--TMK-'], date_tmk_end);
 
 
@@ -220,30 +219,37 @@
             $(`.display-tmk-desc`).text(text_tmk_desc);
 
 
-            let count_month_contract = calculateMonthsBetweenDates( excelSerialToDate(data_for_field_edit[
+            let count_month_contract = calculateMonthsBetweenDates(excelSerialToDate(data_for_field_edit[
                 'TANGGAL-AWAL-KONTRAK']), excelSerialToDate(data_for_field_edit[
-                    'TANGGAL-AKHIR-KONTRAK']));            
-            $(`.display-start-contract`).text(`${toShortStringDate_fromFormatDate(data_for_field_edit['TANGGAL-AWAL-KONTRAK'])} (${count_month_contract} BULAN)`);
+                'TANGGAL-AKHIR-KONTRAK']));
+            $(`.display-start-contract`).text(
+                `${toShortStringDate_fromFormatDate(data_for_field_edit['TANGGAL-AWAL-KONTRAK'])} (${count_month_contract} BULAN)`
+            );
 
-            
+
             let count_day_contract = dateDiff(excelSerialToDate(data_for_field_edit[
                 'TANGGAL-AWAL-KONTRAK']), getDateToday());
-            $(`.display-start-contract-desc`).text(`Kontrak berjalan ${count_day_contract.years} tahun ${count_day_contract.months} bulan ${count_day_contract.days} hari.`);
+            $(`.display-start-contract-desc`).text(
+                `Kontrak berjalan ${count_day_contract.years} tahun ${count_day_contract.months} bulan ${count_day_contract.days} hari.`
+            );
 
-            $(`.display-end-contract`).text(`${toShortStringDate_fromFormatDate(data_for_field_edit['TANGGAL-AKHIR-KONTRAK'])}`);
-            
+            $(`.display-end-contract`).text(
+                `${toShortStringDate_fromFormatDate(data_for_field_edit['TANGGAL-AKHIR-KONTRAK'])}`);
+
             let desc_contract = 'tersisa';
             let count_contract;
-            if(getDateToday() > data_for_field_edit['TANGGAL-AKHIR-KONTRAK']){
+            if (getDateToday() > data_for_field_edit['TANGGAL-AKHIR-KONTRAK']) {
                 desc_contract = 'telat';
                 count_contract = dateDiff(data_for_field_edit['TANGGAL-AKHIR-KONTRAK'], getDateToday());
                 console.log('lebih besar');
 
-            }else{
-                count_contract = dateDiff(getDateToday(),data_for_field_edit['TANGGAL-AKHIR-KONTRAK']);
+            } else {
+                count_contract = dateDiff(getDateToday(), data_for_field_edit['TANGGAL-AKHIR-KONTRAK']);
                 console.log('lebih kecil')
             }
-            $(`.display-end-contract-desc`).text(`Kontrak ${desc_contract} ${count_contract.years} tahun ${count_contract.months} bulan ${count_contract.days} hari.`);
+            $(`.display-end-contract-desc`).text(
+                `Kontrak ${desc_contract} ${count_contract.years} tahun ${count_contract.months} bulan ${count_contract.days} hari.`
+            );
 
             conLog('data_for_field_edit', data_for_field_edit);
             let database_datatable = getValueDatabase_datatable(code_table);
@@ -251,7 +257,6 @@
             conLog('database_datatable', database_datatable);
             // === create table fields
             Object.values(database_datatable['fields']).forEach(field => {
-                field['type_data_field'] = 'TEXT';
                 cardFormField('field-form', field, 'disabled');
             });
 
@@ -284,8 +289,8 @@
                     `);
                     database_datatable['field_childs'] = db['db']['database_field'][element];
                     Object.values(database_datatable['field_childs']).forEach(field => {
-                        field['type_data_field'] = 'TEXT';
                         cardFormField('fields-' + element, field, 'disabled');
+
                     });
                     arr_table[element] = count_table;
                     count_table++;
@@ -297,9 +302,14 @@
             //=========== create field form
 
             Object.entries(data_for_field_edit).forEach(([index, value]) => {
+                conLog(index, value)
                 $(`.${index}`).val(value);
-                // $(`.${index}`).trigger('change');
+                $(`.show-${index}`).attr('hidden', false);
+                $(`.show-${index}`).attr('onclick', `showFile('${value}', '${index}')`);
+                // $(`.show-${index}`).show();
             });
+
+
             $('.custom-select2').trigger('change');
             $('.secondary_key').val(code_data);
             conLog('arr_table', arr_table)

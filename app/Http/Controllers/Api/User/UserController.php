@@ -21,6 +21,7 @@ use App\Models\Menu;
 use App\Models\Position;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\Support\DatabaseFieldShow;
+use App\Models\Support\DatabasePersetujuan;
 use App\Models\Support\UserTemplate;
 use App\Models\UserDetail\UserDetail;
 use Illuminate\Database\QueryException;
@@ -156,66 +157,12 @@ class UserController extends Controller
     {
         $database = [];
         $user = UserController::getUserLogin($auth_login);
-        $user->level_user = 5;
+        $user->level_user = 3;
+        
         $session_user = WebUserController::sessionUserAuthentication($auth_login);
-        // $employees = Employee::whereNull('date_end')->get();
-        // $identitiesQ = UserDetail::whereNull('date_end')->get();
-        // $idientities = [];
-        // foreach ($identitiesQ as $identity) {
-        //     $idientities[$identity->uuid] = $identity;
-        // }
-
-        // $Q_position = Position::get();
-        // $positions = [];
-        // foreach ($Q_position as $position) {
-        //     $positions[$position->uuid] = $position;
-        // }
-
-        // $Q_department = Department::get();
-        // $departments = [];
-        // foreach ($Q_department as $department) {
-        //     $departments[$department->uuid] = $department;
-        // }
-
-        // $Q_company = Company::get();
-        // $companys = [];
-        // foreach ($Q_company as $company) {
-        //     $companys[$company->uuid] = $company;
-        // }
-
-        // $data_employee = [];
-        // $arr_data_employee = [];
-        // foreach ($employees as $employee) {
-        //     if (!empty($idientities[$employee->nik_employee])) {
-        //         $employee->name = $idientities[$employee->nik_employee]['name'];
-        //         $employee->photo_path = $idientities[$employee->nik_employee]['photo_path'];
-        //         $data_employee[$employee->nik_employee] = $employee;
-        //     } else {
-        //         $employee->name = 'Tidak ada';
-        //         $employee->photo_path = null;
-        //         $data_employee[$employee->nik_employee] = $employee;
-        //     }
-
-        //     if (!empty($positions[$employee->position_uuid])) {
-        //         $employee->position = $positions[$employee->position_uuid]['position'];
-        //     } else {
-        //         $employee->position = 'Tidak ada';
-        //     }
-
-        //     if (!empty($departments[$employee->department_uuid])) {
-        //         $employee->department = $departments[$employee->department_uuid]['department'];
-        //     } else {
-        //         $employee->department = 'Tidak ada';
-        //     }
-
-        //     if (!empty($companys[$employee->company_uuid])) {
-        //         $employee->company = $companys[$employee->company_uuid]['company'];
-        //     } else {
-        //         $employee->company = 'Tidak ada';
-        //     }
-        //     $arr_data_employee[] = $employee->nik_employee;
-        //     $data_employee[$employee->nik_employee] = $employee;
-        // }
+        if(!empty($session_user['feature']['MANAGE-DATA-HR'])){
+            $user->level_user = 5;
+        }
 
 
         // C O M P A N Y
@@ -272,6 +219,7 @@ class UserController extends Controller
                 ->get([
                     'database_data.*'
                 ]);
+                $Q_data_self =  DatabaseData::where('date_end')->get();
             
 
             foreach ($Q_data as $data) {
@@ -348,12 +296,12 @@ class UserController extends Controller
 
         $data_public = [];
         foreach ($data_table as $code_table_parent => $table_parent) {
-            $field_table_parent = [];
-            if (!empty($all_field_parent_table[$code_table_parent])) {
-                $field_table_parent = $all_field_parent_table[$code_table_parent];
-            } else {
-                $field_table_parent = $data_field[$code_table_parent];
-            }
+        //     $field_table_parent = [];
+        //     if (!empty($all_field_parent_table[$code_table_parent])) {
+        //         $field_table_parent = $all_field_parent_table[$code_table_parent];
+        //     } else {
+        //         $field_table_parent = $data_field[$code_table_parent];
+        //     }
             if (!empty($data_data[$code_table_parent])) {
                 $code_table = (!empty($data_table[$code_table_parent]['parent_table'])) ? $data_table[$code_table_parent]['parent_table'] : $code_table_parent;
                 foreach ($data_data[$code_table_parent] as $code_data => $item_data) {
@@ -419,31 +367,38 @@ class UserController extends Controller
         // return $data_public['KARYAWAN'];
         $arr_employee = [];
         if($user->level_user > 1){
-            foreach($data_public['KARYAWAN'] as $item_karyawan){
+            foreach($data_public['KARYAWAN'] as $NRP=>$item_karyawan){
+                $arr_employee['all_employees'][] =$NRP;
                 if(!empty($item_karyawan['PERUSAHAAN'])){
-                    $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $item_karyawan['NRP'];
+                    $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $NRP;
                 }else{
-                    $arr_employee['PERUSAHAAN']['-'][] = $item_karyawan['NRP'];
+                    $arr_employee['PERUSAHAAN']['-'][] = $NRP;
                 }
                 // project
                 if(!empty($item_karyawan['PROJECT'])){
-                    $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $item_karyawan['NRP'];
+                    $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $NRP;
                 }else{
-                    $arr_employee['PROJECT']['-'][] = $item_karyawan['NRP'];
+                    $arr_employee['PROJECT']['-'][] = $NRP;
                 }
     
                 // DEPARTEMEN
                 if(!empty($item_karyawan['DEPARTEMEN'])){
-                    $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $item_karyawan['NRP'];
+                    $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $NRP;
                 }else{
-                    $arr_employee['DEPARTEMEN']['-'][] = $item_karyawan['NRP'];
+                    $arr_employee['DEPARTEMEN']['-'][] = $NRP;
                 }
     
                 // DIVISI
                 if(!empty($item_karyawan['DIVISI'])){
-                    $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $item_karyawan['NRP'];
+                    $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $NRP;
                 }else{
-                    $arr_employee['DIVISI']['-'][] = $item_karyawan['NRP'];
+                    $arr_employee['DIVISI']['-'][] = $NRP;
+                }
+                // DIVISI
+                if(!empty($item_karyawan['GRADE'])){
+                    $arr_employee['GRADE'][$item_karyawan['GRADE']][] = $NRP;
+                }else{
+                    $arr_employee['GRADE']['-'][] = $NRP;
                 }
             }
         }
@@ -451,8 +406,15 @@ class UserController extends Controller
 
         // return  $data_public['public_value'];
 
+        $Q_Database_Persetujuan = DatabasePersetujuan::all();
+        $databasePersetujuan = [];
+        foreach($Q_Database_Persetujuan as $I_databasePersetujuan){
+            $databasePersetujuan[$I_databasePersetujuan->form_code][$I_databasePersetujuan->level] = $I_databasePersetujuan; 
+        }
+
 
         $database['db']['database_field'] = $data_field;
+        $database['db']['database_persetujuan'] = $databasePersetujuan;
         $database['db']['database_field_join'] = $data_field_join;
         $database['db']['database_field_show'] = $dataDatabaseFieldShow;
         $database['db']['database_data'] = $data_data;

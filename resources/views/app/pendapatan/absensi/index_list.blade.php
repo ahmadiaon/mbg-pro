@@ -1,5 +1,6 @@
 @extends('app.layouts.main')
 
+
 @section('content')
     <div class="card-box mb-30 ">
         <div class="row pd-20">
@@ -7,21 +8,7 @@
                 <h4 class="text-blue h4">Absensi </h4>
             </div>
             <div class="col text-right">
-
-
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-outline-secondary">
-                        <input type="radio" name="options" id="list" autocomplete="off" checked="">
-                        <i class="icon-copy bi bi-list"></i>
-                    </label>
-                    <label class="btn btn-outline-secondary active">
-                        <input type="radio" name="options" id="grid" autocomplete="off">
-                        <i class="icon-copy bi bi-grid-fill"></i>
-                    </label>
-                </div>
-
-
-                <div class="btn-group">
+                <div class="btn-group mb-5">
                     <div class="btn-group dropdown">
                         <button type="button" class="btn btn-secondary dropdown-toggle waves-effect" data-toggle="dropdown"
                             aria-expanded="false" id="btn-year">
@@ -61,9 +48,9 @@
             </div>
         </div>
         <div id="the-table" class="row pd-20">
-            <div class="col-md-3 card-box pt-10 mb-10">
+            <div class="col-md-5 card-box pt-10 mb-10">
                 <h5 class="mb-20 h5 text-blue">Total Absensi</h5>
-                <div class="row mb-2" id="total-absensi">
+                <div class="row mb-3" id="total-absensi">
                     <div class="col-10">
                         <div class="badge badge-primary" role="badge">
                             DS (Day Shift)
@@ -81,56 +68,155 @@
                         </div>
                     </div>
                 </div>
+                <h5 class="mb-20 h5 text-blue">Menu Kehadiran</h5>
+                <div class="btn-list mb-20">
+                    <button type="button" onclick="ajukanIzin()" class="btn" data-bgcolor="#3b5998" data-color="#ffffff"
+                        style="color: rgb(255, 255, 255); background-color: rgb(199, 201, 71);">
+                        <i class="icon-copy bi bi-calendar-minus"></i> ajukan izin
+                    </button>
+                    <button type="button" class="btn" data-bgcolor="#1da1f2" data-color="#ffffff"
+                        style="color: rgb(255, 255, 255); background-color: rgb(29, 161, 242);">
+                        <i class="icon-copy bi bi-envelope-plus"></i> upload keterangan sakit
+                    </button>
+                    <button type="button" class="btn" data-bgcolor="#007bb5" data-color="#ffffff"
+                        style="color: rgb(255, 255, 255); background-color: rgb(0, 123, 181);">
+                        <i class="icon-copy bi bi-calendar2-x-fill"></i> ajukan keterangan bekerja
+                    </button>
+                    <button type="button" class="btn" data-bgcolor="#f46f30" data-color="#ffffff"
+                        style="color: rgb(255, 255, 255); background-color: rgb(244, 111, 48);">
+                        <i class="icon-copy bi bi-calendar3-range"></i> ajukan cuti
+                    </button>
+                </div>
 
             </div>
-            <div class="col-md-9">
-                <div id="display-grid" class="display-grid" id="tablePrivilege">
-                    <div class="row" id="row-absen">
-                        <div class="col-auto mb-5 card-box pd-2 mr-3">
-                            <div class="form-group">
-                                <label for="">1 sen</label>
-                                <div class=""><button class="btn btn-primary">DS</button></div>
+            <div class="col-md-7">
+                <div class="faq-wrap">
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse"
+                                    data-target="#filter-manage-absensi">
+                                    Absensi Bulanan
+                                </button>
+                            </div>
+                            <div id="filter-manage-absensi" class="collapse show" data-parent="#accordion">
+
+                                <div class="row pd-20">
+                                    <div class="col-6">
+                                        <label>Pilih Tampilan</label>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <div class="btn-group btn-group-toggle text-left" data-toggle="buttons">
+                                            <label class="btn btn-outline-secondary mb-5">
+                                                <input type="radio" name="options" id="list" autocomplete="off"
+                                                    checked="">
+                                                <i class="icon-copy bi bi-list"></i>
+                                            </label>
+                                            <label class="btn btn-outline-secondary active mb-5">
+                                                <input type="radio" name="options" id="grid" autocomplete="off">
+                                                <i class="icon-copy bi bi-grid-fill"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="display-grid" class="display-grid pd-20" id="tablePrivilege">
+                                    <div class="row" id="row-absen">
+                                        <div class="col-auto mb-5 card-box pd-2 mr-3">
+                                            <div class="form-group">
+                                                <label for="">1 sen</label>
+                                                <div class=""><button class="btn btn-primary">DS</button></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="display-list" id="table-list">
+                                    <div class="mb-20" id="datatable-data">
+                                        <table class="data-table table hover nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th class="table-plus datatable-nosort">Tanggal</th>
+                                                    <th class="table-plus datatable-nosort">Status</th>
+                                                    <th class="table-plus datatable-nosort">Fingger</th>
+                                                    <th class="table-plus datatable-nosort">Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="">
+                                                        Senin, 01 Mey 2024
+                                                    </td>
+                                                    <td class="">
+                                                        <div class=""><button class="btn btn-primary">DS</button>
+                                                        </div>
+                                                    </td>
+                                                    <td class="">
+                                                        ['10:10','20:20']
+                                                    </td>
+                                                    <td class="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-
-                    </div>
-                </div>
-
-                <div class="display-list card-box" id="table-list">
-                    <div class="pd-20 clearfix">
-                        <div class="pull-left">
-                            <h4 id="text-form-description" class="text-blue h4">Data Absensi</h4>
+                        <div class="card">
+                            <div class="card-header">
+                                <button class="btn btn-block" data-toggle="collapse"
+                                    data-target="#wrap-list-ketidakhadiran">
+                                    List Ketidakhadiran
+                                </button>
+                            </div>
+                            <div id="wrap-list-ketidakhadiran" class="collapse show" data-parent="#accordion">
+                                <div class="display-list" id="table-list">
+                                    <div class="mb-20" id="datatable-data">
+                                        <table class="data-table table hover nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th class="table-plus datatable-nosort">Tanggal</th>
+                                                    <th class="table-plus datatable-nosort">Status</th>
+                                                    <th class="table-plus datatable-nosort">Fingger</th>
+                                                    <th class="table-plus datatable-nosort">Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="">
+                                                        01 Mey 2024
+                                                        <br>
+                                                        Senin
+                                                    </td>
+                                                    <td class="">
+                                                        <div class="name-avatar d-flex align-items-center pr-2">
+                                                            <div class="txt">
+                                                                <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5"
+                                                                    data-color="#265ed7">3 hari</span>
+                                                                <div class="font-14 weight-600">Dr. Neil Wagner</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6">
+                                                                    Anggota Keluarga yang serumah <br> dengan karyawan Meninggal Dunia
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="">
+                                                        ['10:10','20:20']
+                                                    </td>
+                                                    <td class="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-20 pd-20" id="datatable-data">
-                        <table class="data-table table hover  nowrap">
-                            <thead>
-                                <tr>
-                                    <th class="table-plus datatable-nosort">Tanggal</th>
-                                    <th class="table-plus datatable-nosort">Status</th>
-                                    <th class="table-plus datatable-nosort">Fingger</th>
-                                    <th class="table-plus datatable-nosort">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="">
-                                        Senin, 01 Mey 2024
-                                    </td>
-                                    <td class="">
-                                        <div class=""><button class="btn btn-primary">DS</button></div>
-                                    </td>
-                                    <td class="">
-                                        ['10:10','20:20']
-                                    </td>
-                                    <td class="">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
+
+
             </div>
         </div>
 
@@ -167,14 +253,127 @@
             </div>
         </div>
     </div>
+    {{-- modal izin --}}
+    <div class="modal fade" id="modal-izin" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Ajukan Izin
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form enctype="multipart/form-data">
+                        <div class="form-group ">
+                            <label>Jenis Izin</label>
+                            <div class="multi-wrap-select-wrapper">
+                                <select id="status-absen-filter" class="form-control multi-wrap-select">
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Mulai Izin</label>
+                            <input class="form-control date-picker" placeholder="Select Date" type="text" />
+                        </div>
+                        <div class="form-group">
+                            <label id="label-lama-izin">Lama Izin</label>
+                            <input class="form-control" value="1" maxlength="3" type="number" />
+                        </div>
+                        <div class="form-group">
+                            <label id="label-lama-izin">Keterangan lainnya</label>
+                            <input class="form-control" type="text" />
+                        </div>
+                        <div class="form-group ">
+                            <label>Pilih Atasan Langsung</label>
+                            <div class="multi-wrap-select-wrapper">
+                                <select id="NRP-atasan" class="form-control multi-wrap-select atasan">
+
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection()
 
 @section('script_javascript')
     <script>
-        conLog('ui_dataset', ui_dataset)
+        function ajukanIzin() {
+            $('#modal-izin').modal('show');
+        }
+
+        function pilihJenisIzin(CODE_DATA) {
+            let propJenisIzin = db['public']['DATABASE-JENIS-IZIN'][CODE_DATA];
+            if (propJenisIzin['LAMA-IZIN-MAKSIMAL']) {
+                $('#label-lama-izin').text(`Lama Izin | max. ${propJenisIzin['LAMA-IZIN-MAKSIMAL']}`)
+            }
+        }
+    </script>
+    <script>
+        conLog('ui_dataset', ui_dataset);
+        conLog('db', db);
         let variable_local;
         let data_absensi = null;
         let count_absensi = {};
+        Object.entries(db['public']['DATABASE-JENIS-IZIN']).forEach(([kes, data_status_absen_element]) => {
+            $(`#status-absen-filter`).append(
+                `<option class="multi-wrap-option" value="${kes}">${data_status_absen_element['JENIS-IZIN']}</option>`
+            );
+        });
+
+        let profile = db['public']['KARYAWAN'][ui_dataset.ui_dataset.user_authentication.employee_uuid];
+        let atasan = db['db']['arr_employees']['all_employees']; //['PERUSAHAAN'][profile['PERUSAHAAN']];
+        if (ui_dataset.ui_dataset.user_authentication.GRADE <= 5) {
+            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile['PERUSAHAAN']]);
+            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile['PROJECT']]);
+
+            if (ui_dataset.ui_dataset.user_authentication.GRADE <= 4) {
+                
+
+                if (ui_dataset.ui_dataset.user_authentication.GRADE <= 2) {
+                    atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN'][profile['DEPARTEMEN']]);
+                    atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DIVISI'][profile['DIVISI']]);
+                }
+            }
+        }
+        conLog('atasan', atasan);
+        let grade_atas = [];
+        for (let i = 9; i > profile['GRADE']; i--) {
+            conLog(i,db['db']['arr_employees']['GRADE'][i]);
+            grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
+        }
+        
+        conLog('atasan mergered all', grade_atas);
+        atasan = innerJoinArrays(atasan, grade_atas);
+
+
+
+
+
+
+
+        conLog('atasan', atasan);
+        atasan.forEach(NRP => {
+
+            $(`.atasan`).append(
+                `<option class="multi-wrap-option" value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
+            );
+        });
 
 
         $(document).ready(function() {
@@ -191,7 +390,10 @@
                     $('#table-list').show();
                 }
             });
+            setUImonthYear()
         });
+
+
 
 
 
@@ -222,9 +424,8 @@
             header_table_field.forEach(element => {
                 header_table_element = `${header_table_element} <th> ${element} </th>`
             });
-
             header_table_element = `                    
-                        <table id="table-datatable" class="display nowrap stripe hover table" style="width:100%">
+                        <table id="table-datatable" class="nowrap stripe hover table" style="width:100%">
                             <thead>
                                 <tr>
                                     ${header_table_element}
@@ -388,6 +589,7 @@
 
                     $('#table-datatable').DataTable({
                         paging: true,
+                        responsive: true,
                         serverSide: false,
                         data: data_datatable,
                         columns: row_data_datatable
@@ -423,17 +625,19 @@
                         $('#total-absensi').append(elementssss);
                     });
 
+
                 },
                 error: function(response) {
                     conLog('response', response)
                     //alertModal()
                 }
             });
+            stopLoading();
         }
 
-        setUImonthYear()
+
         refreshTable(ui_dataset.ui_dataset.ui_date.year, ui_dataset.ui_dataset.ui_date.month, ui_dataset.ui_dataset.ui_date
-            .day)
+            .day);
 
 
         function showCeklog(date_absen) {
@@ -447,5 +651,40 @@
             }
             $('#modal-edit-live').modal('show');
         }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2
+            $('.multi-wrap-select').select2({
+                width: '100%', // Ensure the select2 takes full width
+                templateResult: formatOptionText,
+                templateSelection: formatOptionText
+            });
+
+            $('.status-absen-filter').select2({
+                width: '100%', // Ensure the select2 takes full width
+                templateResult: formatOptionText,
+                templateSelection: formatOptionText
+            });
+
+            // Function to limit text length based on container width
+            function formatOptionText(option) {
+                if (!option.id) {
+                    return option.text;
+                }
+                let text = option.text;
+                let $tempDiv = $('<div>').css({
+                    'width': $('.modal-dialog').width(), // use modal's width
+                    'font-size': '16px',
+                    'line-height': '1.5',
+                    'visibility': 'hidden',
+                    'white-space': 'nowrap',
+                    'position': 'absolute'
+                }).text(text).appendTo('body');
+
+
+                return text;
+            }
+        });
     </script>
 @endsection()

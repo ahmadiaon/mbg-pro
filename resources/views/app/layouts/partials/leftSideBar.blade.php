@@ -25,17 +25,20 @@
 
 
                 @if (!empty(session('user_authentication')['feature']))
-                    <li class="dropdown">
-                        <a href="human-resource:;" id="hr" class="dropdown-toggle">
-                            <span class="micon bi bi-calendar-range"></span><span class="mtext">Human Resource</span>
-                        </a>
+                    @if (in_array('HR', session('user_authentication')['feature']))
+                        <li class="dropdown">
+                            <a href="human-resource:;" id="hr" class="dropdown-toggle">
+                                <span class="micon bi bi-calendar-range"></span><span class="mtext">Human
+                                    Resource</span>
+                            </a>
 
-                        <ul class="submenu">
-                            @if (in_array('HR', session('user_authentication')['feature']))
-                                <li><a id="karyawan" class="" href="/web/hr/karyawan">Karyawan</a></li>
-                            @endif
-                        </ul>
-                    </li>
+                            <ul class="submenu">
+                                @if (in_array('HR', session('user_authentication')['feature']))
+                                    <li><a id="karyawan" class="" href="/web/hr/karyawan">Karyawan</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
 
                     <li class="dropdown">
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
@@ -49,6 +52,10 @@
                             @if (in_array('CUTI', session('user_authentication')['feature']))
                                 <li><a id="roaster-kerja" class="" href="/web/pengelolaan/roaster-kerja">Roaster
                                         Kerja</a></li>
+                            @endif
+                            @if (!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))
+                                <li><a id="file-fingger" class="" href="/web/pengelolaan/file-fingger">File
+                                        Fingger</a></li>
                             @endif
 
                         </ul>
@@ -87,7 +94,7 @@
                 @endif
 
 
-                @if(!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))
+                @if (!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))
                     <li class="dropdown">
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
                             <span class="micon bi bi-menu-button-wide"></span><span class="mtext">Database</span>
@@ -95,10 +102,11 @@
                         <ul class="submenu">
                             <li><a id="absensi" class="" href="/web/manage/absensi">Absensi</a></li>
                             <li><a id="slip" href="/web/manage/slip">Slip Gaji </a></li>
-                            @if(!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))
+                            @if (!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))
                                 <li><a id="slip" href="/web/manage/users">Users </a></li>
                                 <li><a id="slip" href="/web/manage/app">Aplikasi </a></li>
                                 <li><a id="slip" href="/web/manage/menu">Menu </a></li>
+                                <li><a id="slip" href="/web/manage/agrement">Persetujuan </a></li>
                                 <li><a id="slip" href="/web/manage/database">Database </a></li>
                             @endif
                         </ul>

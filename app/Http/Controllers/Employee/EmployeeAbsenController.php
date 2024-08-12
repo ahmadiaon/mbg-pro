@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Employee;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Aktivity\Aktivity;
+use App\Models\DatabaseData;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeAbsen;
 use App\Models\Employee\EmployeeOut;
@@ -121,7 +122,7 @@ class EmployeeAbsenController extends Controller
         $abjads = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR'];
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
-        $createSheet->setCellValue('A2', 'Absensi Bulan ' . $months[(int)$month] . '-' . $year);
+        $createSheet->setCellValue('A2', 'Absensi Bulan' . $months[(int)$month] . '-' . $year);
         $createSheet->setCellValue('A4', 'Nama');
         $createSheet->setCellValue('B4', 'NIK');
         $createSheet->setCellValue('C4', 'JABATAN');
@@ -165,6 +166,38 @@ class EmployeeAbsenController extends Controller
         $crateWriter->save($name);
 
         return response()->download($name);
+    }
+
+    public function dialyReportWeb(Request $request){
+        $abjads = ResponseFormatter::abjads();
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
+        $row = 9;
+        $col = 7;
+
+        $createSheet->setCellValue('A2', 'Excel');
+
+        $createSheet->setCellValue('A9', 'NO.');
+        $createSheet->setCellValue('B9', 'NRP');
+        $createSheet->setCellValue('C9', 'NAMA');
+        $createSheet->setCellValue('D9', 'POSISI');
+        $createSheet->setCellValue('E9', 'STATUS');
+        $createSheet->setCellValue('F9', 'SHIFT');
+        $createSheet->setCellValue('G9', 'IN');
+        $createSheet->setCellValue($abjads[$col].$row, 'MID');$col++;
+        $createSheet->setCellValue($abjads[$col].$row, 'OUT');$col++;
+        $createSheet->setCellValue($abjads[$col].$row, 'LATE');$col++;
+        $createSheet->setCellValue($abjads[$col].$row, 'EARLY');$col++;
+        $createSheet->setCellValue($abjads[$col].$row, 'TOTAL WORK');$col++;
+        $createSheet->setCellValue($abjads[$col].$row, 'TOTAL LATE');$col++;
+        $createSheet->setCellValue($abjads[$col].$row, 'TOTAL LATE');$col++;
+
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/' .  'DAILY REPORT -' . rand(99, 9999) . 'file.xls';
+        $crateWriter->save($name);
+
+        return ResponseFormatter::toJson($name, $request->all());
+
     }
 
     public function exportTemplate($year_month)
@@ -452,7 +485,13 @@ class EmployeeAbsenController extends Controller
 
     public function reportUnAbsen(Request $request)
     {
+
+        $validatedData = $request->all();
+        $validatedData['filteredData'] = json_decode($request->filteredData);
+        $validatedData['filteredData'] = json_decode(json_encode($validatedData['filteredData']), true);
         $data_database = session('data_database');
+
+        $db = session('db_local_storage');
         $createSpreadsheet = new spreadsheet();
         $createSheet = $createSpreadsheet->getActiveSheet();
         $row_Excel = 20;
@@ -479,14 +518,14 @@ class EmployeeAbsenController extends Controller
             ],
         );
 
-
+        $createSheet->setCellValue('C2', 'DARI-LIST');
         $createSheet->setCellValue('A' . $row_Excel, 'NO');
-        $createSheet->setCellValue('B' . $row_Excel, 'NIK KARYAWAN');
+        $createSheet->setCellValue('B' . $row_Excel, 'NRP');
         $createSheet->setCellValue('C' . $row_Excel, 'NAMA');
         $createSheet->setCellValue('D' . $row_Excel, 'JABATAN');
-        $createSheet->setCellValue('E' . $row_Excel, 'DEPARTMENT');
-        $createSheet->setCellValue('F' . $row_Excel, 'PERUSAHAAN');
-        $createSheet->setCellValue('G' . $row_Excel, 'SITE');
+        $createSheet->setCellValue('E' . $row_Excel, 'DIVISI');
+        $createSheet->setCellValue('F' . $row_Excel, 'DEPARTEMEN');
+        $createSheet->setCellValue('G' . $row_Excel, 'PROJECT');
         $createSheet->setCellValue('H' . $row_Excel, 'TANGGAL MULAI');
         $createSheet->setCellValue('I' . $row_Excel, 'LAMA');
         $createSheet->setCellValue('J' . $row_Excel, 'TANGGAL AKHIR');
@@ -494,10 +533,100 @@ class EmployeeAbsenController extends Controller
         $createSheet->setCellValue('L' . $row_Excel, 'KETERANGAN');
 
         $createSheet->getStyle('A' . $row_Excel . ':L20')->applyFromArray($styleArray_header);
+        $data_list = [];
+        $long_range_date = ResponseFormatter::countDayLongWork($validatedData['filter_absensi']['date_start'], $validatedData['filter_absensi']['date_end']);
+        $dates = ResponseFormatter::getDatesBetween($validatedData['filter_absensi']['date_start'], $validatedData['filter_absensi']['date_end']);
+
+        $colomn_date = 7;
+        $range_add = 4;
 
 
-        $validatedData = $request->all();
-        $validatedData['data_export'] = json_decode($request->data_export);
+        $all_data = [];
+        $data_for_web = [];
+        foreach ($validatedData['filteredData'] as $NRP => $item_data_employee) {
+            foreach ($dates as $date) {
+                $item_data_employee = json_decode(json_encode($item_data_employee), true);
+                if (empty($item_data_employee[$date])) {
+                    $validatedData['filteredData'][$NRP][$date] = [
+                        "date" => $date,
+                        "status_absen_uuid" => "-",
+                        "absen_description" => null,
+                    ];
+                }
+            }
+        }
+        foreach ($validatedData['status_absen_filter'] as $status_absen_filter) {
+
+            foreach ($validatedData['filteredData'] as $NRP => $item_data_employee) {
+                $data_list[] = $NRP;
+                $this_data_employee = [];
+                $item_data_employee = json_decode(json_encode($item_data_employee), true);
+                $prev_date = '';
+                foreach ($dates as $date) {
+                    if (!empty($item_data_employee[$date])) {
+                        if ($item_data_employee[$date]['status_absen_uuid'] == $status_absen_filter) {
+
+                            $data_for_table = [
+                                'nik_employee' => $NRP,
+                                'date_start' =>  $date,
+                                'date_end' => $date,
+                                'long_day' =>  1,
+                                'status_absen_uuid' => $item_data_employee[$date]['status_absen_uuid'],
+                                'absen_description' => $item_data_employee[$date]['absen_description']
+                            ];
+
+                            if (!empty($this_data_employee)) {
+                                $latest_array = end($this_data_employee);
+
+                                if ($latest_array['date_end'] == $prev_date) {
+
+                                    $data_for_table = $latest_array;
+                                    array_pop($this_data_employee);
+                                    $data_for_table['long_day'] =  $data_for_table['long_day'] + 1;
+                                    $data_for_table['date_end'] =  $date;
+                                }
+                            }
+                            $this_data_employee[] = $data_for_table;
+                        }
+                    }
+                    $prev_date = $date;
+                }
+                if (!empty($this_data_employee)) {
+
+                    $all_data[] =   $this_data_employee;
+                }
+            }
+        }
+
+        // return ResponseFormatter::toJson('$name', $all_data);
+        $row_Excel = 21;
+        foreach ($all_data as $item_employee) {
+            foreach ($item_employee as $item_absen) {
+                $data_for_web[] = $item_absen;
+                $db_employee = $db['public']['public_value']['KARYAWAN'][$item_absen['nik_employee']];
+                $createSheet->setCellValue('B' . $row_Excel, $db_employee['NRP']);
+                $createSheet->setCellValue('C' . $row_Excel, $db_employee['NAMA-KARYAWAN']);
+                $createSheet->setCellValue('D' . $row_Excel, $db_employee['JABATAN']);
+                $createSheet->setCellValue('E' . $row_Excel, $db_employee['DIVISI']);
+                $createSheet->setCellValue('F' . $row_Excel, $db_employee['DEPARTEMEN']);
+                $createSheet->setCellValue('G' . $row_Excel, $db_employee['PROJECT']);
+                $createSheet->setCellValue('H' . $row_Excel, $item_absen['date_start']);
+                $createSheet->setCellValue('I' . $row_Excel, $item_absen['long_day']);
+                $createSheet->setCellValue('J' . $row_Excel, $item_absen['date_end']);
+                $createSheet->setCellValue('K' . $row_Excel, $item_absen['status_absen_uuid']);
+                $createSheet->setCellValue('L' . $row_Excel, $item_absen['absen_description']);
+                $row_Excel++;
+            }
+        }
+
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/Laporan_Ketidakhadiran_' . rand(99, 9999) . '_file.xls';
+        $crateWriter->save($name);
+
+        return ResponseFormatter::toJson($name, $data_for_web);
+
+
+        $validatedData['filteredData'] = json_decode($request->filteredData);
         $validatedData['data_export'] = (array)$validatedData['data_export'];
 
         $validatedData['filter_status_absen'] = $validatedData['filter']['status_absen_filter'];
@@ -507,10 +636,12 @@ class EmployeeAbsenController extends Controller
         $date_day_start = $arr_date_start[2];
         $date_day_end = $arr_date_end[2];
 
-        $long_time_day_filter = (int)$date_day_end - (int)$date_day_start + 1;
 
         $data_unabsen = [];
         $data_unabsen_x = [];
+
+
+
         foreach ($validatedData['data_export'] as $item_data) {
             $count_day_filtered = 0;
             $absensi = $item_data->absensi;
@@ -609,75 +740,14 @@ class EmployeeAbsenController extends Controller
     {
         $year_month = '2024-01';
         $validatedData = $request->all();
-        $validatedData['company_uuid'] = 'MBLE';
-        $validatedData['site_uuid'] = 'GBM';
-        $validatedData['date'] = '2023-01-01';
-        $data_session = session('data_database');
-        $data_employee_out = $data_session['data_employee_out'];
-
-        $validatedData['data_export'] = json_decode($request->data_export);
-        $validatedData['data_other_response'] = json_decode($request->data_other_response);
-
-        // return ResponseFormatter::toJson('name', $validatedData);
-        $date = explode("-", $year_month);
-        $year = $date[0];
-        $month = $date[1];
-        $month = (int)$month;
+        $db = session('db_local_storage');
+        $abjads = ResponseFormatter::abjads();
         $months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        $date_start_absen_arr = ResponseFormatter::excelToDateArray($validatedData['filter']['date_filter']['date_start_filter_absen']);
-        $date_end_absen_arr = ResponseFormatter::excelToDateArray($validatedData['filter']['date_filter']['date_start_filter_absen']);
-        $validatedData['date_start_absen_arr'] = $date_start_absen_arr;
-        $month = $date_start_absen_arr['month'];
-        $datetime = Carbon::createFromFormat('Y-m', $year . '-' . $month);
-        $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
+        $arr_date_absen = explode("-", $validatedData['filter_absensi']['date_start']);
 
-        $abjads = ResponseFormatter::abjads();
 
-        $status_absens = StatusAbsen::orderBy('math', 'desc')->get();
-        $status_absen_pay = StatusAbsen::where('math', 'pay')->get()->count();
-        $status_absen = [];
-        foreach ($status_absens as $_status_absen) {
-            $status_absen[$_status_absen->status_absen_code] =  $_status_absen;
-        }
-
-        $row_status_absen = 8;
-        $row_status_absen_abjads = [];
-
-        // return view('datatableshow', [ 'data'         => $row_status_absen_abjads]);
-
-        $data_dialy_absen_detail = [];
-        $createSpreadsheet = new spreadsheet();
-        $createSheet = $createSpreadsheet->getActiveSheet();
-        $xxxx = array(
-            'borders' => array(
-                'outline' => array(
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => array('argb' => '9b189b'),
-                ),
-            ),
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER
-            ]
-        );
-        $createSheet->setCellValue('A2', 'Excel');
-        $createSheet->setCellValue('A20', 'NO.');
-        $createSheet->setCellValue('C20', 'NAMA');
-        $createSheet->setCellValue('B20', 'NIK');
-        $createSheet->setCellValue('D20', 'POSISI');
-        $createSheet->setCellValue('E20', 'DEPARTEMEN');
-        $createSheet->setCellValue('F20', 'SITE');
-        $createSheet->setCellValue('G20', 'PERUSAHAAN');
-
-        $status_absens_col = 1;
-        $date_row = 4;
-        $arr_date_start = explode('-', $validatedData['filter']['date_filter']['date_start_filter_absen']);
-        $arr_date_end = explode('-', $validatedData['filter']['date_filter']['date_end_filter_absen']);
-        $date_day_start = $arr_date_start[2];
-        $date_day_end = $arr_date_end[2];
-        $long_day =  (int)$date_day_end - (int)$date_day_start;
-        // header table tanggal
-
+        $status_absens_col = 2;
         $styleArray_employee = array(
             'font' => [
                 'bold' => true,
@@ -695,6 +765,7 @@ class EmployeeAbsenController extends Controller
                 ]
             ],
         );
+
         $style_text_center = array(
             'alignment' => [
                 'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -702,50 +773,125 @@ class EmployeeAbsenController extends Controller
             ],
         );
 
+        $validatedData['data_absensi'] = json_decode($request->data_absensi);
 
-        $row_ex = 7;
-        $row_first_ceklog = 4 + 6 + (int)$long_day;
+        // return ResponseFormatter::toJson('export data absen', $validatedData);
+        $createSpreadsheet = new spreadsheet();
+        $createSheet = $createSpreadsheet->getActiveSheet();
 
+        $createSheet->setCellValue('A2', 'Excel');
+        $createSheet->setCellValue('A20', 'NO.');
+        $createSheet->setCellValue('C20', 'NAMA');
+        $createSheet->setCellValue('B20', 'NIK');
+        $createSheet->setCellValue('D20', 'POSISI');
+        $createSheet->setCellValue('E20', 'DIVISI');
+        $createSheet->setCellValue('F20', 'DEPARTEMEN');
+        $createSheet->setCellValue('G20', 'PROJECT');
 
-        for ($i = (int)$date_day_start; $i <= (int)$date_day_end; $i++) {
-            // $createSheet->setCellValue($abjads[$row_ex] . '20', $i);
-            // $createSheet->getColumnDimension($abjads[$row_ex])->setWidth(4);
-
-            // // create in out header
-            $createSheet->setCellValue($abjads[$row_first_ceklog] . '19', $i);
-            $createSheet->mergeCells($abjads[$row_first_ceklog] . '19:' . $abjads[$row_first_ceklog + 2] . '19');
-            $createSheet->setCellValue($abjads[$row_first_ceklog] . '20', "Pertama");
-            $createSheet->setCellValue($abjads[$row_first_ceklog + 1] . '20', "Kedua");
-            $createSheet->setCellValue($abjads[$row_first_ceklog + 2] . '20', "Status");
-            $row_first_ceklog = $row_first_ceklog + 3;
-            $row_ex++;
-            $date_row++;
-        }
-
-
+        $status_absens = $db['public']['public_value']['DATABASE-ABSENSI'];
+        // keterangan absensi
         foreach ($status_absens as $item) {
-            $createSheet->setCellValue($abjads[2] . $status_absens_col,  $item->status_absen_code);
-            $createSheet->setCellValue($abjads[2 + 1] . $status_absens_col,  $item->status_absen_description);
-            $styleArray_employee['fill']['startColor']['rgb'] = $item->color;
-            $createSheet->getStyle($abjads[2] . $status_absens_col)->applyFromArray($styleArray_employee);
+            $createSheet->setCellValue($abjads[1] . $status_absens_col,  $item['KODE-ABSEN']);
+            $createSheet->setCellValue($abjads[1 + 1] . $status_absens_col,  $item['KETERANGAN-ABSEN']);
+            $styleArray_employee['fill']['startColor']['rgb'] = str_replace('#', '', $item['WARNA-ABSENSI']);
+            $createSheet->getStyle($abjads[1] . $status_absens_col)->applyFromArray($styleArray_employee);
             $status_absens_col++;
         }
+        // keterangan absensi
+
+        // tanggal absensi
+        $dates = ResponseFormatter::getDatesBetween($validatedData['filter_absensi']['date_start'], $validatedData['filter_absensi']['date_end']);
+        $long_range_date = ResponseFormatter::countDayLongWork($validatedData['filter_absensi']['date_start'], $validatedData['filter_absensi']['date_end']);
+        $colomn_date = 7;
+        $range_add = 4;
+        foreach ($dates as $date) {
+            $createSheet->setCellValue($abjads[$colomn_date] . '20',  Carbon::parse($date)->format('d'));
+            $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add - 2] . '19',  Carbon::parse($date)->format('d'));
+            $createSheet->mergeCells($abjads[$colomn_date + $long_range_date + $range_add - 2] . '19:' . $abjads[$colomn_date + $long_range_date + $range_add] . '19');
+
+            $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add - 2] . '20', "Pertama");
+            $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add - 1] . '20', "Kedua");
+            $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add] . '20', "Status");
+
+            $colomn_date++;
+            $range_add = $range_add + 2;
+        }
+        // tanggal absensi
 
 
-        $createSheet->setCellValue('H19', ResponseFormatter::getMonthName((int)$month) . " " . $year);
-        $createSheet->mergeCells('H19:' . $abjads[$row_ex - 1] . '19');
-        $createSheet->getStyle('H19:' . $abjads[$row_ex - 1] . '19')->applyFromArray($style_text_center);
+        $createSheet->setCellValue('H19', 'ABSENSI BULAN  ' . $months[(int)$arr_date_absen[1]] . ' Tahun ' . $arr_date_absen[0]);
+        $createSheet->mergeCells('H19:' . $abjads[$long_range_date + 6] . '19');
+        $createSheet->getStyle('H19:' . $abjads[$long_range_date + 6] . '19')->applyFromArray($style_text_center);
+
+        $row_data_employee = 21;
+        foreach ($validatedData['data_absensi'] as $NRP => $data_absensi) {
+            $data_employee = $db['public']['public_value']['KARYAWAN'][$NRP];
+            $data_absensi =  json_decode(json_encode($data_absensi), true);
+            $createSheet->setCellValue($abjads[1] . $row_data_employee, $data_employee['NRP']);
+            $createSheet->setCellValue($abjads[1 + 1] . $row_data_employee, $data_employee['NAMA-KARYAWAN']);
+            $createSheet->setCellValue($abjads[1 + 2] . $row_data_employee, $data_employee['JABATAN']);
+            $createSheet->setCellValue($abjads[1 + 3] . $row_data_employee, $data_employee['DIVISI']);
+            $createSheet->setCellValue($abjads[1 + 4] . $row_data_employee, $data_employee['DEPARTEMEN']);
+            $createSheet->setCellValue($abjads[1 + 5] . $row_data_employee, $data_employee['PROJECT']);
+            $colomn_date = 7;
+            $range_add = 2;
+
+            foreach ($dates as $date) {
+                if (!empty($data_absensi[$date])) {
+                    $styleArray_employee['fill']['startColor']['rgb'] = str_replace('#', '', $status_absens[$data_absensi[$date]['status_absen_uuid']]['WARNA-ABSENSI']);
+                    $createSheet->setCellValue($abjads[$colomn_date] . $row_data_employee,  $data_absensi[$date]['status_absen_uuid']);
+                    $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add + 2] . $row_data_employee,  $data_absensi[$date]['status_absen_uuid']);
+
+                    // if(!empty($data_absensi[$date]['cek_log'])){
+                        $arr_ceklog_user = json_decode($data_absensi[$date]['cek_log']);
+                        if(!empty($arr_ceklog_user)){
+
+                            $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add ] . $row_data_employee,  $arr_ceklog_user[0]);
+                            if($data_absensi[$date]['status_absen_uuid'] != "TA"){
+                                $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add + 1 ] . $row_data_employee,  end($arr_ceklog_user));
+                            }
+                        }
+                    // }
+                    
+                    $createSheet->getStyle($abjads[$colomn_date + $long_range_date + $range_add + 2] . $row_data_employee)->applyFromArray($styleArray_employee);
+                    $createSheet->getStyle($abjads[$colomn_date] . $row_data_employee)->applyFromArray($styleArray_employee);
+                }
+                $colomn_date++;
+                $range_add = $range_add + 2;
+            }
+            $row_data_employee++;
+        }
+        $styleArray_employee['fill']['startColor']['rgb'] = null;
+        $createSheet->getStyle('A19:' . $abjads[$long_range_date + 6] . $row_data_employee)->applyFromArray($styleArray_employee);
+        $createSheet->getStyle($abjads[$long_range_date + 6 + 3] . '19:' . $abjads[$long_range_date + 1 + 6 + ($long_range_date * 3)] . $row_data_employee)->applyFromArray($styleArray_employee);
+
+        for ($i = 0; $i <= (4 * $long_range_date) + 12; $i++) {
+            $createSheet->getColumnDimension($abjads[$i])->setAutoSize(true);
+        }
 
 
-        $pay = [];
-        $unpay = [];
+        $crateWriter = new Xls($createSpreadsheet);
+        $name = 'file/absensi/' . $validatedData['filter_absensi']['date_start'] . '-' . $validatedData['filter_absensi']['date_start'] . '-' . rand(99, 9999) . 'file.xls';
+        $crateWriter->save($name);
 
-        $employees = Employee::data_employee();
-        $employee_row = 21;
-        $status_absens_col_employee = $date_row;
-        $arr_status_absens = [];
-        $validatedData['data_export'] = (array)$validatedData['data_export'];
-
+        return ResponseFormatter::toJson($name, $validatedData['data_absensi']);
+        $xxxx = array(
+            'borders' => array(
+                'outline' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('argb' => '9b189b'),
+                ),
+            ),
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER
+            ]
+        );
+        $style_text_center = array(
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        );
         $styleArray_header = array(
             'font' => [
                 'bold' => true,
@@ -767,9 +913,6 @@ class EmployeeAbsenController extends Controller
                 ]
             ],
         );
-        //header
-        $createSheet->getStyle('A19:' . $abjads[$row_ex - 1] . '20')->applyFromArray($styleArray_header);
-
         $styleArray_values = array(
             'font' => [
                 'bold' => false,
@@ -791,10 +934,6 @@ class EmployeeAbsenController extends Controller
                 ]
             ],
         );
-        $styleArray_employee['fill']['startColor']['rgb'] = 'ffffff';
-        $createSheet->getStyle('H21:' . $abjads[$row_ex - 1] . (count($validatedData['data_export']) + 20))->applyFromArray($styleArray_values);
-        $createSheet->getStyle('A21:G' . (count($validatedData['data_export']) + 20))->applyFromArray($styleArray_employee);
-
         $styleArray_value = array(
             'font' => [
                 'bold' => false,
@@ -806,67 +945,6 @@ class EmployeeAbsenController extends Controller
                 ]
             ],
         );
-
-        $row_employees = 21;
-
-        foreach ($validatedData['data_export'] as $item_data_export) {
-            $createSheet->setCellValue('B' . $row_employees, $item_data_export->nik_employee_with_space);
-            $createSheet->setCellValue('C' . $row_employees, $item_data_export->name);
-            $createSheet->setCellValue('D' . $row_employees, $item_data_export->position);
-            $createSheet->setCellValue('E' . $row_employees, $item_data_export->department_uuid);
-            $createSheet->setCellValue('F' . $row_employees, $item_data_export->site_uuid);
-            $createSheet->setCellValue('G' . $row_employees, $item_data_export->company_uuid);
-
-            $row_ex = 7;
-            $count_day = 0;
-            $row_first_ceklog = 4 + 6 + (int)$long_day;
-            $row_end_ceklog = 5  + 6 + (int)$long_day;
-            $row_status_absen_ceklog = 6 + 6 + (int)$long_day;
-            for ($i = (int)$date_day_start; $i <= (int)$date_day_end; $i++) {
-                if (!empty($item_data_export->data)) {
-                    $x = $arr_date_start[0];
-                    $item_data = (array)$item_data_export->data;
-                    $x = ResponseFormatter::to2Digit($i);
-                    $xx = $arr_date_start[0] . '-' . $arr_date_start[1] . '-' . $x;
-                    $x = '';
-
-                    if (!empty($item_data[$xx])) {
-                        $xy = (array)$item_data[$xx];
-                        $x = $xy['status_absen_code'];
-                        $array_ceklog = json_decode($xy['cek_log']);
-                        if (!empty($array_ceklog) && count($array_ceklog) >= 1) {
-                            $array_ceklog = json_decode($xy['cek_log']);
-                            $createSheet->setCellValue($abjads[$row_first_ceklog] . $row_employees, $array_ceklog[0]);
-                            if (count($array_ceklog) > 1) {
-                                $createSheet->setCellValue($abjads[$row_end_ceklog] . $row_employees, end($array_ceklog));
-                            }
-                        }
-                        $createSheet->setCellValue($abjads[$row_status_absen_ceklog] . $row_employees, $x);
-
-                        $styleArray_value['fill']['startColor']['rgb'] = $status_absen[$x]['color'];
-                        // return ResponseFormatter::toJson($styleArray_value['fill']['startColor']['rgb'] ,$styleArray_value['fill']['startColor']['rgb'] );
-                        $createSheet->getStyle($abjads[$row_status_absen_ceklog] . $row_employees)->applyFromArray($styleArray_value);
-                    }
-
-                    $row_first_ceklog = $row_first_ceklog + 3;
-                    $row_end_ceklog = $row_end_ceklog + 3;
-                    $row_status_absen_ceklog = $row_status_absen_ceklog + 3;
-
-                    $createSheet->setCellValue($abjads[$row_ex] . $row_employees, $x);
-                    $createSheet->getStyle($abjads[$row_ex] . $row_employees)->applyFromArray($styleArray_value);
-
-                    $count_day++;
-                }
-
-                $row_ex++;
-                $date_row++;
-                $styleArray_value['fill']['startColor']['rgb'] = 'ffffff';
-            }
-            $row_employees++;
-        }
-        $row_employees--;
-
-        //bordered ceklog
         $styleArray_header = array(
             'font' => [
                 'bold' => true,
@@ -889,8 +967,6 @@ class EmployeeAbsenController extends Controller
             ],
         );
 
-        //header
-        $createSheet->getStyle($abjads[$long_day + 10] . '19:' . $abjads[(4 * $long_day) + 12] . '20')->applyFromArray($styleArray_header);
         $styleArray_header = array(
             'font' => [
                 'bold' => true,
@@ -906,38 +982,6 @@ class EmployeeAbsenController extends Controller
                 ),
             ),
         );
-        $createSheet->getStyle($abjads[$long_day + 10] . '21:' . $abjads[(4 * $long_day) + 12] . $row_employees)->applyFromArray($styleArray_header);
-
-        //columng dimension all
-        for ($i = 0; $i <= (4 * $long_day) + 12; $i++) {
-            $createSheet->getColumnDimension($abjads[$i])->setAutoSize(true);
-        }
-
-        $row_ex = 7;
-        $row_employees += 3;
-        $createSheet->setCellValue($abjads[$row_ex - 1] . $row_employees, "NAMA");
-
-        // for ($i = (int)$date_day_start; $i <= (int)$date_day_end; $i++) {
-        //     $createSheet->setCellValue($abjads[$row_ex] . $row_employees, $i);
-        //     $createSheet->getColumnDimension($abjads[$row_ex])->setWidth(4);
-        //     $row_ex++;
-        //     $date_row++;
-        // }
-
-        // $styleArray_header['fill']['startColor']['rgb'] = '4c4ce9';
-        // $createSheet->getStyle($abjads[7].$row_employees.':' . $abjads[$long_day + 7] . $row_employees)->applyFromArray($styleArray_header);
-        // $row_ex = 6;
-        // $row_employees++;
-        // if(!empty($validatedData['data_other_response'])){
-        //     foreach ($validatedData['data_other_response'] as $index_nik=>$item_data_export) {
-        //         $createSheet->setCellValue($abjads[$row_ex] . $row_employees, $index_nik);
-        //         $row_employees++;
-        //     }
-        // }
-
-
-
-
         $crateWriter = new Xls($createSpreadsheet);
         $name = 'file/absensi/' . $year_month . '-' . rand(99, 9999) . 'file.xls';
         $crateWriter->save($name);
@@ -945,245 +989,6 @@ class EmployeeAbsenController extends Controller
         return ResponseFormatter::toJson($name, $validatedData);
 
 
-
-
-
-
-        $no_emp = 1;
-        $data_dialy_absen = [];
-
-        foreach ($validatedData['data_export'] as $item_data_export) {
-            $data_company = [];
-            if (empty($data_employee_out[$item_data_export->nik_employee])) {
-                if (($item_data_export->company_uuid == $validatedData['company_uuid']) &&  ($item_data_export->site_uuid == $validatedData['site_uuid'])) {
-                    if (empty($data_dialy_absen[$item_data_export->department_uuid]['detail'])) {
-                        foreach ($item_data_export->absensi as $index_absensi => $absensi) {
-                            $data_dialy_absen[$item_data_export->department_uuid]['detail'][$index_absensi] = 0;
-                        }
-                    }
-                    foreach ($item_data_export->absensi as $index_absensi => $absensi) {
-                        if (!empty($data_dialy_absen_detail[$index_absensi]['name'])) {
-                            $data_dialy_absen_detail[$index_absensi]['count'] = $data_dialy_absen_detail[$index_absensi]['count'] +  $absensi;
-                        }
-                        $data_dialy_absen[$item_data_export->department_uuid]['detail'][$index_absensi] = $data_dialy_absen[$item_data_export->department_uuid]['detail'][$index_absensi] + $absensi;
-                    }
-                }
-            }
-        }
-
-        $createSheet->setCellValue('C22', 'KETERANGAN ABSEN');
-        $createSheet->setCellValue('D22', 'JUMLAH');
-
-        $row_item_dialy_detail_start = $row_item_dialy_detail = 23;
-        $row_status_absen = 8;
-        foreach ($data_dialy_absen_detail as $index_name_absen => $item_data_dialy_absen_detail) {
-            if (!empty($item_data_dialy_absen_detail['count'])) {
-                $createSheet->setCellValue('C' . $row_item_dialy_detail, $item_data_dialy_absen_detail['name']);
-                $createSheet->setCellValue('D' . $row_item_dialy_detail, $item_data_dialy_absen_detail['count']);
-
-                $row_status_absen_abjads[$index_name_absen] = $abjads[$row_status_absen];
-                $createSheet->setCellValue($abjads[$row_status_absen] . '22',  $item_data_dialy_absen_detail['name']);
-                $row_status_absen++;
-
-                $row_item_dialy_detail++;
-            }
-        }
-        $createSheet->setCellValue('C' . $row_item_dialy_detail, 'TOTAL');
-        $createSheet->setCellValue('D' . $row_item_dialy_detail, '=SUM(D' . ($row_item_dialy_detail_start) . ':D' . ($row_item_dialy_detail - 1) . ')');
-
-
-        $createSheet->setCellValue('H22', 'DEPARTEMEN');
-
-        $row_dialy_absen_first = $row_dialy_absen = 23;
-        foreach ($data_dialy_absen as $department_uuid => $item_dialy_absen) {
-            $createSheet->setCellValue('H' . $row_dialy_absen, $department_uuid);
-            foreach ($row_status_absen_abjads as $name_count => $row_abjad) {
-                $createSheet->setCellValue($row_abjad . $row_dialy_absen, $item_dialy_absen['detail'][$name_count]);
-            }
-            $row_dialy_absen++;
-        }
-        $createSheet->setCellValue('H' . $row_dialy_absen, 'TOTAL');
-        foreach ($row_status_absen_abjads as $name_count => $row_abjad) {
-            $createSheet->setCellValue($row_abjad . $row_dialy_absen, '=SUM(' . $row_abjad . ($row_dialy_absen_first) . ':' . $row_abjad . ($row_dialy_absen - 1) . ')');
-        }
-
-        /*
-        {
-            'MBLE' => [
-                => 'GBM' => [
-                    'HAULING' => [
-                        'data' => [
-                            'DS' => [
-                                'MBLE-0422003'
-                            ]
-                        ]
-                        'detail' => [
-                            'DS' = > [
-                                'count => 1,
-                            ]
-                        ]
-                    ],
-                    'PRODUCTION' => [
-                        'detail' => [
-                            'DS' = > [
-                                'count => 1,
-                            ]
-                        ]
-                    ],
-                ]
-            ]
-        }
-
-        */
-
-
-
-
-
-
-
-
-        $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/absensi/' . $year_month . '-' . rand(99, 9999) . 'file.xls';
-        $crateWriter->save($name);
-        $validatedData['data_dialy_absen_detail'] = $data_dialy_absen_detail;
-        $validatedData['data_dialy_absen_detail'] = $data_dialy_absen_detail;
-        $validatedData['row_status_absen_abjads'] = $row_status_absen_abjads;
-        $validatedData['data_dialy_absen'] = $data_dialy_absen;
-
-        return ResponseFormatter::toJson($name, $validatedData);
-
-
-        $createSheet->setCellValue('B16', 'ABSENSI BULAN  ' . $months[$month] . ' Tahun ' . $year);
-        $createSheet->setCellValue('A20', 'No.');
-        $createSheet->setCellValue('B20', 'ID EMP');
-        $createSheet->setCellValue('C20', 'NAMA');
-        $createSheet->setCellValue('D20', 'JABATAN');
-
-        $status_absens_col = 1;
-        $date_row = 4;
-        $i_date = [];
-
-        $startDate = new \DateTime($validatedData['filter']['date_filter']['date_start_filter_absen']);
-        $endDate = new \DateTime($validatedData['filter']['date_filter']['date_end_filter_absen']);
-        $i = 4;
-        for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
-            $i_date[$date->format('Y-m-d')] = $abjads[$i];
-            $createSheet->setCellValue($abjads[$i] . '20', $date->format('d'));
-            $i++;
-        }
-
-        $no_emp = 1;
-        foreach ($validatedData['data_export'] as $item_data_export) {
-            $no_emp_col = $no_emp + 20;
-            $createSheet->setCellValue('A' . $no_emp_col, $no_emp);
-            $createSheet->setCellValue('B' . $no_emp_col, $item_data_export->nik_employee_with_space);
-            $createSheet->setCellValue('C' . $no_emp_col, $item_data_export->name);
-            $createSheet->setCellValue('D' . $no_emp_col, $item_data_export->position);
-
-            if (!empty($item_data_export->data)) {
-                foreach ($item_data_export->data as $index => $item_item_data_export) {
-                    $createSheet->setCellValue($i_date[$index] . $no_emp_col, $item_item_data_export->status_absen_uuid);
-                }
-            }
-            $no_emp++;
-        }
-
-        $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/absensi/' . $year_month . '-' . rand(99, 9999) . 'file.xls';
-        $crateWriter->save($name);
-
-        return ResponseFormatter::toJson($name, $validatedData);
-
-        return response()->download($name);
-        // header table tanggal
-        for ($i = 1; $i <= $day_month; $i++) {
-            $createSheet->setCellValue($abjads[$i + 3] . '20',  $i);
-            $createSheet->getColumnDimension($abjads[$i + 3])->setWidth(4);
-            $status_absens_col = 1;
-            foreach ($status_absens as $item) {
-                $createSheet->setCellValue($abjads[$date_row] . $status_absens_col,  $item->status_absen_code);
-                $status_absens_col++;
-            }
-            $date_row++;
-        }
-
-        // simpulan data
-        $pay = [];
-        $unpay = [];
-
-        // dd($pay);
-        // loop karyawan
-        $employees = Employee::data_employee();
-        $employee_row = 21;
-        $status_absens_col_employee = $date_row;
-        $arr_status_absens = [];
-
-        foreach ($status_absens as $item) {
-            $createSheet->setCellValue($abjads[$date_row] . '20',  $item->status_absen_code);
-            if ($item->math == 'pay') {
-                $pay[] = $abjads[$date_row];
-            } else {
-                $unpay[] = $abjads[$date_row];
-            }
-            $arr_status_absens[$item->status_absen_code] = $date_row;
-            $date_row++;
-        }
-
-        // dd($pay);
-        foreach ($employees as $employee) {
-            $createSheet->setCellValue('B' . $employee_row,  $employee->name);
-            $createSheet->setCellValue('C' . $employee_row,  $employee->nik_employee);
-            $createSheet->setCellValue('D' . $employee_row,  $employee->position);
-            // data absen
-            $data_absens_employee = EmployeeAbsen::where('employee_uuid', $employee->machine_id)
-                ->whereYear('employee_absens.date', $year)
-                ->whereMonth('employee_absens.date', $month)
-                ->orderBy('employee_absens.date', 'asc')
-                ->get([
-                    'employee_absens.*'
-                ]);
-
-            foreach ($data_absens_employee as $item) {
-                $date_explode = explode('-', $item->date);
-                // dd($item);
-                $item_date = $date_explode[2] + 3;
-                $createSheet->setCellValue($abjads[$item_date] . $employee_row,  $item->status_absen_uuid);
-            }
-
-
-            foreach ($arr_status_absens as $item => $value) {
-                $column_start_date = 4;
-                $column_end_date = $day_month + 3;
-
-                $formula = '=COUNTIF(' . $abjads[$column_start_date] . $employee_row . ':' . $abjads[$column_end_date] . $employee_row . ',"' . $item . '")';
-                $createSheet->setCellValue($abjads[$value] . $employee_row,  $formula);
-            }
-            // simpulan dibayar
-            $formula_pay = '=SUM(';
-            foreach ($pay as $p) {
-                $formula_pay = $formula_pay . $p . $employee_row . ',';
-            }
-
-            $formula_pay  = rtrim($formula_pay, ",");
-            $formula_pay = $formula_pay . ')';
-            $formula_unpay = '=SUM(';
-            foreach ($unpay as $p) {
-                $formula_unpay = $formula_unpay . $p . $employee_row . ',';
-            }
-            $formula_unpay  = rtrim($formula_unpay, ",");
-            $formula_unpay = $formula_unpay . ')';
-            // dd($formula_unpay);
-            $createSheet->setCellValue($abjads[$date_row] . $employee_row,  $formula_pay);
-            // simpulan potongan
-            $createSheet->setCellValue($abjads[$date_row + 1] . $employee_row,  $formula_unpay);
-
-            $employee_row++;
-        }
-
-        $crateWriter = new Xls($createSpreadsheet);
-        $name = 'file/absensi/' . $year_month . '-' . rand(99, 9999) . 'file.xls';
-        $crateWriter->save($name);
 
         // return 'aaa';
         return response()->download($name);
@@ -2097,42 +1902,80 @@ class EmployeeAbsenController extends Controller
     {
 
         $validatedData = $request->all();
+        $uuids = Str::uuid();
 
-        $get_employee = Employee::whereNull('date_end')->where('nik_employee', $validatedData['nik_employee'])->get()->first();
+        $data_insert = [
+            'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER',
+            'code_field_data' => 'KODE-TABEL-ID-FINGGER',
+            'value_data' => ResponseFormatter::toUUID($request['nik_employee'] . '-' . $request['employee_uuid']),
+            'code_data' => ResponseFormatter::toUUID($request['nik_employee'] . '-' . $request['employee_uuid']),
+            'uuid_data' => $uuids,
+        ];
 
-        $storeEmployee = Employee::updateOrCreate(
-            ['nik_employee' => $validatedData['nik_employee']],
-            ['machine_id' => $validatedData['employee_uuid']]
+        $Q_store_data = DatabaseData::updateOrCreate(
+            [
+                'code_table_data' => $data_insert['code_table_data'], //table data source
+                'code_field_data' => $data_insert['code_field_data'],
+                'code_data' => $data_insert['code_data'], //value primary key
+                'uuid_data' => $uuids,
+            ],
+            [
+                'value_data' => $data_insert['value_data'],
+                'date_start' => Carbon::now()->format('Y-m-d'),
+                'date_end' => null,
+            ]
         );
+
+        $data_insert = [
+            'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER',
+            'code_field_data' => 'NRP',
+            'value_data' => ResponseFormatter::toUUID($request['nik_employee']),
+            'code_data' => ResponseFormatter::toUUID($request['nik_employee'] . '-' . $request['employee_uuid']),
+            'uuid_data' => $uuids,
+        ];
+
+        $Q_store_data = DatabaseData::updateOrCreate(
+            [
+                'code_table_data' => $data_insert['code_table_data'], //table data source
+                'code_field_data' => $data_insert['code_field_data'],
+                'code_data' => $data_insert['code_data'], //value primary key
+                'uuid_data' => $uuids,
+            ],
+            [
+                'value_data' => $data_insert['value_data'],
+                'date_start' => Carbon::now()->format('Y-m-d'),
+                'date_end' => null,
+            ]
+        );
+
+        $data_insert = [
+            'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER',
+            'code_field_data' => 'ID-FINGGER',
+            'value_data' => $request['employee_uuid'],
+            'code_data' => ResponseFormatter::toUUID($request['nik_employee'] . '-' . $request['employee_uuid']),
+            'uuid_data' => $uuids,
+        ];
+
+        $Q_store_data = DatabaseData::updateOrCreate(
+            [
+                'code_table_data' => $data_insert['code_table_data'], //table data source
+                'code_field_data' => $data_insert['code_field_data'],
+                'code_data' => $data_insert['code_data'], //value primary key
+                'uuid_data' => $uuids,
+            ],
+            [
+                'value_data' => $data_insert['value_data'],
+                'date_start' => Carbon::now()->format('Y-m-d'),
+                'date_end' => null,
+            ]
+        );
+
         $StoreAbsen = EmployeeAbsen::where('employee_uuid', $validatedData['employee_uuid'])
             ->update([
                 'employee_uuid' => $validatedData['nik_employee'],
-                // 'uuid' => $validatedData['employee_uuid'],
             ]);
 
-        $uuid =  Str::uuid();
-
-        $insert_data = [
-            'table_name' => 'ID-FINGGER-KARYAWAN',
-            'field'     => 'ID-KARYAWAN',
-            'value_field'   => $validatedData['nik_employee'],
-            'type_data' => 'EMPLOYEES',
-            'code_data' => $uuid,
-        ];
-
-        $store_id_karyawan = Aktivity::insert($insert_data);
-
-        $insert_data['field'] = 'ID-FINGGER';
-        $insert_data['value_field'] = $validatedData['employee_uuid'];
-        $store_id_karyawan = Aktivity::insert($insert_data);
-
-        $insert_data['field'] = 'CREATED-BY';
-        $insert_data['value_field'] = 'MBLE-0422003';
-        $store_id_karyawan = Aktivity::insert($insert_data);
-
-        // change this to people created
-
-        return ResponseFormatter::toJson($request->all(), $StoreAbsen);
+        return ResponseFormatter::toJson($request->all(), 'Absensi stored');
     }
 
     public function import(Request $request)
@@ -2156,9 +1999,9 @@ class EmployeeAbsenController extends Controller
             if ($sheet->getCell('A2')->getValue() == 'Excel') { //File dari Excell berbentuk tabel full bulan
                 $month_absensi = $sheet->getCell('H19')->getValue();
                 $arr_month_absensi = explode(' ', $month_absensi);
-
-                $year =  $arr_month_absensi[1];
-                $month = str_pad(ResponseFormatter::monthSort($arr_month_absensi[0]), 2, '0', STR_PAD_LEFT);
+                // return ResponseFormatter::toJson($arr_month_absensi, 'store from excel report');
+                $year =  $arr_month_absensi[4];
+                $month = str_pad(ResponseFormatter::monthSort($arr_month_absensi[2]), 2, '0', STR_PAD_LEFT);
                 $year_month = $year . '-' . $month;
 
                 $last_day = ResponseFormatter::getEndDay($year . '-' . $month);
@@ -2287,24 +2130,33 @@ class EmployeeAbsenController extends Controller
                     return ResponseFormatter::toJson($data_return, 'data return to setup');
                 }
 
+                $Q_data_fingger = DatabaseData::where('code_table_data', 'DATABASE-KODE-TABEL-ID-FINGGER')->get();
+                $arr_data_fingger = [];
+                foreach ($Q_data_fingger as $item_data_fingger) {
+                    $arr_data_fingger[$item_data_fingger->uuid_data][$item_data_fingger->code_field_data] = $item_data_fingger->value_data;
+                }
+                $employees_machine_ids = [];
+                foreach ($arr_data_fingger as $item_fingger) {
+                    $employees_machine_ids[$item_fingger['ID-FINGGER']] = $item_fingger['NRP'];
+                }
+
+                // return ResponseFormatter::toJson($employees_machine_ids,'data fingger id employees');
+
+
+
                 // ==== END VALIDATION DATE PREPROCESING =====
                 $start_date = date_create($validatedData['date_absen_start']);
                 $end_date = date_create($validatedData['date_absen_end']);
 
-                $data_database = session('data_database');
-                $data_employees = [];
-                foreach ($data_database['data_employees'] as $data_employee_) {
-                    $data_employees[$data_employee_->nik_employee] = $data_employee_;
-                }
+                // $data_database = session('data_database');
+                $data_employees = session('db_local_storage')['public']['KARYAWAN'];
 
-                $data_employees_machine_id = $data_database['data_datatable_database']['database']['data-table']['ID-FINGGER-KARYAWAN'];
-                $employees_machine_ids = [];
-                foreach ($data_employees_machine_id as $item) {
-                    $employees_machine_ids[$item['ID-FINGGER']['value_field']] = $item['ID-KARYAWAN']['value_field'];
-                }
-
-                // return ResponseFormatter::toJson($employees_machine_ids,'dasdas');
-
+                // return ResponseFormatter::toJson($data_employees,'here');
+                // $data_employees_machine_id = $data_database['data_datatable_database']['database']['data-table']['ID-FINGGER-KARYAWAN'];
+                // $employees_machine_ids = [];
+                // foreach ($data_employees_machine_id as $item) {
+                //     $employees_machine_ids[$item['ID-FINGGER']['value_field']] = $item['ID-KARYAWAN']['value_field'];
+                // }
 
                 $data_employee_absen_have_employees = EmployeeAbsen::join('employees', 'employees.machine_id', 'employee_absens.employee_uuid')
                     ->groupBy(
@@ -2364,6 +2216,7 @@ class EmployeeAbsenController extends Controller
                 $un_identification = [];
                 $identification = [];
                 $MAC = [];
+
 
                 // foreach employees
                 for ($j = 0; $j < $employees_count; $j++) {
@@ -2452,10 +2305,9 @@ class EmployeeAbsenController extends Controller
 
                             $all_data[$employee_uuid][] = $absensies;
                             $dataaa[] = $absensies;
-
+                            // return ResponseFormatter::toJson('xx',$all_data);
                             // terapkan jadi index
                             if ((string)$employee_uuid != (string)$employeeName) {
-
                                 if (!empty($data_employees[$employee_uuid])) {
                                     if (empty($all_datas['have_employees']['detail'][$employee_uuid])) {
                                         $all_datas['have_employees']['data'][] = [
@@ -2473,6 +2325,11 @@ class EmployeeAbsenController extends Controller
                                 }
                                 $all_datas['null_employees'][$absensies['employee_uuid']]['data'][$abjad] = $absensies;
                             }
+
+
+
+
+                            // return ResponseFormatter::toJson($all_datas, 'data return to err');
                             $arr_machine_id[$employeeName]['date'][$abjad] = $statusAbsen;
                         }
                         $count_day++;
@@ -2482,7 +2339,8 @@ class EmployeeAbsenController extends Controller
                 }
 
 
-                // return ResponseFormatter::toJson('xx',$MAC);
+                // return ResponseFormatter::toJson('xx','all_datas');
+                // return ResponseFormatter::toJson('xx',$all_datas);
 
                 $all_datas['have_employees']['configuration'] = [
                     'long_date' => $date_end,
@@ -3093,13 +2951,15 @@ class EmployeeAbsenController extends Controller
     // =========================================================== WEB ============================================
     public function getApiAbsensi(Request $request)
     {
+
+
         $Q_data_absens = EmployeeAbsen::where('employee_absens.date', '>=', $request['filter_absensi']['date_start'])
             ->where('employee_absens.date', '<=', $request['filter_absensi']['date_end'])
             ->get();
         $arr_absens = [];
         if (!empty($Q_data_absens)) {
             foreach ($Q_data_absens as $I_data_absen) {
-                $arr_absens[$I_data_absen->employee_uuid]['detail_absen'][$I_data_absen->date] = $I_data_absen;
+                $arr_absens[ResponseFormatter::toUUID($I_data_absen->employee_uuid)][$I_data_absen->date] = $I_data_absen;
             }
         }
         return ResponseFormatter::ResponseJson($arr_absens, 'All Absensi Data', 200);

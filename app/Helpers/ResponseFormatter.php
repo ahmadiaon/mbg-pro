@@ -19,6 +19,8 @@ use App\Models\StatusAbsen;
 use App\Models\Support\DataSource;
 use App\Models\UserDetail\UserDetail;
 use Carbon\Carbon;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -40,23 +42,34 @@ class ResponseFormatter
     return $string;
   }
 
+  public static function dateToArray($dateString)
+  {
+    $date = Carbon::parse($dateString);
+
+    return $dateArray = [
+      'year' => $date->year,
+      'month' => $date->month,
+      'day' => $date->day
+    ];
+  }
+
   public static function convertToDate($value)
   {
-      // Check if the value is a string and in the format yyyy-mm-dd
-      if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
-          return $value; // It's already in yyyy-mm-dd format
-      }
-  
-      // If the value is a number, convert it to yyyy-mm-dd
-      if (is_numeric($value)) {
-          // Convert the number to a Carbon instance, assuming the number is an Excel serial date
-          // Adjust the base date if needed; this example assumes it's an Excel date.
-          $date = Carbon::createFromFormat('Y-m-d', '1899-12-30')->addDays($value);
-          return $date->format('Y-m-d');
-      }
-  
-      // If the value is not valid, return null or throw an exception
-      return null;
+    // Check if the value is a string and in the format yyyy-mm-dd
+    if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+      return $value; // It's already in yyyy-mm-dd format
+    }
+
+    // If the value is a number, convert it to yyyy-mm-dd
+    if (is_numeric($value)) {
+      // Convert the number to a Carbon instance, assuming the number is an Excel serial date
+      // Adjust the base date if needed; this example assumes it's an Excel date.
+      $date = Carbon::createFromFormat('Y-m-d', '1899-12-30')->addDays($value);
+      return $date->format('Y-m-d');
+    }
+
+    // If the value is not valid, return null or throw an exception
+    return null;
   }
 
   public static function monthSort($stringMonth)
@@ -189,6 +202,30 @@ class ResponseFormatter
     return array_search($index, $array);
   }
 
+  public static function getDatesBetween($startDate, $endDate)
+  {
+    // Pastikan tanggal dalam format Carbon
+    $start = Carbon::parse($startDate);
+    $end = Carbon::parse($endDate);
+
+    // Tambahkan satu hari pada tanggal akhir untuk memastikan tanggal akhir juga disertakan
+    $end = $end->addDay();
+
+    // Buat DatePeriod
+    $interval = new DateInterval('P1D'); // Interval 1 hari
+    $datePeriod = new DatePeriod($start, $interval, $end);
+
+    // Array untuk menyimpan hasil tanggal
+    $dates = [];
+
+    // Loop melalui DatePeriod dan ambil tanggal (day)
+    foreach ($datePeriod as $date) {
+      $dates[] = $date->format('Y-m-d'); // Atau gunakan 'd' untuk hanya mendapatkan hari
+    }
+
+    return $dates;
+  }
+
   public static function toFloat($data)
   {
 
@@ -226,11 +263,17 @@ class ResponseFormatter
     $day_month = Carbon::parse($datetime)->endOfMonth()->isoFormat('D');
     return $day_month;
   }
+  public static function getEndDayFromDate($year_month)
+  {
+    $datetime = Carbon::parse('2024-07-15');
+    $day_month = Carbon::parse($year_month)->endOfMonth()->isoFormat('YY-MM-DD');
+    return $day_month;
+  }
 
   public static function toUUID($uuid)
   {
     $uuid = ResponseFormatter::isString($uuid);
-    return strtoupper(str_replace(' ', '-', str_replace('.', '-', str_replace('/', '-',  $uuid))));
+    return strtoupper(str_replace(' ', '-', str_replace('.', '-', str_replace('/', '-',  str_replace('_', '-',  $uuid)))));
   }
 
   public static function toUuidLower($uuid)
@@ -579,7 +622,7 @@ class ResponseFormatter
     $data_datatable_database = [];
     $arr_employees = Employee::data_employee();
 
-    foreach($arr_employees->first()->toArray() as $index_first=>$item_arr_employees){
+    foreach ($arr_employees->first()->toArray() as $index_first => $item_arr_employees) {
       $data_datatable_database['database']['data-schema']['employees'][] = $index_first;
     }
     $data_datatable_database['database']['data-schema']['employees'][] = 'full_name';
@@ -974,6 +1017,12 @@ class ResponseFormatter
       ]
     ];
     return str_pad($num, 2, "0", STR_PAD_LEFT);
+  }
+
+  public static function addDate($currentDate, $countAddDay){
+    $date = Carbon::createFromFormat('Y-m-d', $currentDate);
+    $newDate = $date->addDays($countAddDay - 1);
+    return $newDate->toDateString();
   }
 }
 

@@ -68,6 +68,7 @@ Route::prefix('mbg')->group(function () {
 
         Route::prefix('database')->group(function () {// /api/mbg/manage/database/
             Route::post('/store-database', [DatabaseController::class, 'storeData']);
+            Route::post('/store-database-file', [DatabaseController::class, 'storeDataFile']);
             Route::post('/delete-data-database', [DatabaseController::class, 'deleteData']);
             Route::post('/get-table', [DatabaseController::class, 'getData']);
             Route::post('/store-template', [DatabaseController::class, 'storeTemplate']);

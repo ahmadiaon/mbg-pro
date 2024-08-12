@@ -32,7 +32,7 @@
                         Sub menu
                     </p>
                     @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
-                    <a href="/web/pendapatan/hauling" class="mb-2 btn btn-sm btn-outline-primary">Hauling</a>
+                        <a href="/web/pendapatan/hauling" class="mb-2 btn btn-sm btn-outline-primary">Hauling</a>
                     @endif
                     <a href="/web/pendapatan/absensi" class="mb-2 btn btn-sm btn-outline-warning">absensi</a>
                     <a href="/web/pendapatan/slip" class="mb-2 btn btn-sm btn-outline-success">slip</a>
@@ -56,23 +56,48 @@
             </div>
         </div>
         @if (!empty(session('user_authentication')['user_privileges']['superadmin']))
-        <div class="col-sm-12 col-md-4 mb-20 ">
-            <div class="card card-box mb-20">
-                <h5 class="card-header weight-500">Pengelolaan</h5>
-                <div class="card-body">
+            <div class="col-sm-12 col-md-4 mb-20 ">
+                <div class="card card-box mb-20">
+                    <h5 class="card-header weight-500">Pengelolaan</h5>
+                    <div class="card-body">
 
-                    <p class="card-text">
-                        Sub menu
-                    </p>
-                    <a href="/web/manage/hauling" class="mb-2 btn btn-sm btn-outline-primary">Profile</a>
-                    <a href="/web/manage/user" class="mb-2 btn btn-sm btn-outline-info">Akun</a>
-                    <a href="/web/manage/localdata" class="mb-2 btn btn-sm btn-outline-info">local data</a>
+                        <p class="card-text">
+                            Sub menu
+                        </p>
+                        <a href="/web/manage/hauling" class="mb-2 btn btn-sm btn-outline-primary">Profile</a>
+                        <a href="/web/manage/user" class="mb-2 btn btn-sm btn-outline-info">Akun</a>
+                        <a href="/web/manage/localdata" class="mb-2 btn btn-sm btn-outline-info">local data</a>
+                    </div>
+                    <div class="card-footer text-muted"></div>
                 </div>
-                <div class="card-footer text-muted"></div>
             </div>
-        </div>
         @endif
 
+    </div>
+
+    {{-- warning modal change pin --}}
+    <div class="modal fade" id="warning-modal-change-pin" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content bg-warning">
+                <div class="modal-body text-center">
+                    <h3 class="mb-15">
+                        <i class="fa fa-exclamation-triangle"></i> Warning
+                    </h3>
+                    <p>
+                        harap ganti password login anda menggunakan PIN, untuk memudahkan login di kemudian hari.
+                    </p>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">
+                        batal
+                    </button>
+                    <a href="/web/menu/user">
+                        <button type="button" class="btn btn-success" >
+                            Ubah
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection()
 
@@ -80,10 +105,38 @@
     <script>
         CL('database');
         let data_for_looping_menu = [];
-        // $(document).ready(function() {
-        //     Object.values(db['db']['menu']).forEach(element => {
 
-        //     });
-        // });
+        $(document).ready(function() {
+            getUserInfo();
+        });
+
+        function getUserInfo() {
+            $.ajax({
+                url: '/api/mbg/get/user',
+                type: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    // Add other custom headers if needed
+                },
+                data: JSON.stringify({
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                }),
+                success: function(response) {
+                    setValueInput('nik_employee', response.data.nik_employee);
+                    setValueInput('email', response.data.email);
+                    setValueInput('phone_number', response.data.phone_number);
+                    setValueInput('nik_number', response.data.nik_number);
+                    if (!response.data.pin) {
+                        CL('ksong pin');
+                        $('#warning-modal-change-pin').modal('show');
+                    }
+                },
+                error: function(response) {
+                    conLog('error', response)
+                    //alertModal()
+                }
+            });
+        }
     </script>
 @endsection()

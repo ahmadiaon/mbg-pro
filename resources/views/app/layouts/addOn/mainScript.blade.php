@@ -1,3 +1,7 @@
+<!-- jsPDF and html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+
 <script>
     let db = JSON.parse(localStorage.getItem('DATABASE'));
 
@@ -17,10 +21,16 @@
         cut: 'warning'
     };
 
+    let status_absen_short = '';
+    let code_table_reference = '';
+    let code_table_global = '';
+    let data_persetujuan;
+
     const KONSTANTA = [];
     KONSTANTA['tb_karyawan'] = 'NRP';
     KONSTANTA['Input Autocomplite'] = 'INPUT-AUTOCOMPLITE';
     KONSTANTA['Input Autocomplite'] = 'INPUT-AUTOCOMPLITE';
+    KONSTANTA['PHK-KARYAWAN'] = 'PHK-KARYAWAN';
     var name_days_sort = new Array(7);
     name_days_sort[0] = "Mig";
     name_days_sort[1] = "Sen";
@@ -106,9 +116,6 @@
 
 
     function CL(data_string) {
-        console.log(Object.keys({
-            data_string
-        })[0]);
         console.log(data_string);
     }
 
@@ -151,8 +158,8 @@
 
     function autocompleteNew(inp, arr) {
         var currentFocus;
-        conLog('inp', inp);
-        conLog('arr', arr);
+        // conLog('inp', inp);
+        // conLog('arr', arr);
         inp.addEventListener("input", function(e) {
             let id_element = this.id;
             var a, b, i, val = this.value;
@@ -461,10 +468,23 @@
                             </div>
                         </div>
                     </div>
-    `;
+        `;
         } catch (error) {
             return primary_key_data;
         }
+
+    }
+
+    function getValueData(primary_key, code_table, field) {
+        try {
+            return db['db']['database_data'][code_table][primary_key][field];
+        } catch (error) {
+            return null;
+        }
+
+    }
+
+    function getPublicData(id_element, primary_key, field) {
 
     }
 
@@ -473,14 +493,15 @@
 
 
 
-
-        // conLog('value_data_table', value_data_table);
-        // conLog('primary_key_data', primary_key_data);
+        // conLogs('primary_key_data', primary_key_data);
         // conLog('code_table_data_source', code_table_data_source);
         // conLog('field_get_data_source', field_get_data_source);
-        // conLog('table_data', table_data);
-        // conLog('field_data', field_data);
-        // conLog('satu', db['public'][table_data])
+        // conLogs('table_data', table_data);
+        // conLogs('field_data', field_data);
+        // conLogs('type_data', type_data);
+        // conLog('satu', db['db']['database_data'][
+        //     table_data
+        // ])
 
         try {
             value_data_table = db['db']['database_data'][
@@ -491,22 +512,28 @@
                 'value_data'
             ];
         } catch (error) {
-            value_data_table = primary_key_data;
-
-            return value_data_table;
+            value_data_table = null;
         }
+
+
+        // conLog('value_data_table :' + value_data_table, value_data_table);
+
+
+
+
+
         // CL(data_properties);
-        if (!GLOBAL_DATA_EXPORT['data']) {
-            GLOBAL_DATA_EXPORT['data'] = {};
-        }
+        // if (!GLOBAL_DATA_EXPORT['data']) {
+        //     GLOBAL_DATA_EXPORT['data'] = {};
+        // }
 
-        if (!GLOBAL_DATA_EXPORT['data'][primary_key_data]) {
-            GLOBAL_DATA_EXPORT['data'][primary_key_data] = {};
-        }
+        // if (!GLOBAL_DATA_EXPORT['data'][primary_key_data]) {
+        //     GLOBAL_DATA_EXPORT['data'][primary_key_data] = {};
+        // }
 
-        if (!GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]) {
-            GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = {};
-        }
+        // if (!GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]) {
+        //     GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = {};
+        // }
 
 
 
@@ -514,9 +541,9 @@
             if (field_data == KONSTANTA['tb_karyawan']) {
 
                 // try {
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public']['public_value']['KARYAWAN'][
-                    primary_key_data
-                ]['NRP'];
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public']['public_value']['KARYAWAN'][
+                //     primary_key_data
+                // ]['NRP'];
                 return emmp(primary_key_data);
                 // } catch (error) {
                 //     return `-${primary_key_data}`;
@@ -531,9 +558,11 @@
                 'value_data'
             ] : null;
 
-            GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+            // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
             return value_data_table;
         }
+
+
         let full_code_field = table_data + "-" + field_data;
         let data_field_returned = primary_key_data;
         // conLog('full_code_field', full_code_field);
@@ -548,7 +577,7 @@
                         'value_data'
                     ] : null;
 
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = toValueRupiah(value_data_table);
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = toValueRupiah(value_data_table);
                 return toValueRupiah(value_data_table);
                 break;
             case 'DARI-TABEL':
@@ -561,6 +590,16 @@
                     let field_get_data_source = data_source['field_get_data_source'];
 
 
+
+                    try {
+                        value_data_table = (db['public'][table_data][primary_key_data]) ? db['public'][table_data][
+                            primary_key_data
+                        ][
+                            field_data
+                        ] : null;
+                    } catch (error) {
+                        return primary_key_data;
+                    }
                     //table, to get primary,
                     // conLog('primary_key_data', primary_key_data);
 
@@ -595,9 +634,9 @@
                             // try {
                             if (code_table_data_source == 'KARYAWAN') {
 
-                                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
-                                    'public_value'
-                                ]['KARYAWAN'][value_data_table]['NRP'];
+                                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
+                                //     'public_value'
+                                // ]['KARYAWAN'][value_data_table]['NRP'];
                                 // conLog('MASUK', GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]);
                                 return emmp(toUUID(value_data_table));
                                 break;
@@ -622,7 +661,7 @@
                             // }
                         }
                     }
-                    GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+                    // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
                 }
                 return data_field_returned;
                 break;
@@ -667,9 +706,9 @@
                             // try {
                             if (code_table_data_source == 'KARYAWAN') {
 
-                                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
-                                    'public_value'
-                                ]['KARYAWAN'][value_data_table]['NRP'];
+                                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = db['public'][
+                                //     'public_value'
+                                // ]['KARYAWAN'][value_data_table]['NRP'];
                                 // conLog('MASUK', GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]);
                                 return emmp(toUUID(value_data_table));
                                 break;
@@ -689,7 +728,7 @@
                             // }
                         }
                     }
-                    GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+                    // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
                 }
                 return data_field_returned;
                 break;
@@ -705,7 +744,7 @@
                     ][
                         'value_data'
                     ] : null;
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
                 return `<div class="font-12 text-center" width="100px" 
                                 style="background-color: ${value_data_table};">
                                 ${value_data_table}
@@ -713,7 +752,7 @@
                             `;
                 break;
             case 'DETAIL_ABSENSI':
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
                 return `<div class="row justify-content-md-center">
                                     <div class="col-12 justify-content-md-center"><sup>09</sup></div>
                                     <div class="col-12 justify-content-md-center">                                        
@@ -746,7 +785,7 @@
                         `;
                 break;
             case 'ABSENSI_COUNT':
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
                 let count_absen_element = ``;
                 let count_absensi = {};
                 let element_count_absen = ``;
@@ -776,8 +815,22 @@
                             detail_absen_current_date = data_properties[date_current];
                         }
                     } catch (error) {
-                        detail_absen_current_date = detail_absen_current_date;
-                        detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
+                        try {
+                            detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
+                        } catch (error) {
+                            try {
+                                detail_absensi[primary_key_data] = {};
+                                detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
+
+                            } catch (error) {
+                                detail_absensi = {};
+                                detail_absensi[primary_key_data] = {};
+                                detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
+
+                            }
+
+                        }
+
                     }
                     let obj_current_date = getDateObj(currentDate);
                     if (count_absensi[detail_absen_current_date.status_absen_uuid] >= 1) {
@@ -830,16 +883,26 @@
                 break;
 
             case 'GABUNGAN':
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = primary_key_data;
                 return primary_key_data;
                 break;
             case 'DATE':
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
                 if (value_data_table) {
                     return toShortStringDate_fromFormatDate(value_data_table);
                 }
                 return value_data_table;
                 break;
+            case 'FILE':
+                if (value_data_table) {
+                    return `
+                    <button onclick="showDocument('${value_data_table}')" type="button" class="btn btn-light" >
+                        <i class="bi bi-file-earmark-play-fill"></i>
+                    </button>`;
+                }
+                return value_data_table;
+                break;
+
             default:
                 let xxx = null;
                 try {
@@ -852,17 +915,32 @@
                     xxx = primary_key_data;
                 }
 
-                GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = xxx;
+                // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = xxx;
 
                 return xxx;
         }
-
     }
 
     function cardFormField(id_field, data_field, is_disabled = '') {
+        // if(ui_dataset.ui_dataset.user_authentication.GRADE ){
+
+        // }
+        // conLog('data_field', data_field);
+        is_disabled = '';
+        if (data_field.level_data_field == 1) {
+            is_disabled = '';
+        } else {
+            is_disabled = 'disabled';
+            if (ui_dataset.ui_dataset.user_authentication.feature.includes('MANAGE-DATA-HR')) {
+                is_disabled = '';
+            }
+        }
+
         let element_field = '';
         let element_input_field_ = ``;
-        let data_source_this_field = db['db']['database_data_source'][data_field.full_code_field];
+        let data_source_this_field = db['db']['database_data_source'][
+            `${data_field.code_table_field}-${data_field.code_field}`
+        ];
         let element_option_data_source = ``;
 
 
@@ -893,6 +971,41 @@
                 $(`#${id_field}`).append(element_field)
                 break;
                 break;
+            case 'FILE':
+                element_input_field_ =
+                    `<div class="row">
+                        <div class="col-8">
+                            <input type="file" accept=".pdf, image/*"  ${is_disabled} class="form-control ${data_field.code_table_field} file-${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">
+                        </div>
+                        <div class="col-4">
+                            <button hidden type="button" id="show-${data_field.code_table_field}-${data_field.code_field}" class="btn show-${data_field.code_field}" data-bgcolor="#00b489" data-color="#ffffff" style="color: rgb(255, 255, 255); background-color: rgb(0, 180, 137);">
+                                <i class="bi bi-file-earmark-play-fill"></i> lihat
+                            </button>                            
+                        </div>
+                    </div>
+                    `;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field)
+                break;
+                break;
+            case 'PERSETUJUAN':
+                element_input_field_ =
+                    `<input type="text" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                element_field = `
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label>${data_field.description_field}</label>
+                                ${element_input_field_}
+                            </div>
+                        </div>`;
+                $(`#${id_field}`).append(element_field);
+                break;
             case 'DATETIME':
                 element_input_field_ =
                     `<input type="text" ${is_disabled} class="form-control  datetimepicker ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
@@ -918,6 +1031,33 @@
                         </div>`;
                 $(`#${id_field}`).append(element_field)
                 break;
+                break;
+            case 'REFERENCE':
+                if (db['db']['database_field'][code_table_reference]) {
+                    Object.entries(db['db']['database_field'][code_table_reference]).forEach(
+                        ([key, data_data_source]) => {
+                            element_option_data_source =
+                                `${element_option_data_source} <option value="${key}">${data_data_source['description_field']}</option>`
+                        });
+                }
+
+                element_input_field_ = `
+                            <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.full_code_field}" class="${data_field.code_field} custom-select2 form-control">
+                                <option value="">Pilih Data</option>
+                                ${element_option_data_source}
+                            </select>
+                        `;
+
+                element_field = `
+                    <div class="col-md-12 col-sm-12">
+                        <div class="form-group">
+                            <label>${data_field.description_field}</label>
+                            ${element_input_field_}
+                        </div>
+                    </div>`;
+
+                $(`#${id_field}`).append(element_field)
+                $(`#${data_field.full_code_field}`).select2();
                 break;
             case 'DARI-TABEL':
                 let NRP = "-";
@@ -951,7 +1091,7 @@
                 }
 
                 element_input_field_ = `
-                                                <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" class="${data_field.code_field} custom-select2 form-control">
+                                                <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.full_code_field}" class="${data_field.code_field} custom-select2 form-control">
                                                     <option value="">Pilih Data</option>
                                                     ${element_option_data_source}
                                                 </select>
@@ -966,7 +1106,7 @@
                         </div>`;
 
                 $(`#${id_field}`).append(element_field)
-                $(`#${data_field.code_table_field}-${data_field.code_field}`).select2();
+                $(`#${data_field.full_code_field}`).select2();
                 break;
             case KONSTANTA['Input Autocomplite']:
                 // conLog('data_field', data_field);
@@ -1067,6 +1207,231 @@
         }
     }
 
+    function createFormFieldTable(id_element, code_table) {
+        code_table_global = code_table;
+        Object.values(db['db']['database_field'][code_table]).forEach(field => {
+            cardFormField(id_element, field);
+        });
+        data_persetujuan;
+        if (db['db']['database_persetujuan'][code_table]) {
+
+            let db_persetujuan = db['db']['database_persetujuan'][code_table];
+            data_persetujuan = db_persetujuan;
+            $(`#${id_element}`).append(`
+                    <div class="profile-info bg-light" id="persetujuan-${id_element}">
+                        <div class="text-center">
+                            <h6>PERSETUJUAN</h6>
+                        </div>
+                        
+                    </div>
+            `);
+
+            for (let countLevel = 1; countLevel <= Object.keys(db['db']['database_data']['DATABASE-LEVEL-PERSETUJUAN'])
+                .length; countLevel++) {
+                // const element = array[countLevel];
+                // conLog('countLevel', countLevel);
+                if (db_persetujuan[`LEVEL-${countLevel}`]) {
+                    conLog('LABEL', db['public']['public_value']['DATABASE-LEVEL-PERSETUJUAN'][`LEVEL-${countLevel}`][
+                        'LEVEL-PERSETUJUAN'
+                    ]);
+                    // getValueData(db_persetujuan[`LEVEL-${countLevel}`]['description'],'DATABASE-LEVEL-PERSETUJUAN', 'LEVEL-PERSETUJUAN')
+                    // cardFormField(id_element, field);
+
+                    //CHANGE VALUE REFERENCE
+
+                    $(`#${code_table}-${db_persetujuan[`LEVEL-${countLevel}`]['reference']}`).attr('onchange',
+                        `setValToFieldPersetujuan('${db_persetujuan[`LEVEL-${countLevel}`]['reference']}',this)`);
+
+                    $(`#persetujuan-${id_element}`).append(`
+                        <div class="form-group">
+                            <label for="">${db['public']['public_value']['DESKRIPSI-PERSETUJUAN'][db_persetujuan[`LEVEL-${countLevel}`]['description']]['DESKRIPSI-PERSETUJUAN']}</label>
+                            <div class="row">
+                                <div class="col-9">
+                                    <select style="width: 100%;" id="persetujuan-LEVEL-${countLevel}" class="custom-select2 form-control">
+                                        
+                                        
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-secondary">
+                                        <i class="icon-copy bi bi-clock-history"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+        }
+
+    }
+
+    function setValToFieldPersetujuan(field_reference, value_this) {
+        let value_reference = $(value_this).val();
+
+
+        Object.values(db['db']['database_persetujuan'][code_table_global]).forEach(data_item => {
+            if (field_reference == data_item['reference']) {
+                $(`#persetujuan-${data_item['level']}`).empty();
+                switch (data_item['grade']) { //GROUP PERSETUJUAN PER LEVEL
+                    case 'NRP':
+
+                        $(`#persetujuan-${data_item['level']}`).append(
+                            `<option selected value="${value_reference}">${db['public']['KARYAWAN'][value_reference]['FULL-NAME']}</option>`
+                        );
+                        $(`#persetujuan-${data_item['level']}`).select2();
+
+                        break;
+                    case 'ATASAN-LANGSUNG':
+                        let atasan = db['db']['arr_employees'][
+                            'all_employees'
+                        ];
+                        let profile = db['public']['KARYAWAN'][value_reference];
+
+                        if (ui_dataset.ui_dataset.user_authentication.GRADE <= 5) {
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
+                                'PERUSAHAAN']]);
+                                
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
+                                'PROJECT']]);
+
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN'][
+                                profile['DEPARTEMEN']
+                            ]);
+
+                            if (ui_dataset.ui_dataset.user_authentication.GRADE <= 4) {
+                                if (ui_dataset.ui_dataset.user_authentication.GRADE <= 2) {
+                                    atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DIVISI'][
+                                        profile['DIVISI']
+                                    ]);
+                                }
+                            }
+                        }
+                        conLog('atasan', atasan);
+
+
+                        let grade_atas = [];
+                        for (let i = 9; i > profile['GRADE']; i--) {
+                            conLog(i, db['db']['arr_employees']['GRADE'][i]);
+                            grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
+                        }
+                        conLog('atasan mergered all', grade_atas);
+
+                        atasan = innerJoinArrays(atasan, grade_atas);
+                        conLog('atasan', atasan);
+
+                        atasan.forEach(NRP => {
+                            $(`#persetujuan-${data_item['level']}`).append(
+                                `<option selected value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
+                            );
+                        });
+                        $(`#persetujuan-${data_item['level']}`).select2();
+                        // $(`#persetujuan-${data_item['level']}`).val(value_reference);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+
+    }
+
+    function createPersetujuanFieldForm() {
+
+    }
+
+    async function getFileType(url) {
+        const response = await fetch(url, {
+            method: 'HEAD'
+        });
+
+        return response.headers.get('Content-Type');
+    }
+
+    async function convertImageToPdf(imageUrl) {
+        const {
+            jsPDF
+        } = window.jspdf;
+
+        // Create an image element
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Handle CORS
+        img.src = imageUrl;
+        conLog('run convert', img);
+
+        return new Promise((resolve, reject) => {
+            img.onload = () => {
+                // Create a PDF document
+                const modalWidth = document.querySelector('.modal-dialog').offsetWidth;
+
+                // Calculate scale factor to fit image in modal width
+                const scaleFactor = modalWidth / img.width;
+
+                // Create a PDF document
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [img.width * scaleFactor, img.height * scaleFactor]
+                });
+
+                pdf.addImage(img, 'PNG', 0, 0, img.width * scaleFactor, img.height * scaleFactor);
+
+                // Save the PDF and create a URL for it
+                const pdfUrl = URL.createObjectURL(pdf.output('blob'));
+                resolve(pdfUrl);
+            };
+
+            img.onerror = reject;
+        });
+    }
+
+
+    async function showFile(url_file, field) {
+
+        field = url_file;
+        url_file = "{{ env('APP_URL') }}file/database/" + url_file;
+        $(`#id_cetak_file`).attr('onclick', `downloadFile('${url_file}', '${field}')`);
+        $(`#id_download_file`).attr('onclick', `downloadFile('${url_file}', '${field}')`);
+        // conLog('url', url_file);
+        startLoading();
+        try {
+            // Determine file type
+            const fileType = await getFileType(url_file);
+            conLog('fileType', fileType);
+            if (fileType === 'application/pdf') {
+                // If it's a PDF, display it directly
+                document.getElementById('pdfIframe').src = url_file;
+                $(`#imageContainer`).attr('hidden', true);
+                stopLoading();
+
+            } else if (fileType.startsWith('image/')) {
+                $(`#pdfIframe`).attr('hidden', true);
+                const imageContainer = document.getElementById('imageContainer');
+                imageContainer.innerHTML =
+                    `<img src="${url_file}" alt="Image" style="width: 100%; height: 600px;" />`;
+            } else {
+                alert('Unsupported file type.');
+                return;
+            }
+            stopLoading();
+            $('#pdfModal').modal('show');
+            return false;
+        } catch (error) {
+            stopLoading();
+            console.error('Error processing file:', error);
+        }
+    }
+
+    function downloadFile(url_slip, file_name) {
+        CL(url_slip)
+        var dlink = document.createElement("a");
+        dlink.href = `${url_slip}`;
+        dlink.setAttribute("download", file_name);
+        dlink.download = file_name;
+        dlink.click();
+    }
+
     function toNumber(numberOf) {
         return numberOf.replace(/[^0-9]/g, '');
     }
@@ -1149,6 +1514,18 @@
 
     function filter_data_karyawan() {
 
+    }
+
+    function filterObject(arr_key_filtered, data_object) {
+        let status_absen_filter = $('#status-absen-filter').val();
+        let filteredData = arr_key_filtered.reduce((acc, index) => {
+            if (data_object.hasOwnProperty(index)) {
+                acc[index] = data_object[index];
+            }
+            return acc;
+        }, {});
+
+        return filteredData;
     }
 
     function mergeArrays(array1 = [], array2 = []) {
@@ -1554,6 +1931,12 @@
         //  console.log("============================================================");
     }
 
+    function conLogs(identify, data) {
+        //  console.log("============================================================");
+        console.log(identify + " : " + data);
+        //  console.log("============================================================");
+    }
+
     function padToDigits(much, num) {
         // console.log('padToDigits')
         return num.toString().padStart(much, '0');
@@ -1589,6 +1972,139 @@
         return err;
     }
 
+    function showDocument(url_file) {
+        var modal = $('#pdfModal');
+        modal.find('#pdfIframe').attr('src', '/file/database/' + url_file); // Set the source of the PDF file
+        modal.modal('show'); // Show the modal
+
+        modal.on('hidden.bs.modal', function(event) {
+            modal.find('#pdfIframe').attr('src', ''); // Clear the source to stop loading the PDF
+        });
+    }
+
+    function getDataFilteredKaryawan() {
+        let date_range = $('#FILTER-RANGE').val();
+        let split_date_range = date_range.split(" - ");
+
+        let status_karyawan = [];
+
+        filter_absensi.date_start = formatDate(parseDateString(split_date_range[0], 'mm/dd/yyyy'));
+        filter_absensi.date_end = formatDate(parseDateString(split_date_range[1], 'mm/dd/yyyy'));
+        // let array_karyawan = db['db']['arr_employees'][]
+        let arr_filtered_karyawan = [];
+        let row_data_datatable = [];
+        let arr_part = [];
+
+        filter_absensi['DIVISI'].forEach(element => {
+            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DIVISI'][element]);
+            // conLog(element, db['db']['arr_employees']['DIVISI'][element]);
+        });
+
+        arr_filtered_karyawan = arr_part;
+
+        arr_part = [];
+        filter_absensi['DEPARTEMEN'].forEach(element => {
+            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DEPARTEMEN'][element]);
+        });
+
+        arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+        arr_part = [];
+        filter_absensi['PROJECT'].forEach(element => {
+            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PROJECT'][element]);
+        });
+        arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+        arr_part = [];
+        filter_absensi['PERUSAHAAN'].forEach(element => {
+            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PERUSAHAAN'][element]);
+        });
+        arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
+
+
+        try {
+            status_karyawan = $(`#STATUS-KARYAWAN`).val();
+            if (status_karyawan) {
+                let karyawan_status_karyawan = [];
+
+                if (status_karyawan.includes('Aktif')) {
+                    Object.entries(db['public']['KARYAWAN']).forEach(([NRP, karyawan]) => {
+                        // conLog('karyawan', karyawan)
+                        if (karyawan['STATUS-KERJA'] == 'AKTIVE') {
+                            karyawan_status_karyawan.push(NRP);
+                        }
+                    });
+                }
+
+                let phk_this_month = []
+                if (status_karyawan.includes('PHK Bulan ini')) {
+                    Object.entries(db['public']['KARYAWAN']).forEach(([NRP, karyawan]) => {
+                        // conLog('karyawan', karyawan)
+                        if (karyawan['STATUS-KERJA'] == 'PHK') {
+                            let date_phk = new Date(karyawan['TANGGAL-BERAKHIR-KONTRAK--TBK-']);
+                            let date_end = new Date(filter_absensi['date_end']);
+                            let date_start = new Date(filter_absensi['date_start']);
+                            if (date_phk < date_end && date_phk > date_start) {
+                                phk_this_month.push(NRP);
+                            }
+                        }
+                    });
+                }
+
+
+                let phk_ = []
+                if (status_karyawan.includes('PHK')) {
+                    Object.entries(db['public']['KARYAWAN']).forEach(([NRP, karyawan]) => {
+                        // conLog('karyawan', karyawan)
+                        if (karyawan['STATUS-KERJA'] == 'PHK') {
+                            phk_.push(NRP);
+                        }
+                    });
+                }
+
+                let arr_emp = mergeArrays(karyawan_status_karyawan, phk_this_month);
+                arr_emp = mergeArrays(phk_, arr_emp);
+
+
+                // conLog('karyawan_status_karyawan', karyawan_status_karyawan)
+                // conLog('phk_this_month', phk_this_month)
+                // conLog('phk_', phk_)
+                // conLog('arr_emp', arr_emp)
+
+                // conLog('karyawan_status_karyawan', karyawan_status_karyawan)
+                arr_filtered_karyawan = innerJoinArrays(arr_emp, arr_filtered_karyawan);
+            }
+        } catch (error) {
+
+        }
+        setLocalStorage('filter_absen', filter_absensi);
+        conLog('filter_absensi', filter_absensi)
+        return filter_absensi['KARYAWAN'] = arr_filtered_karyawan;
+    }
+
+    async function globalStoreNoTable(idForm) {
+        let _url = $('#form-' + idForm).attr('action');
+        var form = $('#form-' + idForm)[0];
+        var form_data = new FormData(form);
+        console.log(form_data);
+        // return false;
+        startLoading();
+        return $.ajax({
+            url: _url,
+            type: "POST",
+            contentType: false,
+            processData: false,
+            data: form_data,
+            success: function(response) {
+                // alert("Message:"+JSON.stringify(response.message)+"-"+JSON.stringify(response.data));
+                console.log(response);
+                showModalSuccess();
+                // showModalMessage('berhasil');
+            },
+            error: function(response) {
+                alertModal()
+            }
+        });
+    }
+
     function ajaxGet(dataUrl) {
         $.ajax({
             url: dataUrl,
@@ -1611,7 +2127,8 @@
     function stopLoading() {
         console.log('stop loading')
         $('#loading-modal').hide()
-        $('.modal').modal('hide')
+        $('.modal').modal('hide');
+        $('#loading-modal').modal('hide')
     }
 
     function startLoading() {
@@ -1646,7 +2163,7 @@
                 _token: $('meta[name="csrf-token"]').attr('content'),
             },
             success: function(response) {
-
+                status_absen_short = '';
 
                 localStorage.setItem('DATABASE', JSON.stringify(response.data));
                 db = response.data;
@@ -1656,15 +2173,22 @@
                     'PERUSAHAAN'
                 ]), default_filter_absensi.PERUSAHAAN);
                 default_filter_absensi['PROJECT'] = innerJoinArrays(Object.keys(db['public'][
-                    'PROJECT']), default_filter_absensi.PROJECT);
+                    'PROJECT'
+                ]), default_filter_absensi.PROJECT);
                 default_filter_absensi['DEPARTEMEN'] = innerJoinArrays(Object.keys(db['public'][
                     'DEPARTEMEN'
                 ]), default_filter_absensi.DEPARTEMEN);
                 default_filter_absensi['DIVISI'] = innerJoinArrays(Object.keys(db['public']['DIVISI']),
                     default_filter_absensi.DIVISI);
 
+                Object.values(db['public']['DATABASE-ABSENSI']).forEach(element => {
+                    status_absen_short =
+                        `${status_absen_short} <option value="${element['KODE-ABSEN']}">${element['KODE-ABSEN']}</option>`;
+                });
+
+
                 // iner joining perusahaan dll untuk biar hanya ada di db saja
-                conLog('filter_absensi', filter_absensi)
+                conLog('status_absen_short', status_absen_short)
                 // location.reload();
                 // showModalSuccess();
             },
@@ -1709,4 +2233,35 @@
         setLocalStorage('filter_absen', default_filter_absensi);
         filter_absensi = default_filter_absensi;
     }
+
+    $(document).ready(function() {
+        // Initialize Select2
+        $('.multi-wrap-select').select2({
+            templateResult: formatOptionText,
+            templateSelection: formatOptionText
+        });
+
+        // Function to limit text length based on container width
+        function formatOptionText(option) {
+            if (!option.id) {
+                return option.text;
+            }
+            let text = option.text;
+            let $tempDiv = $('<div>').css({
+                'width': $('.multi-wrap-select-wrapper').width(),
+                'font-size': '16px',
+                'line-height': '1.5',
+                'visibility': 'hidden',
+                'white-space': 'nowrap',
+                'position': 'absolute'
+            }).text(text).appendTo('body');
+
+            while ($tempDiv.width() > $('.multi-wrap-select-wrapper').width()) {
+                text = text.substring(0, text.length - 1);
+                $tempDiv.text(text + '...');
+            }
+            $tempDiv.remove();
+            return text + '...';
+        }
+    });
 </script>

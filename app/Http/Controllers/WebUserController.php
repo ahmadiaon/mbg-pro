@@ -22,6 +22,16 @@ class WebUserController extends Controller
         $storeEmployee = User::where('auth_login', $auth)->first();
 
         $NRP = $storeEmployee->employee_uuid;
+        $O_KARYAWAN = [];
+        $A_DIVISI = [];
+
+        $Q_all_DIVISI = DatabaseData::where('code_table_data', 'DIVISI')
+        ->whereNull('date_end')
+        ->get();
+
+        foreach($Q_all_DIVISI as $I_DIVISI){
+            $A_DIVISI[] = $I_DIVISI->code_data;
+        }
 
 
 
@@ -30,6 +40,15 @@ class WebUserController extends Controller
             ->where('code_field_data', 'NAMA-KARYAWAN')
             ->whereNull('date_end')
             ->first();
+
+        $Q_KARYAWAN = DatabaseData::where('code_table_data', 'KARYAWAN')
+            ->where('code_data', ResponseFormatter::toUUID($NRP))
+            ->whereNull('date_end')
+            ->get();
+
+        foreach($Q_KARYAWAN as $I_KARYAWAN){
+            $O_KARYAWAN[$I_KARYAWAN->code_field_data] = $I_KARYAWAN->value_data;  
+        }
 
 
 
@@ -133,16 +152,22 @@ class WebUserController extends Controller
                 $arr_data_divisi[] =  $data_user_divisi->value_data;
             }
         }
+        $Q_grade = DatabaseData::where('code_table_data','KONTRAK-KARYAWAN')->where('code_field_data','GRADE')->where('code_data', ResponseFormatter::toUUID($NRP))->whereNull('date_end')->first();
 
-        $Q_user_details = DatabaseData::where('code_table_data', 'KARYAWAN')
-            ->where('code_data', ResponseFormatter::toUUID($NRP))
-            ->where('code_field_data', 'DIVISI')
-            ->whereNull('date_end')
-            ->first();
+        $grade = $Q_grade->value_data;
 
-        if ($Q_user_details) {
-            $arr_data_divisi[] = $Q_user_details->value_data;
+        
+        $arr_data_perusahaan[] = $O_KARYAWAN['PERUSAHAAN'];
+        $arr_data_department[] = $O_KARYAWAN['DEPARTEMEN'];
+
+        if($grade == 5 || $grade == 3 ){
+            $arr_data_divisi =array_merge($A_DIVISI,$arr_data_divisi);
         }
+
+        if($grade == 2 || $grade == 4){
+            $arr_data_divisi[] = $O_KARYAWAN['DIVISI'];
+        }
+
 
 
         $storeEmployee->user_privileges = [$storeEmployee->role => true];
@@ -177,15 +202,16 @@ class WebUserController extends Controller
 
                 $storeEmployee = $this->sessionUserAuthentication($token);
 
+                $grade = DatabaseData::where('code_table_data','KONTRAK-KARYAWAN')->where('code_field_data','GRADE')->where('code_data', ResponseFormatter::toUUID($request->nik_employee))->whereNull('date_end')->first();
 
-                // return $storeEmployee;
+                $storeEmployee->GRADE = $grade->value_data;
                 session()->flush();
                 session(['user_authentication' => $storeEmployee]);
                 // session()->put('user_authentication', $storeEmployee);
                 if (!empty($storeEmployee->pin)) {
                     return redirect()->intended('/web/menu');
                 } else {
-                    return redirect()->intended('/web/menu/user');
+                    return redirect()->intended('/web/menu');
                 }
 
 

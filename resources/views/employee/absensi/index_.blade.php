@@ -753,15 +753,13 @@
 
             $('#the-table').append(table_element);
 
-            let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
                 url: '/user/absensi/data-x',
                 type: "POST",
                 data: {
-                    _token: _token,
+                    _token: $('meta[name="csrf-token"]').attr('content'),
                     filter: filter,
                     admin_absen:$('#admin-fingger').val()
-
                 },
                 success: function(response) {
                     cg('response showDataTable', response);

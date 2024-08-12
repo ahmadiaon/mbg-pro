@@ -17,7 +17,7 @@
                             <a class="dropdown-item" id="btn-export" onclick="exportEmployee()"  href="#">Export Karyawan</a>
                         </div>
                     </div>
-                </div>
+                </div>  
             </div>
         </div>
 
@@ -29,8 +29,6 @@
                 </tr>
             </thead>
         </table>
-
-
     </div>
 
 
@@ -202,6 +200,7 @@
                 return  emp+"-"+mcd
             }
         };
+
         data_column.push(elements)
 
         cg('after import', data_absen);
@@ -240,6 +239,7 @@
         variable_header.forEach(element_header => {
             $(`#header-table-have-employees`).append(` <th>${element_header}</th>`);
             $(`#header-table-null-employees`).append(` <th>${element_header}</th>`);
+
             element_profile_empl = {
                 mRender: function(data, type, row) {
                     let status_absen = data_absen.have_employees['detail'][row.nik_employee][element_header]

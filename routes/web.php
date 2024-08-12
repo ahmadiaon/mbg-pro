@@ -995,6 +995,7 @@ Route::middleware(['webIsLogin'])->group(function () {
         });
         
         Route::prefix('/manage')->group(function () {
+            
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
             Route::get('/privilege', [UserPrivilegeController::class, 'index']);
@@ -1017,7 +1018,12 @@ Route::middleware(['webIsLogin'])->group(function () {
             });
         });
         Route::prefix('/pengelolaan')->group(function () {
-            Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);            
+            Route::prefix('/absensi')->group(function () {
+                Route::get('/', [WebAbsensiController::class, 'manageIndex']);  
+                Route::post('/post/list', [WebAbsensiController::class, 'storeListAbsensi']); 
+            });
+            Route::post('/absensi/daily-report', [EmployeeAbsenController::class, 'dialyReportWeb']);    
+            Route::get('/file-fingger', [WebAbsensiController::class, 'fileIndex']);            
             Route::get('/roaster-kerja', [EmployeeCutiController::class, 'webIndex']);       
             Route::post('/roaster-kerja/export', [EmployeeCutiController::class, 'webExport']);
 
