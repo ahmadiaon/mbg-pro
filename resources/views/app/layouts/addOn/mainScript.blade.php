@@ -28,6 +28,7 @@
 
     const KONSTANTA = [];
     KONSTANTA['tb_karyawan'] = 'NRP';
+    KONSTANTA['PAGE'] = 'ADMIN';
     KONSTANTA['Input Autocomplite'] = 'INPUT-AUTOCOMPLITE';
     KONSTANTA['Input Autocomplite'] = 'INPUT-AUTOCOMPLITE';
     KONSTANTA['PHK-KARYAWAN'] = 'PHK-KARYAWAN';
@@ -514,28 +515,6 @@
         } catch (error) {
             value_data_table = null;
         }
-
-
-        // conLog('value_data_table :' + value_data_table, value_data_table);
-
-
-
-
-
-        // CL(data_properties);
-        // if (!GLOBAL_DATA_EXPORT['data']) {
-        //     GLOBAL_DATA_EXPORT['data'] = {};
-        // }
-
-        // if (!GLOBAL_DATA_EXPORT['data'][primary_key_data]) {
-        //     GLOBAL_DATA_EXPORT['data'][primary_key_data] = {};
-        // }
-
-        // if (!GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data]) {
-        //     GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = {};
-        // }
-
-
 
         if (type_data == 'TEXT') {
             if (field_data == KONSTANTA['tb_karyawan']) {
@@ -1098,15 +1077,16 @@
                                             `;
 
                 element_field = `
-                        <div class="col-md-12 col-sm-12">
+                        <div id="form-${data_field.full_code_field}" class="col-md-12 col-sm-12">
                             <div class="form-group">
                                 <label>${data_field.description_field}</label>
                                 ${element_input_field_}
                             </div>
                         </div>`;
 
-                $(`#${id_field}`).append(element_field)
+                $(`#${id_field}`).append(element_field);
                 $(`#${data_field.full_code_field}`).select2();
+
                 break;
             case KONSTANTA['Input Autocomplite']:
                 // conLog('data_field', data_field);
@@ -1208,17 +1188,29 @@
     }
 
     function createFormFieldTable(id_element, code_table) {
+        $(`#${id_element}`).empty();
+        $(`#${id_element}`).append(`
+             <form autocomplete="off" id="FORM-${code_table}"  enctype="multipart/form-data">
+                @csrf
+                <input type="hidDen" value="${code_table}">
+                
+
+            </form>
+        `);
+
         code_table_global = code_table;
         Object.values(db['db']['database_field'][code_table]).forEach(field => {
-            cardFormField(id_element, field);
+
+            cardFormField(`FORM-${code_table}`, field);
         });
         data_persetujuan;
+
         if (db['db']['database_persetujuan'][code_table]) {
 
             let db_persetujuan = db['db']['database_persetujuan'][code_table];
             data_persetujuan = db_persetujuan;
-            $(`#${id_element}`).append(`
-                    <div class="profile-info bg-light" id="persetujuan-${id_element}">
+            $(`#FORM-${code_table}`).append(`
+                    <div class="profile-info bg-light" id="persetujuan-FORM-${code_table}">
                         <div class="text-center">
                             <h6>PERSETUJUAN</h6>
                         </div>
@@ -1242,12 +1234,12 @@
                     $(`#${code_table}-${db_persetujuan[`LEVEL-${countLevel}`]['reference']}`).attr('onchange',
                         `setValToFieldPersetujuan('${db_persetujuan[`LEVEL-${countLevel}`]['reference']}',this)`);
 
-                    $(`#persetujuan-${id_element}`).append(`
+                    $(`#persetujuan-FORM-${code_table}`).append(`
                         <div class="form-group">
                             <label for="">${db['public']['public_value']['DESKRIPSI-PERSETUJUAN'][db_persetujuan[`LEVEL-${countLevel}`]['description']]['DESKRIPSI-PERSETUJUAN']}</label>
                             <div class="row">
                                 <div class="col-9">
-                                    <select style="width: 100%;" id="persetujuan-LEVEL-${countLevel}" class="custom-select2 form-control">
+                                    <select style="width: 100%;" name="LEVEL-${countLevel}" id="persetujuan-LEVEL-${countLevel}" class="custom-select2 form-control">
                                         
                                         
                                     </select>
@@ -1264,6 +1256,23 @@
             }
         }
 
+        Object.values(db['db']['database_field'][code_table]).forEach(field => {
+            if (field.code_field == 'NRP') {
+                conLog('code_field', field);
+                conLog('NRP', KONSTANTA['NRP']);
+
+                $(`#${field.full_code_field}`).val(ui_dataset.ui_dataset.user_authentication.employee_uuid).trigger('change');
+                
+                conLog('NRP', KONSTANTA['PAGE']);
+                if(KONSTANTA['PAGE'] == 'SELF'){
+                    conLog('NRP', KONSTANTA['PAGE']);
+                    $(`#form-${field.full_code_field}`).hide();    
+                }
+            }
+        });
+
+
+
     }
 
     function setValToFieldPersetujuan(field_reference, value_this) {
@@ -1273,6 +1282,10 @@
         Object.values(db['db']['database_persetujuan'][code_table_global]).forEach(data_item => {
             if (field_reference == data_item['reference']) {
                 $(`#persetujuan-${data_item['level']}`).empty();
+                let atasan = db['db']['arr_employees'][
+                    'all_employees'
+                ];
+                let profile = db['public']['KARYAWAN'][value_reference];
                 switch (data_item['grade']) { //GROUP PERSETUJUAN PER LEVEL
                     case 'NRP':
 
@@ -1283,42 +1296,53 @@
 
                         break;
                     case 'ATASAN-LANGSUNG':
-                        let atasan = db['db']['arr_employees'][
+                        atasan = db['db']['arr_employees'][
                             'all_employees'
                         ];
-                        let profile = db['public']['KARYAWAN'][value_reference];
+                        profile = db['public']['KARYAWAN'][value_reference];
 
-                        if (ui_dataset.ui_dataset.user_authentication.GRADE <= 5) {
+                        if (profile['GRADE'] <= 5) {
                             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
                                 'PERUSAHAAN']]);
-                                
+                            // conLog('atasan perusahaan', atasan);
                             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
                                 'PROJECT']]);
-
+                            // conLog('atasan project', atasan);
                             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN'][
                                 profile['DEPARTEMEN']
                             ]);
-
-                            if (ui_dataset.ui_dataset.user_authentication.GRADE <= 4) {
-                                if (ui_dataset.ui_dataset.user_authentication.GRADE <= 2) {
+                            // conLog('atasan departement', atasan);
+                            if (profile['GRADE'] <= 4) {
+                                atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][3].includes(
+                                    item));
+                                if (profile['GRADE'] <= 2) {
                                     atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DIVISI'][
                                         profile['DIVISI']
                                     ]);
                                 }
                             }
                         }
-                        conLog('atasan', atasan);
+                        for (let i = 0; i <= profile['GRADE']; i++) {
+                            // conLog(i, db['db']['arr_employees']['GRADE'][i]);
+                            try {
+                                atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][i].includes(
+                                    item));
+                            } catch (error) {
+
+                            }
+                        }
+                        // conLog('atasan', atasan);
 
 
                         let grade_atas = [];
-                        for (let i = 9; i > profile['GRADE']; i--) {
-                            conLog(i, db['db']['arr_employees']['GRADE'][i]);
-                            grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
-                        }
-                        conLog('atasan mergered all', grade_atas);
+                        // for (let i = 5; i > profile['GRADE']; i--) {
+                        //     conLog(i, db['db']['arr_employees']['GRADE'][i]);
+                        //     grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
+                        // }
+                        // conLog('atasan mergered all', grade_atas);
 
-                        atasan = innerJoinArrays(atasan, grade_atas);
-                        conLog('atasan', atasan);
+                        // atasan = innerJoinArrays(atasan, grade_atas);
+                        // conLog('atasan', atasan);
 
                         atasan.forEach(NRP => {
                             $(`#persetujuan-${data_item['level']}`).append(
@@ -1327,6 +1351,60 @@
                         });
                         $(`#persetujuan-${data_item['level']}`).select2();
                         // $(`#persetujuan-${data_item['level']}`).val(value_reference);
+                        break;
+                    case 'HR':
+                        atasan = db['db']['arr_employees'][
+                            'all_employees'
+                        ];
+                        profile = db['public']['KARYAWAN'][value_reference];
+                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
+                            'PERUSAHAAN']]);
+                        // conLog('atasan perusahaan', atasan);
+                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
+                            'PROJECT']]);
+                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN']['HRGA']);
+                        for (let i = 0; i <= 4; i++) {
+                            conLog(i, db['db']['arr_employees']['GRADE'][i]);
+                            try {
+                                atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][i].includes(
+                                    item));
+                            } catch (error) {
+
+                            }
+                        }
+                        conLog('atasan', atasan);
+                        atasan.forEach(NRP => {
+                            $(`#persetujuan-${data_item['level']}`).append(
+                                `<option selected value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
+                            );
+                        });
+                        $(`#persetujuan-${data_item['level']}`).select2();
+
+                        break;
+                    case 'MANAGER':
+                        atasan = db['db']['arr_employees'][
+                            'all_employees'
+                        ];
+                        profile = db['public']['KARYAWAN'][value_reference];
+                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
+                            'PERUSAHAAN']]);
+                        for (let i = 0; i <= 5; i++) {
+                            conLog(i, db['db']['arr_employees']['GRADE'][i]);
+                            try {
+                                atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][i].includes(
+                                    item));
+                            } catch (error) {
+
+                            }
+                        }
+                        conLog('atasan', atasan);
+                        atasan.forEach(NRP => {
+                            $(`#persetujuan-${data_item['level']}`).append(
+                                `<option selected value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
+                            );
+                        });
+                        $(`#persetujuan-${data_item['level']}`).select2();
+
                         break;
                     default:
                         break;
@@ -1339,6 +1417,61 @@
 
     function createPersetujuanFieldForm() {
 
+    }
+
+
+
+    function storeDataTable(code_table) {
+        conLog('storeDataTable', 'storeDataTable');
+
+        var formId = 'FORM-' + code_table; // Construct the form ID dynamically
+        var formData = new FormData(document.getElementById(formId));
+        formData.append('code_table', code_table);
+        conLog('formData', formData);
+
+        $.ajax({
+
+            url: '/web/manage/database/store-database',
+            type: 'POST',
+            headers: {
+                'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+            },
+            data: formData,
+            contentType: false, // Important: prevents jQuery from setting content type header
+            processData: false, // Important: prevents jQuery from processing the data
+            success: function(response) {
+                console.log("File uploaded successfully");
+                console.log(response);
+            },
+            error: function(response) {
+                conLog('error', response);
+            }
+        });
+
+        return false;
+        $.ajax({
+            url: '/web/manage/database/store-database',
+            type: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+            },
+            data: JSON.stringify({
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                formData: formDataArray,
+                uuid_data: $('#uuid_data').val(),
+                data_table: db_table,
+                data_source_this_field: data_source_this_field
+            }),
+            success: function(response) {
+                conLog('response', response);
+            },
+            error: function(response) {
+                conLog('error', response);
+                stopLoading();
+                //alertModal()
+            }
+        });
     }
 
     async function getFileType(url) {
@@ -2185,6 +2318,7 @@
                     status_absen_short =
                         `${status_absen_short} <option value="${element['KODE-ABSEN']}">${element['KODE-ABSEN']}</option>`;
                 });
+                KONSTANTA['NRP'] = ui_dataset.ui_dataset.user_authentication.employee_uuid;
 
 
                 // iner joining perusahaan dll untuk biar hanya ada di db saja

@@ -275,6 +275,8 @@ return array(
     'App\\Models\\StatusAbsen' => $baseDir . '/app/Models/StatusAbsen.php',
     'App\\Models\\Support\\DataSource' => $baseDir . '/app/Models/Support/DataSource.php',
     'App\\Models\\Support\\Database' => $baseDir . '/app/Models/Support/Database.php',
+    'App\\Models\\Support\\DatabaseDataKehadiran' => $baseDir . '/app/Models/Support/DatabaseDataKehadiran.php',
+    'App\\Models\\Support\\DatabaseDataPersetujuan' => $baseDir . '/app/Models/Support/DatabaseDataPersetujuan.php',
     'App\\Models\\Support\\DatabaseFieldShow' => $baseDir . '/app/Models/Support/DatabaseFieldShow.php',
     'App\\Models\\Support\\DatabasePersetujuan' => $baseDir . '/app/Models/Support/DatabasePersetujuan.php',
     'App\\Models\\Support\\UserTemplate' => $baseDir . '/app/Models/Support/UserTemplate.php',

@@ -640,9 +640,9 @@
 
                 <div class="modal-body">
                     <div class="modal-kehadiran" id="form-kehadiran">
+
                        
-                    </div>
-                  
+                    </div>                  
                 </div>
 
 
@@ -650,7 +650,7 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         Close
                     </button>
-                    <button onclick="dailyReportWeb()" type="button" class="btn btn-primary">
+                    <button id="storeDataKehadiran" onclick="storeDataTable('KEHADIRAN')" type="button" class="btn btn-primary">
                         Save changes
                     </button>
                 </div>

@@ -368,38 +368,42 @@ class UserController extends Controller
         $arr_employee = [];
         if($user->level_user > 1){
             foreach($data_public['KARYAWAN'] as $NRP=>$item_karyawan){
-                $arr_employee['all_employees'][] =$NRP;
-                if(!empty($item_karyawan['PERUSAHAAN'])){
-                    $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $NRP;
-                }else{
-                    $arr_employee['PERUSAHAAN']['-'][] = $NRP;
+                if($item_karyawan['STATUS-KERJA'] != 'PHK'){
+                    $arr_employee['all_employees'][] =$NRP;
+                    if(!empty($item_karyawan['PERUSAHAAN'])){
+                        $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $NRP;
+                    }else{
+                        $arr_employee['PERUSAHAAN']['-'][] = $NRP;
+                    }
+                    // project
+                    if(!empty($item_karyawan['PROJECT'])){
+                        $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $NRP;
+                    }else{
+                        $arr_employee['PROJECT']['-'][] = $NRP;
+                    }
+        
+                    // DEPARTEMEN
+                    if(!empty($item_karyawan['DEPARTEMEN'])){
+                        $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $NRP;
+                    }else{
+                        $arr_employee['DEPARTEMEN']['-'][] = $NRP;
+                    }
+        
+                    // DIVISI
+                    if(!empty($item_karyawan['DIVISI'])){
+                        $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $NRP;
+                    }else{
+                        $arr_employee['DIVISI']['-'][] = $NRP;
+                    }
+                    // DIVISI
+                    if(!empty($item_karyawan['GRADE'])){
+                        $arr_employee['GRADE'][$item_karyawan['GRADE']][] = $NRP;
+                    }else{
+                        $arr_employee['GRADE']['-'][] = $NRP;
+                    }
                 }
-                // project
-                if(!empty($item_karyawan['PROJECT'])){
-                    $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $NRP;
-                }else{
-                    $arr_employee['PROJECT']['-'][] = $NRP;
-                }
-    
-                // DEPARTEMEN
-                if(!empty($item_karyawan['DEPARTEMEN'])){
-                    $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $NRP;
-                }else{
-                    $arr_employee['DEPARTEMEN']['-'][] = $NRP;
-                }
-    
-                // DIVISI
-                if(!empty($item_karyawan['DIVISI'])){
-                    $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $NRP;
-                }else{
-                    $arr_employee['DIVISI']['-'][] = $NRP;
-                }
-                // DIVISI
-                if(!empty($item_karyawan['GRADE'])){
-                    $arr_employee['GRADE'][$item_karyawan['GRADE']][] = $NRP;
-                }else{
-                    $arr_employee['GRADE']['-'][] = $NRP;
-                }
+
+                
             }
         }
         

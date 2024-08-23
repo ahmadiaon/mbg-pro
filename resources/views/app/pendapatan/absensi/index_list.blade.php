@@ -178,33 +178,45 @@
                                                 <tr>
                                                     <th class="table-plus datatable-nosort">Tanggal</th>
                                                     <th class="table-plus datatable-nosort">Status</th>
-                                                    <th class="table-plus datatable-nosort">Fingger</th>
-                                                    <th class="table-plus datatable-nosort">Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td class="">
-                                                        01 Mey 2024
-                                                        <br>
-                                                        Senin
-                                                    </td>
-                                                    <td class="">
-                                                        <div class="name-avatar d-flex align-items-center pr-2">
-                                                            <div class="txt">
-                                                                <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5"
-                                                                    data-color="#265ed7">3 hari</span>
-                                                                <div class="font-14 weight-600">Dr. Neil Wagner</div>
-                                                                <div class="font-12 weight-500" data-color="#b2b1b6">
-                                                                    Anggota Keluarga yang serumah <br> dengan karyawan Meninggal Dunia
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">01
+                                                                    Jan 2024, Sen</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1"><span
+                                                                        class="badge badge-primary">PW</span> Izin Tanpa
+                                                                    Upah</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                     </td>
-                                                    <td class="">
-                                                        ['10:10','20:20']
-                                                    </td>
-                                                    <td class="">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Sedang
+                                                                    disetujui oleh, <i
+                                                                        class="icon-copy bi bi-clock-history"></i></span>
+                                                                <div class="font-14 weight-600 mt-1">MANAGER <span class="badge badge-primary">Persetujuan</span></div>
+                                                                
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -253,8 +265,9 @@
             </div>
         </div>
     </div>
+
     {{-- modal izin --}}
-    <div class="modal fade" id="modal-izin" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    <div class="modal fade" id="modal-kehadiran" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -267,36 +280,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form enctype="multipart/form-data">
-                        <div class="form-group ">
-                            <label>Jenis Izin</label>
-                            <div class="multi-wrap-select-wrapper">
-                                <select id="status-absen-filter" class="form-control multi-wrap-select">
+                    <div class="modal-kehadiran" id="form-kehadiran">
 
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Tanggal Mulai Izin</label>
-                            <input class="form-control date-picker" placeholder="Select Date" type="text" />
-                        </div>
-                        <div class="form-group">
-                            <label id="label-lama-izin">Lama Izin</label>
-                            <input class="form-control" value="1" maxlength="3" type="number" />
-                        </div>
-                        <div class="form-group">
-                            <label id="label-lama-izin">Keterangan lainnya</label>
-                            <input class="form-control" type="text" />
-                        </div>
-                        <div class="form-group ">
-                            <label>Pilih Atasan Langsung</label>
-                            <div class="multi-wrap-select-wrapper">
-                                <select id="NRP-atasan" class="form-control multi-wrap-select atasan">
 
-                                </select>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -313,8 +300,12 @@
 
 @section('script_javascript')
     <script>
+        KONSTANTA['PAGE'] = 'SELF';
+
         function ajukanIzin() {
-            $('#modal-izin').modal('show');
+            $(`#form-kehadiran`).empty();
+            createFormFieldTable('form-kehadiran', 'KEHADIRAN');
+            $(`#modal-kehadiran`).modal('show');
         }
 
         function pilihJenisIzin(CODE_DATA) {
@@ -337,13 +328,14 @@
         });
 
         let profile = db['public']['KARYAWAN'][ui_dataset.ui_dataset.user_authentication.employee_uuid];
+
         let atasan = db['db']['arr_employees']['all_employees']; //['PERUSAHAAN'][profile['PERUSAHAAN']];
         if (ui_dataset.ui_dataset.user_authentication.GRADE <= 5) {
             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile['PERUSAHAAN']]);
             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile['PROJECT']]);
 
             if (ui_dataset.ui_dataset.user_authentication.GRADE <= 4) {
-                
+
 
                 if (ui_dataset.ui_dataset.user_authentication.GRADE <= 2) {
                     atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN'][profile['DEPARTEMEN']]);
@@ -354,10 +346,10 @@
         conLog('atasan', atasan);
         let grade_atas = [];
         for (let i = 9; i > profile['GRADE']; i--) {
-            conLog(i,db['db']['arr_employees']['GRADE'][i]);
+            conLog(i, db['db']['arr_employees']['GRADE'][i]);
             grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
         }
-        
+
         conLog('atasan mergered all', grade_atas);
         atasan = innerJoinArrays(atasan, grade_atas);
 

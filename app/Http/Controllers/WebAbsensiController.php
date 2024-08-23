@@ -8,7 +8,7 @@ use App\Models\DatabaseData;
 use App\Models\Employee\EmployeeAbsen;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 class WebAbsensiController extends Controller
 {
@@ -53,6 +53,7 @@ class WebAbsensiController extends Controller
     }
 
     public function manageIndex(){
+        // dd(Session::all());
         $arr = [];
         foreach(Aktivity::where('table_name', 'ID-FINGGER-KARYAWAN')->where('field', '!=', 'CREATED-BY')->get() as $item){
             $arr[$item->value_field][$item->field] = $item->value_field;

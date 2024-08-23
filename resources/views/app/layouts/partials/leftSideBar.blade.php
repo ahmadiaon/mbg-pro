@@ -82,7 +82,8 @@
                     </a>
                     <ul class="submenu">
                         <li><a id="absensi" class="" href="/web/pendapatan/absensi">Absensi</a></li>
-                        <li><a id="slip" href="/web/pendapatan/slip">Slip Gaji</a></li>
+                        <li><a id="slip" href="/web/pendapatan/slip">Slip Gaji</a></li>                        
+                        <li><a id="slip" href="/web/pendapatan/roaster-kerja">Roaster Kerja</a></li>
                     </ul>
                 </li>
                 @if (!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))

@@ -23,7 +23,6 @@
     <div class="row">
 
 
-
         <div class="col-sm-12 col-md-5">
             <div class="faq-wrap">
                 <h4 class="mb-20 h4 text-blue">Data diri <b class="user-name"></b></h4>

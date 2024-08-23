@@ -1002,9 +1002,15 @@ Route::middleware(['webIsLogin'])->group(function () {
             
                 // Route::get('/user-privilege', [UserPrivilegeController::class, 'index']);
 
-            Route::get('/database', [DatabaseController::class, 'indexData']);
+            
+            
+            Route::prefix('database')->group(function () {// /api/mbg/manage/database/
+                Route::get('/', [DatabaseController::class, 'indexData']);
+                Route::post('/store-database', [DatabaseController::class, 'storeDataWeb']);
+            });
 
             Route::get('/users', [WebUserController::class, 'manageIndexUser']);
+            Route::post('/import-user', [WebUserController::class, 'manageImportUser']);
             Route::post('/slip', [WebSlipController::class, 'slipStore']);
             Route::get('/app', function () {
                 return view('app.menuApp');

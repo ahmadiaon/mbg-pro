@@ -929,6 +929,8 @@ class ComposerStaticInit06f75ac418af319c81f547dc936acf55
         'App\\Models\\StatusAbsen' => __DIR__ . '/../..' . '/app/Models/StatusAbsen.php',
         'App\\Models\\Support\\DataSource' => __DIR__ . '/../..' . '/app/Models/Support/DataSource.php',
         'App\\Models\\Support\\Database' => __DIR__ . '/../..' . '/app/Models/Support/Database.php',
+        'App\\Models\\Support\\DatabaseDataKehadiran' => __DIR__ . '/../..' . '/app/Models/Support/DatabaseDataKehadiran.php',
+        'App\\Models\\Support\\DatabaseDataPersetujuan' => __DIR__ . '/../..' . '/app/Models/Support/DatabaseDataPersetujuan.php',
         'App\\Models\\Support\\DatabaseFieldShow' => __DIR__ . '/../..' . '/app/Models/Support/DatabaseFieldShow.php',
         'App\\Models\\Support\\DatabasePersetujuan' => __DIR__ . '/../..' . '/app/Models/Support/DatabasePersetujuan.php',
         'App\\Models\\Support\\UserTemplate' => __DIR__ . '/../..' . '/app/Models/Support/UserTemplate.php',

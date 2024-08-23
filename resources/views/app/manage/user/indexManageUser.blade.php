@@ -28,8 +28,22 @@
     {{-- datatable --}}
     <!-- Simple Datatable start -->
     <div class="card-box mb-30">
-        <div class="pd-20">
-            <h4 class="text-blue h4">Manage User</h4>
+        <div class="row pd-20">
+            <div class="col-auto">
+                <h4 class="text-blue h4">Manage User </h4>
+            </div>
+            <div class="col text-right">
+                <div class="btn-group mb-5">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary">
+                            Export
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="importUser()">
+                            Import
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="pb-20" id="datatable">
             <table class="data-table table stripe hover nowrap" id="table-datatable">
@@ -37,12 +51,7 @@
                     <tr>
                         <th class="table-plus datatable-nosort">Name</th>
                         <th class="table-plus datatable-nosort">Perusahaan</th>
-                        <th class="table-plus datatable-nosort">Project</th>
-                        <th class="table-plus datatable-nosort">Department</th>
-                        <th class="table-plus datatable-nosort">Divisi</th>
-                        <th class="table-plus datatable-nosort">Feature</th>
-                        <th class="table-plus datatable-nosort">Level</th>
-                        <th class="datatable-nosort">Action</th>
+                        <th class="table-plus datatable-nosort">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +74,10 @@
                                 </div>
                             </div>
                         </td>
-
+                        <td>
+                            <a onclick="editUser('MBLE-0422003')" class="btn btn-primary" href="#"><i
+                                    class="dw dw-edit2"></i> Edit</a>
+                        </td>
                         <td>
                             <a onclick="editUser('MBLE-0422003')" class="btn btn-primary" href="#"><i
                                     class="dw dw-edit2"></i> Edit</a>
@@ -82,8 +94,8 @@
 
 
 
-    <!-- Modal ketidakhadiran-->
-    <div class="modal fade" id="create-absen" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <!-- Modal edit user-->
+    <div class="modal fade" id="modal-edit-user" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -154,6 +166,36 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- import -->
+    <div class="modal fade" id="modal-import-user" role="dialog" aria-labelledby="import-modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="form-import-user" action="/user/absensi/import" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Import
+                            User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pilih File</label>
+                            <input autofocus name="uploaded_file" type="file"
+                                class="form-control-file form-control height-auto" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" onclick="storeImportUser()"
+                            class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection()
@@ -294,13 +336,9 @@
     </script>
 
     <script>
-       
-
-
-
         function editUser(nik_employee) {
 
-            conLog('nik_employee',db['public']['public_value']['KARYAWAN'][nik_employee])
+            conLog('nik_employee', db['public']['public_value']['KARYAWAN'][nik_employee])
             $('#nik_employee').val(`${nik_employee}`)
             $('#company_department').text(
                 `${db['public']['public_value']['KARYAWAN'][nik_employee]['NAMA-KARYAWAN']}`
@@ -310,11 +348,11 @@
             $('#nik_employee_modal').text(db['public']['public_value']['KARYAWAN'][nik_employee]['NRP'])
             $('#position_modal').text(db['public']['public_value']['KARYAWAN'][nik_employee]['JABATAN'])
 
-            $('#create-absen').modal('show');
+            $('#modal-edit-user').modal('show');
         }
 
         function editStoreUser() {
-            $('#create-absen').modal('show');
+            $('#modal-edit-user').modal('show');
             startLoading();
             let _token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
@@ -338,7 +376,31 @@
                     //alertModal()
                 }
             });
+        }
 
+        function importUser() {
+            $('#modal-import-user').modal('show');
+        }
+
+        function storeImportUser(){
+            var form = $('#form-import-user')[0];
+            var form_data = new FormData(form);
+            $.ajax({
+                url: '/web/manage/import-user',
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function(response) {
+                    $('#loading-modal').modal('hide');
+                    conLog('response', response);
+                    
+                    $('#loading-modal').modal('hide');
+                },
+                error: function(response) {
+                    conLog('errr', response);
+                }
+            });
         }
     </script>
 @endsection()

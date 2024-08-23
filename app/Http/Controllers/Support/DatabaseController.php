@@ -10,6 +10,7 @@ use App\Models\DatabaseDataSource;
 use App\Models\DatabaseField;
 use App\Models\DatabaseTable;
 use App\Models\Employee\EmployeeAbsen;
+use App\Models\Support\DatabaseDataKehadiran;
 use App\Models\Support\DatabaseFieldShow;
 use App\Models\Support\DatabasePersetujuan;
 use App\Models\Support\UserTemplate;
@@ -19,6 +20,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -189,7 +191,7 @@ class DatabaseController extends Controller
                     $file_extension = $the_file->getClientOriginalExtension();
                     $filenameWithoutExtension = pathinfo($file_name_original, PATHINFO_FILENAME);
                     $file_name_change = $request->code_table_data . "-" . $request->code_data . "-" . $key . "." . $file_extension;
-                    $xxxx=$the_file->move($parent_path, $file_name_change);
+                    $xxxx = $the_file->move($parent_path, $file_name_change);
                     $store_data = DatabaseData::updateOrCreate(
                         [
                             'uuid_data' => $request->uuid_data,
@@ -262,13 +264,81 @@ class DatabaseController extends Controller
 
         return ResponseFormatter::ResponseJson($files, 'success', 200);
     }
-
-    public function storeData(Request $request)
+    public function storeDataWeb(Request $request)
     {
         // if ($request->hasFile('FILE-KTP')) {
 
         // }
-        // return ResponseFormatter::ResponseJson($request->formFile,"store database", 200);
+        $files = $request->allFiles();
+        $fileCount = count($files);
+        $Q_field = DatabaseField::where('code_table_field', $request->code_table)->get();
+
+        $code_data = '';
+        $uuid_data = '';
+        $auth_login = $request->header('auth_login');
+        $user = User::where('auth_login', $auth_login)->first();
+
+        $db = session('db_local_storage');
+        switch ($request->code_table) {
+            case 'KEHADIRAN':
+                $dibuat_oleh = $user->employee_uuid;
+                $uuid_data = $code_data = $request->NRP . '-' . $request['TANGGAL-MULAI'];
+                foreach ($Q_field as $field) {
+                    $store_data = DatabaseDataKehadiran::updateOrCreate(
+                        [
+                            'code_data' => $code_data,
+                            'nrp' => $request->NRP,
+                        ],
+                        [
+                            'tanggal_diajukan' => $request['TANGGAL-PENGAJUAN'],
+                            'tanggal_mulai' => $request['TANGGAL-MULAI'],
+                            'lama' => $request['LAMA'],
+                            'code_jenis_kehadiran' => $request['JENIS-KEHADIRAN'],
+                            'dokumen' => $request['DOKUMEN'],
+                            'keterangan' => $request['KETERANGAN'],
+                            'dibuat_oleh' => $dibuat_oleh,
+                        ]
+                    );
+                }
+            default:
+                // Default action
+                return response()->json(['error' => 'Invalid action'], 400);
+        }
+
+        if($db['db']['database_persetujuan'][$request->code_table]){
+            foreach($db['db']['database_persetujuan'][$request->code_table] as $code_level => $persetujuan){
+                if($request[$code_level]){
+                    $store_data = DatabaseDataKehadiran::updateOrCreate(
+                        [
+                            'code_data' => $code_data,
+                            'nrp' => $request->NRP,
+                        ],
+                        [
+                            'tanggal_diajukan' => $request['TANGGAL-PENGAJUAN'],
+                            'tanggal_mulai' => $request['TANGGAL-MULAI'],
+                            'lama' => $request['LAMA'],
+                            'code_jenis_kehadiran' => $request['JENIS-KEHADIRAN'],
+                            'dokumen' => $request['DOKUMEN'],
+                            'keterangan' => $request['KETERANGAN'],
+                            'dibuat_oleh' => $dibuat_oleh,
+                        ]
+                    );
+                    /*
+                        jika adminyang input harus ada file,
+                            untuk sekarang masih bisa,
+                        jika karyawan yang input admin tidak boleh me yes, atasan yang yes,
+                    */ 
+                }
+            }
+        }
+        
+        return ResponseFormatter::ResponseJson($request->all(), "stored database", 200);
+    }
+
+
+    public function storeData(Request $request)
+    {
+        
         $data_database_datatable = [];
         foreach ($request->formData as $field) {
             $data_database_datatable[$field['name']] = $field['value'];
@@ -332,12 +402,12 @@ class DatabaseController extends Controller
 
         $code_table = $request['data_table']['code_table'];
         // if emp PHK
-        if($code_table == 'PHK-KARYAWAN'){
-            if(!empty($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'])){
+        if ($code_table == 'PHK-KARYAWAN') {
+            if (!empty($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'])) {
                 //UPDATE ABSENSI
                 // ambil bulannya - ambil akhir bulan - loop 
                 $NRP = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
-                
+
 
                 $data_absen = [
                     'NRP' => $NRP,
@@ -348,7 +418,7 @@ class DatabaseController extends Controller
 
                 EmployeeAbsen::storeAbsen($data_absen);
 
-                if(empty($data_database_datatable['JENIS-PHK'])){
+                if (empty($data_database_datatable['JENIS-PHK'])) {
                     $data_database_datatable['JENIS-PHK'] = "PHK";
 
                     $store_data = DatabaseData::updateOrCreate(
@@ -385,12 +455,12 @@ class DatabaseController extends Controller
             }
         }
 
-        if($code_table == 'KARYAWAN'){
+        if ($code_table == 'KARYAWAN') {
             $NRP = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
             $obj_TMK = ResponseFormatter::dateToArray($data_database_datatable['TANGGAL-MASUK-KERJA--TMK-']);
             $data_absen = [
                 'NRP' => $NRP,
-                'date_start' => $obj_TMK['year'].'-'.$obj_TMK['month'].'-01',
+                'date_start' => $obj_TMK['year'] . '-' . $obj_TMK['month'] . '-01',
                 'date_end' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
                 'status_absen_uuid' => 'X'
             ];
@@ -405,7 +475,7 @@ class DatabaseController extends Controller
 
             EmployeeAbsen::storeAbsen($data_absen);
 
-            if(!empty($data_database_datatable['NIK-KTP'])){
+            if (!empty($data_database_datatable['NIK-KTP'])) {
                 User::updateOrCreate([
                     'uuid' => $NRP,
                     'employee_uuid' => $NRP,
@@ -417,7 +487,7 @@ class DatabaseController extends Controller
                 ]);
             }
 
-            if(empty($data_database_datatable['NIK-KTP'])){
+            if (empty($data_database_datatable['NIK-KTP'])) {
                 $data_database_datatable['NIK-KTP'] = "password";
 
                 $store_data = DatabaseData::updateOrCreate(
@@ -436,9 +506,9 @@ class DatabaseController extends Controller
                 );
             }
         }
-        
 
-       
+
+
 
 
         $data_return['code_data'] = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
@@ -520,25 +590,24 @@ class DatabaseController extends Controller
         }
 
         if (!empty($request_data['persetujuan'])) {
-            
+
             $Q_delete = DatabasePersetujuan::where('form_code', $code_table)->delete();
-            foreach($request_data['persetujuan'] as $persetujuan){
+            foreach ($request_data['persetujuan'] as $persetujuan) {
                 DatabasePersetujuan::updateOrCreate(
                     [
-                        'form_code'=>$code_table,
+                        'form_code' => $code_table,
                         'level' =>  $persetujuan['level'],
                         'grade' =>  $persetujuan['grade'],
                     ],
                     [
-                       'form_code'=>$code_table,
+                        'form_code' => $code_table,
                         'level' =>  $persetujuan['level'],
-                        'grade' =>  $persetujuan['grade'], 
-                        'description' =>  $persetujuan['description'], 
-                        'reference' =>  $persetujuan['reference'], 
+                        'grade' =>  $persetujuan['grade'],
+                        'description' =>  $persetujuan['description'],
+                        'reference' =>  $persetujuan['reference'],
                     ]
                 );
             }
-
         }
 
         return ResponseFormatter::ResponseJson($request_data, "store database", 200);

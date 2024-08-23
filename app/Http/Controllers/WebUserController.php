@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Api\User\UserController;
-use App\Http\Controllers\Support\DatabaseController;
 use App\Models\DatabaseData;
 use App\Models\Privilege\UserPrivilege;
 use App\Models\User;
@@ -12,7 +10,8 @@ use App\Models\UserDetail\UserDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class WebUserController extends Controller
 {
@@ -179,6 +178,7 @@ class WebUserController extends Controller
 
         return $storeEmployee;
     }
+
     public function login(Request $request)
     {
         $dataUser = User::where('nik_employee', ResponseFormatter::toUUID($request->nik_employee))->first();
@@ -286,6 +286,39 @@ class WebUserController extends Controller
 
         return view('app.manage.user.indexManageUser');
     }
+
+    public function manageImportUser(Request $request){
+        $the_file = $request->file('uploaded_file');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet        = $spreadsheet->getActiveSheet();
+            $row_limit    = $sheet->getHighestDataRow();
+            $no_employee = 2;
+            while ($sheet->getCell('A' . $no_employee)->getValue() != null) {
+                $NRP = ResponseFormatter::toUUID($sheet->getCell('B' . $no_employee)->getValue());
+                $NIK_KTP = $sheet->getCell('E' . $no_employee)->getValue();
+                User::updateOrCreate([
+                    'uuid' => $NRP,
+                    'employee_uuid' => $NRP,
+                    'nik_employee' => $NRP,
+
+                ], [
+                    'password' => Hash::make($NIK_KTP),
+                    'role' => 'employee'
+                ]);
+
+                $no_employee++;
+            }
+
+
+
+        } catch (Exception $e) {
+            // $error_code = $e->errorInfo[1];
+            return back()->withErrors('There was a problem uploading the data!');
+        }
+        return ResponseFormatter::ResponseJson($request->all(), 'imprt user',200);
+    }
+
     public function storeUser(Request $request)
     {
         /*

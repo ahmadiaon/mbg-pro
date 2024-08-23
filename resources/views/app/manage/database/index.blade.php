@@ -847,16 +847,12 @@
                     data_source_this_field[element.full_code_field]['code_field'] = element.code_field;
                 }
             });
+
             if (db['db']['database_field_show'][code_table]) {
                 Object.entries(db['db']['database_field_show'][code_table]).forEach(([key_field, fields]) => {
                     let value_gabungan = '';
                     // conLog('key_field', key_field);
                     fields.forEach(items_field => {
-
-                        //     conLog('items_field', items_field);
-
-                        //     conLog('data items_field', $(`#${code_table}-${items_field.field_show_code}`)
-                        // .val());
                         value_gabungan = value_gabungan + `${items_field.split_by}` + $(
                             `#${code_table}-${items_field.field_show_code}`).val();
                     });
