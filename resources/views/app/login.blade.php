@@ -77,17 +77,17 @@
                                 <div class="form-group justify-center row updatePinForm pd-20">
                                     <div class="col-sm-12 col-md-12 btn-group">
                                         <input name="pinNumber-1" maxlength="1" id="pinNumber-1"
-                                            class="pinNumber form-control mr-1" type="number" >
+                                            class="pinNumber form-control mr-1" type="number">
                                         <input name="pinNumber-2" maxlength="1" id="pinNumber-2"
-                                            class="pinNumber  form-control mr-1" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number">
                                         <input name="pinNumber-3" maxlength="1" id="pinNumber-3"
-                                            class="pinNumber  form-control mr-1" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number">
                                         <input name="pinNumber-4" maxlength="1" id="pinNumber-4"
-                                            class="pinNumber  form-control mr-1" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number">
                                         <input name="pinNumber-5" maxlength="1" id="pinNumber-5"
-                                            class="pinNumber  form-control mr-1" type="number" >
+                                            class="pinNumber  form-control mr-1" type="number">
                                         <input name="pinNumber-6" maxlength="1" id="pinNumber-6"
-                                            class="pinNumber  form-control" type="number" >
+                                            class="pinNumber  form-control" type="number">
                                     </div>
                                 </div>
 
@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row pb-30 loadingLogin" style="display: none;">
+                            <div id="id_loadingLogin" class="row pb-30 loadingLogin" style="display: none;">
                                 <div class="col-12 text-center">
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="sr-only">Loading...</span>
@@ -163,26 +163,33 @@
             $(`.pin`).hide();
 
         }
-        $(".btns-login").click(function(event) {
-            $(`.loadingLogin`).show();
-        });
 
-        function cekAvailableEmployee() {
+        // $("#btnSubmit").click(function(event) {
 
-            $(`.loadingLogin`).show();
-            $(`.not-found`).hide();
-            $('.not-match').hide()
+        // });
+
+        async function cekAvailableEmployee() {
+
             
+            // return false;
+            $(`.not-found`).hide();
+            $('.not-match').hide();
+
             let _token = $('meta[name="csrf-token"]').attr('content');
             var pinInsert = getPinInsert();
             $.ajax({
-                url: '/api/mbg/get/user/available',
+                url: '/web/login/available',
                 type: "POST",
-                async: false, 
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     // Add other custom headers if needed
+                },
+                async: true,
+                beforeSend: function() {
+                    console.log('before')
+                    // Show the loading indicator before the request is sent
+                    $(`#id_loadingLogin`).show();
                 },
                 data: JSON.stringify({
                     _token: _token,
@@ -197,15 +204,16 @@
                         if (typeof(response.data) == 'object') {
                             if (response.data.status == 'success') {
                                 console.log(response.data)
-                                $('#pin').val(pinInsert)
-                                // console.log(@json(session('user_authentication')))
-                                $('#btnSubmit').removeAttr("onclick");
-                                $("#btnSubmit").attr("type", "submit");
-                                $("#btnSubmit").attr("class", "btn btn-outline-primary btn-lg btn-block btns-login");
-                                $('#btnSubmit').click();
+                                $('#pin').val(pinInsert);
+                                console.log('response login')
+                                console.log(response);
+                                window.location.href = '/web/menu';
                                 refreshSession();
+                                return false;
+                               
+                                
                                 // window.location.href = '/web/profile';
-                            }else{
+                            } else {
                                 $('.not-match').show()
                                 $('#nik_number').val("");
                                 $('.pinNumber').val("");
@@ -219,15 +227,17 @@
                     } else {
                         $(`.not-found`).show();
                     }
-                    $(`.loadingLogin`).hide();
-
-
+                },
+                complete: function() {
+                    // Always hide the loading indicator after the AJAX call completes
+                    $('.loadingLogin').hide();
                 },
                 error: function(response) {
                     conLog('error', response)
                     //alertModal()
                 }
             });
+            // $(`#id_loadingLogin`).empty();
         }
 
         function getPinInsert() {

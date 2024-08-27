@@ -3,9 +3,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('DATABASE'));
-
-
     let COLOR_BOOTSTRAP = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
     var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
     var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
@@ -96,6 +93,9 @@
         }
         localStorage.setItem('ui_dataset', JSON.stringify(ui_dataset));
     }
+    conLog('ui_dataset', ui_dataset);
+
+    let db = JSON.parse(localStorage.getItem('DATABASE'));
 
     var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
     var end = new Date(arr_date_today.year, arr_date_today.month, 0);
@@ -1185,6 +1185,8 @@
             default:
                 break;
         }
+
+        $
     }
 
     function createFormFieldTable(id_element, code_table) {
@@ -1226,8 +1228,6 @@
                     conLog('LABEL', db['public']['public_value']['DATABASE-LEVEL-PERSETUJUAN'][`LEVEL-${countLevel}`][
                         'LEVEL-PERSETUJUAN'
                     ]);
-                    // getValueData(db_persetujuan[`LEVEL-${countLevel}`]['description'],'DATABASE-LEVEL-PERSETUJUAN', 'LEVEL-PERSETUJUAN')
-                    // cardFormField(id_element, field);
 
                     //CHANGE VALUE REFERENCE
 
@@ -1261,12 +1261,13 @@
                 conLog('code_field', field);
                 conLog('NRP', KONSTANTA['NRP']);
 
-                $(`#${field.full_code_field}`).val(ui_dataset.ui_dataset.user_authentication.employee_uuid).trigger('change');
-                
+                $(`#${field.full_code_field}`).val(ui_dataset.ui_dataset.user_authentication.employee_uuid)
+                    .trigger('change');
+
                 conLog('NRP', KONSTANTA['PAGE']);
-                if(KONSTANTA['PAGE'] == 'SELF'){
+                if (KONSTANTA['PAGE'] == 'SELF') {
                     conLog('NRP', KONSTANTA['PAGE']);
-                    $(`#form-${field.full_code_field}`).hide();    
+                    $(`#form-${field.full_code_field}`).hide();
                 }
             }
         });
@@ -1424,17 +1425,55 @@
     function storeDataTable(code_table) {
         conLog('storeDataTable', 'storeDataTable');
 
+        let data_source_this_field = {};
+        Object.values(db['db']['database_field'][code_table]).forEach(element => {
+            if (element.type_data_field == KONSTANTA['Input Autocomplite']) {
+                data_source_this_field[element.full_code_field] = db['db']['database_data_source'][element
+                    .full_code_field
+                ];
+                data_source_this_field[element.full_code_field]['primary_field'] = db['db']['database_table'][
+                    data_source_this_field[element.full_code_field]['table_data_source']
+                ]['primary_table'];
+                data_source_this_field[element.full_code_field]['code_field'] = element.code_field;
+            }
+        });
+
+        let uuid_data = $('#uuid_data').val();
         var formId = 'FORM-' + code_table; // Construct the form ID dynamically
-        var formData = new FormData(document.getElementById(formId));
+
+        conLog('formId',formId);
+        let db_table = db['db']['database_table'][code_table];
+
+        var formData;
+        try {
+            formData = new FormData(document.getElementById(formId));
+        } catch (error) {
+
+            formData = new FormData(document.getElementById(`form-id-${code_table}`));
+        }
+        
+
         formData.append('code_table', code_table);
-        conLog('formData', formData);
+        formData.append('uuid_data', uuid_data);
+
+
+        Object.entries(db_table).forEach(([key_field, fields]) => {
+            formData.append(`data_table[${key_field}]`, fields);
+        });
+
+        formData.append(`data_source_this_field`, JSON.stringify(data_source_this_field));
+
+        // conLog('formData', formData);
+        // return false;
+        //tidak boleh ke form karena bakal di kasih file,
 
         $.ajax({
-
             url: '/web/manage/database/store-database',
             type: 'POST',
             headers: {
-                'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'user-token-mbg': ui_dataset.ui_dataset.user_authentication.auth_login
             },
             data: formData,
             contentType: false, // Important: prevents jQuery from setting content type header
@@ -1454,7 +1493,7 @@
             type: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
             },
             data: JSON.stringify({
                 _token: $('meta[name="csrf-token"]').attr('content'),
@@ -2285,17 +2324,24 @@
 <script>
     async function refreshSession() {
         console.log('session refreshed')
+        conLog('auth', ui_dataset.ui_dataset.user_authentication.auth_login);
+        let auth = ui_dataset.ui_dataset.user_authentication.auth_login;
         $.ajax({
             url: '/web/local-storage',
             type: "POST",
             headers: {
-                'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                'X-auth_login': auth,
+                'X-Auth-Login': auth, // Changed header name
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+
                 // Add other custom headers if needed
             },
             data: {
-                _token: $('meta[name="csrf-token"]').attr('content'),
+                auth_login: auth
             },
             success: function(response) {
+                conLog('response ' + auth, response);
+                // return false;
                 status_absen_short = '';
 
                 localStorage.setItem('DATABASE', JSON.stringify(response.data));
@@ -2358,7 +2404,7 @@
 
     if (!db) {
         refreshSession();
-
+        conLog('db', db);
 
     }
     if (getLocalStorage('filter_absen')) {

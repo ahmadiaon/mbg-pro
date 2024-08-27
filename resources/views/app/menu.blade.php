@@ -27,7 +27,6 @@
             <div class="card card-box">
                 <h5 class="card-header weight-500">Pendapatan</h5>
                 <div class="card-body">
-
                     <p class="card-text">
                         Sub menu
                     </p>
@@ -45,7 +44,6 @@
             <div class="card card-box mb-20">
                 <h5 class="card-header weight-500">Profile</h5>
                 <div class="card-body">
-
                     <p class="card-text">
                         Sub menu
                     </p>
@@ -60,7 +58,6 @@
                 <div class="card card-box mb-20">
                     <h5 class="card-header weight-500">Pengelolaan</h5>
                     <div class="card-body">
-
                         <p class="card-text">
                             Sub menu
                         </p>
@@ -91,7 +88,7 @@
                         batal
                     </button>
                     <a href="/web/menu/user">
-                        <button type="button" class="btn btn-success" >
+                        <button type="button" class="btn btn-success">
                             Ubah
                         </button>
                     </a>
@@ -111,32 +108,9 @@
         });
 
         function getUserInfo() {
-            $.ajax({
-                url: '/api/mbg/get/user',
-                type: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
-                    // Add other custom headers if needed
-                },
-                data: JSON.stringify({
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                }),
-                success: function(response) {
-                    setValueInput('nik_employee', response.data.nik_employee);
-                    setValueInput('email', response.data.email);
-                    setValueInput('phone_number', response.data.phone_number);
-                    setValueInput('nik_number', response.data.nik_number);
-                    if (!response.data.pin) {
-                        CL('ksong pin');
-                        $('#warning-modal-change-pin').modal('show');
-                    }
-                },
-                error: function(response) {
-                    conLog('error', response)
-                    //alertModal()
-                }
-            });
+            if(!ui_dataset.ui_dataset.user_authentication.pin){
+                $('#warning-modal-change-pin').modal('show');
+            }
         }
     </script>
 @endsection()

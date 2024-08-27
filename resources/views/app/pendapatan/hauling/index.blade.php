@@ -1187,7 +1187,7 @@
                 url: '/web/pendapatan/hauling/get',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: {
@@ -1313,7 +1313,7 @@
                 type: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: JSON.stringify({
@@ -1408,7 +1408,7 @@
                 url: '/api/mbg/pendapatan/hauling/delete',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: {
@@ -1436,7 +1436,7 @@
                 url: '/api/mbg/pendapatan/hauling/get',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: {

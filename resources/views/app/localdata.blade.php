@@ -160,7 +160,7 @@
                     type: "POST",
                     async: false,
                     headers: {
-                        'auth_login': @json(session('user_authentication'))
+                        'X-auth_login': @json(session('user_authentication'))
                         // Add other custom headers if needed
                     },
                     data: {

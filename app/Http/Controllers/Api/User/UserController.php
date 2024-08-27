@@ -9,17 +9,12 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WebUserController;
-use App\Models\Company;
 use App\Models\DatabaseData;
 use App\Models\DatabaseDataSource;
 use App\Models\DatabaseField;
 use App\Models\DatabaseTable;
-use App\Models\Department;
 use App\Models\Employee\Employee;
-use App\Models\Identity;
 use App\Models\Menu;
-use App\Models\Position;
-use App\Models\Privilege\UserPrivilege;
 use App\Models\Support\DatabaseFieldShow;
 use App\Models\Support\DatabasePersetujuan;
 use App\Models\Support\UserTemplate;
@@ -28,7 +23,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use PhpParser\Node\Stmt\Else_;
 
 class UserController extends Controller
 {
@@ -36,17 +30,12 @@ class UserController extends Controller
 
     public function getUser(Request $request)
     {
-        $auth_login = $request->header('auth_login');
+        $auth_login = $request->header('x-auth-login');
+        
+
         $user = User::where('auth_login', $auth_login)->first();
-        $identity = UserDetail::where('uuid', $user->nik_employee)->whereNull('date_end')->first();
 
-
-        $mergedArray = (array)$user + (array)$identity;
-        $data = (object)$mergedArray;
-
-        $data = array_merge($user->toArray(), $identity->toArray());
-
-        return ResponseFormatter::ResponseJson($data, 'Success', 200);
+        return ResponseFormatter::ResponseJson($auth_login, 'Success', 200);
     }
 
     public function cekAvailableEmployee(Request $request)
@@ -84,18 +73,13 @@ class UserController extends Controller
                         ['auth_login' => $token]
                     );
                     $storeEmployee = User::where('auth_login', $token)->first();
-                    $userDetail = UserDetail::where('uuid', ResponseFormatter::toUUID($storeEmployee->nik_employee))->first();
-                    $storeEmployee->user_details = $userDetail;
-
-                    $user_privileges = UserPrivilege::where_nik_employee($storeEmployee->nik_employee);
-
-                    $storeEmployee->user_privileges = $user_privileges;
-
-                    session(['user_authentication' => $storeEmployee]);
-                    Session::put('user_authentication', $storeEmployee);
+                    
+                    $sesss = WebUserController::sessionUserAuthentication($token);
+                    session(['user_authentication' => $sesss]);
+                    Session::put('user_authentication', $sesss);
                     return ResponseFormatter::ResponseJson([
                         'status' => 'success',
-                        'data'  => session('user_authentication')
+                        'data'  => $sesss
                     ], 'Validasi Login Sukses', 200);
                 }
             }
@@ -113,7 +97,7 @@ class UserController extends Controller
 
     public function storeUser(Request $request)
     {
-        $auth_login = $request->header('auth_login');
+        $auth_login = $request->header('X-auth_login');
         $user = User::where('auth_login', $auth_login)->first();
         $dataForm = $request->formData;
         $hashPin = $user->pin;
@@ -158,8 +142,10 @@ class UserController extends Controller
         $database = [];
         $user = UserController::getUserLogin($auth_login);
         $user->level_user = 3;
-        
+
+        // return $auth_login;        
         $session_user = WebUserController::sessionUserAuthentication($auth_login);
+        
         if(!empty($session_user['feature']['MANAGE-DATA-HR'])){
             $user->level_user = 5;
         }
@@ -364,44 +350,48 @@ class UserController extends Controller
                 }
             }
         }
-        // return $data_public['KARYAWAN'];
+        $data_public['KARYAWAN'];
         $arr_employee = [];
         if($user->level_user > 1){
             foreach($data_public['KARYAWAN'] as $NRP=>$item_karyawan){
-                if($item_karyawan['STATUS-KERJA'] != 'PHK'){
-                    $arr_employee['all_employees'][] =$NRP;
-                    if(!empty($item_karyawan['PERUSAHAAN'])){
-                        $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $NRP;
-                    }else{
-                        $arr_employee['PERUSAHAAN']['-'][] = $NRP;
+                try {
+                    if($item_karyawan['STATUS-KERJA'] != 'PHK'){
+                        $arr_employee['all_employees'][] =$NRP;
+                        if(!empty($item_karyawan['PERUSAHAAN'])){
+                            $arr_employee['PERUSAHAAN'][$item_karyawan['PERUSAHAAN']][] = $NRP;
+                        }else{
+                            $arr_employee['PERUSAHAAN']['-'][] = $NRP;
+                        }
+                        // project
+                        if(!empty($item_karyawan['PROJECT'])){
+                            $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $NRP;
+                        }else{
+                            $arr_employee['PROJECT']['-'][] = $NRP;
+                        }
+            
+                        // DEPARTEMEN
+                        if(!empty($item_karyawan['DEPARTEMEN'])){
+                            $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $NRP;
+                        }else{
+                            $arr_employee['DEPARTEMEN']['-'][] = $NRP;
+                        }
+            
+                        // DIVISI
+                        if(!empty($item_karyawan['DIVISI'])){
+                            $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $NRP;
+                        }else{
+                            $arr_employee['DIVISI']['-'][] = $NRP;
+                        }
+                        // DIVISI
+                        if(!empty($item_karyawan['GRADE'])){
+                            $arr_employee['GRADE'][$item_karyawan['GRADE']][] = $NRP;
+                        }else{
+                            $arr_employee['GRADE']['-'][] = $NRP;
+                        }
                     }
-                    // project
-                    if(!empty($item_karyawan['PROJECT'])){
-                        $arr_employee['PROJECT'][$item_karyawan['PROJECT']][] = $NRP;
-                    }else{
-                        $arr_employee['PROJECT']['-'][] = $NRP;
-                    }
-        
-                    // DEPARTEMEN
-                    if(!empty($item_karyawan['DEPARTEMEN'])){
-                        $arr_employee['DEPARTEMEN'][$item_karyawan['DEPARTEMEN']][] = $NRP;
-                    }else{
-                        $arr_employee['DEPARTEMEN']['-'][] = $NRP;
-                    }
-        
-                    // DIVISI
-                    if(!empty($item_karyawan['DIVISI'])){
-                        $arr_employee['DIVISI'][$item_karyawan['DIVISI']][] = $NRP;
-                    }else{
-                        $arr_employee['DIVISI']['-'][] = $NRP;
-                    }
-                    // DIVISI
-                    if(!empty($item_karyawan['GRADE'])){
-                        $arr_employee['GRADE'][$item_karyawan['GRADE']][] = $NRP;
-                    }else{
-                        $arr_employee['GRADE']['-'][] = $NRP;
-                    }
+                } catch (\Throwable $th) {
                 }
+                
 
                 
             }
@@ -439,7 +429,11 @@ class UserController extends Controller
     public function localStorage(Request $request)
     {
 
-        request()->session()->put('db_local_storage', $this->db_local_storage($request->header('auth_login')));
+        
+        request()->session()->put('db_local_storage', $this->db_local_storage($request->header('X-Auth-Login')));
+        
+        // return ResponseFormatter::ResponseJson($request-all(), 'Store Success', 200);
+        // return ResponseFormatter::ResponseJson($request->headers->all(), 'Store Success', 200);
         return ResponseFormatter::ResponseJson(session('db_local_storage'), 'Store Success', 200);
     }
 

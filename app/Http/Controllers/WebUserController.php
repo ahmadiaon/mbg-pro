@@ -19,7 +19,7 @@ class WebUserController extends Controller
     {
 
         $storeEmployee = User::where('auth_login', $auth)->first();
-
+        // return $auth;
         $NRP = $storeEmployee->employee_uuid;
         $O_KARYAWAN = [];
         $A_DIVISI = [];
@@ -34,6 +34,7 @@ class WebUserController extends Controller
 
 
 
+        // return ResponseFormatter::toUUID($NRP);
         $Q_user_details = DatabaseData::where('code_table_data', 'IDENTITAS-KARYAWAN')
             ->where('code_data', ResponseFormatter::toUUID($NRP))
             ->where('code_field_data', 'NAMA-KARYAWAN')
@@ -185,7 +186,6 @@ class WebUserController extends Controller
 
         $isValid = false;
         if ($dataUser) {
-
             if (Hash::check($request->pin, $dataUser->pin)) {
                 $isValid = true;
             }
@@ -202,11 +202,14 @@ class WebUserController extends Controller
 
                 $storeEmployee = $this->sessionUserAuthentication($token);
 
+
                 $grade = DatabaseData::where('code_table_data','KONTRAK-KARYAWAN')->where('code_field_data','GRADE')->where('code_data', ResponseFormatter::toUUID($request->nik_employee))->whereNull('date_end')->first();
 
                 $storeEmployee->GRADE = $grade->value_data;
                 session()->flush();
                 session(['user_authentication' => $storeEmployee]);
+
+                return $storeEmployee;
                 // session()->put('user_authentication', $storeEmployee);
                 if (!empty($storeEmployee->pin)) {
                     return redirect()->intended('/web/menu');

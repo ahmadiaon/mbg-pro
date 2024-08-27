@@ -9,7 +9,6 @@
             <div class="col text-right">
                 <div class="btn-group">
                     <button onclick="showCreateModal()" class="btn btn-secondary">Tambah</button>
-
                     <div class="btn-group dropdown">
                         <button type="button" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown"
                             aria-expanded="false">

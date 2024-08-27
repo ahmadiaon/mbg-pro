@@ -187,16 +187,16 @@
                                                             <div class="col-12">
                                                                 <span class="badge badge-pill badge-sm"
                                                                     data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">01
-                                                                    Jan 2024, Sen</span>
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
                                                                 <span class="badge badge-pill badge-sm"
                                                                     data-bgcolor="#e7ebf5" data-color="#265ed7"
                                                                     style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
                                                                     Hari</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Atasan Langsung <i class="icon-copy bi bi-clock-history"></i></span>
 
-                                                                <div class="font-14 weight-600 mt-1"><span
-                                                                        class="badge badge-primary">PW</span> Izin Tanpa
-                                                                    Upah</div>
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
                                                                 <div class="font-12 weight-500" data-color="#b2b1b6"
                                                                     style="color: rgb(178, 177, 182);">
                                                                     Anggota Keluarga Karyawan Menikah
@@ -210,11 +210,550 @@
                                                             <div class="col-12">
                                                                 <span class="badge badge-pill badge-sm"
                                                                     data-bgcolor="#e7ebf5" data-color="#265ed7"
-                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Sedang
-                                                                    disetujui oleh, <i
-                                                                        class="icon-copy bi bi-clock-history"></i></span>
-                                                                <div class="font-14 weight-600 mt-1">MANAGER <span class="badge badge-primary">Persetujuan</span></div>
-                                                                
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Izin Tanpa Upah</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">3
+                                                                    Hari</span>
+
+                                                                <div class="font-14 weight-600 mt-1">01 Jan 2024, Sen</div>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Anggota Keluarga Karyawan Menikah
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses di HR</span>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">dokumen <i class="icon-copy bi bi-file-earmark-pdf"></i></span>
+                                                                <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                                    style="color: rgb(178, 177, 182);">
+                                                                    Keterangan
+                                                                </div>
+                                                                <span class="badge badge-pill badge-sm"
+                                                                    data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                    style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">tidak ada</span>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -289,7 +828,7 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         Batal
                     </button>
-                    <button type="button" class="btn btn-primary">
+                    <button type="button" onclick="storeDataTable('KEHADIRAN')" class="btn btn-primary" >
                         Simpan
                     </button>
                 </div>
@@ -316,8 +855,6 @@
         }
     </script>
     <script>
-        conLog('ui_dataset', ui_dataset);
-        conLog('db', db);
         let variable_local;
         let data_absensi = null;
         let count_absensi = {};
@@ -333,33 +870,21 @@
         if (ui_dataset.ui_dataset.user_authentication.GRADE <= 5) {
             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile['PERUSAHAAN']]);
             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile['PROJECT']]);
-
             if (ui_dataset.ui_dataset.user_authentication.GRADE <= 4) {
-
-
                 if (ui_dataset.ui_dataset.user_authentication.GRADE <= 2) {
                     atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN'][profile['DEPARTEMEN']]);
                     atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DIVISI'][profile['DIVISI']]);
                 }
             }
         }
-        conLog('atasan', atasan);
+
         let grade_atas = [];
         for (let i = 9; i > profile['GRADE']; i--) {
             conLog(i, db['db']['arr_employees']['GRADE'][i]);
             grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
         }
 
-        conLog('atasan mergered all', grade_atas);
         atasan = innerJoinArrays(atasan, grade_atas);
-
-
-
-
-
-
-
-        conLog('atasan', atasan);
         atasan.forEach(NRP => {
 
             $(`.atasan`).append(
@@ -485,7 +1010,7 @@
                 type: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: JSON.stringify({
@@ -646,6 +1171,7 @@
     </script>
     <script>
         $(document).ready(function() {
+            conLog('ahmadi', 'ahmadi')
             // Initialize Select2
             $('.multi-wrap-select').select2({
                 width: '100%', // Ensure the select2 takes full width

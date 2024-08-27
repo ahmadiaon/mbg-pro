@@ -99,25 +99,11 @@
                         data-toggle="collapse" role="button">Reset</a>
                 </div>
             </div>
-            <form id="fields" class="header-form" enctype="multipart/form-data">
-                <div class="row profile-info" id="field-form">
-                    <div class="col-md-12 col-sm-12">
-                        <div class="form-group">
-                            <label>Nama Field</label>
-                            <input type="text" class="form-control description_field" id="description_field-1">
-                        </div>
-                    </div>
-                    <div class="col-md-12 col-sm-12 mb-2">
-                        <div class="form-group">
-                            <label>Type Data Field</label>
-                            <select style="width: 100%;" onchange="selectSource(1)" name="type_data_field-1"
-                                id="type_data_field-1" class="custom-select2 form-control type-data">
-                                <option value="">Tipe Data Field</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <div id="FORM-BASIC" class="">
+                <form id="fields" class="header-form" enctype="multipart/form-data">
+                    
+                </form>
+            </div>
         </div>
 
         <div class="faq-wrap col-md-7 col-sm-12" hidden>
@@ -337,9 +323,8 @@
             </div>
         </div>
     </div>
-    
+
     <div id="fileInfo"></div>
-    
 @endsection()
 
 @section('script_javascript')
@@ -361,7 +346,7 @@
                 url: '/api/mbg/manage/database/get-table',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: {
@@ -392,7 +377,7 @@
                 url: '/api/mbg/manage/database/import-datatable',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: form_data,
                 contentType: false,
@@ -416,7 +401,7 @@
                 url: '/api/mbg/manage/database/export-datatable',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -443,7 +428,7 @@
         }
 
         function resetForm() {
-            $('#field-form').empty();
+            $('#FORM-BASIC').empty();
             $('#uuid_data').val("");
             createFormField($('#id-code_table').val());
         }
@@ -467,8 +452,6 @@
                     </div>
                 `;
         }
-
-
 
         function changeInput(code_element) {
             $(`#code-autocomplite-${code_element}`).val(toUUID($(`#${code_element}`).val()));
@@ -502,7 +485,7 @@
                 url: '/api/mbg/manage/database/store-template',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -603,14 +586,24 @@
         }
 
         function createFormField(code_table) {
+            $('#FORM-BASIC').empty();
+
+            $('#FORM-BASIC').append(`
+                <form id="FORM-${code_table}" class="FORM-${code_table} header-form" enctype="multipart/form-data">
+                    
+                </form>
+            `);
+            
+
+
             let database_datatable = getValueDatabase_datatable(code_table);
             // === create table fields
             Object.values(database_datatable['fields']).forEach(field => {
-                cardFormField('field-form', field);
+                cardFormField(`FORM-${code_table}`, field);
             });
             // === create table fields
 
-            $(`#field-form`).append(`
+            $(`#FORM-${code_table}`).append(`
                 <div class="col-md-12 col-sm-12 text-right">
                     <button type="button" onclick="storeDataTable('${code_table}')" class="btn btn-primary" id="save-from-table" data-dismiss="modal">
                         Simpan
@@ -618,7 +611,7 @@
                 </div>
             `);
 
-
+            //=========== create field child
             if (database_datatable['table_childs']) {
                 $(`#sub-form`).empty();
                 $('.faq-wrap').attr('hidden', false);
@@ -635,7 +628,7 @@
                                 </button>
                             </div>
                             <div id="faq-${element}" class="collapse" data-parent="#sub-form">
-                                <form id="form-id-${element}" class="form-${element}" enctype="multipart/form-data">
+                                <form id="FORM-${element}" class="FORM-${element}" enctype="multipart/form-data">
                                     <div id="fields-${element}" class="card-body">
                                     
                                     </div>
@@ -656,16 +649,15 @@
                     `);
                 });
             } else {
-
                 $('.faq-wrap').attr('hidden', true);
             }
-            //=========== create field form
+            //=========== create field child
 
 
             // ========== PERSETUJUAN ========
-                if (db['db']['database_persetujuan'][code_table]) {
-                    $('.faq-wrap').attr('hidden', false);
-                    $(`#sub-form`).append(`
+            if (db['db']['database_persetujuan'][code_table]) {
+                $('.faq-wrap').attr('hidden', false);
+                $(`#sub-form`).append(`
                         <div class="card">
                             <div class="card-header">
                                 <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#faq-PERSETUJUAN">
@@ -673,7 +665,8 @@
                                 </button>
                             </div>
                             <div id="faq-PERSETUJUAN" class="collapse" data-parent="#sub-form">
-                                <form id="form-id-PERSETUJUAN" class="form-PERSETUJUAN" enctype="multipart/form-data">
+                                <form id="FORM-PERSETUJUAN" class="form-PERSETUJUAN" enctype="multipart/form-data">
+                                    @csrf
                                     <div id="fields-PERSETUJUAN" class="card-body">
                                     
                                     </div>
@@ -682,8 +675,8 @@
                         </div>
                     `);
 
-                    Object.values(db['db']['database_persetujuan'][code_table]).forEach(element => {});
-                }
+                Object.values(db['db']['database_persetujuan'][code_table]).forEach(element => {});
+            }
             // ========== PERSETUJUAN ========
         }
 
@@ -698,8 +691,8 @@
             GLOBAL_DATA_EXPORT['data'] = {};
             // let database_datatable = getValueDatabase_datatable(code_table);
             $('#btn-refresh-datatable').attr('action', `#${code_table}`);
-            $(`#field-form`).empty();
-            $('#fields').attr('class', `form-${code_table}`);
+            // $(`#field-form`).empty();
+            // $('#fields').attr('class', `FORM-${code_table}`);
             $('#datatable-data').empty();
             $(`#table-description`).text(db['db']['database_table'][code_table]['description_table']);
             $(`#text-form-description`).text(db['db']['database_table'][code_table]['description_table']);
@@ -806,7 +799,7 @@
             }
         }
 
-        function storeDataTable(code_table) {
+        function storeDataTableDatabase(code_table) {
             const fileInputs_element = document.querySelectorAll(`input[type="file"].${code_table}`);
 
             fileInputs_element.forEach(input => {
@@ -833,7 +826,7 @@
 
             // fields
             var formDataArray = $(`.form-${code_table}`).serializeArray();
-            // var formDataArray = new FormData(document.getElementById(`#form-id-${code_table}`));
+            // var formDataArray = new FormData(document.getElementById(`#FORM-${code_table}`));
             let db_table = db['db']['database_table'][code_table];
             let data_source_this_field = {};
             Object.values(db['db']['database_field'][code_table]).forEach(element => {
@@ -874,7 +867,7 @@
                 type: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: JSON.stringify({
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -931,6 +924,11 @@
                     }
                     refreshSession();
 
+                },
+                complete: function() {
+                    // Always hide the loading indicator after the AJAX call completes
+                    refreshSession();
+                    actionCard(code_table)
                 },
                 error: function(response) {
                     conLog('error', response);
@@ -997,7 +995,7 @@
             let data_datatable = Object.values(db['db']['database_table']);
             $('#table-datatable').DataTable({
                 paging: true,
-                responsive:true,
+                responsive: true,
                 serverSide: false,
                 data: data_datatable,
                 columns: row_data_datatable
@@ -1010,7 +1008,7 @@
                 url: '/api/mbg/manage/database/delete-data-database',
                 type: "POST",
                 headers: {
-                    'auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -1132,7 +1130,7 @@
                 scrollY: "600px",
                 paging: false,
                 serverSide: false,
-                response:true,
+                response: true,
                 data: data_datatable,
                 columns: row_data_datatable
             });
@@ -1164,7 +1162,7 @@
             if (database_datatable['table_childs']) {
                 database_datatable['table_childs'].forEach(element => {
                     database_datatable['field_childs'] = db['db']['database_field'][element];
-                    conLog(element,database_datatable['field_childs']);
+                    conLog(element, database_datatable['field_childs']);
                     Object.values(database_datatable['field_childs']).forEach(field => {
                         conLog('code_data', code_data)
                         conLog('fields child', `${field.code_table_field}-${field.code_field}`)
@@ -1172,12 +1170,12 @@
                             if (data_for_field_edit[field.code_field]) {
                                 let value_data = data_for_field_edit[field.code_field];
                                 // conLog('have data child', `${field.code_table_field}-${field.code_field}`);
-                                
-                                
+
+
 
                                 if (field.type_data_field == 'FILE') {
                                     conLog('value', value_data);
-                                }else if (field.type_data_field == KONSTANTA["Input Autocomplite"]) {
+                                } else if (field.type_data_field == KONSTANTA["Input Autocomplite"]) {
                                     $(`#code-autocomplite-${field.full_code_field}`).val(value_data);
                                     let data_source = db['db']['database_data_source'][field
                                         .full_code_field
@@ -1185,7 +1183,7 @@
                                     $(`#${field.full_code_field}`).val(db['public'][data_source
                                         .table_data_source
                                     ][value_data][data_source.field_get_data_source]);
-                                }else{
+                                } else {
                                     $(`#${field.code_table_field}-${field.code_field}`).val(value_data);
                                 }
                             }

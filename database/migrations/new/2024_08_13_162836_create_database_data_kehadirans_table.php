@@ -22,17 +22,12 @@ class CreateDatabaseDataKehadiransTable extends Migration
             $table->string('lama')->nullable();
             $table->string('code_jenis_kehadiran')->nullable();
             $table->string('dokumen')->nullable();
-            $table->string('deskripsi')->nullable();
+            $table->string('keterangan')->nullable();
             $table->string('dibuat_oleh')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('database_data_kehadirans');

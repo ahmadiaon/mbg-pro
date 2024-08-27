@@ -79,8 +79,6 @@ use App\Http\Controllers\WebAbsensiController;
 use App\Http\Controllers\WebHaulingController;
 use App\Http\Controllers\WebSlipController;
 use App\Http\Controllers\WebUserController;
-use App\Models\Employee\EmployeeHourMeterBonus;
-use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('/support')->group(function () {
@@ -98,7 +96,6 @@ Route::get('/refresh-data', [AdminController::class, 'refreshData']);
 Route::get('/get/data/{nik_employee}', [UserDetailController::class, 'show']);
 
 // global
-
 Route::prefix('/app')->group(function () {
     Route::prefix('/user')->group(function () {
         Route::prefix('/detail')->group(function () {
@@ -1052,6 +1049,7 @@ Route::prefix('/web')->group(function () {//before login
         return view('app.login');
     });
     Route::post('/login', [WebUserController::class, 'login']);
+    Route::post('/login/available', [UserController::class, 'cekAvailableEmployee']);
     Route::get('/session', function () {
         dd(session('user_authentication'));
         return view('app.menuApp');

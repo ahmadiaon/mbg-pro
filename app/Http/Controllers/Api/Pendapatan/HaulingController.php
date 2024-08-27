@@ -23,7 +23,7 @@ class HaulingController extends Controller
     public function store(Request $request)
     {
 
-        $users = User::where('auth_login', $request->header('auth_login'))->first();
+        $users = User::where('auth_login', $request->header('X-auth_login'))->first();
         $Q_latest_id_hauling = Hauling::orderBy('id', 'DESC')->first();
         // $Q_latest_id_hauling = Hauling::get();
         $data_form = [];

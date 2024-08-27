@@ -11,24 +11,21 @@ use App\Models\DatabaseField;
 use App\Models\DatabaseTable;
 use App\Models\Employee\EmployeeAbsen;
 use App\Models\Support\DatabaseDataKehadiran;
+use App\Models\Support\DatabaseDataPersetujuan;
 use App\Models\Support\DatabaseFieldShow;
 use App\Models\Support\DatabasePersetujuan;
 use App\Models\Support\UserTemplate;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpParser\Node\Stmt\Foreach_;
 
 class SetCell extends Controller
 {
@@ -41,6 +38,7 @@ class SetCell extends Controller
             ]
         ],];
     }
+
     public static function fontBOLD()
     {
         return ['font' => [
@@ -57,6 +55,7 @@ class SetCell extends Controller
             ]
         ],];
     }
+
     public static function setColorGrey($color)
     {
         return ['fill' => [
@@ -98,7 +97,6 @@ class DatabaseController extends Controller
 
     public function getTableData($code_table)
     {
-
         $Q_table = DatabaseTable::where('code_table', $code_table)->get();
         $data_table = [];
         $data_table_child = [];
@@ -151,7 +149,7 @@ class DatabaseController extends Controller
 
     public function storeTemplate(Request $request)
     {
-        $auth_login = $request->header('auth_login');
+        $auth_login = $request->header('X-auth_login');
         $user = User::where('auth_login', $auth_login)->first();
         $Q_delete = UserTemplate::where('employee_uuid', $user->employee_uuid)->where('code_table_get', $request['code_table_get'])->delete();
         if (!empty($request['show-fields'])) {
@@ -181,12 +179,10 @@ class DatabaseController extends Controller
         if ($request->all()) {
             $arr_key = [];
             foreach ($request->all() as $key => $file) {
-
                 // $files_file = $request->file($key);
                 if ($request->file($key)) {
                     $arr_key[] = $key;
                     $the_file = $request->file($key);
-
                     $file_name_original = $the_file->getClientOriginalName();
                     $file_extension = $the_file->getClientOriginalExtension();
                     $filenameWithoutExtension = pathinfo($file_name_original, PATHINFO_FILENAME);
@@ -207,15 +203,12 @@ class DatabaseController extends Controller
                         ]
                     );
                 }
-
                 // return ResponseFormatter::ResponseJson($files_file->getClientOriginalName(), 'success', 200);
             }
             return ResponseFormatter::ResponseJson($arr_key, 'success', 200);
         } else {
             return ResponseFormatter::ResponseJson($request->all(), 'kosong', 200);
         }
-
-
 
 
 
@@ -264,260 +257,294 @@ class DatabaseController extends Controller
 
         return ResponseFormatter::ResponseJson($files, 'success', 200);
     }
+
     public function storeDataWeb(Request $request)
     {
-        // if ($request->hasFile('FILE-KTP')) {
-
-        // }
         $files = $request->allFiles();
+
+        foreach ($files as $key => $file) {
+            $the_file = $request->file($key);
+            $fileName = $file->getClientOriginalName();
+        }
+
         $fileCount = count($files);
         $Q_field = DatabaseField::where('code_table_field', $request->code_table)->get();
 
         $code_data = '';
         $uuid_data = '';
-        $auth_login = $request->header('auth_login');
+        $auth_login = $request->header('user-token-mbg');
         $user = User::where('auth_login', $auth_login)->first();
-
+        $dibuat_oleh = $user->employee_uuid;
         $db = session('db_local_storage');
+        $data_database_datatable = $request->all();
+        if (!empty($request['data_source_this_field'])) {
+            $data_database_datatable['data_source_this_field'] = json_decode($request['data_source_this_field']);
+        }
+
         switch ($request->code_table) {
             case 'KEHADIRAN':
-                $dibuat_oleh = $user->employee_uuid;
+
                 $uuid_data = $code_data = $request->NRP . '-' . $request['TANGGAL-MULAI'];
-                foreach ($Q_field as $field) {
-                    $store_data = DatabaseDataKehadiran::updateOrCreate(
-                        [
-                            'code_data' => $code_data,
-                            'nrp' => $request->NRP,
-                        ],
-                        [
-                            'tanggal_diajukan' => $request['TANGGAL-PENGAJUAN'],
-                            'tanggal_mulai' => $request['TANGGAL-MULAI'],
-                            'lama' => $request['LAMA'],
-                            'code_jenis_kehadiran' => $request['JENIS-KEHADIRAN'],
-                            'dokumen' => $request['DOKUMEN'],
-                            'keterangan' => $request['KETERANGAN'],
-                            'dibuat_oleh' => $dibuat_oleh,
-                        ]
-                    );
+                if ($files) {
+
+                    $parent_path = 'file/kehadiran/';
+                    foreach ($files as $key => $file) {
+                        $the_file = $request->file($key);
+
+                        $arr_key[] = $key;
+                        $the_file = $request->file($key);
+                        $file_extension = $the_file->getClientOriginalExtension();
+                        $file_name_change = $code_data . "." . $file_extension;
+                        $xxxx = $the_file->move($parent_path, $file_name_change);
+                    }
                 }
+                $store_data = DatabaseDataKehadiran::updateOrCreate(
+                    [
+                        'code_data' => $code_data,
+                        'nrp' => $request->NRP,
+                    ],
+                    [
+                        'tanggal_diajukan' => $request['TANGGAL-PENGAJUAN'],
+                        'tanggal_mulai' => $request['TANGGAL-MULAI'],
+                        'lama' => $request['LAMA'],
+                        'code_jenis_kehadiran' => $request['JENIS-KEHADIRAN'],
+                        'dokumen' => $file_name_change,
+                        'keterangan' => $request['KETERANGAN'],
+                        'dibuat_oleh' => $dibuat_oleh,
+                    ]
+                );
+                // }
+                break;
             default:
-                // Default action
+                $data_database_datatable_data = $data_database_datatable;
+
+                unset($data_database_datatable_data['uuid_data']);
+                unset($data_database_datatable_data['data_table']);
+                unset($data_database_datatable_data['_token']);
+                unset($data_database_datatable_data['code_table']);
+
+                $database_datatable['database_data_source'] = DatabaseController::getDataSource();
+                // store input autocomplite
+                if (!empty($data_database_datatable['data_source_this_field'])) { //store data source dari input autocomplite
+                    foreach ($data_database_datatable['data_source_this_field'] as $data_source_this) {
+                        $data_source_this_field = get_object_vars($data_source_this);
+                        if (!empty($data_database_datatable_data[$data_source_this_field['code_field']])) {
+                            $uuid_data = Str::uuid();
+                            $store_data = DatabaseData::updateOrCreate(
+                                [
+                                    'code_table_data' => $data_source_this_field['table_data_source'], //table data source
+                                    'code_field_data' => $data_source_this_field['field_get_data_source'],
+                                    'code_data' => ResponseFormatter::toUUID($data_database_datatable[$data_source_this_field['code_field']]),
+                                ],
+                                [
+                                    'uuid_data' => $uuid_data,
+                                    'value_data' => $data_database_datatable['description-' . $data_source_this_field['code_field']],
+                                    'date_start' => Carbon::now()->format('Y-m-d'),
+                                    'date_end' => null,
+                                ]
+                            );
+                        }
+                        unset($data_database_datatable_data['description-' . $data_source_this_field['code_field']]);
+                    }
+                }
+                // store input autocomplite
+
+                unset($data_database_datatable_data['data_source_this_field']);
+                $Q_is_data_exist = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))->where('code_table_data',  $request['data_table']['code_table'])->whereNull('date_end')->get();
+
+                if ($Q_is_data_exist->count() > 0) {
+                    $AA = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))
+                        ->where('code_table_data',  $request['data_table']['code_table'])->update(['date_end' => Carbon::now()->format('Y-m-d')]);
+                }
+
+                // insert general
+                $uuid_data = ($request->uuid_data) ? $request->uuid_data : Str::uuid();
+                foreach ($data_database_datatable_data as $index => $value) {
+                    // return ResponseFormatter::ResponseJson($index, "store database 2", 200);
+                    if ($value) {
+                        $store_data = DatabaseData::updateOrCreate(
+                            [
+                                'uuid_data' => $uuid_data,
+                                'code_table_data' => $data_database_datatable['data_table']['code_table'],
+                                'code_field_data' => $index,
+                            ],
+                            [
+                                'value_data' => $value,
+                                'code_data' => ResponseFormatter::toUUID($data_database_datatable[$data_database_datatable['data_table']['primary_table']]),
+                                'uuid_data' => $uuid_data,
+                                'date_start' => Carbon::now()->format('Y-m-d'),
+                                'date_end' => null,
+                            ]
+                        );
+                    }
+                }
+                // insert general
+
+
+                $code_table = $request['data_table']['code_table'];
+                // if emp PHK
+                if ($code_table == 'PHK-KARYAWAN') {
+                    if (!empty($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'])) {
+                        //UPDATE ABSENSI
+                        // ambil bulannya - ambil akhir bulan - loop 
+                        $NRP = ResponseFormatter::toUUID($data_database_datatable_data[$data_database_datatable['data_table']['primary_table']]);
+
+
+                        $data_absen = [
+                            'NRP' => $NRP,
+                            'date_start' => $data_database_datatable_data['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
+                            'date_end' => ResponseFormatter::getEndDayFromDate($data_database_datatable_data['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
+                            'status_absen_uuid' => 'X'
+                        ];
+
+                        EmployeeAbsen::storeAbsen($data_absen);
+
+                        if (empty($data_database_datatable_data['JENIS-PHK'])) {
+                            $data_database_datatable_data['JENIS-PHK'] = "PHK";
+
+                            $store_data = DatabaseData::updateOrCreate(
+                                [
+                                    'uuid_data' => $uuid_data,
+                                    'code_table_data' => $data_database_datatable['data_table']['code_table'],
+                                    'code_field_data' => "JENIS-PHK",
+                                ],
+                                [
+                                    'value_data' => "PHK",
+                                    'code_data' => $NRP,
+                                    'uuid_data' => $uuid_data,
+                                    'date_start' => Carbon::now()->format('Y-m-d'),
+                                    'date_end' => null,
+                                ]
+                            );
+                        }
+
+                        // STATUS KARYAWAN 
+                        $store_data = DatabaseData::updateOrCreate(
+                            [
+                                'uuid_data' => $uuid_data,
+                                'code_table_data' => "KARYAWAN",
+                                'code_field_data' => "STATUS-KERJA",
+                            ],
+                            [
+                                'value_data' => "PHK",
+                                'code_data' => $NRP,
+                                'uuid_data' => $uuid_data,
+                                'date_start' => Carbon::now()->format('Y-m-d'),
+                                'date_end' => null,
+                            ]
+                        );
+                    }
+                }
+
+
+                if ($code_table == 'KARYAWAN') {
+                    $NRP = ResponseFormatter::toUUID($data_database_datatable_data[$data_database_datatable['data_table']['primary_table']]);
+                    $obj_TMK = ResponseFormatter::dateToArray($data_database_datatable_data['TANGGAL-MASUK-KERJA--TMK-']);
+                    $data_absen = [
+                        'NRP' => $NRP,
+                        'date_start' => $obj_TMK['year'] . '-' . $obj_TMK['month'] . '-01',
+                        'date_end' => $data_database_datatable_data['TANGGAL-MASUK-KERJA--TMK-'],
+                        'status_absen_uuid' => 'X'
+                    ];
+
+                    EmployeeAbsen::storeAbsen($data_absen);
+                    $data_absen = [
+                        'NRP' => $NRP,
+                        'date_start' => $data_database_datatable_data['TANGGAL-MASUK-KERJA--TMK-'],
+                        'date_end' => $data_database_datatable_data['TANGGAL-MASUK-KERJA--TMK-'],
+                        'status_absen_uuid' => 'DS'
+                    ];
+
+                    EmployeeAbsen::storeAbsen($data_absen);
+
+                    if (!empty($data_database_datatable_data['NIK-KTP'])) {
+                        User::updateOrCreate([
+                            'uuid' => $NRP,
+                            'employee_uuid' => $NRP,
+                            'nik_employee' => $NRP,
+
+                        ], [
+                            'password' => Hash::make($data_database_datatable_data['NIK-KTP']),
+                            'role' => 'employee'
+                        ]);
+                    }
+
+                    if (empty($data_database_datatable_data['NIK-KTP'])) {
+                        $data_database_datatable_data['NIK-KTP'] = "password";
+
+                        $store_data = DatabaseData::updateOrCreate(
+                            [
+                                'uuid_data' => $uuid_data,
+                                'code_table_data' => 'IDENTITAS-KARYAWAN',
+                                'code_field_data' => "NIK-KTP",
+                            ],
+                            [
+                                'value_data' => "password",
+                                'code_data' => $NRP,
+                                'uuid_data' => $uuid_data,
+                                'date_start' => Carbon::now()->format('Y-m-d'),
+                                'date_end' => null,
+                            ]
+                        );
+                    }
+                }
+
+                return ResponseFormatter::ResponseJson($data_database_datatable_data, "store database 2", 200);
                 return response()->json(['error' => 'Invalid action'], 400);
         }
 
-        if($db['db']['database_persetujuan'][$request->code_table]){
-            foreach($db['db']['database_persetujuan'][$request->code_table] as $code_level => $persetujuan){
-                if($request[$code_level]){
-                    $store_data = DatabaseDataKehadiran::updateOrCreate(
+
+        if ($db['db']['database_persetujuan'][$request->code_table]) {
+            $status = null;
+            $date_change = null;
+
+            foreach ($db['db']['database_persetujuan'][$request->code_table] as $code_level => $persetujuan) {
+                if ($request[$code_level]) {
+
+                    $status = 'ACC';
+                    $date_change =  Carbon::today()->format('Y-m-d');
+
+                    if ($dibuat_oleh == $request->NRP) {
+                        $status = null;
+                        $date_change = null;
+
+                        if ($persetujuan['grade'] == 'NRP') {
+                            $status = 'ACC';
+                            $date_change =  Carbon::today()->format('Y-m-d');
+                        }
+                    }
+
+                    if ($persetujuan['grade'] == 'HR') {
+                        $status = null;
+                        $date_change = null;
+                    }
+
+                    $store_data = DatabaseDataPersetujuan::updateOrCreate(
                         [
                             'code_data' => $code_data,
-                            'nrp' => $request->NRP,
+                            'code_form' => $request->code_table,
+                            'nrp' => $request[$code_level],
+                            'level' => $code_level,
                         ],
                         [
-                            'tanggal_diajukan' => $request['TANGGAL-PENGAJUAN'],
-                            'tanggal_mulai' => $request['TANGGAL-MULAI'],
-                            'lama' => $request['LAMA'],
-                            'code_jenis_kehadiran' => $request['JENIS-KEHADIRAN'],
-                            'dokumen' => $request['DOKUMEN'],
-                            'keterangan' => $request['KETERANGAN'],
-                            'dibuat_oleh' => $dibuat_oleh,
+                            'status' =>  $status,
+                            'date_change' => $date_change,
                         ]
                     );
                     /*
                         jika adminyang input harus ada file,
                             untuk sekarang masih bisa,
                         jika karyawan yang input admin tidak boleh me yes, atasan yang yes,
-                    */ 
+                    */
                 }
             }
         }
-        
+
         return ResponseFormatter::ResponseJson($request->all(), "stored database", 200);
     }
 
 
-    public function storeData(Request $request)
-    {
-        
-        $data_database_datatable = [];
-        foreach ($request->formData as $field) {
-            $data_database_datatable[$field['name']] = $field['value'];
-        }
-
-
-        $database_datatable['database_data_source'] = DatabaseController::getDataSource();
-
-        if (!empty($request['data_source_this_field'])) { //store data source dari input autocomplite
-            foreach ($request['data_source_this_field'] as $data_source_this_field) {
-                $uuid_data = Str::uuid();
-                $store_data = DatabaseData::updateOrCreate(
-                    [
-                        'code_table_data' => $data_source_this_field['table_data_source'], //table data source
-                        'code_field_data' => $data_source_this_field['field_get_data_source'],
-                        'code_data' => ResponseFormatter::toUUID($data_database_datatable[$data_source_this_field['code_field']]),
-                    ],
-                    [
-                        'uuid_data' => $uuid_data,
-                        'value_data' => $data_database_datatable['description-' . $data_source_this_field['code_field']],
-                        'date_start' => Carbon::now()->format('Y-m-d'),
-                        'date_end' => null,
-                    ]
-                );
-                unset($data_database_datatable['description-' . $data_source_this_field['code_field']]);
-            }
-        }
-
-
-        // return ResponseFormatter::ResponseJson($data_database_datatable,"store database", 200);
-
-        $Q_is_data_exist = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))->where('code_table_data',  $request['data_table']['code_table'])->whereNull('date_end')->get();
-
-        if ($Q_is_data_exist->count() > 0) {
-            $AA = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))
-                ->where('code_table_data',  $request['data_table']['code_table'])->update(['date_end' => Carbon::now()->format('Y-m-d')]);
-        }
-
-
-        $uuid_data = ($request->uuid_data) ? $request->uuid_data : Str::uuid();
-
-        foreach ($data_database_datatable as $index => $value) {
-            // if($database_datatable['database_data_source'][$request['data_table']['code_table'].'-'.$index]){
-
-            // }
-            $store_data = DatabaseData::updateOrCreate(
-                [
-                    'uuid_data' => $uuid_data,
-                    'code_table_data' => $request['data_table']['code_table'],
-                    'code_field_data' => $index,
-                ],
-                [
-                    'value_data' => $value,
-                    'code_data' => ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]),
-                    'uuid_data' => $uuid_data,
-                    'date_start' => Carbon::now()->format('Y-m-d'),
-                    'date_end' => null,
-                ]
-            );
-        }
-
-        $code_table = $request['data_table']['code_table'];
-        // if emp PHK
-        if ($code_table == 'PHK-KARYAWAN') {
-            if (!empty($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'])) {
-                //UPDATE ABSENSI
-                // ambil bulannya - ambil akhir bulan - loop 
-                $NRP = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
-
-
-                $data_absen = [
-                    'NRP' => $NRP,
-                    'date_start' => $data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
-                    'date_end' => ResponseFormatter::getEndDayFromDate($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
-                    'status_absen_uuid' => 'X'
-                ];
-
-                EmployeeAbsen::storeAbsen($data_absen);
-
-                if (empty($data_database_datatable['JENIS-PHK'])) {
-                    $data_database_datatable['JENIS-PHK'] = "PHK";
-
-                    $store_data = DatabaseData::updateOrCreate(
-                        [
-                            'uuid_data' => $uuid_data,
-                            'code_table_data' => $request['data_table']['code_table'],
-                            'code_field_data' => "JENIS-PHK",
-                        ],
-                        [
-                            'value_data' => "PHK",
-                            'code_data' => $NRP,
-                            'uuid_data' => $uuid_data,
-                            'date_start' => Carbon::now()->format('Y-m-d'),
-                            'date_end' => null,
-                        ]
-                    );
-                }
-
-                // STATUS KARYAWAN 
-                $store_data = DatabaseData::updateOrCreate(
-                    [
-                        'uuid_data' => $uuid_data,
-                        'code_table_data' => "KARYAWAN",
-                        'code_field_data' => "STATUS-KERJA",
-                    ],
-                    [
-                        'value_data' => "PHK",
-                        'code_data' => $NRP,
-                        'uuid_data' => $uuid_data,
-                        'date_start' => Carbon::now()->format('Y-m-d'),
-                        'date_end' => null,
-                    ]
-                );
-            }
-        }
-
-        if ($code_table == 'KARYAWAN') {
-            $NRP = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
-            $obj_TMK = ResponseFormatter::dateToArray($data_database_datatable['TANGGAL-MASUK-KERJA--TMK-']);
-            $data_absen = [
-                'NRP' => $NRP,
-                'date_start' => $obj_TMK['year'] . '-' . $obj_TMK['month'] . '-01',
-                'date_end' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
-                'status_absen_uuid' => 'X'
-            ];
-
-            EmployeeAbsen::storeAbsen($data_absen);
-            $data_absen = [
-                'NRP' => $NRP,
-                'date_start' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
-                'date_end' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
-                'status_absen_uuid' => 'DS'
-            ];
-
-            EmployeeAbsen::storeAbsen($data_absen);
-
-            if (!empty($data_database_datatable['NIK-KTP'])) {
-                User::updateOrCreate([
-                    'uuid' => $NRP,
-                    'employee_uuid' => $NRP,
-                    'nik_employee' => $NRP,
-
-                ], [
-                    'password' => Hash::make($data_database_datatable['NIK-KTP']),
-                    'role' => 'employee'
-                ]);
-            }
-
-            if (empty($data_database_datatable['NIK-KTP'])) {
-                $data_database_datatable['NIK-KTP'] = "password";
-
-                $store_data = DatabaseData::updateOrCreate(
-                    [
-                        'uuid_data' => $uuid_data,
-                        'code_table_data' => 'IDENTITAS-KARYAWAN',
-                        'code_field_data' => "NIK-KTP",
-                    ],
-                    [
-                        'value_data' => "password",
-                        'code_data' => $NRP,
-                        'uuid_data' => $uuid_data,
-                        'date_start' => Carbon::now()->format('Y-m-d'),
-                        'date_end' => null,
-                    ]
-                );
-            }
-        }
-
-
-
-
-
-        $data_return['code_data'] = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
-        $data_return['uuid_data'] = $uuid_data;
-        $data_return['data_database_datatable'] = $data_database_datatable;
-
-
-        return ResponseFormatter::ResponseJson($data_return, "store database", 200);
-    }
+    
 
     public function store(Request $request)
     {
@@ -669,7 +696,7 @@ class DatabaseController extends Controller
 
     function exportDatatable(Request $request)
     {
-        $auth_login =  $request->header('auth_login');
+        $auth_login =  $request->header('X-auth_login');
         $database_datatable = UserController::db_local_storage($auth_login);
         // return ResponseFormatter::ResponseJson($database_datatable, 'saaaaaa', 200);
         $abjads = ResponseFormatter::abjads();
@@ -729,7 +756,7 @@ class DatabaseController extends Controller
     public function importDatatable(Request $request)
     {
         $the_file = $request->file('uploaded_file');
-        $auth_login =  $request->header('auth_login');
+        $auth_login =  $request->header('X-auth_login');
         $abjads = ResponseFormatter::abjads();
         $database_datatable['database_table'] = DatabaseController::getTables();
         $database_datatable['database_field'] = DatabaseController::getFields();
@@ -1020,5 +1047,279 @@ class DatabaseController extends Controller
         }
 
         return $data_data_source;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // remove this
+    public function storeData(Request $request)
+    {
+        return ResponseFormatter::ResponseJson($request->all(), "store database", 200);
+
+        $data_database_datatable = [];
+        foreach ($request->formData as $field) {
+            $data_database_datatable[$field['name']] = $field['value'];
+        }
+
+
+        $database_datatable['database_data_source'] = DatabaseController::getDataSource();
+
+        if (!empty($request['data_source_this_field'])) { //store data source dari input autocomplite
+            foreach ($request['data_source_this_field'] as $data_source_this_field) {
+                $uuid_data = Str::uuid();
+                $store_data = DatabaseData::updateOrCreate(
+                    [
+                        'code_table_data' => $data_source_this_field['table_data_source'], //table data source
+                        'code_field_data' => $data_source_this_field['field_get_data_source'],
+                        'code_data' => ResponseFormatter::toUUID($data_database_datatable[$data_source_this_field['code_field']]),
+                    ],
+                    [
+                        'uuid_data' => $uuid_data,
+                        'value_data' => $data_database_datatable['description-' . $data_source_this_field['code_field']],
+                        'date_start' => Carbon::now()->format('Y-m-d'),
+                        'date_end' => null,
+                    ]
+                );
+                unset($data_database_datatable['description-' . $data_source_this_field['code_field']]);
+            }
+        }
+
+
+        // return ResponseFormatter::ResponseJson($data_database_datatable,"store database", 200);
+
+        $Q_is_data_exist = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))->where('code_table_data',  $request['data_table']['code_table'])->whereNull('date_end')->get();
+
+        if ($Q_is_data_exist->count() > 0) {
+            $AA = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))
+                ->where('code_table_data',  $request['data_table']['code_table'])->update(['date_end' => Carbon::now()->format('Y-m-d')]);
+        }
+
+
+        $uuid_data = ($request->uuid_data) ? $request->uuid_data : Str::uuid();
+
+        foreach ($data_database_datatable as $index => $value) {
+            // if($database_datatable['database_data_source'][$request['data_table']['code_table'].'-'.$index]){
+
+            // }
+            $store_data = DatabaseData::updateOrCreate(
+                [
+                    'uuid_data' => $uuid_data,
+                    'code_table_data' => $request['data_table']['code_table'],
+                    'code_field_data' => $index,
+                ],
+                [
+                    'value_data' => $value,
+                    'code_data' => ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]),
+                    'uuid_data' => $uuid_data,
+                    'date_start' => Carbon::now()->format('Y-m-d'),
+                    'date_end' => null,
+                ]
+            );
+        }
+
+        $code_table = $request['data_table']['code_table'];
+        // if emp PHK
+        if ($code_table == 'PHK-KARYAWAN') {
+            if (!empty($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'])) {
+                //UPDATE ABSENSI
+                // ambil bulannya - ambil akhir bulan - loop 
+                $NRP = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
+
+
+                $data_absen = [
+                    'NRP' => $NRP,
+                    'date_start' => $data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
+                    'date_end' => ResponseFormatter::getEndDayFromDate($data_database_datatable['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
+                    'status_absen_uuid' => 'X'
+                ];
+
+                EmployeeAbsen::storeAbsen($data_absen);
+
+                if (empty($data_database_datatable['JENIS-PHK'])) {
+                    $data_database_datatable['JENIS-PHK'] = "PHK";
+
+                    $store_data = DatabaseData::updateOrCreate(
+                        [
+                            'uuid_data' => $uuid_data,
+                            'code_table_data' => $request['data_table']['code_table'],
+                            'code_field_data' => "JENIS-PHK",
+                        ],
+                        [
+                            'value_data' => "PHK",
+                            'code_data' => $NRP,
+                            'uuid_data' => $uuid_data,
+                            'date_start' => Carbon::now()->format('Y-m-d'),
+                            'date_end' => null,
+                        ]
+                    );
+                }
+
+                // STATUS KARYAWAN 
+                $store_data = DatabaseData::updateOrCreate(
+                    [
+                        'uuid_data' => $uuid_data,
+                        'code_table_data' => "KARYAWAN",
+                        'code_field_data' => "STATUS-KERJA",
+                    ],
+                    [
+                        'value_data' => "PHK",
+                        'code_data' => $NRP,
+                        'uuid_data' => $uuid_data,
+                        'date_start' => Carbon::now()->format('Y-m-d'),
+                        'date_end' => null,
+                    ]
+                );
+            }
+        }
+
+        if ($code_table == 'KARYAWAN') {
+            $NRP = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
+            $obj_TMK = ResponseFormatter::dateToArray($data_database_datatable['TANGGAL-MASUK-KERJA--TMK-']);
+            $data_absen = [
+                'NRP' => $NRP,
+                'date_start' => $obj_TMK['year'] . '-' . $obj_TMK['month'] . '-01',
+                'date_end' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
+                'status_absen_uuid' => 'X'
+            ];
+
+            EmployeeAbsen::storeAbsen($data_absen);
+            $data_absen = [
+                'NRP' => $NRP,
+                'date_start' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
+                'date_end' => $data_database_datatable['TANGGAL-MASUK-KERJA--TMK-'],
+                'status_absen_uuid' => 'DS'
+            ];
+
+            EmployeeAbsen::storeAbsen($data_absen);
+
+            if (!empty($data_database_datatable['NIK-KTP'])) {
+                User::updateOrCreate([
+                    'uuid' => $NRP,
+                    'employee_uuid' => $NRP,
+                    'nik_employee' => $NRP,
+
+                ], [
+                    'password' => Hash::make($data_database_datatable['NIK-KTP']),
+                    'role' => 'employee'
+                ]);
+            }
+
+            if (empty($data_database_datatable['NIK-KTP'])) {
+                $data_database_datatable['NIK-KTP'] = "password";
+
+                $store_data = DatabaseData::updateOrCreate(
+                    [
+                        'uuid_data' => $uuid_data,
+                        'code_table_data' => 'IDENTITAS-KARYAWAN',
+                        'code_field_data' => "NIK-KTP",
+                    ],
+                    [
+                        'value_data' => "password",
+                        'code_data' => $NRP,
+                        'uuid_data' => $uuid_data,
+                        'date_start' => Carbon::now()->format('Y-m-d'),
+                        'date_end' => null,
+                    ]
+                );
+            }
+        }
+
+
+
+
+
+        $data_return['code_data'] = ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]);
+        $data_return['uuid_data'] = $uuid_data;
+        $data_return['data_database_datatable'] = $data_database_datatable;
+        // return $data_return;
+
+        return ResponseFormatter::ResponseJson($data_return, "store database", 200);
     }
 }

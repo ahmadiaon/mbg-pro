@@ -17,7 +17,7 @@ class ApiEmployeeAbsensiController extends Controller
                 'date_end' => ''
             ]
         );
-        $auth_login = $request->header('auth_login');
+        $auth_login = $request->header('X-auth_login');
 
         $user = User::where('auth_login', $auth_login)->first();
         // $user = User::where('nik_employee', 'MBLE-0422003')->first();

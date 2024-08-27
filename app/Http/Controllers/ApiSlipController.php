@@ -28,7 +28,7 @@ class ApiSlipController extends Controller
             ]
         );
 
-        $auth_login = $request->header('auth_login');
+        $auth_login = $request->header('X-auth_login');
         $user = User::where('auth_login', $auth_login)->first();
         $data = Slip::where('year', $filter['year'])
             ->where('employee_uuid', $user->nik_employee)
