@@ -24,8 +24,8 @@
                 </li>
 
 
-                @if (!empty(session('user_authentication')['feature']))
-                    @if (in_array('HR', session('user_authentication')['feature']))
+                @if (session('user_authentication')['role'] > 1)
+                    {{-- @if (in_array('HR', session('user_authentication')['feature']))
                         <li class="dropdown">
                             <a href="human-resource:;" id="hr" class="dropdown-toggle">
                                 <span class="micon bi bi-calendar-range"></span><span class="mtext">Human
@@ -38,7 +38,7 @@
                                 @endif
                             </ul>
                         </li>
-                    @endif
+                    @endif --}}
 
                     <li class="dropdown">
                         <a href="javascript:;" id="pengelolaan" class="dropdown-toggle">
@@ -46,9 +46,8 @@
                         </a>
 
                         <ul class="submenu">
-                            @if (in_array('ABSENSI', session('user_authentication')['feature']))
-                                <li><a id="absensi" class="" href="/web/pengelolaan/absensi">Absensi</a></li>
-                            @endif
+                            
+                            <li><a id="absensi" class="" href="/web/pengelolaan/absensi">Absensi</a></li>
                             @if (in_array('CUTI', session('user_authentication')['feature']))
                                 <li><a id="roaster-kerja" class="" href="/web/pengelolaan/roaster-kerja">Roaster
                                         Kerja</a></li>
@@ -101,7 +100,6 @@
                             <span class="micon bi bi-menu-button-wide"></span><span class="mtext">Database</span>
                         </a>
                         <ul class="submenu">
-                            <li><a id="absensi" class="" href="/web/manage/absensi">Absensi</a></li>
                             <li><a id="slip" href="/web/manage/slip">Slip Gaji </a></li>
                             @if (!empty(in_array('SUPERADMIN', session('user_authentication')['feature'])))
                                 <li><a id="slip" href="/web/manage/users">Users </a></li>

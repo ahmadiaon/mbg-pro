@@ -206,7 +206,7 @@
                 url: '/api/mbg/manage/database/get-table',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: {
@@ -237,7 +237,7 @@
                 url: '/api/mbg/manage/database/import-datatable',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: form_data,
                 contentType: false,
@@ -261,7 +261,7 @@
                 url: '/api/mbg/manage/database/export-datatable',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -347,7 +347,7 @@
                 url: '/api/mbg/manage/database/store-template',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -661,7 +661,7 @@
                 type: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: JSON.stringify({
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -700,7 +700,7 @@
                 url: '/api/mbg/manage/database/delete-data-database',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),

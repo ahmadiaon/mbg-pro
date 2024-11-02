@@ -11,7 +11,7 @@ class UserController extends Controller
     //
 
     public function userGet(Request $request){
-        $auth_login = $request->header('X-auth_login');
+        $auth_login = $request->header('x-auth-login');
         $user = User::where('auth_login', $auth_login)->first();
 
        

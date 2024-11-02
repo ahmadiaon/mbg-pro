@@ -346,7 +346,7 @@
                 url: '/api/mbg/manage/database/get-table',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: {
@@ -377,7 +377,7 @@
                 url: '/api/mbg/manage/database/import-datatable',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: form_data,
                 contentType: false,
@@ -393,21 +393,21 @@
         }
 
         function exportDatatable(type_export) {
-
+            conLog('code_data', $('#id-code_table').val())
+            conLog('data code_data', db['public']['public_value'][$('#id-code_table').val()]);
             let database_datatable = getValueDatabase_datatable($('#id-code_table').val());
-            CL('GLOBAL_DATA_EXPORT');
-            CL(GLOBAL_DATA_EXPORT);
+            
             $.ajax({
-                url: '/api/mbg/manage/database/export-datatable',
+                url: '/web/manage/database/export-datatable',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     fields: (type_export == "full") ? Object.values(database_datatable['all-fields']) : Object
                         .values(database_datatable['show-fields']),
-                    data_export: GLOBAL_DATA_EXPORT,
+                    // data_export: db['public']['public_value'][$('#id-code_table').val()],
                     code_table_data: $('#id-code_table').val(),
 
                 },
@@ -485,7 +485,7 @@
                 url: '/api/mbg/manage/database/store-template',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -799,148 +799,7 @@
             }
         }
 
-        function storeDataTableDatabase(code_table) {
-            const fileInputs_element = document.querySelectorAll(`input[type="file"].${code_table}`);
-
-            fileInputs_element.forEach(input => {
-                conLog('xx', input);
-                input.addEventListener('change', handleFileInput);
-            });
-
-            const form = document.getElementById('myForm');
-            const formData = new FormData();
-            const fileInputs = document.querySelectorAll(`input[type="file"].${code_table}`);
-            const fileInfo = document.getElementById('fileInfo');
-
-            fileInfo.innerHTML = ''; // Clear previous file info
-
-            fileInputs.forEach(input => {
-                if (input.files.length > 0) {
-                    for (let i = 0; i < input.files.length; i++) {
-                        formData.append(input.name, input.files[i]);
-                    }
-                }
-            });
-            formData.append('code_table_data', code_table);
-
-
-            // fields
-            var formDataArray = $(`.form-${code_table}`).serializeArray();
-            // var formDataArray = new FormData(document.getElementById(`#FORM-${code_table}`));
-            let db_table = db['db']['database_table'][code_table];
-            let data_source_this_field = {};
-            Object.values(db['db']['database_field'][code_table]).forEach(element => {
-                if (element.type_data_field == KONSTANTA['Input Autocomplite']) {
-                    data_source_this_field[element.full_code_field] = db['db']['database_data_source'][element
-                        .full_code_field
-                    ];
-                    data_source_this_field[element.full_code_field]['primary_field'] = db['db']['database_table'][
-                        data_source_this_field[element.full_code_field]['table_data_source']
-                    ]['primary_table'];
-                    data_source_this_field[element.full_code_field]['code_field'] = element.code_field;
-                }
-            });
-
-            if (db['db']['database_field_show'][code_table]) {
-                Object.entries(db['db']['database_field_show'][code_table]).forEach(([key_field, fields]) => {
-                    let value_gabungan = '';
-                    // conLog('key_field', key_field);
-                    fields.forEach(items_field => {
-                        value_gabungan = value_gabungan + `${items_field.split_by}` + $(
-                            `#${code_table}-${items_field.field_show_code}`).val();
-                    });
-                    value_gabungan = value_gabungan.slice(1);
-                    let new_data_form = {
-                        name: key_field,
-                        value: value_gabungan
-                    }
-                    formDataArray.push(new_data_form);
-                });
-            }
-
-            // conLog('formDataArray', formDataArray);
-
-            // return false;
-            // conLog('data_source_this_field', data_source_this_field);
-            $.ajax({
-                url: '/api/mbg/manage/database/store-database',
-                type: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
-                },
-                data: JSON.stringify({
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    formData: formDataArray,
-                    uuid_data: $('#uuid_data').val(),
-                    data_table: db_table,
-                    data_source_this_field: data_source_this_field
-                }),
-                success: function(response) {
-                    conLog('response', response);
-
-
-                    if (db_table['primary_table']) {
-                        $('.secondary_btn_store').attr('disabled', false);
-                        $('.secondary_key').val(response['data']['data_database_datatable'][db_table[
-                            'primary_table']]);
-                    }
-
-                    showModalSuccess();
-
-                    $('#uuid_data').val(response.data.uuid_data);
-                    formData.append('code_data', response.data.code_data);
-                    formData.append('uuid_data', response.data.uuid_data);
-
-                    if (formData) {
-                        console.log('asad');
-                        $.ajax({
-                            url: '/api/mbg/manage/database/store-database-file',
-                            method: 'POST',
-                            data: formData,
-                            success: function(response) {
-                                conLog('re', response);
-                            },
-                            contentType: false,
-                            processData: false,
-                            error: function(response) {
-                                conLog('error', response);
-                                //alertModal()
-                            }
-                        });
-                        formData.forEach((value, key) => {
-                            if (value instanceof File) {
-                                console.log(`Key: ${key}`);
-                                console.log(`File Name: ${value.name}`);
-                                console.log(`File Size: ${value.size} bytes`);
-                                console.log(`File Type: ${value.type}`);
-                            } else {
-                                console.log(`Key: ${key}`);
-                                console.log(`Value: ${value}`);
-                            }
-                        });
-                    } else {
-                        console.log('kosong');
-                    }
-                    refreshSession();
-
-                },
-                complete: function() {
-                    // Always hide the loading indicator after the AJAX call completes
-                    refreshSession();
-                    actionCard(code_table)
-                },
-                error: function(response) {
-                    conLog('error', response);
-                    stopLoading();
-                    //alertModal()
-                }
-            });
-
-
-
-
-        }
+        
 
         function refreshTable() {
             let row_data_datatable = [];
@@ -1008,7 +867,7 @@
                 url: '/api/mbg/manage/database/delete-data-database',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -1194,6 +1053,171 @@
                 $('.secondary_btn_store').attr('disabled', false);
                 $('.secondary_key').val(code_data);
             }
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        //to delete
+        function storeDataTableDatabase(code_table) {
+            const fileInputs_element = document.querySelectorAll(`input[type="file"].${code_table}`);
+
+            fileInputs_element.forEach(input => {
+                conLog('xx', input);
+                input.addEventListener('change', handleFileInput);
+            });
+
+            const form = document.getElementById('myForm');
+            const formData = new FormData();
+            const fileInputs = document.querySelectorAll(`input[type="file"].${code_table}`);
+            const fileInfo = document.getElementById('fileInfo');
+
+            fileInfo.innerHTML = ''; // Clear previous file info
+
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    for (let i = 0; i < input.files.length; i++) {
+                        formData.append(input.name, input.files[i]);
+                    }
+                }
+            });
+            formData.append('code_table_data', code_table);
+
+
+            // fields
+            var formDataArray = $(`.form-${code_table}`).serializeArray();
+            // var formDataArray = new FormData(document.getElementById(`#FORM-${code_table}`));
+            let db_table = db['db']['database_table'][code_table];
+            let data_source_this_field = {};
+            Object.values(db['db']['database_field'][code_table]).forEach(element => {
+                if (element.type_data_field == KONSTANTA['Input Autocomplite']) {
+                    data_source_this_field[element.full_code_field] = db['db']['database_data_source'][element
+                        .full_code_field
+                    ];
+                    data_source_this_field[element.full_code_field]['primary_field'] = db['db']['database_table'][
+                        data_source_this_field[element.full_code_field]['table_data_source']
+                    ]['primary_table'];
+                    data_source_this_field[element.full_code_field]['code_field'] = element.code_field;
+                }
+            });
+
+            if (db['db']['database_field_show'][code_table]) {
+                Object.entries(db['db']['database_field_show'][code_table]).forEach(([key_field, fields]) => {
+                    let value_gabungan = '';
+                    // conLog('key_field', key_field);
+                    fields.forEach(items_field => {
+                        value_gabungan = value_gabungan + `${items_field.split_by}` + $(
+                            `#${code_table}-${items_field.field_show_code}`).val();
+                    });
+                    value_gabungan = value_gabungan.slice(1);
+                    let new_data_form = {
+                        name: key_field,
+                        value: value_gabungan
+                    }
+                    formDataArray.push(new_data_form);
+                });
+            }
+
+            // conLog('formDataArray', formDataArray);
+
+            // return false;
+            // conLog('data_source_this_field', data_source_this_field);
+            $.ajax({
+                url: '/api/mbg/manage/database/store-database',
+                type: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
+                },
+                data: JSON.stringify({
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    formData: formDataArray,
+                    uuid_data: $('#uuid_data').val(),
+                    data_table: db_table,
+                    data_source_this_field: data_source_this_field
+                }),
+                success: function(response) {
+                    conLog('response', response);
+
+
+                    if (db_table['primary_table']) {
+                        $('.secondary_btn_store').attr('disabled', false);
+                        $('.secondary_key').val(response['data']['data_database_datatable'][db_table[
+                            'primary_table']]);
+                    }
+
+                    showModalSuccess();
+
+                    $('#uuid_data').val(response.data.uuid_data);
+                    formData.append('code_data', response.data.code_data);
+                    formData.append('uuid_data', response.data.uuid_data);
+
+                    if (formData) {
+                        console.log('asad');
+                        $.ajax({
+                            url: '/api/mbg/manage/database/store-database-file',
+                            method: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                conLog('re', response);
+                            },
+                            contentType: false,
+                            processData: false,
+                            error: function(response) {
+                                conLog('error', response);
+                                //alertModal()
+                            }
+                        });
+                        formData.forEach((value, key) => {
+                            if (value instanceof File) {
+                                console.log(`Key: ${key}`);
+                                console.log(`File Name: ${value.name}`);
+                                console.log(`File Size: ${value.size} bytes`);
+                                console.log(`File Type: ${value.type}`);
+                            } else {
+                                console.log(`Key: ${key}`);
+                                console.log(`Value: ${value}`);
+                            }
+                        });
+                    } else {
+                        console.log('kosong');
+                    }
+                    refreshSession();
+
+                },
+                complete: function() {
+                    // Always hide the loading indicator after the AJAX call completes
+                    refreshSession();
+                    actionCard(code_table)
+                },
+                error: function(response) {
+                    conLog('error', response);
+                    stopLoading();
+                    //alertModal()
+                }
+            });
+
+
+
+
         }
     </script>
 @endsection()

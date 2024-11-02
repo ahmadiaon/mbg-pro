@@ -40,25 +40,17 @@
                             placeholder="Johnny Brown" disabled>
                     </div>
                 </div>
-
-                <div class="form-group row">
-                    <label class="col-sm-12 col-md-2 col-form-label">NIK KTP</label>
-                    <div class="col-sm-12 col-md-4">
-                        <input id="nik_number" name="nik_number" class="form-control" placeholder="Search Here"
-                            type="search" disabled>
-                    </div>
-                </div>
                 <div class="form-group row">
                     <label class="col-sm-12 col-md-2 col-form-label">No HP</label>
                     <div class="col-sm-12 col-md-4">
-                        <input id="phone_number" name="phone_number" class="form-control" placeholder="Search Here"
+                        <input id="phone_number" name="phone_number" class="form-control" placeholder="tidak ada"
                             type="search">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-12 col-md-2 col-form-label">Email</label>
                     <div class="col-sm-12 col-md-4">
-                        <input id="email" name="email" class="form-control" placeholder="Search Here" type="search">
+                        <input id="email" name="email" class="form-control" placeholder="tidak ada" type="search">
                     </div>
                 </div>
                 <div class="form-group row updatePin">
@@ -102,7 +94,6 @@
             </div>
         </form>
     </div>
-
 @endsection()
 
 @section('script_javascript')
@@ -119,21 +110,27 @@
                     $('#iconBtnToggle').addClass("icon-copy bi bi-x-circle-fill")
                     $('.updatePin').after(
                         `
-                        <div class="form-group row updatePinForm pd-20">
+                        <div class="form-group row updatePinForm">
                             <label class="col-sm-12 col-md-2 col-form-label">PIN Baru</label>
-                            <div class="col-sm-12 col-md-4 row" >
-                                <input name="pinNumber-1" maxlength="1" id="pinNumber-1"  class="pinNumber col-2 form-control"
-                                    type="text" required>
-                                <input name="pinNumber-2" maxlength="1" id="pinNumber-2"  class="pinNumber col-2 form-control"
-                                    type="text" required>
-                                <input name="pinNumber-3" maxlength="1" id="pinNumber-3"  class="pinNumber col-2 form-control"
-                                    type="text" required>
-                                <input name="pinNumber-4" maxlength="1" id="pinNumber-4"  class="pinNumber col-2 form-control"
-                                    type="text" required>
-                                <input name="pinNumber-5" maxlength="1" id="pinNumber-5"  class="pinNumber col-2 form-control"
-                                    type="text" required>
-                                <input name="pinNumber-6" maxlength="1" id="pinNumber-6"  class="pinNumber col-2 form-control"
-                                    type="text" required>                                    
+                            <div class="col-sm-12 col-md-5" >
+                                <div class="input-group custom pin">
+                                    <div class="form-group justify-center row updatePinForm pd-20">
+                                        <div class="col-sm-12 col-md-12 btn-group">
+                                            <input name="pinNumber-1" maxlength="1" id="pinNumber-1"
+                                                class="pinNumber form-control mr-1" type="number">
+                                            <input name="pinNumber-2" maxlength="1" id="pinNumber-2"
+                                                class="pinNumber  form-control mr-1" type="number">
+                                            <input name="pinNumber-3" maxlength="1" id="pinNumber-3"
+                                                class="pinNumber  form-control mr-1" type="number">
+                                            <input name="pinNumber-4" maxlength="1" id="pinNumber-4"
+                                                class="pinNumber  form-control mr-1" type="number">
+                                            <input name="pinNumber-5" maxlength="1" id="pinNumber-5"
+                                                class="pinNumber  form-control mr-1" type="number">
+                                            <input name="pinNumber-6" maxlength="1" id="pinNumber-6"
+                                                class="pinNumber  form-control" type="number">
+                                        </div>
+                                    </div>
+                                </div>                               
                             </div>     
                         </div>                       
                         `
@@ -153,46 +150,6 @@
     {{-- insert field --}}
     <script>
         $(document).ready(function() {
-            // getUserInfo();
-
-        });
-
-        function getUserInfo() {
-            let _token = $('meta[name="csrf-token"]').attr('content');
-            $.ajax({
-                url: '/api/mbg/get/user',
-                type: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
-                    // Add other custom headers if needed
-                },
-                data: JSON.stringify({
-                    _token: _token,
-                }),
-                success: function(response) {
-                    setValueInput('nik_employee', response.data.nik_employee);
-                    setValueInput('email', response.data.email);
-                    setValueInput('phone_number', response.data.phone_number);
-                    setValueInput('nik_number', response.data.nik_number);
-                    if (!response.data.pin) {
-                        CL('ksong pin');
-                        $('#warning-modal-change-pin').modal('show');
-                    }
-                },
-                error: function(response) {
-                    conLog('error', response)
-                    //alertModal()
-                }
-            });
-        }
-    </script>
-
-    {{-- store Users --}}
-    <script>
-        $(document).ready(function() {
-            $(`.errNotif`).hide();
-
             $('#form-user').on('click', '#btnSaveChange', function() {
                 startLoading();
                 var formDataArray = $("#form-user").serializeArray();
@@ -232,7 +189,7 @@
                     type: "POST",
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                        'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                         // Add other custom headers if needed
                     },
                     data: JSON.stringify({
@@ -252,7 +209,16 @@
 
 
             });
+            $(`.errNotif`).hide();
+            getUserInfo();
+
         });
+
+        function getUserInfo() {
+            setValueInput('nik_employee', ui_dataset.ui_dataset.user_authentication.profile.NRP);
+            setValueInput('email', ui_dataset.ui_dataset.user_authentication.email);
+            setValueInput('phone_number', ui_dataset.ui_dataset.user_authentication.phone_number);
+        }
 
         function getPinInsert() {
             return `${getInputValue('pinNumber-1')}${getInputValue('pinNumber-2')}${getInputValue('pinNumber-3')}${getInputValue('pinNumber-4')}${getInputValue('pinNumber-5')}${getInputValue('pinNumber-6')}`;

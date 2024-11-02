@@ -22,6 +22,15 @@ class CreateEmployeeAbsensTable extends Migration
             $table->string('cek_log')->nullable();
             $table->string('edited')->nullable();
             $table->string('color')->nullable();
+            
+            $table->string('late_points')->nullable();
+            $table->string('late_minutes')->nullable();
+            $table->string('working_hours')->nullable();
+            $table->string('entry')->nullable();
+            $table->string('exit')->nullable();
+            $table->string('mid')->nullable();
+            $table->string('shift')->nullable();
+
             $table->string('absen_description')->nullable();
             $table->string('pay_uuid')->nullable();
 

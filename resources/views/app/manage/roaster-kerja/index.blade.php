@@ -1134,7 +1134,7 @@
                 url: '/api/mbg/pengelolaan/absensi/get',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -1550,7 +1550,7 @@
                 url: '/api/mbg/pengelolaan/absensi/store-single',
                 type: "POST",
                 headers: {
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                 },
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),

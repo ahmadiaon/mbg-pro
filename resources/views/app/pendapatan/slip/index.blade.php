@@ -101,7 +101,7 @@
                 type: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
+                    'x-auth-login': ui_dataset.ui_dataset.user_authentication.auth_login
                     // Add other custom headers if needed
                 },
                 data: JSON.stringify({

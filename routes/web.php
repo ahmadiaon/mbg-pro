@@ -79,6 +79,7 @@ use App\Http\Controllers\WebAbsensiController;
 use App\Http\Controllers\WebHaulingController;
 use App\Http\Controllers\WebSlipController;
 use App\Http\Controllers\WebUserController;
+use App\Models\Employee\EmployeeAbsen;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('/support')->group(function () {
@@ -671,15 +672,6 @@ Route::middleware(['islogin'])->group(function () {
         });
 
 
-        // Route::get('/foreman/manage-checker', [ShiftController::class, 'manageCheckerShift']);
-        // Route::get('/foreman/shifts/create', [ShiftController::class, 'create']);
-        // // Route::post('/foreman/manage-checker', [ShiftController::class, 'storeManageCheckerShift']);
-        // Route::post('/foreman/shifts/', [ShiftController::class, 'store']);
-        // Route::post('/foreman/manage-member-list', [ShiftListController::class, 'index']);
-        // Route::post('/foreman/manage-member', [ShiftListController::class, 'store']);
-        // Route::post('/foreman/over-burden', [OverBurdenController::class, 'forForemanOB']);
-        // Route::post('/foreman/over-burden', [OverBurdenListController::class, 'forForeman']);
-        // Route::post('/foreman/hour-meter', [HourMeterController::class, 'listHMforForeman']);
         Route::get('/foreman-ob-data/{checkerId}', [OverBurdenController::class, 'dataOverBurdenForeman'])->name('dataOverBurdenForeman');
         Route::get('/foreman/over-burden/{obID}/show', [OverBurdenListController::class, 'listOBforForeman']);
     });
@@ -968,7 +960,10 @@ Route::middleware(['islogin'])->group(function () {
 
 Route::middleware(['webIsLogin'])->group(function () {
     Route::prefix('/web')->group(function () {
-        
+
+        Route::prefix('/data')->group(function () {
+            Route::post('/employee', [UserController::class, 'getfull']);
+        });
         Route::post('/local-storage', [UserController::class, 'localStorage']);
         Route::get('/profile', [WebUserController::class, 'profile']);
         Route::get('/menu', function () {
@@ -991,8 +986,7 @@ Route::middleware(['webIsLogin'])->group(function () {
             });
         });
         
-        Route::prefix('/manage')->group(function () {
-            
+        Route::prefix('/manage')->group(function () {            
             Route::get('/absensi', [WebAbsensiController::class, 'manageIndex']);
             Route::get('/slip', [WebAbsensiController::class, 'slipManage']);
             Route::get('/privilege', [UserPrivilegeController::class, 'index']);
@@ -1003,6 +997,7 @@ Route::middleware(['webIsLogin'])->group(function () {
             
             Route::prefix('database')->group(function () {// /api/mbg/manage/database/
                 Route::get('/', [DatabaseController::class, 'indexData']);
+                Route::post('/export-datatable', [DatabaseController::class, 'exportDatatable']);
                 Route::post('/store-database', [DatabaseController::class, 'storeDataWeb']);
             });
 
@@ -1023,9 +1018,12 @@ Route::middleware(['webIsLogin'])->group(function () {
         Route::prefix('/pengelolaan')->group(function () {
             Route::prefix('/absensi')->group(function () {
                 Route::get('/', [WebAbsensiController::class, 'manageIndex']);  
+                Route::post('/store-single', [EmployeeAbsenController::class, 'storeAbsensiSingle']);
                 Route::post('/post/list', [WebAbsensiController::class, 'storeListAbsensi']); 
+                Route::post('/getAbsenEmployee', [EmployeeAbsen::class, 'getAbsenEmployee']); 
+                Route::post('/daily-report', [EmployeeAbsenController::class, 'dialyReportWeb']);    
             });
-            Route::post('/absensi/daily-report', [EmployeeAbsenController::class, 'dialyReportWeb']);    
+            
             Route::get('/file-fingger', [WebAbsensiController::class, 'fileIndex']);            
             Route::get('/roaster-kerja', [EmployeeCutiController::class, 'webIndex']);       
             Route::post('/roaster-kerja/export', [EmployeeCutiController::class, 'webExport']);
@@ -1041,9 +1039,6 @@ Route::middleware(['webIsLogin'])->group(function () {
 });
 
 Route::prefix('/web')->group(function () {//before login
-    //
-    // Route::get('/manage/users', [WebUserController::class, 'manageIndexUser']);
-
     Route::get('/logout', [WebUserController::class, 'logout']);
     Route::get('/login', function () {        
         return view('app.login');

@@ -95,10 +95,19 @@ class ResponseFormatter
   public static function abjads()
   {
     $abjads = [];
-    $char = range('A', 'ZZ');
-    for ($i = 'A'; $i !== 'ZZ'; $i++) {
-      $abjads[] = $i;
+
+    // Single letters A to Z
+    foreach (range('A', 'Z') as $char) {
+      $abjads[] = $char;
     }
+
+    // Double letters AA to ZZ
+    foreach (range('A', 'Z') as $first) {
+      foreach (range('A', 'Z') as $second) {
+        $abjads[] = $first . $second;
+      }
+    }
+
     return $abjads;
   }
 
@@ -268,6 +277,12 @@ class ResponseFormatter
     $datetime = Carbon::parse('2024-07-15');
     $day_month = Carbon::parse($year_month)->endOfMonth()->isoFormat('YY-MM-DD');
     return $day_month;
+  }
+  public static function getStartDayFromDate($year_month)
+  {
+    // Parse the provided year and month and get the first day of the month
+    $first_day_month = Carbon::parse($year_month)->startOfMonth()->isoFormat('YY-MM-DD');
+    return $first_day_month;
   }
 
   public static function toUUID($uuid)
@@ -1019,7 +1034,8 @@ class ResponseFormatter
     return str_pad($num, 2, "0", STR_PAD_LEFT);
   }
 
-  public static function addDate($currentDate, $countAddDay){
+  public static function addDate($currentDate, $countAddDay)
+  {
     $date = Carbon::createFromFormat('Y-m-d', $currentDate);
     $newDate = $date->addDays($countAddDay - 1);
     return $newDate->toDateString();

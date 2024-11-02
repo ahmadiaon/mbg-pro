@@ -72,7 +72,7 @@ Route::prefix('mbg')->group(function () {
             Route::post('/delete-data-database', [DatabaseController::class, 'deleteData']);
             Route::post('/get-table', [DatabaseController::class, 'getData']);
             Route::post('/store-template', [DatabaseController::class, 'storeTemplate']);
-            Route::post('/export-datatable', [DatabaseController::class, 'exportDatatable']);
+            
             Route::post('/import-datatable', [DatabaseController::class, 'importDatatable']);
         });
 

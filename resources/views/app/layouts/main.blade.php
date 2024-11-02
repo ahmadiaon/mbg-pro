@@ -27,6 +27,7 @@
     <link rel="stylesheet" type="text/css" href="/src/plugins/bootstrap-touchspin/jquery.bootstrap-touchspin.css" />
     <link rel="stylesheet" type="text/css" href="/src/plugins/datatables/css/dataTables.bootstrap4.min.css" />
     <link rel="stylesheet" type="text/css" href="/src/plugins/datatables/css/responsive.bootstrap4.min.css" />
+
     <style>
         .modal-confirm {
             color: #636363;
@@ -181,6 +182,7 @@
 
     @yield('src_css')
     <script src="/vendors/scripts/core.js"></script>
+    <script src="/vendors/scripts/Chart.js"></script>
     <script src="/vendors/scripts/script.min.js"></script>
     <script src="/vendors/scripts/process.js"></script>
     <script src="/vendors/scripts/layout-settings.js"></script>
@@ -193,8 +195,6 @@
     <script src="/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
     <script src="/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
     <script src="/vendors/scripts/datatable-setting.js"></script>
-
-
 </head>
 
 <body>
@@ -210,11 +210,204 @@
     <div class="mobile-menu-overlay"></div>
 
     <div class="main-container" id="main-content">
+        <div hidden class="maincontent e-general-filter pd-ltr-20 xs-pd-20-10 mt-20">
+            <div class="card-box pd-20">
+                <div class="row">
+                    <form class="col-md-6">
+                        <div class="row mb-20">
+                            <div class="col-auto">
+                                <h5 class="mb-20 h5 text-blue">General Filter</h5>
+                            </div>
+                            <div class="col text-right">
+                                <div class="spinner-grow text-primary refresh-data" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <button type="button" onclick="refreshSession()" class="btn btn-primary">Refresh Database</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Perusahaan</label>
+                            <div class="col-sm-12 col-md-9">
+                                <button type="button" onclick="filterDatatable('PERUSAHAAN')"
+                                    class=" form-control pemilik_batu btn btn-secondary filter">
+                                    <div class="row">
+                                        <div class="col-6 text-left text-white">
+                                            Filter Perusahaan
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <i class="icon-copy bi bi-funnel"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Project</label>
+                            <div class="col-sm-12 col-md-9">
+                                <button type="button" onclick="filterDatatable('PROJECT')"
+                                    class=" form-control PROJECT btn btn-secondary filter">
+                                    <div class="row">
+                                        <div class="col-6 text-left text-white">
+                                            Filter Project
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <i class="icon-copy bi bi-funnel"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Departemen</label>
+                            <div class="col-sm-12 col-md-9">
+                                <button type="button" onclick="filterDatatable('DEPARTEMEN')"
+                                    class=" form-control DEPARTEMEN btn btn-secondary filter">
+                                    <div class="row">
+                                        <div class="col-6 text-left text-white">
+                                            Filter Departemen
+                                            <div class="div"></div>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <i class="icon-copy bi bi-funnel"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Divisi</label>
+                            <div class="col-sm-12 col-md-9">
+                                <button type="button" onclick="filterDatatable('DIVISI')"
+                                    class=" form-control DEPARTEMEN btn btn-secondary filter">
+                                    <div class="row">
+                                        <div class="col-6 text-left text-white">
+                                            Filter Divisi
+                                            <div class="div"></div>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <i class="icon-copy bi bi-funnel"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Jabatan</label>
+                            <div class="col-sm-12 col-md-9">
+                                <button type="button" onclick="filterDatatable('JABATAN')"
+                                    class=" form-control DEPARTEMEN btn btn-secondary filter">
+                                    <div class="row">
+                                        <div class="col-6 text-left text-white">
+                                            Filter Jabatan
+                                            <div class="div"></div>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <i class="icon-copy bi bi-funnel"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Karyawan</label>
+                            <div class="col-sm-12 col-md-9">
+                                <button type="button" onclick="filterDatatable('KARYAWAN')"
+                                    class=" form-control DEPARTEMEN btn btn-secondary filter">
+                                    <div class="row">
+                                        <div class="col-6 text-left text-white">
+                                            Filter Karyawan
+                                            <div class="div"></div>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <i class="icon-copy bi bi-funnel"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-3 col-form-label">Status Aktif</label>
+                            <div class="col-sm-12 col-md-9">
+                                <select class="selectpicker form-control" id="STATUS-KARYAWAN" data-size="5"
+                                    data-style="btn-outline-secondary" multiple="" data-max-options="3"
+                                    tabindex="-98">
+                                    <optgroup label="Condiments">
+                                        <option id="status-karyawan-AKTIVE" value="AKTIVE">Aktive</option>
+                                        <option id="status-karyawan-PHK-BULAN-INI" value="PHK-BULAN-INI">PHK Bulan ini</option>
+                                        <option id="status-karyawan-PHK" value="PHK">PHK</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 col-md-6 form-text">
+                                Tanggal <br>(mm/dd/yyyy - mm/dd/yyyy)
+                            </label>
+                            <div class="col-sm-12 col-md-6">
+                                <input class="form-control datetimepicker-range" id="FILTER-RANGE"
+                                    name="filter_range" type="text" placeholder="">
+                            </div>
+                        </div>
+                        <div class="form-group row pd-20">
+                            <button onclick="saveGeneralFilter()" type="button"
+                                class="btn btn-primary b-block col-md-12" href="">
+                                Simpan </button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
         <div class="pd-ltr-20 xs-pd-20-10">
-            <div class="min-height-200px">
+
+            <div class="loading-content text-center">
+                <div class="d-flex justify-content-center align-items-center vh-100">
+                    <div class="text-center">
+                        <div class="spinner-grow text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-secondary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-success" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-danger" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-warning" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-info" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-light" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-dark" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="footer-wrap pd-20 mb-20 card-box">
+                    MBG - Online Created By
+                    <a href="https://github.com/ahmadiaon" target="_blank">ahma.id </a>
+                    Perlu Bantuan hubungi <a href="https://wa.me/6281255897044"><i
+                            class="icon-copy bi bi-telephone-fill"></i></a>
+                </div>
+
+            </div>
+            <div hidden class="maincontent min-height-200px">
                 @yield('content')
             </div>
-            <div class="footer-wrap pd-20 mb-20 card-box">
+            <div hidden class="maincontent footer-wrap pd-20 mb-20 card-box">
                 MBG - Online Created By
                 <a href="https://github.com/ahmadiaon" target="_blank">ahma.id </a>
                 Perlu Bantuan hubungi <a href="https://wa.me/6281255897044"><i
@@ -224,7 +417,47 @@
     </div>
 
     {{-- modal loading --}}
-    <div class="modal fade" id="loading-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="loading-modal" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <br>
+                <br>
+                <div class="modal-body text-center">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    {{-- modal loading --}}
+    <div class="modal fade" id="loading-modal-start" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <br>
@@ -262,9 +495,11 @@
     </div>
 
 
+
+
     {{-- success modal --}}
-    <div class="modal fade" id="success-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-        aria-hidden="true">
+    <div class="modal fade" id="success-modal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body text-center font-18">
@@ -354,17 +589,51 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <iframe id="pdfIframe"
-                        src="http://127.0.0.1:8000/file/database/FILE-KARYAWAN-MBLE-0422003-FILE-KTP.pdf"
-                        style="width:100%; height:600px;" frameborder="0"></iframe>
-                    <div  id="imageContainer"></div>
+                    <iframe id="pdfIframe" src="" style="width:100%; height:600px;"
+                        frameborder="0"></iframe>
+                    <div id="imageContainer"></div>
                 </div>
                 <div class="modal-footer">
-                    <button  data-dismiss="modal" type="button" class="btn btn-secondary">
+                    <button data-dismiss="modal" type="button" class="btn btn-secondary">
                         Batal
                     </button>
                     <button id="id_download_file" type="button" class="btn btn-primary">
                         Unduh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    {{-- filter data modal filter absensi_filter--}}
+    <div class="modal fade customscroll" id="modal-general-filter" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header mb-10">
+                    <h5 class="modal-title" id="filter-table-name">
+                        Filter Driver
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip"
+                        data-placement="bottom" title="" data-original-title="Close Modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pd-0 mt-20">
+                    <div class="task-list-form">
+                        <input type="hidden" name="general-filter-name" id="general-filter-name">
+                        <div class="" id="datatable-general-filter">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="filterSave()" id="btn-save-filter" class="btn btn-primary">
+                        Simpan Filter
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Batal
                     </button>
                 </div>
             </div>
@@ -408,9 +677,93 @@
                 // console.log("Element not found");
             }
         }
-    </script>
-    <script>
         $('.user-name').text(`${ui_dataset.ui_dataset.user_authentication.user_details.name}`);
+
+        if (!db) {
+            try {
+                refreshSession();
+            } catch (error) {
+                db = null;
+            }
+
+            conLog('db', db);
+
+        }
+        if (getLocalStorage('filter_absen')) {
+            filter_absensi = getLocalStorage('filter_absen');
+        } else {
+            setLocalStorage('filter_absen', default_filter_absensi);
+            filter_absensi = default_filter_absensi;
+        }
+
+        // cg('arr_date_today-----------1', arr_date_today);
+        conLog('ui_dataset', ui_dataset);
+        // cg('arr_date_today-----------1', arr_date_today);
+        // conLog('filter_absensi', filter_absensi);
+        // =========================================================================================================
+        // Initialize Select2
+        $('.multi-wrap-select').select2({
+            templateResult: formatOptionText,
+            templateSelection: formatOptionText
+        });
+
+        // Function to limit text length based on container width
+        function formatOptionText(option) {
+            if (!option.id) {
+                return option.text;
+            }
+            let text = option.text;
+            let $tempDiv = $('<div>').css({
+                'width': $('.multi-wrap-select-wrapper').width(),
+                'font-size': '16px',
+                'line-height': '1.5',
+                'visibility': 'hidden',
+                'white-space': 'nowrap',
+                'position': 'absolute'
+            }).text(text).appendTo('body');
+
+            while ($tempDiv.width() > $('.multi-wrap-select-wrapper').width()) {
+                text = text.substring(0, text.length - 1);
+                $tempDiv.text(text + '...');
+            }
+            $tempDiv.remove();
+            return text + '...';
+        }
+
+        function hideLoadingContent() {
+            $('.loading-content').hide();
+        }
+        $('.refresh-data').hide();
+
+        $(document).ready(function() {
+            // conLog('ready getwithnewdata', 'ready getwithnewdata');
+            hideLoadingContent();
+            $('.maincontent').removeAttr("hidden");
+            $('.maincontent').show();
+
+            if(ui_dataset.ui_dataset.user_authentication.role == 1){
+                
+                $('#btn-general-filter').hide();
+            }
+        $(".e-general-filter").hide();
+            $("#btn-general-filter").click(function() {
+                $(".e-general-filter").toggle();
+
+                // Update the badge text depending on visibility
+                let isVisible = $(".e-general-filter").is(":visible");
+                $("#badge").text(isVisible ? "Hide" : "Show");
+            });
+
+            default_filter_absensi['statusKaryawan'].forEach(element => {
+                $(`#status-karyawan-${element}`).prop('selected', true);
+            });
+
+            $('#FILTER-RANGE').val(setRangeDate(formatDate(start), formatDate(end))).trigger(
+            'change');
+            setUIdate(ui_dataset.ui_dataset.ui_date.year, ui_dataset.ui_dataset.ui_date.month, ui_dataset.ui_dataset.ui_date.day);
+            @yield('js_ready')
+            stopLoading();
+        });
     </script>
 </body>
 

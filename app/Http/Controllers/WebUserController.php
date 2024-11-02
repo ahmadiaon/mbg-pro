@@ -25,13 +25,12 @@ class WebUserController extends Controller
         $A_DIVISI = [];
 
         $Q_all_DIVISI = DatabaseData::where('code_table_data', 'DIVISI')
-        ->whereNull('date_end')
-        ->get();
+            ->whereNull('date_end')
+            ->get();
 
-        foreach($Q_all_DIVISI as $I_DIVISI){
+        foreach ($Q_all_DIVISI as $I_DIVISI) {
             $A_DIVISI[] = $I_DIVISI->code_data;
         }
-
 
 
         // return ResponseFormatter::toUUID($NRP);
@@ -46,8 +45,8 @@ class WebUserController extends Controller
             ->whereNull('date_end')
             ->get();
 
-        foreach($Q_KARYAWAN as $I_KARYAWAN){
-            $O_KARYAWAN[$I_KARYAWAN->code_field_data] = $I_KARYAWAN->value_data;  
+        foreach ($Q_KARYAWAN as $I_KARYAWAN) {
+            $O_KARYAWAN[$I_KARYAWAN->code_field_data] = $I_KARYAWAN->value_data;
         }
 
 
@@ -152,23 +151,27 @@ class WebUserController extends Controller
                 $arr_data_divisi[] =  $data_user_divisi->value_data;
             }
         }
-        $Q_grade = DatabaseData::where('code_table_data','KONTRAK-KARYAWAN')->where('code_field_data','GRADE')->where('code_data', ResponseFormatter::toUUID($NRP))->whereNull('date_end')->first();
 
-        $grade = $Q_grade->value_data;
 
-        
+
         $arr_data_perusahaan[] = $O_KARYAWAN['PERUSAHAAN'];
         $arr_data_department[] = $O_KARYAWAN['DEPARTEMEN'];
+        $data_kekaryawanan['PROJECT'][] = $O_KARYAWAN['PROJECT'];
+        $data_kekaryawanan['DIVISI'][] = $O_KARYAWAN['DIVISI'];
+      
 
-        if($grade == 5 || $grade == 3 ){
-            $arr_data_divisi =array_merge($A_DIVISI,$arr_data_divisi);
+
+
+        $Q_table_kekaryawanan = DatabaseData::where('code_table_data', 'KARYAWAN')->where('code_data', ResponseFormatter::toUUID($NRP))
+            ->whereNull('date_end')->get();
+
+        $data_kekaryawanan = [];
+        foreach ($Q_table_kekaryawanan as $I_kekaryawanan) {
+            $data_kekaryawanan[$I_kekaryawanan->code_field_data] = $I_kekaryawanan->value_data;
         }
 
-        if($grade == 2 || $grade == 4){
-            $arr_data_divisi[] = $O_KARYAWAN['DIVISI'];
-        }
-
-
+        
+        $storeEmployee->profile = $data_kekaryawanan;
 
         $storeEmployee->user_privileges = [$storeEmployee->role => true];
         $storeEmployee->feature = array_unique($arr_data_feature);
@@ -176,6 +179,23 @@ class WebUserController extends Controller
         $storeEmployee->DEPARTEMEN = array_unique($arr_data_department);
         $storeEmployee->PROJECT = array_unique($arr_data_project);
         $storeEmployee->DIVISI = array_unique($arr_data_divisi);
+
+        $storeEmployee->PERUSAHAAN = array_merge([$data_kekaryawanan['PERUSAHAAN']], $storeEmployee->PERUSAHAAN);
+        $storeEmployee->DEPARTEMEN = array_merge([$data_kekaryawanan['DEPARTEMEN']], $storeEmployee->DEPARTEMEN);
+        $storeEmployee->PROJECT = array_merge([$data_kekaryawanan['PROJECT']], $storeEmployee->PROJECT);
+        $storeEmployee->DIVISI = array_merge([$data_kekaryawanan['DIVISI']], $storeEmployee->DIVISI);
+
+        $storeEmployee->PERUSAHAAN = array_unique($storeEmployee->PERUSAHAAN);
+        $storeEmployee->DEPARTEMEN = array_unique($storeEmployee->DEPARTEMEN);
+        $storeEmployee->PROJECT = array_unique($storeEmployee->PROJECT);
+        $storeEmployee->DIVISI = array_unique($storeEmployee->DIVISI);
+
+        $storeEmployee->PERUSAHAAN = array_values($storeEmployee->PERUSAHAAN);
+        $storeEmployee->DEPARTEMEN = array_values($storeEmployee->DEPARTEMEN);
+        $storeEmployee->PROJECT = array_values($storeEmployee->PROJECT);
+        $storeEmployee->DIVISI = array_values($storeEmployee->DIVISI);
+        
+
 
         return $storeEmployee;
     }
@@ -203,14 +223,22 @@ class WebUserController extends Controller
                 $storeEmployee = $this->sessionUserAuthentication($token);
 
 
-                $grade = DatabaseData::where('code_table_data','KONTRAK-KARYAWAN')->where('code_field_data','GRADE')->where('code_data', ResponseFormatter::toUUID($request->nik_employee))->whereNull('date_end')->first();
+                $grade = DatabaseData::where('code_table_data', 'KONTRAK-KARYAWAN')->where('code_field_data', 'GRADE')->where('code_data', ResponseFormatter::toUUID($request->nik_employee))->whereNull('date_end')->first();
 
                 $storeEmployee->GRADE = $grade->value_data;
+                if($storeEmployee->GRADE > 1){
+                    $storeEmployee->FIELD_LEVEL = 2;
+                }
+                if(in_array('HR', $storeEmployee->feature)){
+                    $storeEmployee->FIELD_LEVEL = 3;
+                }
+
+
+        
                 session()->flush();
                 session(['user_authentication' => $storeEmployee]);
 
                 return $storeEmployee;
-                // session()->put('user_authentication', $storeEmployee);
                 if (!empty($storeEmployee->pin)) {
                     return redirect()->intended('/web/menu');
                 } else {
@@ -290,7 +318,8 @@ class WebUserController extends Controller
         return view('app.manage.user.indexManageUser');
     }
 
-    public function manageImportUser(Request $request){
+    public function manageImportUser(Request $request)
+    {
         $the_file = $request->file('uploaded_file');
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
@@ -312,14 +341,11 @@ class WebUserController extends Controller
 
                 $no_employee++;
             }
-
-
-
         } catch (Exception $e) {
             // $error_code = $e->errorInfo[1];
             return back()->withErrors('There was a problem uploading the data!');
         }
-        return ResponseFormatter::ResponseJson($request->all(), 'imprt user',200);
+        return ResponseFormatter::ResponseJson($request->all(), 'imprt user', 200);
     }
 
     public function storeUser(Request $request)

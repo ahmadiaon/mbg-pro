@@ -21,8 +21,6 @@
         </div>
     </div>
     <div class="row">
-
-
         <div class="col-sm-12 col-md-5">
             <div class="faq-wrap">
                 <h4 class="mb-20 h4 text-blue">Data diri <b class="user-name"></b></h4>
@@ -52,7 +50,7 @@
                                                 </p>
                                             </li>
                                         </ul>
-                                        <ul class="display-contract">
+                                        <ul class="display-contract PKWT">
                                             <li>
                                                 <div class="date">Mulai <br> Kontrak</div>
                                                 <div class="task-name display-start-contract">
@@ -157,46 +155,20 @@
 @endsection()
 
 @section('script_javascript')
-    <script>
-        // console.log(localStorage.getItem('ui_dataset'));
-        // console.log(@json(session('user_authentication')));
 
-        let user_authentication = @json(session('user_authentication'));
-        conLog('user_authentication', user_authentication);
-        let _token = $('meta[name="csrf-token"]').attr('content');
-        $.ajax({
-            url: '/api/mbg/employee',
-            type: "POST",
-            data: {
-                _token: _token,
-                token: user_authentication['auth_login'],
-            },
-            success: function(response) {
-                conLog('response', response);
-                let dataShow = response.data
-                for (var key in dataShow) {
-                    if (dataShow[key] != null) {
-                        $('.index-employee-' + key).text(dataShow[key])
-                    } else {
-                        $('.index-employee-' + key + '-hide').hide()
-                    }
-                }
-            },
-            error: function(response) {
-                conLog('response', response)
-            }
-        });
-    </script>
 
     <script>
         function createFormField(code_table) {
-            let code_data = db['user']['employee_uuid'];
+            let code_data = ui_dataset.ui_dataset.user_authentication.employee_uuid;
             // code_table = 'KARYAWAN';
             let arr_table = {};
 
             let data_for_field_edit = db['public'][code_table][code_data];
             let date_tmk_end = getDateToday();
 
+            conLog('db',db);
+            conLog('data_for_field_edit',data_for_field_edit);
+            
             data_for_field_edit['TANGGAL-AWAL-KONTRAK'] = excelSerialToDate(data_for_field_edit['TANGGAL-AWAL-KONTRAK']);
             data_for_field_edit['TANGGAL-AKHIR-KONTRAK'] = excelSerialToDate(data_for_field_edit['TANGGAL-AKHIR-KONTRAK']);
 
@@ -269,7 +241,7 @@
                     /*
                     1. buat form table child di bawah table utama
                     */
-                    CL(element);
+                    // CL(element);
                     $(`#identitas-${count_table}`).after(`
                         <div id="identitas-${count_table+1}" class="card">
                             <div class="card-header">
@@ -301,7 +273,7 @@
             //=========== create field form
 
             Object.entries(data_for_field_edit).forEach(([index, value]) => {
-                conLog(index, value)
+                // conLog(index, value)
                 $(`.${index}`).val(value);
                 $(`.show-${index}`).attr('hidden', false);
                 $(`.show-${index}`).attr('onclick', `showFile('${value}', '${index}')`);
@@ -312,9 +284,21 @@
             $('.custom-select2').trigger('change');
             $('.secondary_key').val(code_data);
             conLog('arr_table', arr_table)
-            if (data_for_field_edit['STATUS-KERJA'] == 'Aktive') {
+            if (data_for_field_edit['STATUS-KERJA'] == 'AKTIVE') {
                 $(`#identitas-${arr_table['PHK-KARYAWAN']+1}`).remove();
             }
+
+
+            if(data_for_field_edit['JENIS-KONTRAK'] == 'PKWTT'){
+                $('.PKWT').empty();
+                $('.PKWT').append(`<li>
+                                                <div class="date">Jenis <br> Kontrak</div>
+                                                <div class="task-name display-start-contract">
+                                                    <i class=""></i> PKWTT
+                                                </div>
+                                            </li>`)
+            }
+            $('.form-control').attr('disabled', true);
         }
 
         createFormField('KARYAWAN');

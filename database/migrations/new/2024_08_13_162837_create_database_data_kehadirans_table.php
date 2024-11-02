@@ -21,6 +21,7 @@ class CreateDatabaseDataKehadiransTable extends Migration
             $table->date('tanggal_mulai')->nullable();
             $table->string('lama')->nullable();
             $table->string('code_jenis_kehadiran')->nullable();
+            $table->string('status_absen')->nullable();
             $table->string('dokumen')->nullable();
             $table->string('keterangan')->nullable();
             $table->string('dibuat_oleh')->nullable();

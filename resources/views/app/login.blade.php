@@ -19,6 +19,11 @@
     <link rel="stylesheet" type="text/css" href="/vendors/styles/core.css" />
     <link rel="stylesheet" type="text/css" href="/vendors/styles/icon-font.min.css" />
     <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css" />
+    <script src="/vendors/scripts/core.js"></script>
+    <script src="/vendors/scripts/script.min.js"></script>
+    <script src="/vendors/scripts/process.js"></script>
+    <script src="/vendors/scripts/layout-settings.js"></script>
+    @include('app.layouts.addOn.mainScript')
 </head>
 
 <body class="login-page">
@@ -31,6 +36,7 @@
             </div>
         </div>
     </div>
+    
     <div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
         <div class="container">
             <div class="row align-items-center">
@@ -170,7 +176,7 @@
 
         async function cekAvailableEmployee() {
 
-            
+
             // return false;
             $(`.not-found`).hide();
             $('.not-match').hide();
@@ -188,7 +194,6 @@
                 async: true,
                 beforeSend: function() {
                     console.log('before')
-                    // Show the loading indicator before the request is sent
                     $(`#id_loadingLogin`).show();
                 },
                 data: JSON.stringify({
@@ -198,20 +203,27 @@
                     nik_number: $(`#nik_number`).val()
                 }),
                 success: function(response) {
-
+                    console.log(response)
                     if (response.data) {
                         console.log(response.data)
                         if (typeof(response.data) == 'object') {
+
                             if (response.data.status == 'success') {
                                 console.log(response.data)
                                 $('#pin').val(pinInsert);
-                                console.log('response login')
+                                console.log('response login');
                                 console.log(response);
+                                // return false;
                                 window.location.href = '/web/menu';
-                                refreshSession();
+                                // refreshSession();
+                                let date_today_new = getDateTodayArr();
+
+                                conLog('date_today_new', date_today_new);
+                                // setDateSession(date_today_new.year, date_today_new.month);
+                                // localStorage.setItem('arr_date_today', );
                                 return false;
-                               
-                                
+
+
                                 // window.location.href = '/web/profile';
                             } else {
                                 $('.not-match').show()
@@ -269,6 +281,7 @@
                 }
             });
         });
+        conLog('s', 's')
     </script>
 </body>
 

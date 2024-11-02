@@ -4,11 +4,9 @@
     </div>
     <div class="header-right">
         <div class="dashboard-setting user-notification">
-            <div class="dropdown">
-                <a class="dropdown-toggle no-arrow" href="javascript:;" onclick="refreshSession()">
-                    <i class="icon-copy bi bi-arrow-repeat"></i>
+                <a class="badge badge-secondary btn-general-filter" href="javascript:;" id="btn-general-filter" >
+                    Filter <i class="icon-copy bi bi-funnel"></i>
                 </a>
-            </div>
         </div>
         <div class="user-notification">
             <div class="dropdown">
@@ -22,7 +20,7 @@
                             <li>
                                 <a href="#">
                                     <img src="/vendors/images/photo4.jpg" alt="" />
-                                    <h3>Selamat Datang</h3>
+                                    <h3>Selamat Datang <div class="user-name"></div></h3>
                                     <p>
                                         pada sistem online MBG
                                     </p>

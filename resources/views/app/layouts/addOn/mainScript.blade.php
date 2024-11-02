@@ -1,8 +1,13 @@
 <!-- jsPDF and html2canvas -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+<script src="/src/scripts/jspdf.umd.min.js"></script>
+<script src="/src/scripts/html2canvas.min.js"></script>
 
 <script>
+    // ========================================================================= ABSENSI ================================
+    var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
+        "November", "Desember"
+    ];
     let COLOR_BOOTSTRAP = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
     var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
     var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
@@ -11,6 +16,18 @@
     var months_3_char = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt",
         "Nov", "Des"
     ];
+
+
+    var sort_day = {
+
+    }
+    let db = {};
+    try {
+        db = JSON.parse(localStorage.getItem('DATABASE'));
+    } catch (error) {
+        db = {};
+    }
+
     let color_button = {
         alpa: 'danger',
         pay: 'primary',
@@ -22,6 +39,13 @@
     let code_table_reference = '';
     let code_table_global = '';
     let data_persetujuan;
+    let detail_absensi;
+
+    let data_ketidakhadiran = {};
+    let data_data_persetujuan = {};
+
+    let filter_absensi = {}
+
 
     const KONSTANTA = [];
     KONSTANTA['tb_karyawan'] = 'NRP';
@@ -29,6 +53,7 @@
     KONSTANTA['Input Autocomplite'] = 'INPUT-AUTOCOMPLITE';
     KONSTANTA['Input Autocomplite'] = 'INPUT-AUTOCOMPLITE';
     KONSTANTA['PHK-KARYAWAN'] = 'PHK-KARYAWAN';
+    KONSTANTA['DATABASE-JENIS-IZIN'] = 'DATABASE-JENIS-IZIN';
     var name_days_sort = new Array(7);
     name_days_sort[0] = "Mig";
     name_days_sort[1] = "Sen";
@@ -37,6 +62,37 @@
     name_days_sort[4] = "Kam";
     name_days_sort[5] = "Jum";
     name_days_sort[6] = "Sab";
+
+    let loading_e = `<div class="loading-content text-center">
+                        <div class="loading-content d-flex justify-content-center align-items-center" style="height: 100px;">
+                            <div class="text-center">
+                                <div class="spinner-grow text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-secondary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-success" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-danger" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-warning" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-info" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-light" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div class="spinner-grow text-dark" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
 
     let GLOBAL_DATA_EXPORT = {};
 
@@ -47,29 +103,38 @@
         }
     }
 
-    let arr_date_today = @json(session('year_month'));
-
-
-
-
-
-
-
-
-    if (!arr_date_today) {
-        // arr_date_today = getDateTodayArr();
-
-        // cg('kosong', arr_date_today);
-        setDateSession(getDateTodayArr()['year'], getDateTodayArr()['month']);
-        cg('kosong', @json(session('year_month')));
+    let default_filter_absensi = {
+        date_start: null,
+        date_end: null,
+        statusKaryawan: ['AKTIVE', 'PHK-BULAN-INI'],
+        PERUSAHAAN: [],
+        PROJECT: [],
+        DEPARTEMEN: [],
+        DIVISI: [],
+        KARYAWAN: [],
+        JABATAN: [],
     }
 
-    // cg('arr_date_today', arr_date_today)
+    let arr_date_today = {};
 
-    function cg(message, data) {
-        console.log(message + ':');
-        console.log(data);
+    if (JSON.parse(localStorage.getItem('arr_date_today')) != null) {
+        // conLog('arr_date_today have local storage from local ', JSON.parse(localStorage.getItem('arr_date_today')));
+        arr_date_today = JSON.parse(localStorage.getItem('arr_date_today'));
+        // conLog('arr_date_today have local storage ', arr_date_today);
     }
+
+    if (Object.keys(arr_date_today).length == 0) {
+        let date_today_new = getDateTodayArr();
+        // conLog('date_today_new', date_today_new);
+        setDateSession(date_today_new.year, date_today_new.month);
+    }
+
+    if (localStorage.getItem('default_filter_absensi')) {
+        conLog('default_filter_absensi dari local', default_filter_absensi)
+        default_filter_absensi = getLocalStorage('default_filter_absensi');
+    }
+
+
 
     if (localStorage.getItem('ui_dataset')) {
         // conLog('not null', localStorage.getItem('ui_dataset'));
@@ -93,9 +158,7 @@
         }
         localStorage.setItem('ui_dataset', JSON.stringify(ui_dataset));
     }
-    conLog('ui_dataset', ui_dataset);
 
-    let db = JSON.parse(localStorage.getItem('DATABASE'));
 
     var start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
     var end = new Date(arr_date_today.year, arr_date_today.month, 0);
@@ -104,20 +167,38 @@
         end = date_today;
     }
 
-    let default_filter_absensi = {
-        date_start: formatDate(start),
-        date_end: formatDate(end),
-        PERUSAHAAN: ui_dataset.ui_dataset.user_authentication.PERUSAHAAN,
-        PROJECT: ui_dataset.ui_dataset.user_authentication.PROJECT,
-        DEPARTEMEN: ui_dataset.ui_dataset.user_authentication.DEPARTEMEN,
-        DIVISI: ui_dataset.ui_dataset.user_authentication.DIVISI,
-        KARYAWAN: [],
+
+
+
+
+
+    startLoading();
+
+    function setLocalStorage(key_local_storage, data_local_storage) {
+        localStorage.setItem(key_local_storage, JSON.stringify(data_local_storage));
     }
-    let filter_absensi = {}
 
 
     function CL(data_string) {
         console.log(data_string);
+    }
+
+    function cg(message, data) {
+        console.log(message + ':');
+        console.log(data);
+    }
+
+    function getDayAbbreviation(dateString) {
+        const date = new Date(dateString);
+        const options = {
+            weekday: 'short'
+        }; // Mendapatkan 3 huruf dari nama hari
+        return date.toLocaleDateString('id-ID', options);
+    }
+
+    function getDateOnly(dateString) {
+        const date = new Date(dateString);
+        return date.getDate();
     }
 
     function optionSelect(table_code, field_get, filter_data) {
@@ -140,15 +221,11 @@
                     });
                     break;
             }
-
         } else {
             element_option_data_source = `<option value="">Tidak ada data</option>`;
         }
-
         return element_option_data_source;
     }
-
-
 
     function truncateString(str, maxLength) {
         if (str.length > maxLength) {
@@ -405,7 +482,6 @@
                 }
             });
         }
-
         return data_table_filtered;
     }
 
@@ -489,10 +565,43 @@
 
     }
 
+    function manageAbsensiDay(employee_uuid, date_absen) {
+        $('#name-date').text(`Absen Tanggal ${date_absen}`);
+        try {
+            $('#absen_description-show').val(detail_absensi[employee_uuid][date_absen][
+                'absen_description'
+            ]);
+        } catch (error) {
+            $('#absen_description-show').val("-");
+        }
+
+
+        if (!(ui_dataset.ui_dataset.user_authentication.feature).includes('HR')) {
+            $('.feature-HR').hide();
+        }
+        // $('#date-edit-live').val(`${date_value}`);
+        // let cek_log = '-';
+        // if (typeof(data_datatable[employee_uuid]['data'][date_value]) != 'undefined') {
+        //     cek_log = data_datatable[employee_uuid]['data'][date_value]['cek_log'];
+        // }
+
+        // $('#button-status_absen_uuid').empty();
+        let ceklog = '-';
+        try {
+            ceklog = detail_absensi[employee_uuid][date_absen]['cek_log'];
+        } catch (error) {}
+
+        $('#employee_uuid-show').val(`${employee_uuid}`);
+        $('#date-show').val(`${date_absen}`);
+        $('.cek_log-show').val(`${ceklog}`);
+        $('#modal-show-fingger').modal('show');
+    }
+
     function showFieldData(type_data, table_data, field_data, primary_key_data, data_properties = null) {
         let value_data_table;
 
 
+        // conLog('data_properties', data_properties);
 
         // conLogs('primary_key_data', primary_key_data);
         // conLog('code_table_data_source', code_table_data_source);
@@ -772,8 +881,8 @@
                 let element_two_column = ``;
                 // conLog('data_properties', data_properties);
                 // if (data_properties) {
-                const startDate = new Date(filter_absensi.date_start);
-                const endDate = new Date(filter_absensi.date_end);
+                const startDate = new Date(default_filter_absensi.date_start);
+                const endDate = new Date(default_filter_absensi.date_end);
 
 
 
@@ -807,9 +916,7 @@
                                 detail_absensi[primary_key_data][date_current] = detail_absen_current_date;
 
                             }
-
                         }
-
                     }
                     let obj_current_date = getDateObj(currentDate);
                     if (count_absensi[detail_absen_current_date.status_absen_uuid] >= 1) {
@@ -817,6 +924,7 @@
                     } else {
                         count_absensi[detail_absen_current_date.status_absen_uuid] = 1;
                     }
+                    // console.log(detail_absen_current_date.status_absen_uuid);
                     element_detail_absen += `<div id="element_absen-${primary_key_data}-${date_current}" class="col-auto mb-1">
                                                     <div onclick="manageAbsensiDay('${primary_key_data}', '${date_current}')" style=" background-color: ${db['public']['DATABASE-ABSENSI'][detail_absen_current_date.status_absen_uuid]['WARNA-ABSENSI']}" class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
                                                         <div class="txt text-center">
@@ -832,25 +940,27 @@
                 }
                 Object.entries(count_absensi).forEach(([key, values]) => {
                     element_count_absen += `<div class="col-auto mb-1">
-                                                    <button style=" background-color: ${db['public']['DATABASE-ABSENSI'][key]['WARNA-ABSENSI']}" class="btn font-14  weight-600 ">${key} : ${values}</button>
-                                                </div>`;
+                                                    <span class="badge" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                            style=" background-color: ${db['public']['DATABASE-ABSENSI'][key]['WARNA-ABSENSI']};">
+                                                               ${key} : ${values}
+                                                    </span></div>`;
                 });
-                element_two_column = `<div class="col-md-2 col-sm-12">
-                                    <div class="row">
-                                        ${element_count_absen}
-                                    </div>
-                                </div>
-                                <div class="col-md-7 col-sm-12 row ">
-                                    ${element_detail_absen}
-                                </div>`;
+                element_count_absen += `<div class="col-12 mb-1">
+                                            <button onclick="detailAbsensi('${primary_key_data}')" type="button" id="btn-toggle-absenn-${primary_key_data}"
+                                                class="btn btn-sm btn-primary">
+                                                detail
+                                            </button>
+                                        </div>`;
+                element_two_column = `  <div class="col-md-2 col-sm-12">
+                                            <div class="row">
+                                                ${element_count_absen}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-7 col-sm-12 row detail-absensi-${primary_key_data} ">
+                                            ${element_detail_absen}
+                                        </div>`;
 
-                // } else {
-                //     element_two_column = ` <div class="col-md-9 col-sm-12"> 
-                //                             <div class="alert alert-secondary" role="alert">
-                //                                 Data tidak ditemukan.
-                //                             </div>
-                //                         </div>`;
-                // }
+
                 return `    <div id="row-absensi-${primary_key_data}" class="row justify-content-md-center">
                                 <div class="col-md-3 col-sm-12 mb-2">
                                     ${emmp(primary_key_data)}
@@ -900,6 +1010,306 @@
         }
     }
 
+    function processingAbsensi() {
+
+        let countAbsensiEachStatusAbsen = {};
+        Object.keys(db['public']['DATABASE-ABSENSI']).forEach(I_KeysDatabaseAbsen => {
+            countAbsensiEachStatusAbsen[I_KeysDatabaseAbsen] = 0;
+        });
+
+        if (detail_absensi) {
+            (default_filter_absensi.KARYAWAN).forEach(I_NRP => {
+                if (detail_absensi[I_NRP]) {
+                    Object.values(detail_absensi[I_NRP]).forEach(I_data_absensi => {
+                        countAbsensiEachStatusAbsen[I_data_absensi['status_absen_uuid']] = parseInt(
+                                countAbsensiEachStatusAbsen[I_data_absensi['status_absen_uuid']], 10) +
+                            1;
+                    });
+                }
+            });
+
+        }
+        let for_grafik_count_absensi = [];
+
+        for (const key in countAbsensiEachStatusAbsen) {
+            if (countAbsensiEachStatusAbsen[key] === 0) {
+                delete countAbsensiEachStatusAbsen[key];
+            }
+        }
+
+        Object.entries(countAbsensiEachStatusAbsen).forEach(([I_Key_countAbsensiEachStatusAbsen,
+            data_countAbsensiEachStatusAbsen
+        ]) => {
+            let data_count_absensi_for_grafik = {
+                name: I_Key_countAbsensiEachStatusAbsen,
+                data: [data_countAbsensiEachStatusAbsen]
+            }
+            for_grafik_count_absensi.push(data_count_absensi_for_grafik);
+        });
+
+
+
+
+        return {
+            label: Object.keys(countAbsensiEachStatusAbsen),
+            data: for_grafik_count_absensi
+        };
+    }
+
+    function simpleAbsensi(code_data) {
+        $(`#btn-toggle-absenn-${code_data}`).text('detail');
+        $(`#btn-toggle-absenn-${code_data}`).attr('onclick', `detailAbsensi('${code_data}')`);
+
+        $(`.detail-absensi-${code_data}`).empty();
+
+        let element_detail_absen = ``;
+        let data_properties = detail_absensi[code_data];
+        const startDate = new Date(filter_absensi.date_start);
+        const endDate = new Date(filter_absensi.date_end);
+        let currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+            let date_current = formatDate(currentDate);
+            let detail_absen_current_date = {
+                absen_description: null,
+                cek_log: '-',
+                color: "#544545",
+                date: date_current,
+                employee_uuid: null,
+                status_absen_uuid: "-",
+                uuid: null
+            }
+            try {
+                if (data_properties[date_current]) {
+                    detail_absen_current_date = data_properties[date_current];
+                }
+            } catch (error) {
+                try {
+                    detail_absensi[code_data][date_current] = detail_absen_current_date;
+                } catch (error) {
+                    try {
+                        detail_absensi[code_data] = {};
+                        detail_absensi[code_data][date_current] = detail_absen_current_date;
+
+                    } catch (error) {
+                        detail_absensi = {};
+                        detail_absensi[code_data] = {};
+                        detail_absensi[code_data][date_current] = detail_absen_current_date;
+
+                    }
+
+                }
+
+            }
+            let obj_current_date = getDateObj(currentDate);
+            // console.log(detail_absen_current_date.status_absen_uuid);
+            element_detail_absen += `<div id="element_absen-${code_data}-${date_current}" class="col-auto mb-1">
+                                                    <div onclick="manageAbsensiDay('${code_data}', '${date_current}')" style=" background-color: ${db['public']['DATABASE-ABSENSI'][detail_absen_current_date.status_absen_uuid]['WARNA-ABSENSI']}" class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
+                                                        <div class="txt text-center">
+                                                            <span class="badge badge-pill badge-sm" data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                                                style=" background-color: rgb(231, 235, 245);">${getFirstCharDay(currentDate)} ${obj_current_date.day}-${obj_current_date.month}</span>
+                                                            <div class="font-14  weight-600">${detail_absen_current_date.status_absen_uuid}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+
+            // Move to the next day
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        let e_datatable_table_detail = ``;
+        $(`.detail-absensi-${code_data}`).append(element_detail_absen);
+    }
+
+    function detailAbsensi(code_data) {
+        $(`#btn-toggle-absenn-${code_data}`).text('simple');
+        $(`#btn-toggle-absenn-${code_data}`).attr('onclick', `simpleAbsensi('${code_data}')`);
+        let data_properties = detail_absensi[code_data];
+        const startDate = new Date(filter_absensi.date_start);
+        const endDate = new Date(filter_absensi.date_end);
+
+        let currentDate = new Date(startDate);
+        $(`.detail-absensi-${code_data}`).empty();
+        let data_code_data_absensi = [];
+        let data_detail_absen_current_date = {};
+        while (currentDate <= endDate) {
+            let date_current = formatDate(currentDate);
+            data_code_data_absensi.push(formatDate(currentDate))
+            let detail_absen_current_date = {
+                absen_description: null,
+                cek_log: '-',
+                color: "#544545",
+                date: date_current,
+                employee_uuid: null,
+                status_absen_uuid: "-",
+                uuid: null
+            }
+            try {
+                if (data_properties[date_current]) {
+                    detail_absen_current_date = data_properties[date_current];
+                }
+            } catch (error) {
+                try {
+                    detail_absensi[code_data][date_current] = detail_absen_current_date;
+                } catch (error) {
+                    try {
+                        detail_absensi[code_data] = {};
+                        detail_absensi[code_data][date_current] = detail_absen_current_date;
+
+                    } catch (error) {
+                        detail_absensi = {};
+                        detail_absensi[code_data] = {};
+                        detail_absensi[code_data][date_current] = detail_absen_current_date;
+
+                    }
+
+                }
+
+            }
+
+            data_detail_absen_current_date[formatDate(currentDate)] = detail_absen_current_date;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        let row_data_datatable = [];
+        let e_datatable_table_detail = `
+                                        <div class="col-12 card-box" >
+                                            <table  id="table-detail-absensi-data" class="" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th> DETAIL </th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>`;
+
+
+        $(`.detail-absensi-${code_data}`).append(e_datatable_table_detail);
+
+        var element_card = {
+            mRender: function(data, type, row) {
+                let element_point_late = '';
+                if ((ui_dataset.ui_dataset.user_authentication.feature).includes('HR')) {
+                    element_point_late = `
+                                        <div class="col-3 d-flex align-items-start">
+                                            <small class="text-muted">
+                                                P Late
+                                            </small>
+                                        </div>
+                                        <div class="col-9">
+                                            <small class="text-muted">
+                                                ${data_detail_absen_current_date[row]['late_points']?(toValueRupiah(data_detail_absen_current_date[row]['late_points'] * 12500)):"-"}
+                                            </small>
+                                        </div>`;
+                }
+
+                let warna_bg_absensi = db['public']['DATABASE-ABSENSI'][data_detail_absen_current_date[row][
+                    'status_absen_uuid'
+                ]]['WARNA-ABSENSI'];
+                return `<div class="row card-box mb-2">
+                                <div class="col-md-3 col-sm-12 pd-20 text-center">
+                                    <div class="card-box pd-20">
+                                        <div class="font-14  weight-600">${getDayAbbreviation(row)}, ${getDateOnly(row)}</div>
+                                        <div id="element_absen-BK-PL-220367-2024-10-02" class="col-auto mb-1">
+                                            <div onclick="manageAbsensiDay('BK-PL-220367', '2024-10-02')"
+                                                style=" background-color: ${warna_bg_absensi}"
+                                                class="name-avatar text-center  card-box ">
+                                                <div class="txt text-center">
+                                                    <h5>${data_detail_absen_current_date[row]['status_absen_uuid']}</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-12  pd-20">
+                                    <div class="card-box pd-20">
+                                        <div class="row name-avatar  pl-2">
+                                            <div class="col-5">
+                                                <small class="text-muted">
+                                                    In
+                                                </small>
+                                            </div>
+                                            <div class="col-7">
+                                                <small class="text-muted">
+                                                    <cite title="Source Title">${data_detail_absen_current_date[row]['entry']?data_detail_absen_current_date[row]['entry']:"-"}</cite>
+                                                </small>
+                                            </div>
+                                            <div class="col-5 d-flex align-items-start">
+                                                <small class="text-muted">
+                                                    Mid
+                                                </small>
+                                            </div>
+                                            <div class="col-7">
+                                                <small class="text-muted">
+                                                    <cite title="Source Title">${data_detail_absen_current_date[row]['mid']?data_detail_absen_current_date[row]['mid']:"-"}</cite>
+                                                </small>
+                                            </div>
+                                            <div class="col-5 d-flex align-items-start">
+                                                <small class="text-muted">
+                                                    Out
+                                                </small>
+                                            </div>
+                                            <div class="col-7 d-flex align-items-start">
+                                                <small class="text-muted">
+                                                    <cite class="text-wrap" title="Source Title">${data_detail_absen_current_date[row]['exit']?data_detail_absen_current_date[row]['exit']:"-"}</cite>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-12 pd-20">
+                                    <div class="card-box pd-20">
+                                        <div class="row name-avatar ">
+                                            <div class="col-5">
+                                                <small class="text-muted">
+                                                    Work
+                                                </small>
+                                            </div>
+                                            <div class="col-7">
+                                                <small class="text-muted">
+                                                    <cite title="Source Title">${data_detail_absen_current_date[row]['working_hours']?data_detail_absen_current_date[row]['working_hours']:"-"} h</cite>
+                                                </small>
+                                            </div>
+                                            <div class="col-5 d-flex align-items-start">
+                                                <small class="text-muted">
+                                                    Late
+                                                </small>
+                                            </div>
+                                            <div class="col-7">
+                                                <small class="text-muted">
+                                                    <cite title="Source Title">${data_detail_absen_current_date[row]['late_minutes']?data_detail_absen_current_date[row]['late_minutes']:"-"} m</cite>
+                                                </small>
+                                            </div>
+
+                                            ${element_point_late}
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+            }
+        };
+        row_data_datatable.push(element_card);
+
+
+        conLog('data_detail_absen_current_date', data_detail_absen_current_date);
+        conLog('data_code_data_absensi', data_code_data_absensi);
+        let xxx = $('#table-detail-absensi-data').DataTable({
+            scrollX: true,
+            scrollY: "400px",
+            paging: false,
+            serverSide: false,
+            ordering: false,
+            data: data_code_data_absensi,
+            columns: row_data_datatable
+        });
+
+    }
+
+    function modalGeneralFilter() {
+
+    }
+
     function cardFormField(id_field, data_field, is_disabled = '') {
         // if(ui_dataset.ui_dataset.user_authentication.GRADE ){
 
@@ -910,7 +1320,7 @@
             is_disabled = '';
         } else {
             is_disabled = 'disabled';
-            if (ui_dataset.ui_dataset.user_authentication.feature.includes('MANAGE-DATA-HR')) {
+            if (ui_dataset.ui_dataset.user_authentication.FIELD_LEVEL >= 3) {
                 is_disabled = '';
             }
         }
@@ -926,10 +1336,10 @@
         switch (data_field.type_data_field) {
             case 'TEXT':
                 element_input_field_ =
-                    `<input type="text" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="text" ${is_disabled} class="form-control ${id_field} ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
+                            <div id="form-${data_field.full_code_field}" class="form-group">
                                 <label>${data_field.description_field}</label>
                                 ${element_input_field_}
                             </div>
@@ -939,7 +1349,7 @@
 
             case 'FILE-PDF':
                 element_input_field_ =
-                    `<input type="file"  ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="file"  ${is_disabled} class="form-control ${id_field} ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -954,7 +1364,7 @@
                 element_input_field_ =
                     `<div class="row">
                         <div class="col-8">
-                            <input type="file" accept=".pdf, image/*"  ${is_disabled} class="form-control ${data_field.code_table_field} file-${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">
+                            <input type="file" accept=".pdf, image/*"  ${is_disabled} class="form-control ${id_field} ${data_field.code_table_field} file-${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">
                         </div>
                         <div class="col-4">
                             <button hidden type="button" id="show-${data_field.code_table_field}-${data_field.code_field}" class="btn show-${data_field.code_field}" data-bgcolor="#00b489" data-color="#ffffff" style="color: rgb(255, 255, 255); background-color: rgb(0, 180, 137);">
@@ -975,7 +1385,7 @@
                 break;
             case 'PERSETUJUAN':
                 element_input_field_ =
-                    `<input type="text" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="text" ${is_disabled} class="form-control ${id_field} ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -987,7 +1397,7 @@
                 break;
             case 'DATETIME':
                 element_input_field_ =
-                    `<input type="text" ${is_disabled} class="form-control  datetimepicker ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="text" ${is_disabled} class="form-control ${id_field} datetimepicker ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -1000,7 +1410,7 @@
                 break;
             case 'NOMINAL-UANG':
                 element_input_field_ =
-                    `<input type="text" onfocus="toRupiah(this)" onkeyup="toRupiah(this)" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="text" onfocus="toRupiah(this)" onkeyup="toRupiah(this)" ${is_disabled} class="form-control ${id_field} ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -1021,7 +1431,7 @@
                 }
 
                 element_input_field_ = `
-                            <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.full_code_field}" class="${data_field.code_field} custom-select2 form-control">
+                            <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.full_code_field}" class="${data_field.code_field} custom-select2 ${id_field} form-control">
                                 <option value="">Pilih Data</option>
                                 ${element_option_data_source}
                             </select>
@@ -1041,7 +1451,13 @@
             case 'DARI-TABEL':
                 let NRP = "-";
                 if (db['db']['database_data'][data_source_this_field.table_data_source]) {
-
+                    let db_data_FULL = db['public']['public_value'][data_source_this_field.table_data_source];
+                    let db_data = [];
+                    if (data_source_this_field.table_data_source == 'KARYAWAN') {
+                        db_data = db['DEFAULT-FILTER']['FILTER']['KARYAWAN'];
+                    } else {
+                        db_data = Object.keys(db['db']['database_data'][data_source_this_field.table_data_source]);
+                    }
                     /*
                         1. hanya departemenyna,
                         2. hanya apa yg di kelolanya,
@@ -1062,15 +1478,15 @@
                         },{}]
                     */
                     // conLog('data_source_this_field',data_source_this_field)
-                    Object.entries(db['db']['database_data'][data_source_this_field.table_data_source]).forEach(
-                        ([key, data_data_source]) => {
+                    db_data.forEach(
+                        key => {
                             element_option_data_source =
-                                `${element_option_data_source} <option value="${key}">${data_data_source[data_source_this_field.field_get_data_source]['value_data']}</option>`
+                                `${element_option_data_source} <option value="${key}">${db_data_FULL[key][data_source_this_field.field_get_data_source]}</option>`
                         });
                 }
 
                 element_input_field_ = `
-                                                <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.full_code_field}" class="${data_field.code_field} custom-select2 form-control">
+                                                <select ${is_disabled} style="width: 100%;" name="${data_field.code_field}" id="${data_field.full_code_field}" class="${data_field.code_field} custom-select2 ${id_field} form-control">
                                                     <option value="">Pilih Data</option>
                                                     ${element_option_data_source}
                                                 </select>
@@ -1092,7 +1508,7 @@
                 // conLog('data_field', data_field);
                 if (is_disabled == 'disabled') {
                     element_input_field_ =
-                        `<input type="text" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                        `<input type="text" ${is_disabled} class="form-control ${id_field} ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                     element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -1108,7 +1524,7 @@
 
                     `
                         <input type="text" ${is_disabled} name="${data_field.code_field}" id="code-autocomplite-${data_field.code_table_field}-${data_field.code_field}">
-                        <input type="text" ${is_disabled} name="description-${data_field.code_field}" class="${data_field.code_field} form-control db-text mb-30" onkeyup="changeInput('${data_field.code_table_field}-${data_field.code_field}')" style=" margin-bottom: 60px;"  id="${data_field.code_table_field}-${data_field.code_field}">`;
+                        <input type="text" ${is_disabled} name="description-${data_field.code_field}" class="${data_field.code_field} form-control ${id_field} db-text mb-30" onkeyup="changeInput('${data_field.code_table_field}-${data_field.code_field}')" style=" margin-bottom: 60px;"  id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group mb-20 h-500">
@@ -1141,7 +1557,7 @@
 
                 element_input_field_ =
 
-                    `<input ${is_disabled} type="color" onchange="setColor('${data_field.code_table_field}-${data_field.code_field}')" class="form-control-color form-control" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />`;
+                    `<input ${is_disabled} type="color" onchange="setColor('${data_field.code_table_field}-${data_field.code_field}')" class="form-control-color ${id_field} form-control" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -1151,7 +1567,7 @@
                                         ${element_input_field_}
                                     </div>
                                     <div class="col-6">
-                                        <input ${is_disabled} type="text" class="form-control " id="color-${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />
+                                        <input ${is_disabled} type="text" class="form-control ${id_field}" id="color-${data_field.code_table_field}-${data_field.code_field}" value="#f56767" />
                                     </div>
                                 </div>                                
                             </div>
@@ -1160,10 +1576,10 @@
                 break;
             case 'DATE':
                 element_input_field_ =
-                    `<input type="date" ${is_disabled} class="form-control ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="date" ${is_disabled} class="form-control ${id_field} ${data_field.code_field}" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
-                            <div class="form-group">
+                            <div  id="form-${data_field.full_code_field}" class="form-group">
                                 <label>${data_field.description_field}</label>
                                 ${element_input_field_}
                             </div>
@@ -1172,7 +1588,7 @@
                 break;
             case 'hidden':
                 element_input_field_ =
-                    `<input type="text" ${is_disabled}  class="form-control secondary_key" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
+                    `<input type="text" ${is_disabled}  class="form-control ${id_field} secondary_key" name="${data_field.code_field}" id="${data_field.code_table_field}-${data_field.code_field}">`;
                 element_field = `
                         <div class="col-md-12 col-sm-12">
                             <div class="form-group">
@@ -1186,7 +1602,7 @@
                 break;
         }
 
-        $
+
     }
 
     function createFormFieldTable(id_element, code_table) {
@@ -1194,7 +1610,8 @@
         $(`#${id_element}`).append(`
              <form autocomplete="off" id="FORM-${code_table}"  enctype="multipart/form-data">
                 @csrf
-                <input type="hidDen" value="${code_table}">
+                <input hidden type="text" name="code_table" value="${code_table}">
+                <input hidden type="text" name="uuid_data" id="uuid_data" value="">
                 
 
             </form>
@@ -1202,7 +1619,6 @@
 
         code_table_global = code_table;
         Object.values(db['db']['database_field'][code_table]).forEach(field => {
-
             cardFormField(`FORM-${code_table}`, field);
         });
         data_persetujuan;
@@ -1212,11 +1628,10 @@
             let db_persetujuan = db['db']['database_persetujuan'][code_table];
             data_persetujuan = db_persetujuan;
             $(`#FORM-${code_table}`).append(`
-                    <div class="profile-info bg-light" id="persetujuan-FORM-${code_table}">
+                    <div class="profile-info bg-light " id="persetujuan-FORM-${code_table}">
                         <div class="text-center">
                             <h6>PERSETUJUAN</h6>
                         </div>
-                        
                     </div>
             `);
 
@@ -1225,11 +1640,6 @@
                 // const element = array[countLevel];
                 // conLog('countLevel', countLevel);
                 if (db_persetujuan[`LEVEL-${countLevel}`]) {
-                    conLog('LABEL', db['public']['public_value']['DATABASE-LEVEL-PERSETUJUAN'][`LEVEL-${countLevel}`][
-                        'LEVEL-PERSETUJUAN'
-                    ]);
-
-                    //CHANGE VALUE REFERENCE
 
                     $(`#${code_table}-${db_persetujuan[`LEVEL-${countLevel}`]['reference']}`).attr('onchange',
                         `setValToFieldPersetujuan('${db_persetujuan[`LEVEL-${countLevel}`]['reference']}',this)`);
@@ -1239,12 +1649,12 @@
                             <label for="">${db['public']['public_value']['DESKRIPSI-PERSETUJUAN'][db_persetujuan[`LEVEL-${countLevel}`]['description']]['DESKRIPSI-PERSETUJUAN']}</label>
                             <div class="row">
                                 <div class="col-9">
-                                    <select style="width: 100%;" name="LEVEL-${countLevel}" id="persetujuan-LEVEL-${countLevel}" class="custom-select2 form-control">
+                                    <select style="width: 100%;" name="LEVEL-${countLevel}" id="persetujuan-LEVEL-${countLevel}" class="custom-select2 FORM-${code_table} form-control">
                                         
                                         
                                     </select>
                                 </div>
-                                <div class="col-3">
+                                <div class="col-3"  id="icon-persetujuan-LEVEL-${countLevel}">
                                     <button type="button" class="btn btn-secondary">
                                         <i class="icon-copy bi bi-clock-history"></i>
                                     </button>
@@ -1258,13 +1668,10 @@
 
         Object.values(db['db']['database_field'][code_table]).forEach(field => {
             if (field.code_field == 'NRP') {
-                conLog('code_field', field);
-                conLog('NRP', KONSTANTA['NRP']);
 
                 $(`#${field.full_code_field}`).val(ui_dataset.ui_dataset.user_authentication.employee_uuid)
                     .trigger('change');
 
-                conLog('NRP', KONSTANTA['PAGE']);
                 if (KONSTANTA['PAGE'] == 'SELF') {
                     conLog('NRP', KONSTANTA['PAGE']);
                     $(`#form-${field.full_code_field}`).hide();
@@ -1278,7 +1685,10 @@
 
     function setValToFieldPersetujuan(field_reference, value_this) {
         let value_reference = $(value_this).val();
-
+        conLog('value_reference', value_reference);
+        if (!value_reference) {
+            value_reference = ui_dataset.ui_dataset.user_authentication.nik_employee;
+        }
 
         Object.values(db['db']['database_persetujuan'][code_table_global]).forEach(data_item => {
             if (field_reference == data_item['reference']) {
@@ -1302,27 +1712,64 @@
                         ];
                         profile = db['public']['KARYAWAN'][value_reference];
 
+                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
+                            'PERUSAHAAN']]);
+                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
+                            'PROJECT']]);
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][3]
+                            .includes(
+                                item));
+
                         if (profile['GRADE'] <= 5) {
-                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
-                                'PERUSAHAAN']]);
-                            // conLog('atasan perusahaan', atasan);
-                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
-                                'PROJECT']]);
-                            // conLog('atasan project', atasan);
                             atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN'][
                                 profile['DEPARTEMEN']
                             ]);
-                            // conLog('atasan departement', atasan);
-                            if (profile['GRADE'] <= 4) {
-                                atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][3].includes(
+                            atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][5].includes(
+                                item));
+                            atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][1]
+                                .includes(
                                     item));
+
+                            // return false;
+                            if (profile['GRADE'] <= 4) {
+                                atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][1]
+                                    .includes(
+                                        item));
                                 if (profile['GRADE'] <= 2) {
                                     atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DIVISI'][
                                         profile['DIVISI']
                                     ]);
+                                } else {
+                                    atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][3]
+                                        .includes(
+                                            item));
+
+                                    atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][2]
+                                        .includes(
+                                            item));
                                 }
                             }
+                        } else if (profile['GRADE'] <= 7) {
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['GRADE'][8]);
+                        } else if (profile['GRADE'] <= 9) {
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['GRADE'][10]);
+                        } else if (profile['GRADE'] <= 11) {
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['GRADE'][12]);
+                        } else if (profile['GRADE'] <= 13) {
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['GRADE'][14]);
                         }
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][11]
+                            .includes(
+                                item));
+
+
+
+
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['PHK'].includes(
+                            item));
+
+
+
                         for (let i = 0; i <= profile['GRADE']; i++) {
                             // conLog(i, db['db']['arr_employees']['GRADE'][i]);
                             try {
@@ -1332,26 +1779,16 @@
 
                             }
                         }
-                        // conLog('atasan', atasan);
+                        conLog('Atasan Langsung', atasan);
 
 
                         let grade_atas = [];
-                        // for (let i = 5; i > profile['GRADE']; i--) {
-                        //     conLog(i, db['db']['arr_employees']['GRADE'][i]);
-                        //     grade_atas = mergeArrays(grade_atas, db['db']['arr_employees']['GRADE'][i]);
-                        // }
-                        // conLog('atasan mergered all', grade_atas);
-
-                        // atasan = innerJoinArrays(atasan, grade_atas);
-                        // conLog('atasan', atasan);
-
                         atasan.forEach(NRP => {
                             $(`#persetujuan-${data_item['level']}`).append(
                                 `<option selected value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
                             );
                         });
                         $(`#persetujuan-${data_item['level']}`).select2();
-                        // $(`#persetujuan-${data_item['level']}`).val(value_reference);
                         break;
                     case 'HR':
                         atasan = db['db']['arr_employees'][
@@ -1364,8 +1801,16 @@
                         atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
                             'PROJECT']]);
                         atasan = innerJoinArrays(atasan, db['db']['arr_employees']['DEPARTEMEN']['HRGA']);
+                        if (atasan.length > 0) {
+                            conLog('HR', atasan);
+                        } else {
+                            atasan = innerJoinArrays(db['db']['arr_employees']['PROJECT']['MBG'], db['db'][
+                                'arr_employees'
+                            ]['DEPARTEMEN']['HRGA']);
+                        }
+
+
                         for (let i = 0; i <= 4; i++) {
-                            conLog(i, db['db']['arr_employees']['GRADE'][i]);
                             try {
                                 atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][i].includes(
                                     item));
@@ -1373,24 +1818,32 @@
 
                             }
                         }
-                        conLog('atasan', atasan);
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][11]
+                            .includes(
+                                item));
+
+
                         atasan.forEach(NRP => {
                             $(`#persetujuan-${data_item['level']}`).append(
                                 `<option selected value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
                             );
                         });
                         $(`#persetujuan-${data_item['level']}`).select2();
-
+                        conLog('HR', atasan);
                         break;
                     case 'MANAGER':
                         atasan = db['db']['arr_employees'][
                             'all_employees'
                         ];
                         profile = db['public']['KARYAWAN'][value_reference];
-                        atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
-                            'PERUSAHAAN']]);
-                        for (let i = 0; i <= 5; i++) {
-                            conLog(i, db['db']['arr_employees']['GRADE'][i]);
+
+                        if (profile['GRADE'] <= 7) {
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PERUSAHAAN'][profile[
+                                'PERUSAHAAN']]);
+                            atasan = innerJoinArrays(atasan, db['db']['arr_employees']['PROJECT'][profile[
+                                'PROJECT']]);
+                        }
+                        for (let i = 0; i <= 7; i++) {
                             try {
                                 atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][i].includes(
                                     item));
@@ -1398,7 +1851,22 @@
 
                             }
                         }
-                        conLog('atasan', atasan);
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][11]
+                            .includes(
+                                item));
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][13]
+                            .includes(
+                                item));
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][3]
+                            .includes(
+                                item));
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][5]
+                            .includes(
+                                item));
+                        atasan = atasan.filter(item => !db['db']['arr_employees']['GRADE'][7]
+                            .includes(
+                                item));
+                        conLog('MANAGER', atasan);
                         atasan.forEach(NRP => {
                             $(`#persetujuan-${data_item['level']}`).append(
                                 `<option selected value="${NRP}">${db['public']['KARYAWAN'][NRP]['FULL-NAME']}</option>`
@@ -1420,7 +1888,272 @@
 
     }
 
+    function storePersetujuan(code_data, value_agreement) {
 
+        $(`#${code_data}-STATUS`).remove();
+
+        $(`#FORM-${code_data}`).append(`
+                <input type="text" name="STATUS" id="KEHADIRAN-STATUS" value="${value_agreement}">
+        `);
+        // return false;   
+        storeDataTable(code_data);
+
+    }
+
+    function ajukanIzin(code_data = null) {
+        $(`#form-kehadiran`).empty();
+        createFormFieldTable('form-kehadiran', 'KEHADIRAN');
+
+
+        if (code_data) {
+
+            $('#uuid_data').val(code_data);
+
+            let data_ketidakhadiran_edit = data_ketidakhadiran[code_data];
+            let data_persetujuan_edit = data_data_persetujuan[code_data];
+
+            conLog('data_ketidakhadiran_edit', data_ketidakhadiran_edit)
+
+            $('#KEHADIRAN-TANGGAL-PENGAJUAN').val(data_ketidakhadiran_edit['tanggal_diajukan']);
+            $('#KEHADIRAN-JENIS-KEHADIRAN').val(data_ketidakhadiran_edit['code_jenis_kehadiran']).trigger('change');
+            $('#KEHADIRAN-TANGGAL-MULAI').val(data_ketidakhadiran_edit['tanggal_mulai']);
+            $('#KEHADIRAN-LAMA').val(data_ketidakhadiran_edit['lama']);
+            if (data_ketidakhadiran_edit['dokumen']) {
+                // code for file show
+            }
+            $('#KEHADIRAN-KETERANGAN').val(data_ketidakhadiran_edit['keterangan']);
+            $('#KEHADIRAN-NRP').val(data_ketidakhadiran_edit['nrp']).trigger('change');
+
+            if (data_ketidakhadiran_edit['status_absen']) {
+                $('#KEHADIRAN-STATUS-ABSEN').val(data_ketidakhadiran_edit['status_absen']).trigger('change');
+            } else {
+                $('#KEHADIRAN-STATUS-ABSEN').val(db['public']['DATABASE-JENIS-IZIN'][data_ketidakhadiran_edit[
+                    'code_jenis_kehadiran']]['STATUS-ABSEN']).trigger('change');
+            }
+
+
+            if (data_ketidakhadiran_edit['dokumen']) {
+                $(`.show-DOKUMEN`).attr('hidden', false);
+                $(`.show-DOKUMEN`).attr('onclick', `showFile('${data_ketidakhadiran_edit['dokumen']}', 'DOKUMEN')`);
+            }
+
+            conLog('data_ketidakhadiran', data_ketidakhadiran[code_data]);
+            conLog('data_persetujuan_edit', db['public']['DATABASE-JENIS-IZIN'][data_ketidakhadiran_edit[
+                'code_jenis_kehadiran']]['STATUS-ABSEN']);
+            let is_lower = true;
+            Object.values(data_persetujuan_edit).forEach(item_persetujuan => {
+                if (item_persetujuan['status'] == 'ACC') {
+                    $(`#icon-persetujuan-${item_persetujuan['level']}`).empty();
+                    $(`#icon-persetujuan-${item_persetujuan['level']}`).append(`
+                        <button type="button" class="btn btn-success">
+                            <i class="icon-copy bi bi-check-lg"></i>
+                        </button>
+                    `);
+                }
+
+                if (item_persetujuan['status'] == 'DECLINE') {
+                    $(`#icon-persetujuan-${item_persetujuan['level']}`).empty();
+                    $(`#icon-persetujuan-${item_persetujuan['level']}`).append(`
+                        <button type="button" class="btn btn-danger">
+                            <i class="icon-copy bi bi-x-lg"></i>
+                        </button>
+                    `);
+                }
+
+                $(`#persetujuan-${item_persetujuan['level']}`).empty();
+                $(`#persetujuan-${item_persetujuan['level']}`).append(
+                    `<option selected value="${item_persetujuan.nrp}">${db['public']['KARYAWAN'][item_persetujuan.nrp]['FULL-NAME']}</option>`
+                );
+                $(`#persetujuan-${item_persetujuan['level']}`).select2();
+                if (!is_lower && item_persetujuan['status']) {
+                    $(`.FORM-KEHADIRAN`).attr('disabled', true);
+                    $('.persetujuan').attr('hidden', true);
+                }
+                if (item_persetujuan['nrp'] == ui_dataset.ui_dataset.user_authentication.nik_employee &&
+                    is_lower) {
+                    is_lower = false;
+                }
+                if (ui_dataset.ui_dataset.user_authentication.feature.includes('HR')) {
+                    is_lower = true;
+                }
+
+
+
+            });
+
+        }
+
+        if ((ui_dataset.ui_dataset.user_authentication.DEPARTEMEN).includes('HRGA') && ui_dataset.ui_dataset
+            .user_authentication.role >= 6) {
+            conLog('hr', 'hr');
+        } else {
+            $('#form-KEHADIRAN-STATUS-ABSEN').attr('hidden', true);
+        }
+        $('#form-KEHADIRAN-TANGGAL-PENGAJUAN').attr('hidden', true);
+        $(`#modal-kehadiran`).modal('show');
+    }
+
+    function createDatatablePersetujuanAbsen() {
+        conLog('createDatatablePersetujuanAbsen', '-------------------------');
+        // 1. empty element
+        $('#datatable-data-persetujuan').empty();
+        // 1. empty element
+        // return false;
+        // 2. add header
+        let row_data_datatable = [];
+        let header_table_element = '';
+        let header_table_field = ['Tanggal'];
+        header_table_element = '';
+        header_table_field.forEach(element => {
+            header_table_element = `${header_table_element} <th> ${element} </th>`
+        });
+        header_table_element = `                    
+            <table id="table-datatable-persetujuan" class="nowrap stripe hover table" style="width:100%">
+                <thead>
+                    <tr>
+                        ${header_table_element}
+                    </tr>
+                </thead>
+            </table>
+        `;
+        // return false;
+        $('#datatable-data-persetujuan').append(header_table_element);
+        // 2. add header 
+
+        // 3. code add data
+        let column_design = [];
+
+
+        card_column = {
+            mRender: function(data, type, row) {
+                let value_return;
+                // conLog('row',row);
+                // conLog('data_ketidakhadiran',data_ketidakhadiran)
+                // console.log(data_ketidakhadiran[row]['tanggal_mulai']);
+                let date_format = parseDate_fromFormatDate(data_ketidakhadiran[row]['tanggal_mulai']);
+                var r = name_days_sort[date_format.getDay()];
+                let status_absen_HR = data_ketidakhadiran[row]['status_absen'];
+                if (!status_absen_HR) {
+                    status_absen_HR = '-';
+                }
+                var status_pembayaran_upah = db['public']
+                    ['public_value']
+                    ['DATABASE-ABSENSI']
+                    [status_absen_HR]
+                    ['JENIS-PEMBAYARAN-ABSEN'];
+
+                let keterangan = (data_ketidakhadiran[row]['keterangan']) ?
+                    data_ketidakhadiran[row]['keterangan'] : "tidak ada";
+
+                let field_persetujuan = db['db']['database_persetujuan']['KEHADIRAN'];
+                let proses_persetujuan = 'tidak ada';
+                if (data_data_persetujuan[row]) {
+                    const keys = Object.keys(field_persetujuan);
+                    let i = 1;
+                    while (i <= keys.length) {
+                        const key = keys[i];
+                        const value = data_data_persetujuan[row][`LEVEL-${i}`];
+                        // conLog('field_persetujuan',);
+                        if (!value['status']) {
+                            if (proses_persetujuan == 'tidak ada') {
+                                proses_persetujuan = db['public']['public_value'][
+                                    'DATABASE-GROUP-PERSETUJUAN'
+                                ][field_persetujuan[`LEVEL-${i}`]['grade']]['GROUP-PERSETUJUAN'];
+                            }
+
+                            // break;
+                        }
+                        i++;
+                    }
+                }
+
+                // conLog('asdads',data_ketidakhadiran[row])
+
+                return `<div class="row justify-content-center">
+                            <div class="col-12 row justify-content-center">
+                                <div class="col-md-4 col-sm-12 mb-2">
+                                    ${emmp(data_ketidakhadiran[row]['nrp'])}
+                                </div>
+                                <div class="col-md-4 col-sm-12 mb-2 pr-20 pl-20">
+                                    <div class="row pd-10 card-box" mb-10>
+                                        <div class="col-10">
+                                            <span class="badge badge-pill badge-sm"
+                                            data-bgcolor="#e7ebf5" data-color="#265ed7"
+                                            style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses
+                                            di ${proses_persetujuan}</span>
+                                        
+                                            <div class="font-14 weight-600 mt-1">${toShortStringDate_fromFormatDate(data_ketidakhadiran[row]['tanggal_mulai'])}, ${r} 
+                                                |<cite title="Source Title">${(data_ketidakhadiran[row]['lama'])?data_ketidakhadiran[row]['lama']:""} Hari</cite>
+                                            </div>
+                                            <div class="font-12 weight-500" data-color="#b2b1b6"
+                                                style="color: rgb(178, 177, 182);">
+                                                ${db['public']['public_value'][KONSTANTA['DATABASE-JENIS-IZIN']][data_ketidakhadiran[row]['code_jenis_kehadiran']]['JENIS-IZIN']}
+                                            </div>
+                                        </div>   
+                                        <div class="col-2 d-flex justify-content-center align-items-center">
+                                            <a class="dropdown-toggle no-arrow" href="javascript:;" >
+                                                <i onclick="ajukanIzin('${row}')" class="dw dw-settings2"></i>
+                                            </a>
+                                        </div> 
+                                    </div>  
+                                    
+                                </div>
+                                <div class="col-md-4 col-sm-12 pr-20 pl-20">
+                                    <div class="row name-avatar  pr-2 card-box pl-2">
+                                        <div class="col-5">
+                                            <small class="text-muted">
+                                                Pembayaran
+                                            </small>
+                                        </div>
+                                        <div class="col-7">
+                                            <small class="text-muted">
+                                                <cite title="Source Title">${status_pembayaran_upah} (${status_absen_HR})</cite>
+                                            </small>
+                                        </div>
+                                        <div class="col-5 d-flex align-items-start">
+                                            <small class="text-muted">
+                                                Dokumen
+                                            </small>
+                                        </div>
+                                        <div class="col-7">
+                                            <small class="text-muted">
+                                                <cite title="Source Title"><i class="icon-copy bi bi-file-earmark-pdf"></i></span></cite>
+                                            </small>
+                                        </div>
+                                        <div class="col-5 d-flex align-items-start">
+                                            <small class="text-muted">
+                                                Keterangan
+                                            </small>
+                                        </div>
+                                        <div class="col-7 d-flex align-items-start">
+                                            <small class="text-muted">
+                                                <cite class="text-wrap" title="Source Title">${keterangan}</cite>
+                                            </small>
+                                        </div> 
+                                </div>
+                                
+                            </div>
+                        </div>`;
+            }
+        };
+        column_design.push(card_column);
+        // 3. code add data
+
+        // 4. data datatable
+
+        // 4. data datatable
+        conLog('data_ketidakhadiran', Object.keys(data_ketidakhadiran));
+        conLog('ALL data_ketidakhadiran', data_ketidakhadiran);
+        // 5. datatable
+        $('#table-datatable-persetujuan').DataTable({
+            paging: true,
+            responsive: true,
+            serverSide: false,
+            data: Object.keys(data_ketidakhadiran),
+            columns: column_design
+        });
+        // 5. datatable
+    }
 
     function storeDataTable(code_table) {
         conLog('storeDataTable', 'storeDataTable');
@@ -1441,7 +2174,6 @@
         let uuid_data = $('#uuid_data').val();
         var formId = 'FORM-' + code_table; // Construct the form ID dynamically
 
-        conLog('formId',formId);
         let db_table = db['db']['database_table'][code_table];
 
         var formData;
@@ -1451,10 +2183,22 @@
 
             formData = new FormData(document.getElementById(`form-id-${code_table}`));
         }
-        
 
         formData.append('code_table', code_table);
         formData.append('uuid_data', uuid_data);
+
+        if (db['db']['database_field_show'][code_table]) {
+            Object.entries(db['db']['database_field_show'][code_table]).forEach(([key_field, fields]) => {
+                let value_gabungan = '';
+                // conLog('key_field', key_field);
+                fields.forEach(items_field => {
+                    value_gabungan = value_gabungan + `${items_field.split_by}` + $(
+                        `#${code_table}-${items_field.field_show_code}`).val();
+                });
+                value_gabungan = value_gabungan.slice(1);
+                formData.append(key_field, value_gabungan);
+            });
+        }
 
 
         Object.entries(db_table).forEach(([key_field, fields]) => {
@@ -1471,7 +2215,7 @@
             url: '/web/manage/database/store-database',
             type: 'POST',
             headers: {
-                
+
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                 'user-token-mbg': ui_dataset.ui_dataset.user_authentication.auth_login
             },
@@ -1479,36 +2223,11 @@
             contentType: false, // Important: prevents jQuery from setting content type header
             processData: false, // Important: prevents jQuery from processing the data
             success: function(response) {
-                console.log("File uploaded successfully");
-                console.log(response);
+                conLog('response ', response);
+                showModalSuccess();
             },
             error: function(response) {
                 conLog('error', response);
-            }
-        });
-
-        return false;
-        $.ajax({
-            url: '/web/manage/database/store-database',
-            type: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-auth_login': ui_dataset.ui_dataset.user_authentication.auth_login
-            },
-            data: JSON.stringify({
-                _token: $('meta[name="csrf-token"]').attr('content'),
-                formData: formDataArray,
-                uuid_data: $('#uuid_data').val(),
-                data_table: db_table,
-                data_source_this_field: data_source_this_field
-            }),
-            success: function(response) {
-                conLog('response', response);
-            },
-            error: function(response) {
-                conLog('error', response);
-                stopLoading();
-                //alertModal()
             }
         });
     }
@@ -1558,7 +2277,6 @@
         });
     }
 
-
     async function showFile(url_file, field) {
 
         field = url_file;
@@ -1607,7 +2325,6 @@
     function toNumber(numberOf) {
         return numberOf.replace(/[^0-9]/g, '');
     }
-
 
     function toRupiah(arg) {
 
@@ -1682,10 +2399,6 @@
             database_datatable['show-fields'] = Object.values(db['db']['database_field'][code_table])
         }
         return database_datatable;
-    }
-
-    function filter_data_karyawan() {
-
     }
 
     function filterObject(arr_key_filtered, data_object) {
@@ -1791,7 +2504,7 @@
     function excelSerialToDate(serial) {
         // Excel serial date starts from 1 January 1900
         // JavaScript date starts from 1 January 1970
-        if (serial.includes('-')) {
+        if (serial.indexOf('-')) {
             return serial;
         } else {
             const baseDate = new Date(1899, 11, 30); // December 30, 1899
@@ -1943,8 +2656,13 @@
     function toUUID(the_text) {
         const regex = /[^a-zA-Z0-9&]/g;
         // Ganti semua simbol dengan tanda dash ("-")
-        const resultString = the_text.replace(regex, "-");
-        return resultString.toUpperCase();
+        try {
+            const resultString = the_text.replace(regex, "-");
+            return resultString.toUpperCase();
+        } catch (error) {
+            return the_text;
+        }
+
     }
 
     function UUIDtoStr(str) {
@@ -1963,7 +2681,6 @@
     function setUIdate(param_ui_year = ui_dataset.ui_dataset.ui_date.year, param_ui_month = ui_dataset.ui_dataset
         .ui_date.month,
         param_ui_day = ui_dataset.ui_dataset.ui_date.day) {
-        conLog('run function', 'setUIdate')
         if (param_ui_day == null) {
             param_ui_day = ui_dataset.ui_dataset.ui_date.day
         }
@@ -1978,8 +2695,9 @@
             "month": param_ui_month,
             "year": param_ui_year
         }
-        setUImonthYear()
-        localStorage.setItem('ui_dataset', JSON.stringify(ui_dataset));
+        conLog('set ui ui_dataset', ui_dataset)
+        setUImonthYear();
+        setLocalStorage('ui_dataset', ui_dataset);
     }
 
     function getEndDate(val_year, val_month) {
@@ -2003,6 +2721,7 @@
             "month": month,
             "year": year
         };
+
         return arr;
     }
 
@@ -2038,7 +2757,18 @@
     }
 
     function setDateSession(year, month) {
-        cg('set-date-session', arr_date_today);
+        // conLog('year', year);
+        conLog('set date session', arr_date_today);
+
+
+        if (year) {
+            arr_date_today.year = year;
+        }
+
+        if (month) {
+            arr_date_today.month = month;
+        }
+        // cg('set-date-session', arr_date_today);
         if (!arr_date_today) {
             arr_date_today = getDateTodayArr();
             $.ajax({
@@ -2050,21 +2780,19 @@
                     month: arr_date_today.month,
                 },
                 success: function(response) {
-                    // $('#success-modal').modal('show')
-                    cg('/support/set-date', response);
                     arr_date_today.day = response.data.day;
                     arr_date_today.month = response.data.month;
                     arr_date_today.year = response.data.year;
-                    // cg('arr_data', arr_date_today);
+                    // cg('arr_data new', arr_date_today);
                 },
                 error: function(response) {
                     alertModal()
                 }
             });
-            cg('when not', arr_date_today);
+            // cg('when not', arr_date_today);
         } else {
             if (year == arr_date_today.year && parseInt(month) == parseInt(arr_date_today.month)) {
-                cg('same', 'same');
+                // cg('same', 'same');
             } else {
                 $.ajax({
                     url: '/support/set-date',
@@ -2075,12 +2803,10 @@
                         month: arr_date_today.month,
                     },
                     success: function(response) {
-                        // $('#success-modal').modal('show')
-                        cg('/support/set-date', response);
                         arr_date_today.day = response.data.day;
                         arr_date_today.month = response.data.month;
                         arr_date_today.year = response.data.year;
-                        // cg('arr_data', arr_date_today);
+                        // cg('arr_data ubah', arr_date_today);
                     },
                     error: function(response) {
                         alertModal()
@@ -2088,6 +2814,18 @@
                 });
             }
         }
+        setUIdate(arr_date_today.year, arr_date_today.month, '01');
+        setLocalStorage('arr_date_today', arr_date_today);
+        start = new Date(arr_date_today.year, arr_date_today.month - 1, 1);
+        end = new Date(arr_date_today.year, arr_date_today.month, 0);
+        filter_absensi.date_start = formatDate(start);
+        filter_absensi.date_end = formatDate(end);
+
+        default_filter_absensi.date_start = formatDate(start);
+        default_filter_absensi.date_end = formatDate(end);
+        $('#FILTER-RANGE').val(setRangeDate(formatDate(start), formatDate(end))).trigger(
+            'change');
+        setLocalStorage('default_filter_absensi', default_filter_absensi);
     }
 
     async function deleteForm(id_form) {
@@ -2118,6 +2856,7 @@
         if (!localStorage.getItem(key)) {
             return null;
         } else {
+            return JSON.parse(localStorage.getItem(key));
             return localStorage.getItem(key);
         }
     }
@@ -2155,101 +2894,90 @@
     }
 
     function getDataFilteredKaryawan() {
-        let date_range = $('#FILTER-RANGE').val();
-        let split_date_range = date_range.split(" - ");
+        //kondisi disni sudah ada kryawan yang terfilter namun perlu di refresh lagi jika filternya update
+        // bagaimana supaya efesien dalam filter nya
+
+        let arr_part = [];
+        // conLog('getDataFilteredKaryawan', db['DEFAULT-FILTER']['KARYAWAN'])
+        Object.entries(db['DEFAULT-FILTER']['KARYAWAN']).forEach(([key_perusahaan, perusahaan]) => {
+            if (default_filter_absensi['PERUSAHAAN'].includes(key_perusahaan)) {
+                Object.entries(db['DEFAULT-FILTER']['KARYAWAN'][key_perusahaan]).forEach(([key_project,
+                    project
+                ]) => {
+                    if (default_filter_absensi['PROJECT'].includes(key_project)) {
+                        Object.entries(db['DEFAULT-FILTER']['KARYAWAN'][key_perusahaan][key_project])
+                            .forEach(([key_department, department]) => {
+                                if (default_filter_absensi['DEPARTEMEN'].includes(key_department)) {
+                                    Object.entries(db['DEFAULT-FILTER']['KARYAWAN'][key_perusahaan][
+                                        key_project
+                                    ][key_department]).forEach(([key_divisi, divisi]) => {
+                                        if (default_filter_absensi['DIVISI'].includes(
+                                                key_divisi)) {
+                                            Object.entries(db['DEFAULT-FILTER']['KARYAWAN'][
+                                                key_perusahaan
+                                            ][key_project][key_department][
+                                                key_divisi
+                                            ]).forEach(([key_jabatan, jabatan]) => {
+                                                if (default_filter_absensi[
+                                                        'JABATAN'].includes(
+                                                        key_jabatan)) {
+                                                    arr_part = mergeArrays(arr_part,
+                                                        jabatan);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                });
+            }
+
+        });
+
 
         let status_karyawan = [];
+        let db_karyawan = db['public']['KARYAWAN'];
+        let karyawan_status_karyawan = [];
 
-        filter_absensi.date_start = formatDate(parseDateString(split_date_range[0], 'mm/dd/yyyy'));
-        filter_absensi.date_end = formatDate(parseDateString(split_date_range[1], 'mm/dd/yyyy'));
-        // let array_karyawan = db['db']['arr_employees'][]
-        let arr_filtered_karyawan = [];
-        let row_data_datatable = [];
-        let arr_part = [];
-
-        filter_absensi['DIVISI'].forEach(element => {
-            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DIVISI'][element]);
-            // conLog(element, db['db']['arr_employees']['DIVISI'][element]);
-        });
-
-        arr_filtered_karyawan = arr_part;
-
-        arr_part = [];
-        filter_absensi['DEPARTEMEN'].forEach(element => {
-            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['DEPARTEMEN'][element]);
-        });
-
-        arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
-        arr_part = [];
-        filter_absensi['PROJECT'].forEach(element => {
-            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PROJECT'][element]);
-        });
-        arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
-        arr_part = [];
-        filter_absensi['PERUSAHAAN'].forEach(element => {
-            arr_part = mergeArrays(arr_part, db['db']['arr_employees']['PERUSAHAAN'][element]);
-        });
-        arr_filtered_karyawan = innerJoinArrays(arr_part, arr_filtered_karyawan);
-
+        let date_end = new Date(default_filter_absensi['date_end']);
+        let date_start = new Date(default_filter_absensi['date_start']);
 
         try {
-            status_karyawan = $(`#STATUS-KARYAWAN`).val();
-            if (status_karyawan) {
-                let karyawan_status_karyawan = [];
-
-                if (status_karyawan.includes('Aktif')) {
-                    Object.entries(db['public']['KARYAWAN']).forEach(([NRP, karyawan]) => {
-                        // conLog('karyawan', karyawan)
-                        if (karyawan['STATUS-KERJA'] == 'AKTIVE') {
-                            karyawan_status_karyawan.push(NRP);
+            status_karyawan = default_filter_absensi.statusKaryawan;
+            if (status_karyawan || status_karyawan.length < 3) {
+                arr_part.forEach(karyawan => {
+                    if (status_karyawan.includes('AKTIVE')) {
+                        if (db_karyawan[karyawan]['STATUS-KERJA'] == 'AKTIVE') {
+                            karyawan_status_karyawan.push(karyawan);
+                            return;
                         }
-                    });
-                }
+                    }
 
-                let phk_this_month = []
-                if (status_karyawan.includes('PHK Bulan ini')) {
-                    Object.entries(db['public']['KARYAWAN']).forEach(([NRP, karyawan]) => {
-                        // conLog('karyawan', karyawan)
-                        if (karyawan['STATUS-KERJA'] == 'PHK') {
-                            let date_phk = new Date(karyawan['TANGGAL-BERAKHIR-KONTRAK--TBK-']);
-                            let date_end = new Date(filter_absensi['date_end']);
-                            let date_start = new Date(filter_absensi['date_start']);
-                            if (date_phk < date_end && date_phk > date_start) {
-                                phk_this_month.push(NRP);
+                    if (db_karyawan[karyawan]['STATUS-KERJA'] == 'PHK') {
+                        if (status_karyawan.includes('PHK')) {
+                            karyawan_status_karyawan.push(karyawan);
+                            return;
+                        }
+                        if (status_karyawan.includes('PHK-BULAN-INI')) {
+                            let date_phk = new Date(db_karyawan[karyawan][
+                                'TANGGAL-BERAKHIR-KONTRAK--TBK-'
+                            ]);
+                            if (date_phk <= date_end && date_phk >= date_start) {
+                                karyawan_status_karyawan.push(karyawan);
+                                return;
                             }
                         }
-                    });
-                }
-
-
-                let phk_ = []
-                if (status_karyawan.includes('PHK')) {
-                    Object.entries(db['public']['KARYAWAN']).forEach(([NRP, karyawan]) => {
-                        // conLog('karyawan', karyawan)
-                        if (karyawan['STATUS-KERJA'] == 'PHK') {
-                            phk_.push(NRP);
-                        }
-                    });
-                }
-
-                let arr_emp = mergeArrays(karyawan_status_karyawan, phk_this_month);
-                arr_emp = mergeArrays(phk_, arr_emp);
-
-
-                // conLog('karyawan_status_karyawan', karyawan_status_karyawan)
-                // conLog('phk_this_month', phk_this_month)
-                // conLog('phk_', phk_)
-                // conLog('arr_emp', arr_emp)
-
-                // conLog('karyawan_status_karyawan', karyawan_status_karyawan)
-                arr_filtered_karyawan = innerJoinArrays(arr_emp, arr_filtered_karyawan);
+                    }
+                });
+                // conLog('karyawan_status_karyawan', karyawan_status_karyawan);
             }
         } catch (error) {
 
         }
-        setLocalStorage('filter_absen', filter_absensi);
-        conLog('filter_absensi', filter_absensi)
-        return filter_absensi['KARYAWAN'] = arr_filtered_karyawan;
+        default_filter_absensi['KARYAWAN'] = karyawan_status_karyawan;
+        setLocalStorage('default_filter_absensi', default_filter_absensi);
+        return karyawan_status_karyawan;
     }
 
     async function globalStoreNoTable(idForm) {
@@ -2297,14 +3025,15 @@
 
     // ================================= UI
     function stopLoading() {
-        console.log('stop loading')
+        console.log('stop loading ---------------------------------------------------')
         $('#loading-modal').hide()
         $('.modal').modal('hide');
         $('#loading-modal').modal('hide')
     }
 
     function startLoading() {
-        $('#loading-modal').modal('show')
+        conLogs('loading start', '-----------------------------------------------------------------');
+        $('#loading-modal').modal('show');
     }
 
     function showModalSuccess(data) {
@@ -2319,78 +3048,187 @@
         return $(`#${idElement}`).val();
     }
 </script>
+<script>
+    //============= GENERAL FILTER-==
+    function filterSave() {
+        let arr_checkbox_filter = [];
+        let name_filter = $('#general-filter-name').val();
 
+        var checkboxValues = $('.datatable-filter:checked').map(function() {
+            arr_checkbox_filter.push($(this).val());
+        }).get();
+
+        default_filter_absensi[name_filter] = arr_checkbox_filter;
+        setLocalStorage('default_filter_absensi', default_filter_absensi);
+
+        conLog('name_filter', name_filter)
+        conLog('arr_checkbox_filter', arr_checkbox_filter)
+
+        $('#modal-general-filter').modal('hide');
+    }
+
+    function saveGeneralFilter() {
+        default_filter_absensi['statusKaryawan'] = $(`#STATUS-KARYAWAN`).val();
+        let date_range = $('#FILTER-RANGE').val();
+        if (date_range) {
+            let split_date_range = date_range.split(" - ");
+            default_filter_absensi.date_start = formatDate(parseDateString(split_date_range[0], 'mm/dd/yyyy'));
+            default_filter_absensi.date_end = formatDate(parseDateString(split_date_range[1], 'mm/dd/yyyy'));
+        }
+        setLocalStorage('default_filter_absensi', default_filter_absensi);
+        conLog('default_filter_absensi', default_filter_absensi)
+    }
+
+    function selectAllFilter() {
+        var isChecked = $('#select-all-filter').prop('checked');
+        $('.datatable-filter').prop('checked', isChecked);
+    }
+
+    function filterTableShow(code_table) {
+        conLog('filterTableShow', code_table);
+        let table_detail = db['db']['database_table'][code_table];
+        let table_field = db['db']['database_field'][code_table];
+        let data_table_datatable = db['public']['public_value'][code_table];
+        $('#general-filter-name').val(code_table);
+
+        let isChecked = "";
+        if (default_filter_absensi[code_table].length == filter_absensi[code_table].length) {
+            isChecked = "checked";
+        }
+        let headerTableFilter = `<th>
+                                        <div class="dt-checkbox no-sort">
+                                            <input onchange="selectAllFilter()"
+                                                type="checkbox"
+                                                name="select_all-filter"
+                                                ${isChecked}
+                                                id="select-all-filter"
+                                            />
+                                            <span class="dt-checkbox-label"></span>
+                                        </div>
+                                    </th>
+                                    <th> ${table_field[table_detail['primary_table']]['description_field']}</th>
+                                    `;
+        headerTableFilter = `                    
+                    <table id="table-datatable-general-filter" class="checkbox-datatable nowrap stripe hover table" style="width:100%">
+                        <thead>
+                            <tr>
+                                ${headerTableFilter}
+                            </tr>
+                        </thead>
+                    </table>
+                `;
+        $('#datatable-general-filter').empty();
+        $('#filter-table-name').text("Filter by " + table_detail['description_table']);
+        $('#datatable-general-filter').append(headerTableFilter);
+
+
+        let row_data_datatable = [];
+
+
+        var checkbox_card_element = {
+            mRender: function(data, type, row) {
+                let isChecked = "";
+                if (default_filter_absensi[code_table].includes(row)) {
+                    isChecked = "checked";
+                }
+                return `<input value="${row}" type="checkbox" ${isChecked} class="datatable-filter editor-active dt-checkbox no-sort">`
+            }
+        };
+
+        row_data_datatable.push(checkbox_card_element);
+
+        var element_card = {
+            mRender: function(data, type, row) {
+                let data_show = showFieldData(table_field[table_detail['primary_table']]['type_data_field'],
+                    code_table, table_detail['primary_table'],
+                    toUUID(row)
+                );
+                return data_show;
+            }
+        };
+        row_data_datatable.push(element_card);
+        let first_local_filter = getLocalStorage('first-default_filter_absensi');
+        // return false;
+        $('#table-datatable-general-filter').DataTable({
+            paging: false,
+            // scrollY: true,
+            scrollX: true,
+            scrollY: "400px",
+            responsive: true,
+            serverSide: false,
+            data: first_local_filter[code_table],
+            columns: row_data_datatable
+        });
+
+
+    }
+
+    function filterDatatable(code_table) {
+        filterTableShow(code_table);
+        $('#modal-general-filter').modal('show');
+    }
+</script>
 {{-- LOCAL STORAGE --}}
 <script>
     async function refreshSession() {
-        console.log('session refreshed')
-        conLog('auth', ui_dataset.ui_dataset.user_authentication.auth_login);
+        console.log('SESSION START');
+        console.log('======================================================================================');
+        $('.refresh-data').show();
         let auth = ui_dataset.ui_dataset.user_authentication.auth_login;
         $.ajax({
             url: '/web/local-storage',
             type: "POST",
             headers: {
-                'X-auth_login': auth,
+                'x-auth-login': auth,
                 'X-Auth-Login': auth, // Changed header name
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-
-                // Add other custom headers if needed
             },
             data: {
                 auth_login: auth
             },
             success: function(response) {
-                conLog('response ' + auth, response);
                 // return false;
                 status_absen_short = '';
 
-                localStorage.setItem('DATABASE', JSON.stringify(response.data));
+                setLocalStorage('DATABASE', response.data);
                 db = response.data;
                 conLog('db', db);
-                // conLog('ui_dataset', ui_dataset);
-                default_filter_absensi['PERUSAHAAN'] = innerJoinArrays(Object.keys(db['public'][
-                    'PERUSAHAAN'
-                ]), default_filter_absensi.PERUSAHAAN);
-                default_filter_absensi['PROJECT'] = innerJoinArrays(Object.keys(db['public'][
-                    'PROJECT'
-                ]), default_filter_absensi.PROJECT);
-                default_filter_absensi['DEPARTEMEN'] = innerJoinArrays(Object.keys(db['public'][
-                    'DEPARTEMEN'
-                ]), default_filter_absensi.DEPARTEMEN);
-                default_filter_absensi['DIVISI'] = innerJoinArrays(Object.keys(db['public']['DIVISI']),
-                    default_filter_absensi.DIVISI);
+
+                let lo_df_filter_ab = JSON.parse(localStorage.getItem('default_filter_absensi'));
+
+                if (lo_df_filter_ab.PERUSAHAAN.length == 0) {
+                    default_filter_absensi = db['DEFAULT-FILTER']['FILTER'];
+                    default_filter_absensi.statusKaryawan = lo_df_filter_ab.statusKaryawan;
+                    default_filter_absensi.date_start = lo_df_filter_ab.date_start;
+                    default_filter_absensi.date_end = lo_df_filter_ab.date_end;
+                    // conLog('x - default_filter_absensi', default_filter_absensi);
+                    setLocalStorage('default_filter_absensi', default_filter_absensi);
+                    setLocalStorage('first-default_filter_absensi', default_filter_absensi);
+
+                }
 
                 Object.values(db['public']['DATABASE-ABSENSI']).forEach(element => {
                     status_absen_short =
                         `${status_absen_short} <option value="${element['KODE-ABSEN']}">${element['KODE-ABSEN']}</option>`;
                 });
                 KONSTANTA['NRP'] = ui_dataset.ui_dataset.user_authentication.employee_uuid;
-
-
-                // iner joining perusahaan dll untuk biar hanya ada di db saja
-                conLog('status_absen_short', status_absen_short)
-                // location.reload();
-                // showModalSuccess();
+                conLog('default_filter_absensi', default_filter_absensi);
+                $('.refresh-data').hide();
             },
             error: function(response) {
-                conLog('error', 'localStorage')
                 conLog('error', response);
                 stopLoading();
             }
         });
+        console.log('======================================================================================');
+        console.log('SESSION END');
     }
 
-    function setLocalStorage(key_local_storage, data_local_storage) {
-        localStorage.setItem(key_local_storage, JSON.stringify(data_local_storage));
-    }
 
 
 
-    // ========================================================================= ABSENSI ================================
-    var monthRomawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-    var months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
-        "November", "Desember"
-    ];
+
+
 
     function getLetter(num) {
         var letter = String.fromCharCode(num + 64);
@@ -2400,48 +3238,4 @@
     function monthName(month) {
         return months[parseInt(month)]
     }
-
-
-    if (!db) {
-        refreshSession();
-        conLog('db', db);
-
-    }
-    if (getLocalStorage('filter_absen')) {
-        filter_absensi = JSON.parse(getLocalStorage('filter_absen'));
-    } else {
-        setLocalStorage('filter_absen', default_filter_absensi);
-        filter_absensi = default_filter_absensi;
-    }
-
-    $(document).ready(function() {
-        // Initialize Select2
-        $('.multi-wrap-select').select2({
-            templateResult: formatOptionText,
-            templateSelection: formatOptionText
-        });
-
-        // Function to limit text length based on container width
-        function formatOptionText(option) {
-            if (!option.id) {
-                return option.text;
-            }
-            let text = option.text;
-            let $tempDiv = $('<div>').css({
-                'width': $('.multi-wrap-select-wrapper').width(),
-                'font-size': '16px',
-                'line-height': '1.5',
-                'visibility': 'hidden',
-                'white-space': 'nowrap',
-                'position': 'absolute'
-            }).text(text).appendTo('body');
-
-            while ($tempDiv.width() > $('.multi-wrap-select-wrapper').width()) {
-                text = text.substring(0, text.length - 1);
-                $tempDiv.text(text + '...');
-            }
-            $tempDiv.remove();
-            return text + '...';
-        }
-    });
 </script>

@@ -114,12 +114,6 @@ class WebAbsensiController extends Controller
 
         }
 
-        
-
-        $TES = "DSA/SAD";
-        
-        // dd($arr);
-
 
         return view('app.manage.absensi.index', [
             'title'         => 'Slip'
