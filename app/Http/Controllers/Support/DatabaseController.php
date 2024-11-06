@@ -894,6 +894,7 @@ class DatabaseController extends Controller
                             $field_arr[] = $field_code;
                         }
                         $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
+                        // return ResponseFormatter::ResponseJson($table_code, $field_code, 200);
                         $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
                         $column_fields['index_column'][$abjads[$loop_col]]['type_data_field'] = $db['db']['database_field'][$table_code][$field_code]['type_data_field'];
                         $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
@@ -905,7 +906,7 @@ class DatabaseController extends Controller
                 $loop_col++;
             }
 
-            // return ResponseFormatter::ResponseJson($db, 'column_fields', 200);
+            // return ResponseFormatter::ResponseJson($column_fields, 'column_fields', 200);
             $i = 3;
             while ($sheet->getCell('A' . $i)->getValue() != null) {
                 $uuid_data = Str::uuid();
@@ -983,25 +984,41 @@ class DatabaseController extends Controller
                 if (in_array('NIK-KTP', $field_arr)) {
                     foreach ($arr_value as $row_to_insert) {
                         if ($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']) {
+                            $for_users = [
+                                'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'password' => Hash::make($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']),
+                                'role' => $row_to_insert['KONTRAK-KARYAWAN']['GRADE'],
+                                'email' => (!empty($row_to_insert['IDENTITAS-KARYAWAN']['EMAIL']))?$row_to_insert['IDENTITAS-KARYAWAN']['EMAIL']:null,
+                                'phone_number' => (!empty($row_to_insert['IDENTITAS-KARYAWAN']['NO-HP']))?$row_to_insert['IDENTITAS-KARYAWAN']['NO-HP']:null,
+                            ];
+
+                            $for_users = array_filter($for_users);
                             User::updateOrCreate([
                                 'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-
                             ], [
-                                'password' => Hash::make($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']),
-                                'role' => $row_to_insert['KONTRAK-KARYAWAN']['GRADE']
+                                $for_users
                             ]);
                         }
                     }
                 }
             }
-            // if (in_array('PHK-KARYAWAN', $table_arr)) {
-            //     if (in_array('TANGGAL-BERAKHIR-KONTRAK--TBK-', $field_arr)) {
-            //         foreach ($arr_value as $row_to_insert) {
-            //         }
-            //     }
-            // }
+            if (in_array('PHK-KARYAWAN', $table_arr)) {
+                if (in_array('TANGGAL-BERAKHIR-KONTRAK--TBK-', $field_arr)) {
+                    if(!empty($row_to_insert['PHK-KARYAWAN'])){
+                        $data_absen = [
+                            'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                            'date_start' =>  $row_to_insert['PHK-KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
+                            'date_end' => ResponseFormatter::getEndDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
+                            'status_absen_uuid' => 'X'
+                        ];
+                        EmployeeAbsen::storeAbsen($data_absen);
+                    }                    
+                }
+            }
 
             if (in_array('KARYAWAN', $table_arr)) {
                 if (in_array('TANGGAL-MASUK-KERJA--TMK-', $field_arr)) {

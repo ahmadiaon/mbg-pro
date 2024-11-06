@@ -1064,8 +1064,8 @@
 
         let element_detail_absen = ``;
         let data_properties = detail_absensi[code_data];
-        const startDate = new Date(filter_absensi.date_start);
-        const endDate = new Date(filter_absensi.date_end);
+        const startDate = new Date(default_filter_absensi.date_start);
+        const endDate = new Date(default_filter_absensi.date_end);
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
             let date_current = formatDate(currentDate);
@@ -1078,30 +1078,11 @@
                 status_absen_uuid: "-",
                 uuid: null
             }
-            try {
-                if (data_properties[date_current]) {
-                    detail_absen_current_date = data_properties[date_current];
-                }
-            } catch (error) {
-                try {
-                    detail_absensi[code_data][date_current] = detail_absen_current_date;
-                } catch (error) {
-                    try {
-                        detail_absensi[code_data] = {};
-                        detail_absensi[code_data][date_current] = detail_absen_current_date;
-
-                    } catch (error) {
-                        detail_absensi = {};
-                        detail_absensi[code_data] = {};
-                        detail_absensi[code_data][date_current] = detail_absen_current_date;
-
-                    }
-
-                }
-
+            if (data_properties[date_current]) {
+                detail_absen_current_date = data_properties[date_current];
             }
+
             let obj_current_date = getDateObj(currentDate);
-            // console.log(detail_absen_current_date.status_absen_uuid);
             element_detail_absen += `<div id="element_absen-${code_data}-${date_current}" class="col-auto mb-1">
                                                     <div onclick="manageAbsensiDay('${code_data}', '${date_current}')" style=" background-color: ${db['public']['DATABASE-ABSENSI'][detail_absen_current_date.status_absen_uuid]['WARNA-ABSENSI']}" class="name-avatar d-flex align-items-center pr-2 card-box pl-2">
                                                         <div class="txt text-center">
@@ -1123,14 +1104,22 @@
     function detailAbsensi(code_data) {
         $(`#btn-toggle-absenn-${code_data}`).text('simple');
         $(`#btn-toggle-absenn-${code_data}`).attr('onclick', `simpleAbsensi('${code_data}')`);
-        let data_properties = detail_absensi[code_data];
-        const startDate = new Date(filter_absensi.date_start);
-        const endDate = new Date(filter_absensi.date_end);
+        let data_properties = null;
+        try {
+            data_properties = detail_absensi[code_data];
+        } catch (error) {
+
+        }
+
+
+        const startDate = new Date(default_filter_absensi.date_start);
+        const endDate = new Date(default_filter_absensi.date_end);
 
         let currentDate = new Date(startDate);
         $(`.detail-absensi-${code_data}`).empty();
         let data_code_data_absensi = [];
         let data_detail_absen_current_date = {};
+
         while (currentDate <= endDate) {
             let date_current = formatDate(currentDate);
             data_code_data_absensi.push(formatDate(currentDate))
@@ -1207,12 +1196,12 @@
                 ]]['WARNA-ABSENSI'];
                 return `<div class="row card-box mb-2">
                                 <div class="col-md-3 col-sm-12 pd-20 text-center">
-                                    <div class="card-box pd-20">
+                                    <div class="card-box">
                                         <div class="font-14  weight-600">${getDayAbbreviation(row)}, ${getDateOnly(row)}</div>
                                         <div id="element_absen-BK-PL-220367-2024-10-02" class="col-auto mb-1">
                                             <div onclick="manageAbsensiDay('BK-PL-220367', '2024-10-02')"
                                                 style=" background-color: ${warna_bg_absensi}"
-                                                class="name-avatar text-center  card-box ">
+                                                class="name-avatar mb-2 text-center btn ">
                                                 <div class="txt text-center">
                                                     <h5>${data_detail_absen_current_date[row]['status_absen_uuid']}</h5>
                                                 </div>
@@ -1291,9 +1280,6 @@
         };
         row_data_datatable.push(element_card);
 
-
-        conLog('data_detail_absen_current_date', data_detail_absen_current_date);
-        conLog('data_code_data_absensi', data_code_data_absensi);
         let xxx = $('#table-detail-absensi-data').DataTable({
             scrollX: true,
             scrollY: "400px",
@@ -2047,6 +2033,7 @@
 
                 let field_persetujuan = db['db']['database_persetujuan']['KEHADIRAN'];
                 let proses_persetujuan = 'tidak ada';
+                let bg = 'light';
                 if (data_data_persetujuan[row]) {
                     const keys = Object.keys(field_persetujuan);
                     let i = 1;
@@ -2055,83 +2042,123 @@
                         const value = data_data_persetujuan[row][`LEVEL-${i}`];
                         // conLog('field_persetujuan',);
                         if (!value['status']) {
+                            if (value['nrp'] == ui_dataset.ui_dataset.user_authentication.nik_employee) {
+                                bg = 'warning';
+                            }
                             if (proses_persetujuan == 'tidak ada') {
                                 proses_persetujuan = db['public']['public_value'][
                                     'DATABASE-GROUP-PERSETUJUAN'
                                 ][field_persetujuan[`LEVEL-${i}`]['grade']]['GROUP-PERSETUJUAN'];
+
+                                if (value['nrp'] == ui_dataset.ui_dataset.user_authentication.nik_employee) {
+                                    bg = 'warning';
+                                }
                             }
 
                             // break;
+                        } else {
+                            if (value['nrp'] == ui_dataset.ui_dataset.user_authentication.nik_employee) {
+                                bg = 'warning';
+                                if (value['status'] == 'ACC') {
+                                    bg = 'info';
+                                }
+
+                                if (value['status'] == 'DECLINE') {
+                                    bg = 'danger';
+                                }
+                            }
                         }
+
                         i++;
                     }
                 }
 
-                // conLog('asdads',data_ketidakhadiran[row])
 
-                return `<div class="row justify-content-center">
-                            <div class="col-12 row justify-content-center">
-                                <div class="col-md-4 col-sm-12 mb-2">
+                // let is_lower = true;
+
+                // let data_persetujuan_edit = data_data_persetujuan[row];
+                // Object.values(data_persetujuan_edit).forEach(item_persetujuan => {
+                //     if (value['nrp'] == ui_dataset.ui_dataset.user_authentication.nik_employee) {
+                //         if (value['status'] == 'ACC') {
+                //             bg = 'success';
+                //         }
+
+                //         if (value['status'] == 'DECLINE') {
+                //             bg = 'danger';
+                //         }
+                //     }
+                // });
+
+
+                // conLog('BG', bg)
+
+
+                return `<div class="row pd-10">
+                    
+                            <div class="col-12 row">
+                                <div class="col-md-5 col-sm-12 mb-2">
                                     ${emmp(data_ketidakhadiran[row]['nrp'])}
                                 </div>
-                                <div class="col-md-4 col-sm-12 mb-2 pr-20 pl-20">
-                                    <div class="row pd-10 card-box" mb-10>
-                                        <div class="col-10">
-                                            <span class="badge badge-pill badge-sm"
+                                <div class="col-md-7 col-sm-12">
+                                    <div  class="name-avatar bg-${bg} d-flex align-items-center pr-2 card-box row  pl-2">
+                                        <div class="col-12 row ml-1 mt-2 justify-content-between">
+                                            <span class="col-auto badge badge-pill badge-sm"
                                             data-bgcolor="#e7ebf5" data-color="#265ed7"
                                             style="color: rgb(38, 94, 215); background-color: rgb(231, 235, 245);">Proses
                                             di ${proses_persetujuan}</span>
+
+                                            <div class="col-auto text-right">
+                                                <a class="dropdown-toggle no-arrow" href="javascript:;" >
+                                                    <i onclick="ajukanIzin('${row}')" class="icon-copy bi bi-arrow-right"></i>
+                                                </a>
+                                            </div> 
+                                        </div>
+                                        <div class="row col-md-6 col-sm-12">       
+                                            <div class="col-12 row">
+                                                <div class="col-12 font-14 weight-600">${toShortStringDate_fromFormatDate(data_ketidakhadiran[row]['tanggal_mulai'])}, ${r} 
+                                                    |<div class="date">${(data_ketidakhadiran[row]['lama'])?data_ketidakhadiran[row]['lama']:""} Hari</div>
+                                                </div>
+                                                <div class="col-12 font-12 weight-500" >
+                                                    ${db['public']['public_value'][KONSTANTA['DATABASE-JENIS-IZIN']][data_ketidakhadiran[row]['code_jenis_kehadiran']]['JENIS-IZIN']}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row col-md-6 col-sm-12 row">
+                                            <div class="col-5">
+                                                <small class="">
+                                                    Pembayaran
+                                                </small>
+                                            </div>
+                                            <div class="col-7">
+                                                <small class="">
+                                                    <div class="date">${status_pembayaran_upah} (${status_absen_HR})</div>
+                                                </small>
+                                            </div>
+                                            <div class="col-5 d-flex align-items-start">
+                                                <small class="">
+                                                    Dokumen
+                                                </small>
+                                            </div>
+                                            <div class="col-7">
+                                                <small class="">
+                                                    <div class="date"><i class="icon-copy bi bi-file-earmark-pdf"></i></span></div>
+                                                </small>
+                                            </div>
+                                            <div class="col-5 d-flex align-items-start">
+                                                <small class="">
+                                                    Keterangan
+                                                </small>
+                                            </div>
+                                            <div class="col-7 d-flex align-items-start">
+                                                <small class="">
+                                                    <cite class="text-wrap" title="Source Title">${keterangan}</div>
+                                                </small>
+                                            </div> 
+                                        </div>
                                         
-                                            <div class="font-14 weight-600 mt-1">${toShortStringDate_fromFormatDate(data_ketidakhadiran[row]['tanggal_mulai'])}, ${r} 
-                                                |<cite title="Source Title">${(data_ketidakhadiran[row]['lama'])?data_ketidakhadiran[row]['lama']:""} Hari</cite>
-                                            </div>
-                                            <div class="font-12 weight-500" data-color="#b2b1b6"
-                                                style="color: rgb(178, 177, 182);">
-                                                ${db['public']['public_value'][KONSTANTA['DATABASE-JENIS-IZIN']][data_ketidakhadiran[row]['code_jenis_kehadiran']]['JENIS-IZIN']}
-                                            </div>
-                                        </div>   
-                                        <div class="col-2 d-flex justify-content-center align-items-center">
-                                            <a class="dropdown-toggle no-arrow" href="javascript:;" >
-                                                <i onclick="ajukanIzin('${row}')" class="dw dw-settings2"></i>
-                                            </a>
-                                        </div> 
-                                    </div>  
-                                    
+                                    </div>
                                 </div>
-                                <div class="col-md-4 col-sm-12 pr-20 pl-20">
-                                    <div class="row name-avatar  pr-2 card-box pl-2">
-                                        <div class="col-5">
-                                            <small class="text-muted">
-                                                Pembayaran
-                                            </small>
-                                        </div>
-                                        <div class="col-7">
-                                            <small class="text-muted">
-                                                <cite title="Source Title">${status_pembayaran_upah} (${status_absen_HR})</cite>
-                                            </small>
-                                        </div>
-                                        <div class="col-5 d-flex align-items-start">
-                                            <small class="text-muted">
-                                                Dokumen
-                                            </small>
-                                        </div>
-                                        <div class="col-7">
-                                            <small class="text-muted">
-                                                <cite title="Source Title"><i class="icon-copy bi bi-file-earmark-pdf"></i></span></cite>
-                                            </small>
-                                        </div>
-                                        <div class="col-5 d-flex align-items-start">
-                                            <small class="text-muted">
-                                                Keterangan
-                                            </small>
-                                        </div>
-                                        <div class="col-7 d-flex align-items-start">
-                                            <small class="text-muted">
-                                                <cite class="text-wrap" title="Source Title">${keterangan}</cite>
-                                            </small>
-                                        </div> 
-                                </div>
-                                
                             </div>
                         </div>`;
             }
@@ -2142,14 +2169,14 @@
         // 4. data datatable
 
         // 4. data datatable
-        conLog('data_ketidakhadiran', Object.keys(data_ketidakhadiran));
+        let data_kehadiran_table = (data_ketidakhadiran) ? Object.keys(data_ketidakhadiran) : [];
         conLog('ALL data_ketidakhadiran', data_ketidakhadiran);
         // 5. datatable
         $('#table-datatable-persetujuan').DataTable({
             paging: true,
             responsive: true,
             serverSide: false,
-            data: Object.keys(data_ketidakhadiran),
+            data: data_kehadiran_table,
             columns: column_design
         });
         // 5. datatable

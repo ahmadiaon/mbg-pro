@@ -155,8 +155,12 @@ class EmployeeAbsen extends Model
     function getAbsenEmployee(Request $request)
     {
 
-        $filter_absen = $request->default_filter_absensi;
-        $auth_login = $request->header('x-auth-login');
+        $filter_absen = $request->default_filter_absensi; 
+        $auth_login = $request->header('x-auth-login');        
+        $filter_absen['auth_login'] = $auth_login;
+        $user = User::where('auth_login', $auth_login)->first();
+        $filter_absen['nik_employee'] = $user->nik_employee;
+
         $data_to_return['data_ketidakhadiran'] = [];
         $NRP = null;
         $data_absen_return = [];
@@ -167,21 +171,18 @@ class EmployeeAbsen extends Model
 
 
         if (!empty($filter_absen['from'])) {
-            $user = User::where('auth_login', $auth_login)->first();
-            $NRP = $user->nik_employee;
             $filter_absen['KARYAWAN'] = [$NRP];
-            $Q_data_absensi = $Q_data_absensi->where('employee_absens.employee_uuid', $user->nik_employee);
+            $Q_data_absensi = $Q_data_absensi->where('employee_absens.employee_uuid', $filter_absen['nik_employee']);
         }
 
         $Q_data_absensi = $Q_data_absensi->get();
 
-
-        // return ResponseFormatter::ResponseJson($Q_data_absensi, 'All Absensi Data', 200);
-
-
-
         foreach ($Q_data_absensi as $absensi) {
             $arr_data_absen[$absensi->employee_uuid][$absensi->date] = $absensi;
+        }
+        $data_to_return['data_absensi'][$filter_absen['nik_employee']] = [];
+        if(!empty($arr_data_absen[$filter_absen['nik_employee']])){
+            $data_to_return['data_absensi'][$filter_absen['nik_employee']] = $arr_data_absen[$filter_absen['nik_employee']];
         }
         if (!empty($filter_absen['KARYAWAN'])) {
             foreach ($filter_absen['KARYAWAN'] as $I_karyawan) {
@@ -190,34 +191,22 @@ class EmployeeAbsen extends Model
                 }
             }
         }
+        $data_to_return['data_ketidakhadiran'] = [];
+        $data_ketidakhadiran =  DatabaseDataKehadiran::getData($filter_absen);
 
+        if(!empty($data_ketidakhadiran[$filter_absen['nik_employee']])){
+            $data_to_return['data_ketidakhadiran'][] =  array_merge($data_to_return['data_ketidakhadiran'], $data_ketidakhadiran[$filter_absen['nik_employee']]);
+        }
 
-
-        if (!empty($filter_absen['from'])) {
-            $user = User::where('auth_login', $auth_login)->first();
-
-            $data_to_return['data_ketidakhadiran'] = DatabaseDataKehadiran::getData($user->nik_employee);
-            if ($data_to_return['data_ketidakhadiran']) {
-                $data_to_return['data_ketidakhadiran'] = $data_to_return['data_ketidakhadiran'][$user->nik_employee];
-            }
-
-
-            $data_to_return['data_persetujuan'] = DatabaseDataPersetujuan::getDataPersetujuan('KEHADIRAN', null);
-            // return ResponseFormatter::ResponseJson($data_to_return, 'Success', 200);
-        } else {
-
-            $data_ketidakhadiran = DatabaseDataKehadiran::getData();
-
-            if ($data_ketidakhadiran) {
-                foreach ($filter_absen['KARYAWAN'] as $I_karyawan) {
-                    if (!empty($data_ketidakhadiran[$I_karyawan])) {
-                        $data_to_return['data_ketidakhadiran'] =  array_merge($data_to_return['data_ketidakhadiran'], $data_ketidakhadiran[$I_karyawan]);
-                    }
+        if ($data_ketidakhadiran) {
+            foreach ($filter_absen['KARYAWAN'] as $I_karyawan) {
+                if (!empty($data_ketidakhadiran[$I_karyawan])) {
+                    $data_to_return['data_ketidakhadiran'] =  array_merge($data_to_return['data_ketidakhadiran'], $data_ketidakhadiran[$I_karyawan]);
                 }
             }
-
-            $data_to_return['data_persetujuan'] = DatabaseDataPersetujuan::getDataPersetujuan('KEHADIRAN', null);
         }
+
+        $data_to_return['data_persetujuan'] = DatabaseDataPersetujuan::getDataPersetujuan('KEHADIRAN', null);
 
 
         // return ResponseFormatter::ResponseJson(count($data_to_return['data_absensi']), 'All Absensi Data', 200);

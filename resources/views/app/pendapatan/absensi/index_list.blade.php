@@ -47,6 +47,10 @@
                 </div>
             </div>
         </div>
+        
+        <div class="row col-md-6 col-sm-12">
+        </div>  
+        
         <div id="the-table" class="row pd-20">
             <div class="col-md-5 card-box pt-10 mb-10">
                 <h5 class="mb-20 h5 text-blue">Total Absensi</h5>
@@ -296,27 +300,6 @@
                                         </div>
                 `);
 
-            // create header table                    
-            // header_table_field.forEach(element => {
-            //     header_table_element = `
-            //     $ {
-            //         header_table_element
-            //     } < th > $ {
-            //         element
-            //     } < /th>`
-            // });
-            // header_table_element = `                    
-            //                 <table id="table-datatable" class="nowrap stripe hover table" style="width:100%">
-            //                     <thead>
-            //                         <tr>
-            //                             ${header_table_element}
-            //                         </tr>
-            //                     </thead>
-            //                 </table>
-            //             `;
-            // $('#datatable-data').append(header_table_element);
-
-
             var employees_card_element = {
                 mRender: function(data, type, row) {
                     let value_return;
@@ -331,6 +314,7 @@
             let data_datatable = [];
 
             default_filter_absensi.from = 'EMPLOYEE';
+            conLog('default_filter_absensi', default_filter_absensi);
 
             $.ajax({
                 url: '/web/pengelolaan/absensi/getAbsenEmployee',
@@ -346,7 +330,7 @@
                     conLog('response', response);
                     data_absensi = null;
                     count_absensi = {};
-                    
+
                     detail_absensi = response['data']['data_absensi']
                     data_ketidakhadiran = response['data']['data_ketidakhadiran'];
                     data_data_persetujuan = response['data']['data_persetujuan'];
@@ -408,8 +392,6 @@
                                 }
 
 
-
-
                                 $('#row-absen').append(`
                                         <div class="col-auto py-1">
                                             <div class="card-box card-box px-2 mb-10">
@@ -433,15 +415,6 @@
 
                         }
                     }
-
-
-                    // $('#table-datatable').DataTable({
-                    //     paging: true,
-                    //     responsive: true,
-                    //     serverSide: false,
-                    //     data: [],
-                    //     columns: row_data_datatable
-                    // });
                     $('#total-absensi').empty();
 
                     let count_range_date = parseInt(countBetweenDate(new Date(default_filter_absensi

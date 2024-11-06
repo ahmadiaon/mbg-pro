@@ -261,6 +261,7 @@ class UserController extends Controller
         }
 
 
+        
 
         $Q_data_DatabaseFieldShow = DatabaseFieldShow::get();
         $dataDatabaseFieldShow = [];
@@ -306,8 +307,6 @@ class UserController extends Controller
             }
         }
 
-
-
         $data_public = [];
         foreach ($data_table as $code_table_parent => $table_parent) {
             //     $field_table_parent = [];
@@ -351,6 +350,8 @@ class UserController extends Controller
                 }
             }
         }
+        // return $data_public['public_value'];
+
         // }
 
         $data_gabungan = [];
@@ -378,6 +379,10 @@ class UserController extends Controller
                 }
             }
         }
+
+        
+        
+        // return $data_public['public_value'];
         // $data_public['KARYAWAN'];
         $arr_employee = [];
         $data_filter = [];

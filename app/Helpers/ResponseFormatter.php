@@ -275,13 +275,13 @@ class ResponseFormatter
   public static function getEndDayFromDate($year_month)
   {
     $datetime = Carbon::parse('2024-07-15');
-    $day_month = Carbon::parse($year_month)->endOfMonth()->isoFormat('YY-MM-DD');
+    $day_month = Carbon::parse($year_month)->endOfMonth()->isoFormat('YYYY-MM-DD');
     return $day_month;
   }
   public static function getStartDayFromDate($year_month)
   {
     // Parse the provided year and month and get the first day of the month
-    $first_day_month = Carbon::parse($year_month)->startOfMonth()->isoFormat('YY-MM-DD');
+    $first_day_month = Carbon::parse($year_month)->startOfMonth()->isoFormat('YYYY-MM-DD');
     return $first_day_month;
   }
 
