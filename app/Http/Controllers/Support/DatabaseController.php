@@ -879,6 +879,7 @@ class DatabaseController extends Controller
 
             $table_arr = [];
             $field_arr = [];
+            $ARR_ALL = [];
 
             while ($sheet->getCell($abjads[$loop_col] . '2')->getValue() != null) {
                 $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
@@ -999,10 +1000,11 @@ class DatabaseController extends Controller
                                 'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                            ], [
+                            ], 
                                 $for_users
-                            ]);
+                            );
                         }
+                        $ARR_ALL[$row_to_insert['KARYAWAN']['NRP']] = $for_users;
                     }
                 }
             }
@@ -1032,7 +1034,9 @@ class DatabaseController extends Controller
                 }
             }
 
-            return ResponseFormatter::ResponseJson($arr_data_insert, 'store data from importDatatable', 200);
+
+
+            return ResponseFormatter::ResponseJson($ARR_ALL, 'store data from importDatatable', 200);
         } catch (Exception $e) {
             // $error_code = $e->errorInfo[1];
             return ResponseFormatter::ResponseJson($e, 'store data from importDatatable err', 200);

@@ -191,17 +191,20 @@ class EmployeeAbsen extends Model
                 }
             }
         }
+        $data_data_ketidakhadiran = [];
         $data_to_return['data_ketidakhadiran'] = [];
-        $data_ketidakhadiran =  DatabaseDataKehadiran::getData($filter_absen);
+        $data_data_ketidakhadiran =  DatabaseDataKehadiran::getData($filter_absen);//[nrp][code]
 
-        if(!empty($data_ketidakhadiran[$filter_absen['nik_employee']])){
-            $data_to_return['data_ketidakhadiran'][] =  array_merge($data_to_return['data_ketidakhadiran'], $data_ketidakhadiran[$filter_absen['nik_employee']]);
+
+        // return ResponseFormatter::ResponseJson($data_data_ketidakhadiran, 'All Absensi Data', 200);
+        if(!empty($data_data_ketidakhadiran[$filter_absen['nik_employee']])){
+            $data_to_return['data_ketidakhadiran'] =  array_merge($data_to_return['data_ketidakhadiran'], $data_data_ketidakhadiran[$filter_absen['nik_employee']]);
         }
 
-        if ($data_ketidakhadiran) {
+        if ($data_data_ketidakhadiran) {
             foreach ($filter_absen['KARYAWAN'] as $I_karyawan) {
-                if (!empty($data_ketidakhadiran[$I_karyawan])) {
-                    $data_to_return['data_ketidakhadiran'] =  array_merge($data_to_return['data_ketidakhadiran'], $data_ketidakhadiran[$I_karyawan]);
+                if (!empty($data_data_ketidakhadiran[$I_karyawan])) {
+                    $data_to_return['data_ketidakhadiran'] =  array_merge($data_to_return['data_ketidakhadiran'], $data_data_ketidakhadiran[$I_karyawan]);
                 }
             }
         }
