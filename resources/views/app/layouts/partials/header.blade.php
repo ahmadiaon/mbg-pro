@@ -4,6 +4,13 @@
     </div>
     <div class="header-right">
         <div class="dashboard-setting user-notification">
+            <div class="dropdown">
+                <a class="dropdown-toggle no-arrow" href="javascript:;" data-toggle="right-sidebar">
+                    <i class="dw dw-settings2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-setting user-notification">
                 <a class="badge badge-secondary btn-general-filter" href="javascript:;" id="btn-general-filter" >
                     Filter <i class="icon-copy bi bi-funnel"></i>
                 </a>
@@ -43,6 +50,33 @@
                     <a class="dropdown-item" href="/web/profile"><i class="dw dw-user1"></i> Profile</a>
                     <a class="dropdown-item" href="/web/logout"><i class="dw dw-logout"></i> Log Out</a>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="right-sidebar">
+    <div class="sidebar-title">
+        <h3 class="weight-600 font-16 text-blue">
+            Layout Settings
+            <span class="btn-block font-weight-400 font-12"
+                >User Interface Settings</span
+            >
+        </h3>
+        <div class="close-sidebar" data-toggle="right-sidebar-close">
+            <i class="icon-copy ion-close-round"></i>
+        </div>
+    </div>
+    <div class="right-sidebar-body customscroll">
+        <div class="right-sidebar-body-content">
+           <div class="header-filter">
+            
+           </div>
+
+            <div class="reset-options pt-30 text-center">
+                <button class="btn btn-danger" id="reset-settings">
+                    Reset Settings
+                </button>
             </div>
         </div>
     </div>

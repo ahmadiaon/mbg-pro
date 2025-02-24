@@ -130,8 +130,8 @@
     }
 
     if (localStorage.getItem('default_filter_absensi')) {
-        conLog('default_filter_absensi dari local', default_filter_absensi)
         default_filter_absensi = getLocalStorage('default_filter_absensi');
+        conLog('default_filter_absensi dari local', default_filter_absensi)
     }
 
 
@@ -3087,7 +3087,8 @@
 
         default_filter_absensi[name_filter] = arr_checkbox_filter;
         setLocalStorage('default_filter_absensi', default_filter_absensi);
-
+        conLog('local local local',getLocalStorage('default_filter_absensi')) ;
+        conLog('default_filter_absensi', default_filter_absensi)
         conLog('name_filter', name_filter)
         conLog('arr_checkbox_filter', arr_checkbox_filter)
 

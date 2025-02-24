@@ -960,6 +960,10 @@ Route::middleware(['islogin'])->group(function () {
 
 Route::middleware(['webIsLogin'])->group(function () {
     Route::prefix('/web')->group(function () {
+        // 1. FILE
+        Route::prefix('/file')->group(function () {
+            Route::get('/', [DatabaseController::class, 'file']);
+        });
 
         Route::prefix('/data')->group(function () {
             Route::post('/employee', [UserController::class, 'getfull']);

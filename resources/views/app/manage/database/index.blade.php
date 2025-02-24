@@ -84,7 +84,7 @@
         </div>
     </div>
     <div class="row pd-20">
-        <div id="form-parent" class="pd-20 card-box mb-30 col-md-7 col-sm-12">
+        <div id="form-parent" class="pd-20 card-box mb-30 col-md-6 col-sm-12">
             <div class="clearfix mb-10">
                 <div class="pull-left">
                     <h4 id="table-description" class="text-blue h4">Field Form</h4>
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <div class="faq-wrap col-md-7 col-sm-12" hidden>
+        <div class="faq-wrap col-md-6 col-sm-12" hidden>
             <h4 class="mb-20 h4 text-blue">Sub Form</h4>
             <div id="sub-form">
 
@@ -467,8 +467,6 @@
             refreshTableData(valTable)
             CL(valTable);
         }
-
-        conLog('dasdsa', @JSON(session('user_authentication')))
 
         function storeFieldShow() {
             let arr_checkbox_filter = [];

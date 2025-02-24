@@ -22,6 +22,12 @@
                         <span class="micon bi bi-app"></span><span class="mtext">Menu</span>
                     </a>
                 </li>
+                <li>
+                    <a href="/web/file" id="file" class="dropdown-toggle no-arrow">
+                        {{-- <i class="icon-copy bi bi-app"></i> --}}
+                        <span class="micon bi bi-files"></span><span class="mtext">FILE</span>
+                    </a>
+                </li>
 
 
                 @if (session('user_authentication')['role'] > 1)

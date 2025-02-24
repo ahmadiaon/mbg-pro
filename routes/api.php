@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('recruitment')->group(function () {
     Route::post('store', [RecruitmentController::class, 'store']);
+    Route::post('cek-rekruitment', [RecruitmentController::class, 'getDataRecruitment']);
     Route::post('get', [RecruitmentController::class, 'getData']);
 });
 

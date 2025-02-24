@@ -111,14 +111,19 @@ class EmployeeAbsen extends Model
 
                 // CLEAR NULL INDEX
                 $DATA_ABSENSIES = array_filter($DATA_ABSENSIES);
-                $data_return[]=$DATA_ABSENSIES;
-                $store = EmployeeAbsen::updateOrCreate(
-                    [
-                        'employee_uuid'  => $DATA_ABSENSIES['employee_uuid'],
-                        'date' => ResponseFormatter::excelToDate($DATA_ABSENSIES['date']),
-                    ],
-                    $DATA_ABSENSIES
-                );
+                $data_return[] = $DATA_ABSENSIES;
+                if (!empty($DATA_ABSENSIES['status_absen_uuid'])) {
+
+                    if ($DATA_ABSENSIES['status_absen_uuid'] != "-") {
+                        $store = EmployeeAbsen::updateOrCreate(
+                            [
+                                'employee_uuid'  => $DATA_ABSENSIES['employee_uuid'],
+                                'date' => ResponseFormatter::excelToDate($DATA_ABSENSIES['date']),
+                            ],
+                            $DATA_ABSENSIES
+                        );
+                    }
+                }
             }
         }
         return $data_return;
@@ -130,17 +135,19 @@ class EmployeeAbsen extends Model
         $period = CarbonPeriod::create($data['date_start'], $data['date_end']);
 
         foreach ($period as $date) {
-            $store_employee_absen = EmployeeAbsen::updateOrCreate(
-                [
-                    'employee_uuid'  => $data['NRP'],
-                    'date' => $date->toDateString() . PHP_EOL,
-                ],
-                [
-                    'uuid' => $date->toDateString() . PHP_EOL . '-' . $data['NRP'],
-                    'status_absen_uuid'     => $data['status_absen_uuid'],
-                    'shift'     => 'S1',
-                ]
-            );
+            if ($data['status_absen_uuid'] != '-') {
+                $store_employee_absen = EmployeeAbsen::updateOrCreate(
+                    [
+                        'employee_uuid'  => $data['NRP'],
+                        'date' => $date->toDateString() . PHP_EOL,
+                    ],
+                    [
+                        'uuid' => $date->toDateString() . PHP_EOL . '-' . $data['NRP'],
+                        'status_absen_uuid'     => $data['status_absen_uuid'],
+                        'shift'     => 'S1',
+                    ]
+                );
+            }
         }
     }
 
@@ -155,8 +162,8 @@ class EmployeeAbsen extends Model
     function getAbsenEmployee(Request $request)
     {
 
-        $filter_absen = $request->default_filter_absensi; 
-        $auth_login = $request->header('x-auth-login');        
+        $filter_absen = $request->default_filter_absensi;
+        $auth_login = $request->header('x-auth-login');
         $filter_absen['auth_login'] = $auth_login;
         $user = User::where('auth_login', $auth_login)->first();
         $filter_absen['nik_employee'] = $user->nik_employee;
@@ -175,13 +182,13 @@ class EmployeeAbsen extends Model
             $Q_data_absensi = $Q_data_absensi->where('employee_absens.employee_uuid', $filter_absen['nik_employee']);
         }
 
-        $Q_data_absensi = $Q_data_absensi->get();
+        $Q_data_absensi = $Q_data_absensi->get(['employee_uuid', 'absen_description', 'cek_log', 'date', 'entry', 'mid', 'exit', 'late_minutes', 'late_points', 'shift', 'status_absen_uuid', 'working_hours', 'uuid']);
 
         foreach ($Q_data_absensi as $absensi) {
             $arr_data_absen[$absensi->employee_uuid][$absensi->date] = $absensi;
         }
         $data_to_return['data_absensi'][$filter_absen['nik_employee']] = [];
-        if(!empty($arr_data_absen[$filter_absen['nik_employee']])){
+        if (!empty($arr_data_absen[$filter_absen['nik_employee']])) {
             $data_to_return['data_absensi'][$filter_absen['nik_employee']] = $arr_data_absen[$filter_absen['nik_employee']];
         }
         if (!empty($filter_absen['KARYAWAN'])) {
@@ -191,13 +198,14 @@ class EmployeeAbsen extends Model
                 }
             }
         }
+
         $data_data_ketidakhadiran = [];
         $data_to_return['data_ketidakhadiran'] = [];
-        $data_data_ketidakhadiran =  DatabaseDataKehadiran::getData($filter_absen);//[nrp][code]
+        $data_data_ketidakhadiran =  DatabaseDataKehadiran::getData($filter_absen); //[nrp][code]
 
 
         // return ResponseFormatter::ResponseJson($data_data_ketidakhadiran, 'All Absensi Data', 200);
-        if(!empty($data_data_ketidakhadiran[$filter_absen['nik_employee']])){
+        if (!empty($data_data_ketidakhadiran[$filter_absen['nik_employee']])) {
             $data_to_return['data_ketidakhadiran'] =  array_merge($data_to_return['data_ketidakhadiran'], $data_data_ketidakhadiran[$filter_absen['nik_employee']]);
         }
 
@@ -211,8 +219,9 @@ class EmployeeAbsen extends Model
 
         $data_to_return['data_persetujuan'] = DatabaseDataPersetujuan::getDataPersetujuan('KEHADIRAN', null);
 
-
         // return ResponseFormatter::ResponseJson(count($data_to_return['data_absensi']), 'All Absensi Data', 200);
-        return ResponseFormatter::ResponseJson($data_to_return, 'All Absensi Data', 200);
+        return ResponseFormatter::ResponseJson($data_to_return, 'All Absensi Dataaaaaaaaaaa', 200);
+
+        return ResponseFormatter::ResponseJson(json_encode($data_to_return), 'All Absensi Data', 200);
     }
 }

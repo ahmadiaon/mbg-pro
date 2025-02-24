@@ -88,6 +88,21 @@ class DatabaseController extends Controller
         ]);
     }
 
+    public function file()
+    { //use
+        $layout = [
+            'head_datatable'        => true,
+            'javascript_datatable'  => true,
+            'head_form'             => true,
+            'javascript_form'       => true,
+            'active'                        => 'employees-index'
+        ];
+        return view('application.file', [
+            'title'         => 'Apps',
+            'layout'    => $layout
+        ]);
+    }
+
 
     public function indexData()
     {
@@ -101,21 +116,44 @@ class DatabaseController extends Controller
 
     public function getTableData($code_table)
     {
+        //1.0 GET table properties
         $Q_table = DatabaseTable::where('code_table', $code_table)->get();
+        $data_return = [];
         $data_table = [];
         $data_table_child = [];
         foreach ($Q_table as $table) {
             // $data_table['table'] = $table;
             $data_table['all_table'][$table->code_table] = $table;
             $data_table['the_table'] = $table;
+            $data_return['table'] = $table;
         }
 
 
+        
+
+        // 1.1 GET Fields
         $Q_field = DatabaseField::where('code_table_field', $code_table)->get();
         foreach ($Q_field as $field) {
             // $data_table['fields'][$field->code_field] = $field;
             $data_table['all_fields'][$field->full_code_field] = $field;
+            $data_return['fields'][$field->code_table_field] = $field;
         }
+
+
+        // 2.0 GET data
+        $Q_data_table = DatabaseData::where('code_table_data', $code_table)->whereNull('date_end')->get([
+            'code_table_data','code_field_data','value_data','code_data','uuid_data'
+        ]);
+
+        $data_datatables = [];
+        foreach ($Q_data_table  as $data_datatable) {
+            $data_datatables[$data_datatable->code_data][$data_datatable->code_field_data] =   $data_datatable;
+            $data_table['the_data'][$data_datatable->uuid_data][$data_datatable->code_field_data] =  $data_datatable;
+        }
+        $data_return['data_tables'] = $data_datatables;
+        
+
+        return ResponseFormatter::ResponseJson($data_return, 'Success Get '.$code_table, 200);
 
         $Q_table = DatabaseTable::where('parent_table', $code_table)->get();
         foreach ($Q_table as $table) {
@@ -148,7 +186,7 @@ class DatabaseController extends Controller
 
         $data_table['the_template'] = null;
 
-        return ResponseFormatter::ResponseJson($data_table, 'Success get data', 200);
+        return ResponseFormatter::ResponseJson($data_table, 'Success Get '.$code_table, 200);
     }
 
     public function storeTemplate(Request $request)
@@ -176,7 +214,7 @@ class DatabaseController extends Controller
         return ResponseFormatter::ResponseJson($dataUserTemplate, 'success from storeTemplate DatabaseController', 200);
     }
 
-    public function storeDataFile(Request $request)//store slip
+    public function storeDataFile(Request $request) //store slip
     {
         // return ResponseFormatter::ResponseJson($request->all(), 'kosong', 200);
         $parent_path = 'file/database/';
@@ -296,7 +334,7 @@ class DatabaseController extends Controller
                     $request['TANGGAL-PENGAJUAN'] = Carbon::today()->format('Y-m-d');
                 }
                 $uuid_data = $code_data = $request['NRP'] . '-' . $request['TANGGAL-MULAI'];
-                if($request['uuid_data']){
+                if ($request['uuid_data']) {
                     $uuid_data = $code_data = $request['uuid_data'];
                 }
                 $file_name_change = null;
@@ -383,7 +421,7 @@ class DatabaseController extends Controller
             default:
 
                 $date_start =  Carbon::now()->format('Y-m-d');
-                
+
                 $data_database_datatable_data = $data_database_datatable;
 
                 unset($data_database_datatable_data['uuid_data']);
@@ -424,7 +462,7 @@ class DatabaseController extends Controller
                     $AA = DatabaseData::where('code_data', ResponseFormatter::toUUID($data_database_datatable[$request['data_table']['primary_table']]))
                         ->where('code_table_data',  $request['data_table']['code_table'])->update(['date_end' => Carbon::now()->format('Y-m-d')]);
                 }
-                if($request->code_table == 'DATA-SHIFT-KARYAWAN'){
+                if ($request->code_table == 'DATA-SHIFT-KARYAWAN') {
                     $date_start = $data_database_datatable_data['TANGGAL-MULAI'];
                 }
 
@@ -443,7 +481,7 @@ class DatabaseController extends Controller
                                 'value_data' => $value,
                                 'code_data' => ResponseFormatter::toUUID($data_database_datatable[$data_database_datatable['data_table']['primary_table']]),
                                 'uuid_data' => $uuid_data,
-                                'date_start' => $date_start ,
+                                'date_start' => $date_start,
                                 'date_end' => null,
                             ]
                         );
@@ -540,24 +578,24 @@ class DatabaseController extends Controller
                         ]);
                     }
 
-                    if (empty($data_database_datatable_data['NIK-KTP'])) {
-                        $data_database_datatable_data['NIK-KTP'] = "password";
+                    // if (empty($data_database_datatable_data['NIK-KTP'])) {
+                    //     $data_database_datatable_data['NIK-KTP'] = "password";
 
-                        $store_data = DatabaseData::updateOrCreate(
-                            [
-                                'uuid_data' => $uuid_data,
-                                'code_table_data' => 'IDENTITAS-KARYAWAN',
-                                'code_field_data' => "NIK-KTP",
-                            ],
-                            [
-                                'value_data' => "password",
-                                'code_data' => $NRP,
-                                'uuid_data' => $uuid_data,
-                                'date_start' => Carbon::now()->format('Y-m-d'),
-                                'date_end' => null,
-                            ]
-                        );
-                    }
+                    //     $store_data = DatabaseData::updateOrCreate(
+                    //         [
+                    //             'uuid_data' => $uuid_data,
+                    //             'code_table_data' => 'IDENTITAS-KARYAWAN',
+                    //             'code_field_data' => "NIK-KTP",
+                    //         ],
+                    //         [
+                    //             'value_data' => "password",
+                    //             'code_data' => $NRP,
+                    //             'uuid_data' => $uuid_data,
+                    //             'date_start' => Carbon::now()->format('Y-m-d'),
+                    //             'date_end' => null,
+                    //         ]
+                    //     );
+                    // }
                 }
 
                 return ResponseFormatter::ResponseJson($data_database_datatable_data, "store database 2", 200);
@@ -881,33 +919,40 @@ class DatabaseController extends Controller
             $field_arr = [];
             $ARR_ALL = [];
 
-            while ($sheet->getCell($abjads[$loop_col] . '2')->getValue() != null) {
-                $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
-                if (!in_array($table_code, $table_arr)) {
-                    $table_arr[] = $table_code;
-                }
 
-                $field_code = ResponseFormatter::toUUID($sheet->getCell($abjads[$loop_col] . '1')->getValue());
-                $column_fields['excel_properties'][$table_code][] = $field_code;
-                if (!empty($database_datatable['database_field'][$table_code])) {
-                    if (!empty($database_datatable['database_field'][$table_code][$field_code])) {
-                        if (!in_array($field_code, $field_arr)) {
-                            $field_arr[] = $field_code;
-                        }
-                        $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
-                        // return ResponseFormatter::ResponseJson($table_code, $field_code, 200);
-                        $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
-                        $column_fields['index_column'][$abjads[$loop_col]]['type_data_field'] = $db['db']['database_field'][$table_code][$field_code]['type_data_field'];
-                        $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
-                        if (!empty($database_datatable['database_data_source'][$table_code . '-' . $field_code])) { //jika ada di data source
-                            $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = true;
+            // 1. MENGAMBIL TABEL APA SAJA YANG IMPORT
+                while ($sheet->getCell($abjads[$loop_col] . '1')->getValue() != null) {
+                    $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
+
+                    if (!in_array($table_code, $table_arr)) {
+                        $table_arr[] = $table_code;
+                    }
+
+                    $field_code = ResponseFormatter::toUUID($sheet->getCell($abjads[$loop_col] . '1')->getValue());
+
+                    $column_fields['excel_properties'][$table_code][] = $field_code;
+
+                    if (!empty($database_datatable['database_field'][$table_code])) {
+                        if (!empty($database_datatable['database_field'][$table_code][$field_code])) {
+                            if (!in_array($field_code, $field_arr)) {
+                                $field_arr[] = $field_code;
+                            }
+
+                            $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
+                            $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
+                            $column_fields['index_column'][$abjads[$loop_col]]['type_data_field'] = $db['db']['database_field'][$table_code][$field_code]['type_data_field'];
+                            $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
+
+                            if (!empty($database_datatable['database_data_source'][$table_code . '-' . $field_code])) { //jika ada di data source
+                                $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = true;
+                            }
                         }
                     }
+                    $loop_col++;
                 }
-                $loop_col++;
-            }
+            // 1. MENGAMBIL TABEL APA SAJA YANG IMPORT
 
-            // return ResponseFormatter::ResponseJson($column_fields, 'column_fields', 200);
+
             $i = 3;
             while ($sheet->getCell('A' . $i)->getValue() != null) {
                 $uuid_data = Str::uuid();
@@ -991,16 +1036,37 @@ class DatabaseController extends Controller
                                 'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                 'password' => Hash::make($row_to_insert['IDENTITAS-KARYAWAN']['NIK-KTP']),
                                 'role' => $row_to_insert['KONTRAK-KARYAWAN']['GRADE'],
-                                'email' => (!empty($row_to_insert['IDENTITAS-KARYAWAN']['EMAIL']))?$row_to_insert['IDENTITAS-KARYAWAN']['EMAIL']:null,
-                                'phone_number' => (!empty($row_to_insert['IDENTITAS-KARYAWAN']['NO-HP']))?$row_to_insert['IDENTITAS-KARYAWAN']['NO-HP']:null,
+                                'email' => (!empty($row_to_insert['IDENTITAS-KARYAWAN']['EMAIL'])) ? $row_to_insert['IDENTITAS-KARYAWAN']['EMAIL'] : null,
+                                'phone_number' => (!empty($row_to_insert['IDENTITAS-KARYAWAN']['NO-HP'])) ? $row_to_insert['IDENTITAS-KARYAWAN']['NO-HP'] : null,
                             ];
 
+                            // 10. MEMBUAT ID FINGGER
+                                // $NRP = ;
+                                // $ID_FINGER = ;
+                                // $Q_store_data = DatabaseData::updateOrCreate(
+                                //     [
+                                //         'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER', //table data source
+                                //         'code_field_data' => 'ID-FINGGER',
+                                //         'code_data' => $NRP.'-'.$ID_FINGER, //GABUNGAN NRP+ID
+                                //         'uuid_data' => ,
+                                //     ],
+                                //     [
+                                //         'value_data' => $data_insert['value_data'],
+                                //         'date_start' => Carbon::now()->format('Y-m-d'),
+                                //         'date_end' => null,
+                                //     ]
+                                // );
+
+
+                            // 10. MEMBUAT ID FINGGER
+
                             $for_users = array_filter($for_users);
-                            User::updateOrCreate([
-                                'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                                'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                                'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                            ], 
+                            User::updateOrCreate(
+                                [
+                                    'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                    'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                    'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                ],
                                 $for_users
                             );
                         }
@@ -1008,33 +1074,37 @@ class DatabaseController extends Controller
                     }
                 }
             }
-            if (in_array('PHK-KARYAWAN', $table_arr)) {
-                if (in_array('TANGGAL-BERAKHIR-KONTRAK--TBK-', $field_arr)) {
-                    if(!empty($row_to_insert['PHK-KARYAWAN'])){
+            // 11. JIKA KARYAWAN PHK
+                // 11.1 ADD ABSENSI X
+                if (in_array('PHK-KARYAWAN', $table_arr)) {
+                    if (in_array('TANGGAL-BERAKHIR-KONTRAK--TBK-', $field_arr)) {
+                        if (!empty($row_to_insert['PHK-KARYAWAN'])) {
+                            $data_absen = [
+                                'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'date_start' =>  $row_to_insert['PHK-KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
+                                'date_end' => ResponseFormatter::getEndDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
+                                'status_absen_uuid' => 'X'
+                            ];
+                            EmployeeAbsen::storeAbsen($data_absen);
+                        }
+                    }
+                }
+            // 11. JIKA KARYAWAN PHK
+            
+            // 12. ADA DATA KARYAWAN
+                // 12.1 MENAMBAHKAN ABSENSI X KE TANGGAL SEBELUM MASUK
+                if (in_array('KARYAWAN', $table_arr)) {
+                    if (in_array('TANGGAL-MASUK-KERJA--TMK-', $field_arr)) {
                         $data_absen = [
                             'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                            'date_start' =>  $row_to_insert['PHK-KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
-                            'date_end' => ResponseFormatter::getEndDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
+                            'date_start' =>  ResponseFormatter::getStartDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-']),
+                            'date_end' => $row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-'],
                             'status_absen_uuid' => 'X'
                         ];
                         EmployeeAbsen::storeAbsen($data_absen);
-                    }                    
+                    }
                 }
-            }
-
-            if (in_array('KARYAWAN', $table_arr)) {
-                if (in_array('TANGGAL-MASUK-KERJA--TMK-', $field_arr)) {
-                    $data_absen = [
-                        'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                        'date_start' =>  ResponseFormatter::getStartDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-']),
-                        'date_end' => $row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-'],
-                        'status_absen_uuid' => 'X'
-                    ];
-                    EmployeeAbsen::storeAbsen($data_absen);
-                }
-            }
-
-
+            // 12. ADA DATA KARYAWAN
 
             return ResponseFormatter::ResponseJson($ARR_ALL, 'store data from importDatatable', 200);
         } catch (Exception $e) {

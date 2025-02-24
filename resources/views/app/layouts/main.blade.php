@@ -181,6 +181,18 @@
 
 
     @yield('src_css')
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
     <script src="/vendors/scripts/core.js"></script>
     <script src="/vendors/scripts/Chart.js"></script>
     <script src="/vendors/scripts/script.min.js"></script>
@@ -195,6 +207,7 @@
     <script src="/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
     <script src="/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
     <script src="/vendors/scripts/datatable-setting.js"></script>
+
 </head>
 
 <body>
@@ -222,7 +235,8 @@
                                 <div class="spinner-grow text-primary refresh-data" role="status">
                                     <span class="sr-only">Loading...</span>
                                 </div>
-                                <button type="button" onclick="refreshSession()" class="btn btn-primary">Refresh Database</button>
+                                <button type="button" onclick="refreshSession()" class="btn btn-primary">Refresh
+                                    Database</button>
                             </div>
                         </div>
 
@@ -337,7 +351,8 @@
                                     tabindex="-98">
                                     <optgroup label="Condiments">
                                         <option id="status-karyawan-AKTIVE" value="AKTIVE">Aktive</option>
-                                        <option id="status-karyawan-PHK-BULAN-INI" value="PHK-BULAN-INI">PHK Bulan ini</option>
+                                        <option id="status-karyawan-PHK-BULAN-INI" value="PHK-BULAN-INI">PHK Bulan ini
+                                        </option>
                                         <option id="status-karyawan-PHK" value="PHK">PHK</option>
                                     </optgroup>
                                 </select>
@@ -607,7 +622,7 @@
 
 
 
-    {{-- filter data modal filter absensi_filter--}}
+    {{-- filter data modal filter absensi_filter --}}
     <div class="modal fade customscroll" id="modal-general-filter" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -615,8 +630,9 @@
                     <h5 class="modal-title" id="filter-table-name">
                         Filter Driver
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip"
-                        data-placement="bottom" title="" data-original-title="Close Modal">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        data-toggle="tooltip" data-placement="bottom" title=""
+                        data-original-title="Close Modal">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -741,11 +757,11 @@
             $('.maincontent').removeAttr("hidden");
             $('.maincontent').show();
 
-            if(ui_dataset.ui_dataset.user_authentication.role == 1){
-                
+            if (ui_dataset.ui_dataset.user_authentication.role == 1) {
+
                 $('#btn-general-filter').hide();
             }
-        $(".e-general-filter").hide();
+            $(".e-general-filter").hide();
             $("#btn-general-filter").click(function() {
                 $(".e-general-filter").toggle();
 
@@ -759,8 +775,9 @@
             });
 
             $('#FILTER-RANGE').val(setRangeDate(formatDate(start), formatDate(end))).trigger(
-            'change');
-            setUIdate(ui_dataset.ui_dataset.ui_date.year, ui_dataset.ui_dataset.ui_date.month, ui_dataset.ui_dataset.ui_date.day);
+                'change');
+            setUIdate(ui_dataset.ui_dataset.ui_date.year, ui_dataset.ui_dataset.ui_date.month, ui_dataset.ui_dataset
+                .ui_date.day);
             @yield('js_ready')
             stopLoading();
         });

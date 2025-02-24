@@ -59,6 +59,7 @@
                                         <a class="dropdown-item" onclick="refreshTable('2022',null)" href="#">2022</a>
                                         <a class="dropdown-item" onclick="refreshTable('2023',null)" href="#">2023</a>
                                         <a class="dropdown-item" onclick="refreshTable('2024',null)" href="#">2024</a>
+                                        <a class="dropdown-item" onclick="refreshTable('2025',null)" href="#">2025</a>
                                     </div>
                                 </div>
                                 <div class="btn-group dropdown">
@@ -727,9 +728,9 @@
                         default_filter_absensi: default_filter_absensi
                     },
                     success: function(response) {
-                        conLog('response', response);                        
-                        conLog('default_filter_absensi',default_filter_absensi)
-                        // return false;
+                        conLog('response', response);      
+
+                        // conLog('default_filter_absensi',default_filter_absensi)
                         detail_absensi = response['data']['data_absensi'];
                         db['db']['database_data']['ABSENSI_COUNT'] = detail_absensi;
                         data_ketidakhadiran = response['data']['data_ketidakhadiran'];
@@ -739,7 +740,7 @@
                         let header_table_element = '';
                         let data_grafik = processingAbsensi();
                         $('#datatable-data-detail-absensi-chart').empty();
-                        conLog('data_grafik',data_grafik);
+                        // conLog('data_grafik',data_grafik);
                         $('#datatable-data-detail-absensi-chart').append(`<div id="chart6"></div>`);
 
                         Highcharts.chart('chart6', {
@@ -820,9 +821,8 @@
                         `;
                         $('#datatable-data').append(header_table_element);
                         // ============ create header table
+                        conLog('aa','bb')
                         // return false;
-
-
                         // ====== D A T A    F O R    D A T A T A B L E ===
                         let xxx = $('#table-datatable-data').DataTable({
                             scrollX: true,
@@ -937,6 +937,7 @@
 
             function refreshTable(val_year = null, val_month = null) {
                 // cg('refreshtable', arr_date_today);
+
                 year = arr_date_today.year;
                 month = arr_date_today.month;
 
@@ -961,7 +962,7 @@
                 
                 $('#FILTER-RANGE').val(setRangeDate(formatDate(start), formatDate(end))).trigger(
                     'change');
-
+                    conLog('default_filter_absensi refresh table', default_filter_absensi);
                 getWithNewData();
 
             }
@@ -1439,7 +1440,12 @@
                                 columns: data_column,
                             });
 
-                            let data_null_employees = Object.keys(data_absen['null_employees']);
+                            let data_null_employees =[] ;
+
+                            if(data_absen['null_employees']){
+                                data_null_employees = Object.keys(data_absen['null_employees']);
+                            }
+
                             conLog('data_null_employees', data_null_employees);
 
                             $(document).ready(function() {

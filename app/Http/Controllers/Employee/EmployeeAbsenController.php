@@ -962,7 +962,7 @@ class EmployeeAbsenController extends Controller
         // tanggal absensi
 
 
-        $createSheet->setCellValue('H19', 'ABSENSI BULAN  ' . $months[(int)$arr_date_absen[1]] . ' Tahun ' . $arr_date_absen[0]);
+        $createSheet->setCellValue('H19', 'ABSENSI BULAN ' . $months[(int)$arr_date_absen[1]] . ' Tahun ' . $arr_date_absen[0]);
         $createSheet->mergeCells('H19:' . $abjads[$long_range_date + 6] . '19');
         $createSheet->getStyle('H19:' . $abjads[$long_range_date + 6] . '19')->applyFromArray($style_text_center);
 
@@ -981,7 +981,7 @@ class EmployeeAbsenController extends Controller
             $range_add = 2;
             foreach ($dates as $date) {
                 if (!empty($data_absensi[$date])) {
-                    if ($data_absensi[$date]['status_absen_uuid'] != '-' || !empty($data_absensi[$date]['status_absen_uuid'])) {
+                    if ($data_absensi[$date]['status_absen_uuid'] != '-' && !empty($data_absensi[$date]['status_absen_uuid'])) {
                         $styleArray_employee['fill']['startColor']['rgb'] = str_replace('#', '', $status_absens[$data_absensi[$date]['status_absen_uuid']]['WARNA-ABSENSI']);
                         $createSheet->setCellValue($abjads[$colomn_date] . $row_data_employee,  $data_absensi[$date]['status_absen_uuid']);
                         $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add + 2] . $row_data_employee,  $data_absensi[$date]['status_absen_uuid']);
@@ -996,6 +996,8 @@ class EmployeeAbsenController extends Controller
                     }
 
                     $range_add = $range_add + 2;
+                }else{
+                    $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add + 2] . $row_data_employee,  "zz");
                 }
                 $colomn_date++;
             }
@@ -2260,8 +2262,8 @@ class EmployeeAbsenController extends Controller
 
                 $last_day = ResponseFormatter::getEndDay($year . '-' . $month);
 
-                $start_date = ResponseFormatter::getStartDayFromDate($year_month.'-01');
-                $end_date = ResponseFormatter::getEndDayFromDate($year_month.'-'.$last_day);
+                $start_date = ResponseFormatter::getStartDayFromDate($year_month . '-01');
+                $end_date = ResponseFormatter::getEndDayFromDate($year_month . '-' . $last_day);
 
                 $data_absensi_old_ceklog = EmployeeAbsen::where('employee_absens.date', '>=', $start_date)
                     ->where('employee_absens.date', '<=', $end_date)
@@ -2290,7 +2292,8 @@ class EmployeeAbsenController extends Controller
 
                     for ($day = 1; $day <= $last_day; $day++) {
                         if ($sheet->getCell($rows[$column_date] . $no_employee)->getValue()) {
-                            // if (empty($array_data_old_absensi[$nik_employee][ResponseFormatter::excelToDate($year_month . '-' . $day)])) {
+                            if ($sheet->getCell($rows[$column_date] . $no_employee)->getValue() != "-") {
+                                // if (empty($array_data_old_absensi[$nik_employee][ResponseFormatter::excelToDate($year_month . '-' . $day)])) {
                                 $store_employee_absen = EmployeeAbsen::updateOrCreate(
                                     [
                                         'employee_uuid'  => $nik_employee,
@@ -2302,7 +2305,8 @@ class EmployeeAbsenController extends Controller
                                         'status_absen_uuid'     => ResponseFormatter::toUUID($sheet->getCell($rows[$column_date] . $no_employee)->getValue()),
                                     ]
                                 );
-                            // }
+                                // }
+                            }
                         }
                         $column_date++;
                     }
@@ -2359,15 +2363,17 @@ class EmployeeAbsenController extends Controller
                         $data_one_row['date'] =  $date->format('Y-m-d');
 
                         $data_one_row['uuid']  = $data_one_row['date'] . '-' . $data_one_row['employee_uuid'];
-
-                        $store = EmployeeAbsen::updateOrCreate(
-                            [
-                                'employee_uuid'  => $data_one_row['nik_employee'],
-                                'date' => $data_one_row['date'],
-                            ],
-                            $data_one_row
-                        );
-                        $validatedData['store'][] = $store;
+                        if($data_one_row['status_absen_uuid'] != '-'){
+                            $store = EmployeeAbsen::updateOrCreate(
+                                [
+                                    'employee_uuid'  => $data_one_row['nik_employee'],
+                                    'date' => $data_one_row['date'],
+                                ],
+                                $data_one_row
+                            );
+                            $validatedData['store'][] = $store;
+                        }
+                        
                     }
 
                     $arr_data_list[] = $data_one_row;
@@ -2616,15 +2622,14 @@ class EmployeeAbsenController extends Controller
 
                                         $merge_arr_absen = array_unique(array_merge($old_cek_log, $merge_arr_absen), SORT_REGULAR);
                                         $merge_arr_absen = array_unique($merge_arr_absen);
+                                        $isEqual = false;
 
-
-
-                                        $isEqual = (sort($merge_arr_absen) == sort($old_cek_log));
                                     }
                                 } catch (\Throwable $th) {
                                 }
 
                                 if (!$isEqual) {
+
                                     $data_fingger = [];
                                     foreach ($merge_arr_absen as $is_fingger) {
                                         $data_fingger[] = $is_fingger;
@@ -2682,12 +2687,6 @@ class EmployeeAbsenController extends Controller
 
                     $i = $i + 2;
                 }
-
-
-
-
-                // return ResponseFormatter::toJson('xx','all_datas');
-                // return ResponseFormatter::toJson('xx',$all_datas);
 
                 $all_datas['have_employees']['configuration'] = [
                     'long_date' => $date_end,
@@ -3072,14 +3071,17 @@ class EmployeeAbsenController extends Controller
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
             $validatedData['date'] = $date->format('Y-m-d');
             $validatedData['uuid']  = $validatedData['date'] . '-' . $validatedData['employee_uuid'];
-            $store = EmployeeAbsen::updateOrCreate(
-                [
-                    'employee_uuid'  => $validatedData['employee_uuid'],
-                    'date' => $validatedData['date'],
-                ],
-                $validatedData
-            );
-            $validatedData['store'][] = $store;
+            if($validatedData['status_absen_uuid'] != '-'){
+                $store = EmployeeAbsen::updateOrCreate(
+                    [
+                        'employee_uuid'  => $validatedData['employee_uuid'],
+                        'date' => $validatedData['date'],
+                    ],
+                    $validatedData
+                );
+                $validatedData['store'][] = $store;
+            }
+            
         }
 
         return ResponseFormatter::toJson($validatedData, "data absen stored");
@@ -3094,19 +3096,22 @@ class EmployeeAbsenController extends Controller
         $validatedData['date'] =  ResponseFormatter::excelToDate($validatedData['date']);
         $validatedData['uuid']  = $validatedData['date'] . '-' . $validatedData['employee_uuid'];
         $validatedData['edited'] = 'edited';
-        $store = EmployeeAbsen::updateOrCreate([
-            'employee_uuid'  => $validatedData['employee_uuid'],
-            'date' => $validatedData['date'],
-        ], $validatedData);
-
-        $store = EmployeeAbsen::join('status_absens', 'status_absens.uuid', 'employee_absens.status_absen_uuid')
-            ->where('employee_absens.id', $store->id)
-            ->get([
-                'status_absens.status_absen_code',
-                'status_absens.math',
-                'employee_absens.*'
-            ])
-            ->first();
+        if($validatedData['status_absen_uuid'] != '-' ){
+            $store = EmployeeAbsen::updateOrCreate([
+                'employee_uuid'  => $validatedData['employee_uuid'],
+                'date' => $validatedData['date'],
+            ], $validatedData);
+    
+            $store = EmployeeAbsen::join('status_absens', 'status_absens.uuid', 'employee_absens.status_absen_uuid')
+                ->where('employee_absens.id', $store->id)
+                ->get([
+                    'status_absens.status_absen_code',
+                    'status_absens.math',
+                    'employee_absens.*'
+                ])
+                ->first();
+        }
+        
 
         return ResponseFormatter::toJson($store, "data stored");
     }
