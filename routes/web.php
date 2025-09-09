@@ -90,6 +90,10 @@ Route::prefix('/support')->group(function () {
     Route::get('/all-db', [ResponseFormatter::class, 'tableList']);
 });
 
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
+
 Route::get('/test-udin', [EmployeeController::class, 'allEmployeeData']);
 Route::get('/refresh-data', [AdminController::class, 'refreshData']);
 
@@ -938,12 +942,6 @@ Route::middleware(['islogin'])->group(function () {
     Route::post('/user-privilege/store', [UserPrivilegeController::class, 'store']);
     Route::get('/user-privilege-data', [UserPrivilegeController::class, 'anyData']);
 
-
-
-
-
-
-
     Route::get('/user-employee/{nik_employee}/edit', [EmployeeController::class, 'show']);
     Route::post('/user-employee/store', [EmployeeController::class, 'store']);
     Route::post('/user-employee/cekNikEmployee', [EmployeeController::class, 'cekNikEmployee']);
@@ -1012,7 +1010,7 @@ Route::middleware(['webIsLogin'])->group(function () {
                 return view('app.menuApp');
             });
             Route::get('/menu', function () {
-                return view('app.manageMenuApp');
+            return view('app.manageMenuApp');
             });
 
             Route::get('/localdata', function () {

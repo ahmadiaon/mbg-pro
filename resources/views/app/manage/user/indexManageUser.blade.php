@@ -308,7 +308,7 @@
             };
             row_data_datatable.push(feature_element);
 
-            data_datatable = Object.keys(db['db']['database_data']['KARYAWAN']);
+            data_datatable = Object.keys(db['public']['public_value']['KARYAWAN']);
             $('#table-datatable').DataTable({
                 paging: true,
                 serverSide: false,

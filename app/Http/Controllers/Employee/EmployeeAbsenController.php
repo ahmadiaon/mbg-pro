@@ -971,7 +971,7 @@ class EmployeeAbsenController extends Controller
 
             $data_employee = $db['public']['public_value']['KARYAWAN'][$NRP];
             $data_absensi =  json_decode(json_encode($data_absensi), true);
-            $createSheet->setCellValue($abjads[1] . $row_data_employee, (!empty($data_employee['NRP'])) ? $db['db']['database_data']['KARYAWAN'][$NRP]['NRP']['value_data'] : "");
+            $createSheet->setCellValue($abjads[1] . $row_data_employee, (!empty($data_employee['NRP'])) ? $data_employee['NRP'] : "");
             $createSheet->setCellValue($abjads[1 + 1] . $row_data_employee, (!empty($data_employee['NAMA-KARYAWAN'])) ? $data_employee['NAMA-KARYAWAN'] : "");
             $createSheet->setCellValue($abjads[1 + 2] . $row_data_employee, (!empty($data_employee['JABATAN'])) ? $data_employee['JABATAN'] : "");
             $createSheet->setCellValue($abjads[1 + 3] . $row_data_employee, (!empty($data_employee['DIVISI'])) ? $data_employee['DIVISI'] : "");
@@ -996,9 +996,10 @@ class EmployeeAbsenController extends Controller
                     }
 
                     $range_add = $range_add + 2;
-                }else{
-                    $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add + 2] . $row_data_employee,  "zz");
                 }
+                // else{
+                //     $createSheet->setCellValue($abjads[$colomn_date + $long_range_date + $range_add + 2] . $row_data_employee,  "zz");
+                // }
                 $colomn_date++;
             }
 
@@ -2235,7 +2236,8 @@ class EmployeeAbsenController extends Controller
     }
 
     public function import(Request $request)
-    {
+    {   
+        ini_set('max_execution_time', 2200);       // Set waktu eksekusi maksimum menjadi 20 menit
         $the_file = $request->file('uploaded_file');
         $data_database = session('data_database');
         $createSpreadsheet = new spreadsheet();
@@ -2289,6 +2291,7 @@ class EmployeeAbsenController extends Controller
                 while ($sheet->getCell('A' . $no_employee)->getValue() != null) {
                     $column_date = 7;
                     $nik_employee = ResponseFormatter::toUUID($sheet->getCell('B' . $no_employee)->getValue());
+                    $data_absensi_row = [];
 
                     for ($day = 1; $day <= $last_day; $day++) {
                         if ($sheet->getCell($rows[$column_date] . $no_employee)->getValue()) {
@@ -2308,8 +2311,10 @@ class EmployeeAbsenController extends Controller
                                 // }
                             }
                         }
+                        $data_absensi_row[ResponseFormatter::excelToDate($year_month . '-' . $day)] = $sheet->getCell($rows[$column_date] . $no_employee)->getValue();
                         $column_date++;
                     }
+                    // return ResponseFormatter::toJson($data_absensi_row, 'data_absensi_row');
 
 
                     $column_date = 4 + $last_day;

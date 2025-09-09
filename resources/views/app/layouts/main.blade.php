@@ -182,9 +182,6 @@
 
     @yield('src_css')
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <!-- Select2 CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -379,6 +376,7 @@
 
 
         </div>
+
         <div class="pd-ltr-20 xs-pd-20-10">
 
             <div class="loading-content text-center">
@@ -781,6 +779,31 @@
             @yield('js_ready')
             stopLoading();
         });
+    </script>
+
+
+    <script>
+        // indexDB
+        let db;
+        const request = indexedDB.open("DATABASE", 1);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+
+            // bikin 1 objectStore umum (kayak key-value di localStorage)
+            if (!db.objectStoreNames.contains("storage")) {
+                db.createObjectStore("storage");
+            }
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            console.log("IndexedDB siap 🚀");
+        };
+
+        request.onerror = function(event) {
+            console.error("IndexedDB gagal dibuka ❌", event.target.errorCode);
+        };
     </script>
 </body>
 

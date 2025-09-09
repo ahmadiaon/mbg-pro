@@ -38,6 +38,7 @@
                     <button class="btn btn-block collapsed" data-toggle="collapse" data-target="#data-table-manage-absensi">
                         Data Recruitment
                     </button>
+                    <input type="text" name="" id="searchBox">
                 </div>
 
                 <div id="data-table-manage-absensi" class="collapse show" data-parent="#accordion">
@@ -46,11 +47,11 @@
                             <div class="col-auto">
                                 <h4 class="text-blue h4">Recruitment</h4>
                             </div>
+                            <div class="col-auto">
+                                <button onclick="openFilter()">filter</button>
+                            </div>
                         </div>
                         <div class="mb-20" id="datatable-data">
-
-
-
                             <table id="example" class="display" style="width:100%">
                                 <thead>
                                     <tr>
@@ -60,14 +61,13 @@
                                         <th>Nama <button><i class="icon-copy bi bi-123"></i></button></th>
                                         <th>Jabatan</th>
                                         <th>Kota</th>
+                                        <th>ID</th>
                                     </tr>
                                 </thead>
                                 <tbody>
 
                                 </tbody>
                             </table>
-
-
                         </div>
                     </div>
                 </div>
@@ -167,20 +167,88 @@
             </div>
         </div>
     </div>
+
+    {{-- modal filter datatable --}}
+    <div class="modal fade" id="modal-filter-datatable" tabindex="-1" role="dialog"
+        aria-labelledby="header-modal-filter-datatable">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="header-modal-filter-datatable">
+                        Nama Colom
+                    </h4>
+                    <button type="button" class="close close-modal" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body" id="body-modal-filter-datatable">
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn close-modal btn-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" id="store-filter-datatable" onclick="storeDatatable('filter-datatable')"
+                        class="btn btn-primary">
+                        Save changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- modal filter datatable --}}
 @endsection()
 
 @section('script_javascript')
     <script>
+        function openFilter() {
+            let column_id = 'Tanggal';
+
+            // $('#body-modal-filter-datatable').append(`
+        //     <div class="filter-container mb-30">
+        //         <div class="sidebar-btn-group pb-30">
+        //         <button type="button" class="btn btn-outline btn-primary select-all" data-col="0">Pilih
+        //             Semua</button>
+        //         <button type="button" class="btn btn-outline btn-danger deselect-all" data-col="0">Hapus
+        //             Semua</button>
+        //         </div>
+        //         <select class="form-control multi-filter" id="pilihan-0" data-col-index="0" multiple="multiple"></select>
+        //     </div>            
+        // `);
+            // updateFilterOptions(0);
+            $('.number-filter-6').removeAttr("hidden");
+            $('#modal-filter-datatable').modal('show');
+
+
+        }
+    </script>
+    <script>
         //getDataRecruitment
-        let data_header = 
-            ['Tanggal','Nama','Posisi','Provinsi','Status','Aksi'];
+        let data_header = ['Tanggal', 'Nama', 'Posisi', 'Provinsi', 'Status', 'Aksi', 'ID'];
 
-          
 
-        data_header.forEach((header, index) =>{
-                        $(`.header-filter`).append(`
-                        <h4 class="weight-600 font-18 pb-10">Filter ${header}</h4>
-                        <div class="filter-container mb-30">
+
+        // data_header.forEach((header, index) => {
+        //     $(`.header-filter`).append(`
+        //                 <h4 class="weight-600 font-18 pb-10">Filter ${header}</h4>
+        //                 <div class="filter-container mb-30">
+        //                     <div class="sidebar-btn-group pb-30">
+        //                     <button type="button" class="btn btn-outline btn-primary select-all" data-col="${index}">Pilih
+        //                         Semua</button>
+        //                     <button type="button" class="btn btn-outline btn-danger deselect-all" data-col="${index}">Hapus
+        //                         Semua</button>
+        //                     </div>
+        //                     <select class="multi-filter" data-col-index="${index}" multiple="multiple"></select>
+        //                 </div>
+        //                 `);
+        //     console.log("Kolom ke-" + index + ": " + $(header).text());
+        // });
+
+        data_header.forEach((header, index) => {
+            $(`#body-modal-filter-datatable`).append(`
+                        <h4 hidden class="number-filter-${index} weight-600 font-18 pb-10">Filter ${header}</h4>
+                        <div hidden class="number-filter-${index} filter-container mb-30">
                             <div class="sidebar-btn-group pb-30">
                             <button type="button" class="btn btn-outline btn-primary select-all" data-col="${index}">Pilih
                                 Semua</button>
@@ -189,11 +257,9 @@
                             </div>
                             <select class="multi-filter" data-col-index="${index}" multiple="multiple"></select>
                         </div>
-                        
-                        
                         `);
-                        console.log("Kolom ke-" + index + ": " + $(header).text());
-                    });
+            console.log("Kolom ke-" + index + ": " + $(header).text());
+        });
         var data;
         var table;
         let data_object_recruitment = {};
@@ -306,59 +372,65 @@
                     let data_array_recruitment = [];
                     Object.values(response.data).forEach(recruitment => {
                         data_array_recruitment.push([recruitment.time_propose, recruitment.full_name,
-                        data_jabatan[recruitment.position]['JABATAN']['value_data'], recruitment.provinsi, recruitment.status,
+                            data_jabatan[recruitment.position]['JABATAN']['value_data'],
+                            recruitment.provinsi, recruitment.status,
                             recruitment.nik_ktp, recruitment.id
                         ]);
-
                     });
                     console.log('data_array_recruitment');
                     console.log(data_array_recruitment);
                     data_object_recruitment = response.data;
                     data = data_array_recruitment;
-                    table = $('#example').DataTable({
-                        dom: 'lrtip',
-                        data: data_array_recruitment,
-                        columns: [{
-                                title: "Tanggal"
-                            },
-                            {
-                                title: "Nama Lengkap"
-                            },
-                            {
-                                title: "Posisi",
-                                render: function(data, type, row) {
-                                    return `${row[2]}`;
+
+                    let data_columns = [{
+                            title: "Tanggal"
+                        },
+                        {
+                            title: "Nama Lengkap"
+                        },
+                        {
+                            title: "Posisi",
+                            render: function(data, type, row) {
+                                return `${row[2]}`;
+                            }
+                        },
+                        {
+                            title: "Provinsi"
+                        },
+                        {
+                            title: "Status",
+                            render: function(data, type, row) {
+                                let color_status = 'outline-secondary'
+                                if (row[4] == 'Disimpan') {
+                                    color_status = 'primary';
+                                } else if (row[4] == 'Ditolak') {
+                                    color_status = 'danger';
                                 }
-                            },
-                            {
-                                title: "Provinsi"
-                            },
-                            {
-                                title: "Status",
-                                render: function(data, type, row) {
-                                    let color_status = 'outline-secondary'
-                                    if (row[4] == 'Disimpan') {
-                                        color_status = 'primary';
-                                    } else if (row[4] == 'Ditolak') {
-                                        color_status = 'danger';
-                                    }
-                                    return `<button class="btn btn-${color_status} btn-sm" >${row[4]}</button>`;
-                                }
-                            },
-                            {
-                                title: "Aksi",
-                                render: function(data, type, row) {
-                                    return `
-                                            
+                                return `<button class="btn btn-${color_status} btn-sm" >${row[4]}</button>`;
+                            }
+                        },
+                        {
+                            title: "Aksi",
+                            render: function(data, type, row) {
+                                return `
                                                 <a href="modal" onclick="dataShow(${row[6]})" data-toggle="modal" data-target="#small-modal" class="edit-avatar">
                                                     <div class="btn btn-sm btn-outline-warning"><i class="icon-copy bi bi-arrow-up-right-square"></i> </div>
                                                 </a>
                                            `;
-                                }
                             }
-                        ],
+                        },
+                        {
+                            title: "ID",
+                            visible: false
+                        },
 
-                        
+                    ];
+                    table = $('#example').DataTable({
+                        data: data_array_recruitment,
+                        columns: data_columns,
+
+
+
 
                         // headerCallback: function(thead, data, start, end, display) {
                         //     var th = $(thead).find("th").eq(0); // Kolom pertama (Names)
@@ -369,6 +441,7 @@
                     });
                     console.log('abs');
                     console.log(table.columns().header());
+
                     updateFilterOptions(null);
 
                 },
@@ -377,6 +450,9 @@
                 }
             });
         }
+        $('#searchBox').on('keyup', function() {
+            table.search(this.value).draw();
+        })
     </script>
 
 
@@ -414,18 +490,6 @@
 
             getDataRecruitment();
 
-
-
-
-
-
-
-
-
-
-
-
-
             // Inisialisasi Select2 untuk dropdown filter
             $(".multi-filter").select2({
                 placeholder: "Pilih...",
@@ -434,8 +498,10 @@
                 closeOnSelect: false
             });
 
+
             // Event: Pilih Semua
             $(document).on("click", ".select-all", function() {
+
                 var colIndex = $(this).data("col");
                 var select = $(".multi-filter[data-col-index='" + colIndex + "']");
 

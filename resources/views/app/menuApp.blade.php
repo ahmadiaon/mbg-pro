@@ -638,30 +638,7 @@
                 $(`#type_data_field-${countField}`).select2();
             });
 
-            /*
-                user fingger
-                    nik
-                    user id
-                    machine_id granted
 
-                    2 table
-                    # table users_fingger
-
-                        nik
-                        user_fingger_id
-                            code nik|user_fingger
-                    # table users_granted_location_fingger
-                        nik
-                        location_id
-                            code nik|user_fingger
-
-                    if user_fingger_id findout
-                        if nik location granted
-
-
-
-
-            */
 
             //create-form
             $('button[class="col-6 btn btn-primary btn-block create-form"]').click(function() {

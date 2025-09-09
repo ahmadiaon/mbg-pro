@@ -552,18 +552,7 @@
 
     }
 
-    function getValueData(primary_key, code_table, field) {
-        try {
-            return db['db']['database_data'][code_table][primary_key][field];
-        } catch (error) {
-            return null;
-        }
 
-    }
-
-    function getPublicData(id_element, primary_key, field) {
-
-    }
 
     function manageAbsensiDay(employee_uuid, date_absen) {
         $('#name-date').text(`Absen Tanggal ${date_absen}`);
@@ -609,17 +598,15 @@
         // conLogs('table_data', table_data);
         // conLogs('field_data', field_data);
         // conLogs('type_data', type_data);
-        // conLog('satu', db['db']['database_data'][
+        // conLog('satu', db['public']['public_value'][
         //     table_data
         // ])
 
         try {
-            value_data_table = db['db']['database_data'][
+            value_data_table = db['public']['public_value'][
                 table_data
             ][primary_key_data][
                 field_data
-            ][
-                'value_data'
             ];
         } catch (error) {
             value_data_table = null;
@@ -638,13 +625,9 @@
                 // }
 
             }
-            value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db']['database_data'][
-                table_data
-            ][primary_key_data][
-                field_data
-            ][
-                'value_data'
-            ] : null;
+            value_data_table = (db['public']['public_value'][table_data][primary_key_data]) ? db['public'][
+                'public_value'
+            ][table_data][primary_key_data][field_data] : null;
 
             // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
             return value_data_table;
@@ -656,22 +639,19 @@
         // conLog('full_code_field', full_code_field);
         switch (type_data) {
             case 'NOMINAL-UANG':
-                value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db']['database_data']
+                value_data_table = (db['public']['public_value'][table_data][primary_key_data]) ? db['public'][
+                        'public_value'
+                    ]
                     [
                         table_data
                     ][primary_key_data][
                         field_data
-                    ][
-                        'value_data'
                     ] : null;
 
                 // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = toValueRupiah(value_data_table);
                 return toValueRupiah(value_data_table);
                 break;
             case 'DARI-TABEL':
-
-
-
                 if (db['db']['database_data_source'][full_code_field]) {
                     let data_source = db['db']['database_data_source'][full_code_field];
                     let code_table_data_source = data_source['table_data_source'];
@@ -710,9 +690,9 @@
 
 
                         // conLog('KE DARI TABLE value_data_table', value_data_table);
-                        // value_data_table = (db['db']['database_data'][table_data][primary_key_data][field_data][
+                        // value_data_table = (db['public']['public_value'][table_data][primary_key_data][field_data][
                         //     'value_data'
-                        // ]) ? toUUID(db['db']['database_data'][table_data][primary_key_data][field_data][
+                        // ]) ? toUUID(db['public']['public_value'][table_data][primary_key_data][field_data][
                         //     'value_data'
                         // ]) : null;
                         if (value_data_table) {
@@ -782,11 +762,8 @@
                             field_data
                         ] : null;
 
-                        value_data_table = (db['db']['database_data'][table_data][primary_key_data][field_data][
-                            'value_data'
-                        ]) ? toUUID(db['db']['database_data'][table_data][primary_key_data][field_data][
-                            'value_data'
-                        ]) : null;
+                        value_data_table = (db['public']['public_value'][table_data][primary_key_data][field_data]) ?
+                            toUUID(db['public']['public_value'][table_data][primary_key_data][field_data]) : null;
                         if (value_data_table) {
 
                             // conLog('DATATABLE', value_data_table);
@@ -824,13 +801,11 @@
             case 'COLOR':
                 let datas = primary_key_data ? primary_key_data : '-';
                 let color = primary_key_data ? primary_key_data : '#ffffff';
-                value_data_table = (db['db']['database_data'][table_data][primary_key_data]) ? db['db'][
-                        'database_data'
+                value_data_table = (db['public']['public_value'][table_data][primary_key_data]) ? db['public'][
+                        'public_value'
                     ]
                     [table_data][primary_key_data][
                         field_data
-                    ][
-                        'value_data'
                     ] : null;
                 // GLOBAL_DATA_EXPORT['data'][primary_key_data][field_data] = value_data_table;
                 return `<div class="font-12 text-center" width="100px" 
@@ -995,10 +970,8 @@
             default:
                 let xxx = null;
                 try {
-                    xxx = db['db']['database_data'][table_data][primary_key_data][
+                    xxx = db['public']['public_value'][table_data][primary_key_data][
                         field_data
-                    ][
-                        'value_data'
                     ];
                 } catch (error) {
                     xxx = primary_key_data;
@@ -1436,13 +1409,13 @@
                 break;
             case 'DARI-TABEL':
                 let NRP = "-";
-                if (db['db']['database_data'][data_source_this_field.table_data_source]) {
+                if (db['public']['public_value'][data_source_this_field.table_data_source]) {
                     let db_data_FULL = db['public']['public_value'][data_source_this_field.table_data_source];
                     let db_data = [];
                     if (data_source_this_field.table_data_source == 'KARYAWAN') {
                         db_data = db['DEFAULT-FILTER']['FILTER']['KARYAWAN'];
                     } else {
-                        db_data = Object.keys(db['db']['database_data'][data_source_this_field.table_data_source]);
+                        db_data = Object.keys(db['public']['public_value'][data_source_this_field.table_data_source]);
                     }
                     /*
                         1. hanya departemenyna,
@@ -1520,10 +1493,12 @@
                         </div>`;
                 $(`#${id_field}`).append(element_field)
                 let db_text = [];
-                if (db['db']['database_data'][data_source_this_field.table_data_source]) {
+                if (db['public']['public_value'][data_source_this_field.table_data_source]) {
                     let field_get = db['db']['database_data_source'][data_field.full_code_field];
                     conLog('field_get', field_get);
-                    let db_text_ob = Object.values(db['db']['database_data'][data_source_this_field.table_data_source]);
+                    let db_text_ob = Object.values(db['public']['public_value'][data_source_this_field
+                        .table_data_source
+                    ]);
                     db_text_ob.forEach(element => {
                         conLog('element', element)
                         let item_autocomplite = {
@@ -1621,7 +1596,9 @@
                     </div>
             `);
 
-            for (let countLevel = 1; countLevel <= Object.keys(db['db']['database_data']['DATABASE-LEVEL-PERSETUJUAN'])
+            for (let countLevel = 1; countLevel <= Object.keys(db['public']['public_value'][
+                    'DATABASE-LEVEL-PERSETUJUAN'
+                ])
                 .length; countLevel++) {
                 // const element = array[countLevel];
                 // conLog('countLevel', countLevel);
@@ -3087,7 +3064,7 @@
 
         default_filter_absensi[name_filter] = arr_checkbox_filter;
         setLocalStorage('default_filter_absensi', default_filter_absensi);
-        conLog('local local local',getLocalStorage('default_filter_absensi')) ;
+        conLog('local local local', getLocalStorage('default_filter_absensi'));
         conLog('default_filter_absensi', default_filter_absensi)
         conLog('name_filter', name_filter)
         conLog('arr_checkbox_filter', arr_checkbox_filter)
@@ -3217,8 +3194,9 @@
             success: function(response) {
                 // return false;
                 status_absen_short = '';
-
+                conLog('responseaa', response);
                 setLocalStorage('DATABASE', response.data);
+
                 db = response.data;
                 conLog('db', db);
 
@@ -3265,5 +3243,40 @@
 
     function monthName(month) {
         return months[parseInt(month)]
+    }
+</script>
+
+
+
+
+
+<script>
+    // indexDB
+    function setDatabase(key, value) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("storage", "readwrite");
+            const store = tx.objectStore("storage");
+            const request = store.put(JSON.stringify(value), key);
+
+            request.onsuccess = () => resolve(true);
+            request.onerror = (e) => reject(e);
+        });
+    }
+
+    function getDatabase(key) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("storage", "readonly");
+            const store = tx.objectStore("storage");
+            const request = store.get(key);
+
+            request.onsuccess = () => {
+                try {
+                    resolve(JSON.parse(request.result));
+                } catch (e) {
+                    resolve(request.result);
+                }
+            };
+            request.onerror = (e) => reject(e);
+        });
     }
 </script>

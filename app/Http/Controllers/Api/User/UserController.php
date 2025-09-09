@@ -22,6 +22,7 @@ use App\Models\UserDetail\UserDetail;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -184,7 +185,6 @@ class UserController extends Controller
 
 
         // C O M P A N Y
-
         $Q_Menu = Menu::get();
         $data_menu = [];
         foreach ($Q_Menu as $menu) {
@@ -243,6 +243,9 @@ class UserController extends Controller
             $data_data[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)][$data->code_field_data]['value_data'] = $data->value_data;
             $data_data[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)][$data->code_field_data]['uuid_data'] = $data->uuid_data;
             $uuid_all[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)] = $data->uuid_data;
+
+            //uuid_data only
+            $data_data_uuid[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)]['uuid_data'] = $data->uuid_data;
         }
 
         $Q_data_self = DB::table('database_fields')
@@ -258,10 +261,12 @@ class UserController extends Controller
             $data_data[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)][$data->code_field_data]['value_data'] = $data->value_data;
             $data_data[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)][$data->code_field_data]['uuid_data'] = $data->uuid_data;
             $uuid_all[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)] = $data->uuid_data;
+            //uuid_data only
+            $data_data_uuid[$data->code_table_data][ResponseFormatter::toUUID($data->code_data)]['uuid_data'] = $data->uuid_data;
         }
 
 
-        
+
 
         $Q_data_DatabaseFieldShow = DatabaseFieldShow::get();
         $dataDatabaseFieldShow = [];
@@ -301,6 +306,9 @@ class UserController extends Controller
                         if (empty($item_data_field_gabungan[$item_code_field_show])) {
                             $data_data[$index_code_table][$code_data][$item_code_field_show]['value_data'] = $code_data;
                             $data_data[$index_code_table][$code_data][$item_code_field_show]['uuid_data'] = $uuid_all[$index_code_table][$code_data];
+
+                            //uuid_data only
+                            $data_data_uuid[$index_code_table][$code_data]['uuid_data'] = $uuid_all[$index_code_table][$code_data];
                         }
                     }
                 }
@@ -374,14 +382,14 @@ class UserController extends Controller
                         $gabungan = substr($gabungan, 1);
                         $data_public['public_value'][$index_code_table][$code_data][$item_code_field_show] = $gabungan;
                         $data_public[$index_code_table][$code_data][$item_code_field_show] = $gabungan;
-                        $data_data[$index_code_table][$code_data][$item_code_field_show]['value_data'] = $gabungan;
+                        // $data_data[$index_code_table][$code_data][$item_code_field_show]['value_data'] = $gabungan;
                     }
                 }
             }
         }
 
-        
-        
+
+
         // return $data_public['public_value'];
         // $data_public['KARYAWAN'];
         $arr_employee = [];
@@ -536,21 +544,28 @@ class UserController extends Controller
         $database['db']['database_persetujuan'] = $databasePersetujuan;
         $database['db']['database_field_join'] = $data_field_join;
         $database['db']['database_field_show'] = $dataDatabaseFieldShow;
-        $database['db']['database_data'] = $data_data;
+        $database['db']['database_data'] =[];// $data_data
+        $database['db']['database_data_uuid'] = $data_data_uuid;
         // $database['db']['database_data_history'] = $data_data_history;
         $database['db']['arr_employees'] = $arr_employee;
         $database['db']['database_table'] = $data_table;
-        $database['db']['database_data_source'] = $data_data_source;
         $database['db']['data_table_child'] = $data_table_child;
+        $database['db']['database_data_source'] = $data_data_source;
         $database['db']['table_show_template'] = $dataUserTemplate;
         $database['db']['all_field_parent_table'] = $all_field_parent_table;
         $database['db']['data_table_menu'] = $data_table_menu;
-        // $database['db']['data_filter'] = $data_filter;
+        $database['db']['data_filter'] = $data_filter;
         $database['DEFAULT-FILTER']['KARYAWAN'] = $karyawan_filtered_grouped;
         $database['DEFAULT-FILTER']['FILTER'] = $DEFAULT_data_filter;
         $database['user'] = $session_user;
         $database['public'] = $data_public;
         session('db', $database);
+        // Tentukan path file (misalnya di public/json/)
+        $filePath = public_path('generate.json');
+
+        // Simpan ke file
+        file_put_contents($filePath, json_encode($database));
+
         return $database;
     }
 

@@ -61,7 +61,8 @@ class MenuController extends Controller
                 $data_menu[$menu->number_sort] = $menu;
                 if ((int)$menu->number_sort  > (int)$to_delete->number_sort) {
                     Menu::updateOrCreate(
-                        ['uuid' => $menu->uuid],
+                        [
+                            'uuid' => $menu->uuid],
                         [
                             'number_sort' => ($menu->number_sort - 1)
                         ]

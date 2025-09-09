@@ -129,7 +129,7 @@ class DatabaseController extends Controller
         }
 
 
-        
+
 
         // 1.1 GET Fields
         $Q_field = DatabaseField::where('code_table_field', $code_table)->get();
@@ -142,7 +142,11 @@ class DatabaseController extends Controller
 
         // 2.0 GET data
         $Q_data_table = DatabaseData::where('code_table_data', $code_table)->whereNull('date_end')->get([
-            'code_table_data','code_field_data','value_data','code_data','uuid_data'
+            'code_table_data',
+            'code_field_data',
+            'value_data',
+            'code_data',
+            'uuid_data'
         ]);
 
         $data_datatables = [];
@@ -151,9 +155,9 @@ class DatabaseController extends Controller
             $data_table['the_data'][$data_datatable->uuid_data][$data_datatable->code_field_data] =  $data_datatable;
         }
         $data_return['data_tables'] = $data_datatables;
-        
 
-        return ResponseFormatter::ResponseJson($data_return, 'Success Get '.$code_table, 200);
+
+        return ResponseFormatter::ResponseJson($data_return, 'Success Get ' . $code_table, 200);
 
         $Q_table = DatabaseTable::where('parent_table', $code_table)->get();
         foreach ($Q_table as $table) {
@@ -186,7 +190,7 @@ class DatabaseController extends Controller
 
         $data_table['the_template'] = null;
 
-        return ResponseFormatter::ResponseJson($data_table, 'Success Get '.$code_table, 200);
+        return ResponseFormatter::ResponseJson($data_table, 'Success Get ' . $code_table, 200);
     }
 
     public function storeTemplate(Request $request)
@@ -900,7 +904,6 @@ class DatabaseController extends Controller
 
 
         $db = UserController::db_local_storage($auth_login);
-        // $db = session('db_local_storage');
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet        = $spreadsheet->getActiveSheet();
@@ -921,35 +924,35 @@ class DatabaseController extends Controller
 
 
             // 1. MENGAMBIL TABEL APA SAJA YANG IMPORT
-                while ($sheet->getCell($abjads[$loop_col] . '1')->getValue() != null) {
-                    $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
+            while ($sheet->getCell($abjads[$loop_col] . '1')->getValue() != null) {
+                $table_code = $sheet->getCell($abjads[$loop_col] . '2')->getValue();
 
-                    if (!in_array($table_code, $table_arr)) {
-                        $table_arr[] = $table_code;
-                    }
+                if (!in_array($table_code, $table_arr)) {
+                    $table_arr[] = $table_code;
+                }
 
-                    $field_code = ResponseFormatter::toUUID($sheet->getCell($abjads[$loop_col] . '1')->getValue());
+                $field_code = ResponseFormatter::toUUID($sheet->getCell($abjads[$loop_col] . '1')->getValue());
 
-                    $column_fields['excel_properties'][$table_code][] = $field_code;
+                $column_fields['excel_properties'][$table_code][] = $field_code;
 
-                    if (!empty($database_datatable['database_field'][$table_code])) {
-                        if (!empty($database_datatable['database_field'][$table_code][$field_code])) {
-                            if (!in_array($field_code, $field_arr)) {
-                                $field_arr[] = $field_code;
-                            }
+                if (!empty($database_datatable['database_field'][$table_code])) {
+                    if (!empty($database_datatable['database_field'][$table_code][$field_code])) {
+                        if (!in_array($field_code, $field_arr)) {
+                            $field_arr[] = $field_code;
+                        }
 
-                            $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
-                            $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
-                            $column_fields['index_column'][$abjads[$loop_col]]['type_data_field'] = $db['db']['database_field'][$table_code][$field_code]['type_data_field'];
-                            $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
+                        $column_fields['index_column'][$abjads[$loop_col]]['table_code'] = $table_code;
+                        $column_fields['index_column'][$abjads[$loop_col]]['field_code'] = $field_code;
+                        $column_fields['index_column'][$abjads[$loop_col]]['type_data_field'] = $db['db']['database_field'][$table_code][$field_code]['type_data_field'];
+                        $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = false;
 
-                            if (!empty($database_datatable['database_data_source'][$table_code . '-' . $field_code])) { //jika ada di data source
-                                $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = true;
-                            }
+                        if (!empty($database_datatable['database_data_source'][$table_code . '-' . $field_code])) { //jika ada di data source
+                            $column_fields['index_column'][$abjads[$loop_col]]['is_uuid'] = true;
                         }
                     }
-                    $loop_col++;
                 }
+                $loop_col++;
+            }
             // 1. MENGAMBIL TABEL APA SAJA YANG IMPORT
 
 
@@ -987,11 +990,11 @@ class DatabaseController extends Controller
 
                     if (empty($uuid_data)) {
                         $code_data = ResponseFormatter::toUUID($row_to_insert[$table_code_primary_code][$field_code_primary_code]);
-                        if (!empty($db['db']['database_data'][$table_code_primary_code][$code_data])) {
+                        if (!empty($db['public'][$table_code_primary_code][$code_data])) {
                             try {
-                                $uuid_data = $db['db']['database_data'][$table_code_primary_code][$code_data][$field_code_primary_code]['uuid_data'];
+                                $uuid_data = $db['db']['database_data_uuid'][$table_code_primary_code][$code_data]['uuid_data'];
                             } catch (\Throwable $th) {
-                                return ResponseFormatter::ResponseJson($db['db']['database_data'][$table_code_primary_code][$code_data], $field_code_primary_code, 200);
+                                return ResponseFormatter::ResponseJson($db['public'][$table_code_primary_code][$code_data], $field_code_primary_code, 200);
                             }
                         } else {
                             $uuid_data = Str::uuid();
@@ -1024,6 +1027,39 @@ class DatabaseController extends Controller
                         $arr_data_insert[] = $data_insert;
                     }
                 }
+
+                // 11. JIKA KARYAWAN PHK
+                // 11.1 ADD ABSENSI X
+                if (in_array('PHK-KARYAWAN', $table_arr)) {
+                    // return ResponseFormatter::ResponseJson($ARR_ALL, 'store data from importDatatable', 200);
+                    if (in_array('TANGGAL-BERAKHIR-KONTRAK--TBK-', $field_arr)) {
+                        if (!empty($row_to_insert['PHK-KARYAWAN'])) {
+                            $data_absen = [
+                                'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                'date_start' =>  $row_to_insert['PHK-KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
+                                'date_end' => ResponseFormatter::getEndDayFromDate($row_to_insert['PHK-KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
+                                'status_absen_uuid' => 'X'
+                            ];
+                            EmployeeAbsen::storeAbsen($data_absen);
+                        }
+                    }
+                }
+                // 11. JIKA KARYAWAN PHK
+
+                // 12. ADA DATA KARYAWAN
+                // 12.1 MENAMBAHKAN ABSENSI X KE TANGGAL SEBELUM MASUK
+                if (in_array('KARYAWAN', $table_arr)) {
+                    if (in_array('TANGGAL-MASUK-KERJA--TMK-', $field_arr)) {
+                        $data_absen = [
+                            'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                            'date_start' =>  ResponseFormatter::getStartDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-']),
+                            'date_end' => $row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-'],
+                            'status_absen_uuid' => 'X'
+                        ];
+                        EmployeeAbsen::storeAbsen($data_absen);
+                    }
+                }
+                // 12. ADA DATA KARYAWAN
             }
 
             if (in_array('IDENTITAS-KARYAWAN', $table_arr)) {
@@ -1041,23 +1077,50 @@ class DatabaseController extends Controller
                             ];
 
                             // 10. MEMBUAT ID FINGGER
-                                // $NRP = ;
-                                // $ID_FINGER = ;
-                                // $Q_store_data = DatabaseData::updateOrCreate(
-                                //     [
-                                //         'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER', //table data source
-                                //         'code_field_data' => 'ID-FINGGER',
-                                //         'code_data' => $NRP.'-'.$ID_FINGER, //GABUNGAN NRP+ID
-                                //         'uuid_data' => ,
-                                //     ],
-                                //     [
-                                //         'value_data' => $data_insert['value_data'],
-                                //         'date_start' => Carbon::now()->format('Y-m-d'),
-                                //         'date_end' => null,
-                                //     ]
-                                // );
+                            $NRP = $row_to_insert['KARYAWAN']['NRP'];
+                            $ID_FINGER = ResponseFormatter::toNumber($row_to_insert['KARYAWAN']['NRP']);
+                            if (empty($db['public']['public_value']['DATABASE-KODE-TABEL-ID-FINGGER'][ResponseFormatter::toUUID($NRP) . '-' . $ID_FINGER])) {
+                                $Q_store_data = DatabaseData::updateOrCreate(
+                                    [
+                                        'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER', //table data source
+                                        'code_field_data' => 'ID-FINGGER',
+                                        'code_data' => ResponseFormatter::toUUID($NRP) . '-' . $ID_FINGER, //GABUNGAN NRP+ID
+                                        'uuid_data' => $uuid_data,
+                                    ],
+                                    [
+                                        'value_data' => $ID_FINGER,
+                                        'date_start' => Carbon::now()->format('Y-m-d'),
+                                        'date_end' => null,
+                                    ]
+                                );
 
-
+                                $Q_store_data = DatabaseData::updateOrCreate(
+                                    [
+                                        'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER', //table data source
+                                        'code_field_data' => 'NRP',
+                                        'code_data' => ResponseFormatter::toUUID($NRP) . '-' . $ID_FINGER, //GABUNGAN NRP+ID
+                                        'uuid_data' => $uuid_data,
+                                    ],
+                                    [
+                                        'value_data' => $NRP,
+                                        'date_start' => Carbon::now()->format('Y-m-d'),
+                                        'date_end' => null,
+                                    ]
+                                );
+                                $Q_store_data = DatabaseData::updateOrCreate(
+                                    [
+                                        'code_table_data' => 'DATABASE-KODE-TABEL-ID-FINGGER', //table data source
+                                        'code_field_data' => 'KODE-TABEL-ID-FINGGER',
+                                        'code_data' => ResponseFormatter::toUUID($NRP) . '-' . $ID_FINGER, //GABUNGAN NRP+ID
+                                        'uuid_data' => $uuid_data,
+                                    ],
+                                    [
+                                        'value_data' => ResponseFormatter::toUUID($NRP) . '-' . $ID_FINGER,
+                                        'date_start' => Carbon::now()->format('Y-m-d'),
+                                        'date_end' => null,
+                                    ]
+                                );
+                            }
                             // 10. MEMBUAT ID FINGGER
 
                             $for_users = array_filter($for_users);
@@ -1066,6 +1129,7 @@ class DatabaseController extends Controller
                                     'uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                     'employee_uuid' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
                                     'nik_employee' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
+                                    'pin' => null
                                 ],
                                 $for_users
                             );
@@ -1074,39 +1138,10 @@ class DatabaseController extends Controller
                     }
                 }
             }
-            // 11. JIKA KARYAWAN PHK
-                // 11.1 ADD ABSENSI X
-                if (in_array('PHK-KARYAWAN', $table_arr)) {
-                    if (in_array('TANGGAL-BERAKHIR-KONTRAK--TBK-', $field_arr)) {
-                        if (!empty($row_to_insert['PHK-KARYAWAN'])) {
-                            $data_absen = [
-                                'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                                'date_start' =>  $row_to_insert['PHK-KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-'],
-                                'date_end' => ResponseFormatter::getEndDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-BERAKHIR-KONTRAK--TBK-']),
-                                'status_absen_uuid' => 'X'
-                            ];
-                            EmployeeAbsen::storeAbsen($data_absen);
-                        }
-                    }
-                }
-            // 11. JIKA KARYAWAN PHK
-            
-            // 12. ADA DATA KARYAWAN
-                // 12.1 MENAMBAHKAN ABSENSI X KE TANGGAL SEBELUM MASUK
-                if (in_array('KARYAWAN', $table_arr)) {
-                    if (in_array('TANGGAL-MASUK-KERJA--TMK-', $field_arr)) {
-                        $data_absen = [
-                            'NRP' => ResponseFormatter::toUUID($row_to_insert['KARYAWAN']['NRP']),
-                            'date_start' =>  ResponseFormatter::getStartDayFromDate($row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-']),
-                            'date_end' => $row_to_insert['KARYAWAN']['TANGGAL-MASUK-KERJA--TMK-'],
-                            'status_absen_uuid' => 'X'
-                        ];
-                        EmployeeAbsen::storeAbsen($data_absen);
-                    }
-                }
-            // 12. ADA DATA KARYAWAN
 
-            return ResponseFormatter::ResponseJson($ARR_ALL, 'store data from importDatatable', 200);
+
+
+            return ResponseFormatter::ResponseJson($arr_value, 'store data from importDatatable', 200);
         } catch (Exception $e) {
             // $error_code = $e->errorInfo[1];
             return ResponseFormatter::ResponseJson($e, 'store data from importDatatable err', 200);

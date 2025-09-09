@@ -771,8 +771,8 @@
                     mRender: function(data, type, row) {
                         let code_data = row;
                         let data_show = null;
-                        if (typeof db['db']['database_data'][data_code_table][code_data] !== 'undefined') {
-                            if (typeof db['db']['database_data'][data_code_table][code_data][code_field] !==
+                        if (typeof db['public'][data_code_table][code_data] !== 'undefined') {
+                            if (typeof db['public'][data_code_table][code_data][code_field] !==
                                 'undefined') {
                                 // conLog('type_data_field',type_data_field);
                                 // conLog('data_code_table',data_code_table);
@@ -793,7 +793,7 @@
                 mRender: function(data, type, row) {
                     return `<div class="table-actions">
                                 <a href="#" onclick="editDataForm('${row}')" data-color="#265ed7" style="color: rgb(38, 94, 215);"><i class="icon-copy dw dw-edit2"></i></a>
-                                <a href="#" onclick="deleteForm('${db['db']['database_data'][code_table][row][primary_field]['uuid_data']}')"  data-color="#e95959" style="color: rgb(233, 89, 89);"><i class="icon-copy dw dw-delete-3"></i></a>
+                                <a href="#" onclick="deleteForm('${db['db']['database_data_uuid'][code_table][row]['uuid_data']}')"  data-color="#e95959" style="color: rgb(233, 89, 89);"><i class="icon-copy dw dw-delete-3"></i></a>
                             </div>`;
                 }
             };
@@ -816,8 +816,8 @@
 
             row_data_datatable.push(employees_card_element);
             let data_datatable = [];
-            if (db['db']['database_data'][code_table]) {
-                data_datatable = Object.keys(db['db']['database_data'][code_table]);
+            if (db['public'][code_table]) {
+                data_datatable = Object.keys(db['public'][code_table]);
             }
 
             conLog('data_datatable', data_datatable);
@@ -840,7 +840,7 @@
             conLog('code_data', code_data);
             // conLog('primary_field',primary_field);
 
-            let uuid_data = db['db']['database_data'][$('#id-code_table').val()][code_data][primary_field]['uuid_data'];
+            let uuid_data = db['db']['database_data_uuid'][$('#id-code_table').val()][code_data]['uuid_data'];
             let data_for_field_edit = db['public'][$('#id-code_table').val()][code_data];
             conLog('data_for_field_edit', data_for_field_edit);
             $('#uuid_data').val(uuid_data);

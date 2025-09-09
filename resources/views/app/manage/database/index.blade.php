@@ -934,15 +934,6 @@
                             // conLog('code_field', code_field);
                             return data_show;
                         }
-                        // if (typeof db['db']['database_data'][data_code_table][code_data] !== 'undefined') {
-                        //     if (typeof db['db']['database_data'][data_code_table][code_data][code_field] !==
-                        //         'undefined') {
-                        //         // conLog('type_data_field',type_data_field)
-                        //         data_show = showFieldData(type_data_field, data_code_table, code_field,
-                        //             toUUID(code_data)
-                        //         );
-                        //     }
-                        // }
                         return data_show;
                     }
                 };
@@ -954,9 +945,7 @@
                 mRender: function(data, type, row) {
                     return `<div class="table-actions">
                                 <a href="#" onclick="editDataForm('${row}')" data-color="#265ed7" style="color: rgb(38, 94, 215);"><i class="icon-copy dw dw-edit2"></i></a>
-                                <a href="#" onclick="deleteForm('` + db['db']['database_data'][code_table][row][
-                        primary_field
-                    ]['uuid_data'] + `')"  data-color="#e95959" style="color: rgb(233, 89, 89);"><i class="icon-copy dw dw-delete-3"></i></a>
+                                <a href="#" onclick="deleteForm('` + db['db']['database_data_uuid'][code_table][row]['uuid_data'] + `')"  data-color="#e95959" style="color: rgb(233, 89, 89);"><i class="icon-copy dw dw-delete-3"></i></a>
                             </div>`;
                 }
             };
@@ -979,8 +968,8 @@
 
             row_data_datatable.push(employees_card_element);
             let data_datatable = [];
-            if (db['db']['database_data'][code_table]) {
-                data_datatable = Object.keys(db['db']['database_data'][code_table]);
+            if (db['public']['public_value'][code_table]) {
+                data_datatable = Object.keys(db['public']['public_value'][code_table]);
             }
             $('#table-datatable-data').DataTable({
                 scrollX: true,
@@ -1000,7 +989,7 @@
             conLog('code_data', code_data);
             // conLog('primary_field',primary_field);
 
-            let uuid_data = db['db']['database_data'][$('#id-code_table').val()][code_data][primary_field]['uuid_data'];
+            let uuid_data = db['db']['database_data_uuid'][$('#id-code_table').val()][code_data]['uuid_data'];
             let data_for_field_edit = db['public'][$('#id-code_table').val()][code_data];
             conLog('data_for_field_edit', data_for_field_edit);
             $('#uuid_data').val(uuid_data);
@@ -1033,13 +1022,16 @@
                                 if (field.type_data_field == 'FILE') {
                                     conLog('value', value_data);
                                 } else if (field.type_data_field == KONSTANTA["Input Autocomplite"]) {
-                                    $(`#code-autocomplite-${field.full_code_field}`).val(value_data);
-                                    let data_source = db['db']['database_data_source'][field
-                                        .full_code_field
-                                    ];
-                                    $(`#${field.full_code_field}`).val(db['public'][data_source
-                                        .table_data_source
-                                    ][value_data][data_source.field_get_data_source]);
+                                    // $(`#code-autocomplite-${field.full_code_field}`).val(value_data);
+                                    // let data_source = db['db']['database_data_source'][field
+                                    //     .full_code_field
+                                    // ];
+                                    // $(`#${field.full_code_field}`).val(db['public'][data_source
+                                    //     .table_data_source
+                                    // ][value_data][data_source.field_get_data_source]);
+
+                                    let data_source = value_data;
+
                                 } else {
                                     $(`#${field.code_table_field}-${field.code_field}`).val(value_data);
                                 }

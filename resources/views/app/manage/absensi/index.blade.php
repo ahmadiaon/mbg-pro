@@ -104,7 +104,7 @@
                                             href="#">Lap.
                                             Bulanan</a>
                                         <a class="dropdown-item" onclick="openModalExportDialy()" id="btn-export-dialy"
-                                            href="#">Dialy
+                                            href="#">Daily
                                             Report</a>
                                         <a class="dropdown-item" onclick="reportOpenModalReportStatusAbsen()"
                                             id="btn-export-dialy" href="#">Lap. Ketidakhadiran</a>
@@ -733,6 +733,8 @@
                         // conLog('default_filter_absensi',default_filter_absensi)
                         detail_absensi = response['data']['data_absensi'];
                         db['db']['database_data']['ABSENSI_COUNT'] = detail_absensi;
+
+                        conLog('detail_absensi', detail_absensi);
                         data_ketidakhadiran = response['data']['data_ketidakhadiran'];
                         data_data_persetujuan = response['data']['data_persetujuan'];
 
@@ -799,6 +801,7 @@
                                     } catch (error) {
 
                                     }
+                                    conLog('aaa',detail_properties)
                                     let data_show = showFieldData(type_data_field, data_code_table,
                                         code_field,
                                         toUUID(row), detail_properties
@@ -821,6 +824,7 @@
                         `;
                         $('#datatable-data').append(header_table_element);
                         // ============ create header table
+                        conLog('aa','bb')
                         conLog('aa','bb')
                         // return false;
                         // ====== D A T A    F O R    D A T A T A B L E ===
